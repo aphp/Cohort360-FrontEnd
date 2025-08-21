@@ -22,7 +22,7 @@ import { logout, login, impersonate } from './me'
 import { addRequest } from './request'
 
 import services from 'services/aphp'
-import { CriteriaType, SelectedCriteriaType } from 'types/requestCriterias'
+import { CriteriaType, SelectedCriteriaType, ViewMode } from 'types/requestCriterias'
 import { Hierarchy } from 'types/hierarchy'
 import { getConfig } from 'config'
 import { ScopeElement } from 'types/scope'
@@ -32,6 +32,8 @@ import { ScopeElement } from 'types/scope'
  * Contains all data needed for building and managing cohort requests.
  */
 export type CohortCreationState = {
+  /** General loading state for cohort operations */
+  viewMode: string
   /** General loading state for cohort operations */
   loading: boolean
   /** Loading state specifically for save operations */
@@ -89,6 +91,7 @@ export type CohortCreationState = {
  * @returns {CohortCreationState} Fresh initial state
  */
 const defaultInitialState: () => CohortCreationState = () => ({
+  viewMode: ViewMode.LOGICAL_OPERATOR_INTERFACE,
   loading: false,
   saveLoading: false,
   countLoading: false,
@@ -1152,6 +1155,24 @@ const cohortCreationSlice = createSlice({
       }
       navHistory.push(newSnapshot)
       state.navHistory = navHistory
+    },
+    /**
+     * Switch between view modes (LogicalOperator/json)
+     *
+     * @param state - Current cohort creation state
+     * @param action - Action containing the view Mode
+     */
+    editDiagramViewMode: (state: CohortCreationState, action: PayloadAction<string>) => {
+      state.viewMode = action.payload
+    },
+    /**
+     * Edit global json query
+     *
+     * @param state - Current cohort creation state
+     * @param action - Action containing the view Mode
+     */
+    editJson: (state: CohortCreationState, action: PayloadAction<string>) => {
+      state.json = action.payload
     }
   },
   extraReducers: (builder) => {
@@ -1234,6 +1255,8 @@ export const {
   editAllCriteria,
   pseudonimizeCriteria,
   editSelectedCriteria,
+  editDiagramViewMode,
+  editJson,
   editCriteriaGroup,
   duplicateSelectedCriteria,
   updateTemporalConstraints,

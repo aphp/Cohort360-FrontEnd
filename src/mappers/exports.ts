@@ -1,13 +1,38 @@
 import { Order } from 'types/searchCriterias'
-import { CellType, Column, Row, Table } from 'types/table'
+import { Action, CellType, Column, Row, Table } from 'types/table'
 import { mapToDateHours } from './dates'
-import { ExportList } from 'types/export'
+import { ExportCallbacks, ExportList } from 'types/export'
 import { mapJobStatus } from 'utils/status'
+import Download from 'assets/icones/download.svg?react'
+import { JobStatus } from 'types'
+import { Refresh } from '@mui/icons-material'
+import { isDateBefore } from 'utils/dates'
 
-const mapExportsToRows = (list: ExportList[]) => {
+const mapExportsToRows = (list: ExportList[], callbacks: ExportCallbacks) => {
   const rows: Row[] = []
   const unknown = 'N/A'
+  const { onDownload, onRetry } = callbacks
   list.forEach((elem) => {
+    const actions = [
+      {
+        title: 'Télécharger l’export',
+        icon: Download,
+        onClick: () => onDownload(elem.uuid, elem.target_name ?? elem.uuid),
+        disabled:
+          elem.request_job_status !== JobStatus.FINISHED || (elem.created_at && isDateBefore(elem.created_at, 7))
+      },
+      {
+        title: 'Relancer l’export',
+
+        icon: Refresh,
+        onClick: () => onRetry(elem.uuid),
+        disabled: !(
+          elem.request_job_status === JobStatus.FAILED ||
+          elem.request_job_status === JobStatus.SUSPENDED ||
+          elem.request_job_status === JobStatus.FINISHED
+        )
+      }
+    ]
     const row: Row = [
       {
         id: `${elem.cohort_id}-number`,
@@ -35,15 +60,16 @@ const mapExportsToRows = (list: ExportList[]) => {
         type: CellType.TEXT
       },
       {
-        id: `${elem.cohort_id}-created_at`,
-        value: elem.created_at ? mapToDateHours(elem.created_at) : unknown,
+        id: `${elem.cohort_id}-date`,
+        value: elem.modified_at ? mapToDateHours(elem.modified_at) : unknown,
         type: CellType.TEXT
       },
       {
         id: `${elem.cohort_id}-request_job_status`,
         value: mapJobStatus(elem.request_job_status ?? undefined),
         type: CellType.STATUS_CHIP
-      }
+      },
+      { id: `${elem.cohort_id}-actions`, value: actions as Action[], type: CellType.ACTIONS }
     ].filter((elem) => elem) as Row
     rows.push(row)
   })
@@ -58,13 +84,14 @@ const mapExportsToColumns = (): Column[] => {
     { label: 'Nombre de patient' },
     { label: 'Format', code: Order.OUTPUT_FORMAT },
     { label: 'Date de l’export', code: Order.CREATED_AT },
-    { label: 'Statut', code: Order.STATUS }
+    { label: 'Statut', code: Order.STATUS },
+    { label: '' }
   ]
 }
 
-export const mapExportListToTable = (exportList: ExportList[]) => {
+export const mapExportListToTable = (exportList: ExportList[], callbacks: ExportCallbacks) => {
   const table: Table = { rows: [], columns: [] }
   table.columns = mapExportsToColumns()
-  table.rows = mapExportsToRows(exportList)
+  table.rows = mapExportsToRows(exportList, callbacks)
   return table
 }

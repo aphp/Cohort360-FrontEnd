@@ -160,11 +160,21 @@ const mapDocumentsFromRequestParams = async (parameters: URLSearchParams) => {
     docTypes = decodeURIComponent(docTypesParams)
       ?.split(',')
       ?.map((code) => {
-        const elem = allDocTypesList.docTypes.find((docType) => docType.code === code)
-        return elem ? { label: elem.label, code: elem.code, type: elem.type } : null
+        // Chercher d'abord dans les docTypes
+        const docType = allDocTypesList.docTypes.find((dt) => dt.code === code)
+        if (docType) {
+          return { label: docType.label, code: docType.code, type: docType.type }
+        }
+        // Si non trouvé, chercher dans les chapters (codes parents)
+        const chapter = allDocTypesList.chapters.find((ch) => ch.code === code)
+        if (chapter) {
+          return { label: chapter.display, code: chapter.code, type: 'Parent' }
+        }
+        return null
       })
       .filter((elem) => elem !== null) as SimpleCodeType[]
   }
+
   const ipp = decodeURIComponent(parameters.get(DocumentsParamsKeys.IPP) ?? '')
   if (docStatusesParams) {
     docStatuses = decodeURIComponent(docStatusesParams)
@@ -417,8 +427,7 @@ const mapConditionToRequestParams = (filters: PMSIFilters) => {
   const { diagnosticTypes, code, source, nda, ipp, durationRange, executiveUnits, encounterStatus } = filters
   const requestParams: string[] = []
   if (diagnosticTypes && diagnosticTypes.length > 0) {
-    const diagnosticTypesUrl = `${getConfig().features.condition.valueSets.conditionStatus.url}|`
-    const urlString = diagnosticTypes.map((elem) => diagnosticTypesUrl + elem.id).join(',')
+    const urlString = diagnosticTypes.map((elem) => elem.id).join(',')
     requestParams.push(`${ConditionParamsKeys.DIAGNOSTIC_TYPES}=${encodeURIComponent(urlString)}`)
   }
   if (code.length)
@@ -579,7 +588,6 @@ export const mapSearchCriteriasToRequestParams = (
     case ResourceType.CONDITION:
       filtersParam.push(...mapConditionToRequestParams(filters as PMSIFilters))
       break
-
     case ResourceType.PROCEDURE:
       filtersParam.push(...mapProcedureToRequestParams(filters as PMSIFilters))
       break

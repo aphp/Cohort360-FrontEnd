@@ -1,4 +1,10 @@
-import { fetchExportTableInfo, fetchExportTableRelationInfo, fetchExportList } from 'services/aphp/callApi'
+import {
+  fetchExportTableInfo,
+  fetchExportTableRelationInfo,
+  fetchExportList,
+  downloadExport as _downloadExport,
+  retryExport as _retryExport
+} from 'services/aphp/callApi'
 import { getConfig } from 'config'
 import { AxiosResponse } from 'axios'
 import { Export, Cohort } from 'types'
@@ -6,10 +12,10 @@ import apiBackend from 'services/apiBackend'
 import { TableSetting } from 'types/export'
 import { Direction, OrderBy } from 'types/searchCriterias'
 
-export const fetchExportTablesInfo = () => {
+export const fetchExportTablesInfo = async () => {
   try {
     const columnCategory = ['none', 'confidential']
-    const response = fetchExportTableInfo({
+    const response = await fetchExportTableInfo({
       tableNames: getConfig().features.export.exportTables,
       columnCategory: columnCategory
     })
@@ -35,6 +41,37 @@ export const fetchExportTablesRelationsInfo = async (tableList: string[]) => {
   } catch (error) {
     console.error(error)
     return []
+  }
+}
+
+export const downloadExport = async (id: string, name: string, signal?: AbortSignal) => {
+  try {
+    const blob = (await _downloadExport({ id, signal })) as unknown as Blob
+    const url = window.URL.createObjectURL(blob)
+    const link = document.createElement('a')
+
+    link.href = url
+    link.download = `${name}.zip`
+
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+
+    window.URL.revokeObjectURL(url)
+  } catch (error) {
+    console.error('Download error:', error)
+  }
+}
+
+export const retryExport = async (id: string, signal?: AbortSignal) => {
+  try {
+    const response = await _retryExport({ id, signal })
+    return response
+  } catch (error) {
+    return {
+      count: 0,
+      results: []
+    }
   }
 }
 

@@ -33,9 +33,11 @@ export type TableInfo = {
 }
 
 export type ExportList = {
+  uuid: string
   cohort_id: string | null
   cohort_name: string | null
   created_at: string | null
+  modified_at: string | null
   output_format: 'csv' | 'xlsx' | 'hive' | null
   owner: string | null
   patients_count: number | null
@@ -48,4 +50,9 @@ export type FetchExportArgs = {
   input: string
   orderBy: OrderBy
   page: number
+}
+
+export type ExportCallbacks = {
+  onDownload: (id: string, name: string) => void
+  onRetry: (id: string) => void
 }

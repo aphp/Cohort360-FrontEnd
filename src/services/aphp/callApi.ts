@@ -15,6 +15,7 @@ import {
   UserAccesses
 } from 'types'
 
+import { addParentCodesToDocTypes } from 'utils/docTypesHelper'
 import { ExportList } from 'types/export'
 
 import { AxiosError, AxiosResponse } from 'axios'
@@ -296,20 +297,23 @@ export const fetchDocumentReference = async (
   uniqueFacet = uniqueFacet ? uniqueFacet.filter(uniq) : []
   _elements = _elements ? _elements.filter(uniq) : []
 
-  // By default, all the calls to `/DocumentReference` will have `type:not=https://terminology.eds.aphp.fr/aphp-orbis-document-textuel-hospitalier|doc-impor`, contenttype=text/plain, and patient.active=true in parameter
+  // By default, all the calls to `/DocumentReference` will have`'type:not=https://terminology.eds.aphp.fr/fhir/CodeSystem/aphp-document-class|doc-impor'`, contenttype=text/plain, and patient.active=true in parameter
   let options: string[] = [
-    `type:not=${encodeURIComponent(
-      'https://terminology.eds.aphp.fr/aphp-orbis-document-textuel-hospitalier|doc-impor'
-    )}`,
+    `type:not=${encodeURIComponent('https://terminology.eds.aphp.fr/fhir/CodeSystem/aphp-document-class|doc-impor')}`,
     `contenttype=${encodeURIComponent('text/plain')}`
   ]
+
   if (appConfig.core.fhir.totalCount) options = [...options, '_total=accurate']
   if (appConfig.core.fhir.filterActive) options = [...options, 'patient.active=true']
   if (_id) options = [...options, `_id=${_id}`]
   if (size !== undefined) options = [...options, `_count=${size}`]
   if (offset) options = [...options, `_offset=${offset}`]
   if (_sort) options = [...options, `_sort=${_sortDirection}${_sort}`]
-  if (type) options = [...options, `${DocumentsParamsKeys.DOC_TYPES}=${type}`]
+  if (type) {
+    const typeCodes = type.split(',') // Ajouter les codes parents aux codes de docTypes
+    const typeCodesWithParents = addParentCodesToDocTypes(typeCodes)
+    options = [...options, `${DocumentsParamsKeys.DOC_TYPES}=${typeCodesWithParents.join(',')}`]
+  }
   if (_text)
     options = [...options, `${searchBy === SearchByTypes.TEXT ? `_text` : 'description'}=${encodeURIComponent(_text)}`]
   if (highlight_search_results)
@@ -676,8 +680,7 @@ export const fetchCondition = async (args: fetchConditionProps): FHIR_Bundle_Pro
 
   if (!subject && _list && _list.length > 0) options = [...options, `_list=${_list.reduce(paramValuesReducer, '')}`]
   if (hasSearchParam(ResourceType.CONDITION, ConditionParamsKeys.DIAGNOSTIC_TYPES) && type && type.length > 0) {
-    const diagnosticTypesUrl = appConfig.features.condition.valueSets.conditionStatus.url + '|'
-    const urlString = type.map((id) => diagnosticTypesUrl + id).join(',')
+    const urlString = type.map((id) => id).join(',')
     options = [...options, `${ConditionParamsKeys.DIAGNOSTIC_TYPES}=${encodeURIComponent(urlString)}`]
   }
 
@@ -926,7 +929,7 @@ export const fetchMedicationAdministration = async (
     const urlString = route.map((id) => routeUrl + id).join(',')
     options = [...options, `${AdministrationParamsKeys.ADMINISTRATION_ROUTES}=${encodeURIComponent(urlString)}`]
   }
-  if (code) if (code) options = [...options, `${AdministrationParamsKeys.CODE}=${code}`]
+  if (code) options = [...options, `${AdministrationParamsKeys.CODE}=${code}`]
   if (minDate) options = [...options, `${AdministrationParamsKeys.DATE}=ge${minDate}`]
   if (maxDate) options = [...options, `${AdministrationParamsKeys.DATE}=le${maxDate}`]
   if (executiveUnits && executiveUnits.length > 0)
@@ -1291,6 +1294,26 @@ export const fetchExportList = async (args: fetchExportListProps) => {
     queryParams = `?${options.reduce(paramsReducer, '')}`
   }
   const response = await apiBackend.get<Back_API_Response<ExportList>>(`/exports/${queryParams}`, { signal })
+  return response.data
+}
+
+type ExportProps = {
+  id: string
+  signal?: AbortSignal
+}
+
+export const downloadExport = async (args: ExportProps) => {
+  const { id, signal } = args
+  const response = await apiBackend.get<Back_API_Response<ExportList>>(`/exports/${id}/download/`, {
+    responseType: 'blob',
+    signal
+  })
+  return response.data
+}
+
+export const retryExport = async (args: ExportProps) => {
+  const { id, signal } = args
+  const response = await apiBackend.post(`/exports/${id}/retry/`, { signal })
   return response.data
 }
 

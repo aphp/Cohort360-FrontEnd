@@ -134,7 +134,7 @@ export const fetcherWithParams = async <T extends Patient | NonPatientResource, 
   } else {
     results.list = (
       patient
-        ? linkElementWithEncounter(bundle as NonPatientResource[], patient?.infos.hospits, deidentified)
+        ? await linkElementWithEncounter(bundle as NonPatientResource[], patient?.infos.hospits, deidentified)
         : await getResourceInfos(bundle as NonPatientResource[], deidentified, groupId?.[0])
     ) as T[]
   }

@@ -4,6 +4,7 @@ import * as R from 'ramda'
 import { CONFIG_URL } from 'constants.js'
 import { LabelObject } from 'types/searchCriterias'
 import { birthStatusData, booleanFieldsData, booleanOpenChoiceFieldsData, vmeData } from 'data/questionnaire_data'
+
 type DeepPartial<T> = {
   [P in keyof T]?: T[P] extends object ? DeepPartial<T[P]> : T[P]
 }
@@ -18,17 +19,29 @@ type FeatureConfig = {
   enabled: boolean
 }
 
+type PmsiFilters = {
+  sources: {
+    arem: string
+    orbis: string
+  }
+}
+
+type FiltersConfig<F> = {
+  filters?: F
+}
+
 export type ResourceFeatureConfig = FeatureConfig & {
   fhir: {
     searchParams: string[]
   }
 }
 
-type ResourceWithValuesetsFeatureConfig<ValueSetEnum> = ResourceFeatureConfig & {
-  valueSets: {
-    [K in keyof ValueSetEnum]: ValueSetConfig
+type ResourceWithValuesetsFeatureConfig<ValueSetEnum, F = void> = ResourceFeatureConfig &
+  FiltersConfig<F> & {
+    valueSets: {
+      [K in keyof ValueSetEnum]: ValueSetConfig
+    }
   }
-}
 
 export type AppConfig = {
   labels: {
@@ -65,15 +78,18 @@ export type AppConfig = {
       medicationPrescriptionTypes: ValueSetConfig
       medicationUcd: ValueSetConfig
     }>
-    condition: ResourceWithValuesetsFeatureConfig<{
-      conditionHierarchy: ValueSetConfig
-      conditionStatus: ValueSetConfig
-    }> & {
+    condition: ResourceWithValuesetsFeatureConfig<
+      {
+        conditionHierarchy: ValueSetConfig
+        conditionStatus: ValueSetConfig
+      },
+      PmsiFilters
+    > & {
       extensions: {
         orbisStatus?: string
       }
     }
-    procedure: ResourceWithValuesetsFeatureConfig<{ procedureHierarchy: ValueSetConfig }>
+    procedure: ResourceWithValuesetsFeatureConfig<{ procedureHierarchy: ValueSetConfig }, PmsiFilters>
     documentReference: ResourceFeatureConfig & {
       useDocStatus: boolean
     }
@@ -292,6 +308,12 @@ let config: AppConfig = {
       }
     },
     condition: {
+      filters: {
+        sources: {
+          arem: '',
+          orbis: ''
+        }
+      },
       enabled: true,
       fhir: { searchParams: [] },
       valueSets: {
@@ -303,6 +325,12 @@ let config: AppConfig = {
       }
     },
     procedure: {
+      filters: {
+        sources: {
+          arem: '',
+          orbis: ''
+        }
+      },
       enabled: true,
       fhir: { searchParams: [] },
       valueSets: {

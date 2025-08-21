@@ -96,8 +96,9 @@ const unbuildEncounterServiceFilter = async (
   existingValue?: Hierarchy<ScopeElement, string>[]
 ) => {
   if (value) {
-    const encounterServices: Hierarchy<ScopeElement>[] = (await services.perimeters.getPerimeters({ ids: value }))
-      .results
+    const encounterServices: Hierarchy<ScopeElement>[] = (
+      await services.perimeters.getPerimeters({ ids: value, limit: -1 })
+    ).results
     return encounterServices.concat(existingValue || [])
   }
   return Promise.resolve(existingValue || [])
