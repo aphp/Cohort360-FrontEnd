@@ -264,7 +264,6 @@ onUpdateConfig((config) => {
   const encounterCareSite = hasSearchParam(ResourceType.ENCOUNTER, 'encounter-care-site', config)
     ? 'encounter-care-site'
     : 'service-provider'
-
   EncounterParamsKeys.SERVICE_PROVIDER = encounterCareSite
   DocumentsParamsKeys.EXECUTIVE_UNITS = `encounter.${encounterCareSite}`
   ConditionParamsKeys.EXECUTIVE_UNITS = `encounter.${encounterCareSite}`
