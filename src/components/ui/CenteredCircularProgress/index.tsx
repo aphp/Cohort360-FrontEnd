@@ -10,7 +10,7 @@ type CenteredCircularProgressProps = {
 
 const CenteredCircularProgress: React.FC<CenteredCircularProgressProps> = ({ size = 50 }) => {
   return (
-    <Grid container justifyContent="center">
+    <Grid container justifyContent="center" size={12}>
       <CircularProgress size={size} />
     </Grid>
   )

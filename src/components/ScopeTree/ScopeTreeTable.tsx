@@ -51,7 +51,7 @@ const ScopeTreeRow = ({ item, path, sourceType, mode, loading, onSelect, onExpan
 
   return (
     <>
-      <RowContainerWrapper container color={path.length % 2 === 0 ? '#f3f5f9' : '#fff'}>
+      <RowContainerWrapper color={path.length % 2 === 0 ? '#f3f5f9' : '#fff'}>
         <RowWrapper
           size={mode === SearchMode.RESEARCH ? '75px' : '55px'}
           container

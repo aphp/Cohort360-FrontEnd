@@ -60,7 +60,7 @@ const CalendarRange = ({
       ) : (
         label
       )}
-      <Grid size={{ xs: 12 }} container sx={{ gap: 2 }}>
+      <Grid size={{ xs: 12 }} container spacing={2}>
         <Grid size={{ xs: 12, md: inline ? 6 : 12 }}>
           <CalendarInput
             disabled={disabled}

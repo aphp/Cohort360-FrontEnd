@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { FormLabel, Grid, IconButton, InputAdornment, TextField } from '@mui/material'
+import { FormLabel, Grid, IconButton } from '@mui/material'
 
 import { LocalizationProvider } from '@mui/x-date-pickers'
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment'
@@ -9,6 +9,7 @@ import { DatePickerWrapper, DateWrapper } from './styles'
 import { BlockWrapper } from 'components/ui/Layout'
 import { ErrorType } from 'types/error'
 import { ErrorMessage } from '../Errors'
+import { frFR } from '@mui/x-date-pickers/locales'
 
 interface CalendarInputProps {
   value: string | null
@@ -37,26 +38,19 @@ const CalendarInput = ({ value, label, disabled = false, onChange }: CalendarInp
         <FormLabel component="legend">{label} :</FormLabel>
         <Grid container sx={{ alignItems: 'center' }}>
           <Grid container size={date ? 11 : 12} sx={{ justifyContent: 'space-between' }}>
-            <LocalizationProvider dateAdapter={AdapterMoment} adapterLocale={'fr'}>
+            <LocalizationProvider
+              dateAdapter={AdapterMoment}
+              adapterLocale={'fr'}
+              localeText={frFR.components.MuiLocalizationProvider.defaultProps.localeText}
+            >
               <DatePickerWrapper
                 disabled={disabled}
                 onChange={(newValue: unknown) => setDate(newValue as string)}
                 value={date as any}
-                slots={{
-                  textField: (params: any) => (
-                    <TextField
-                      {...params}
-                      variant="standard"
-                      InputProps={{
-                        ...params.InputProps,
-                        startAdornment: (
-                          <InputAdornment position="start">
-                            <ClearIcon color="primary" onClick={() => setDate(null)} />
-                          </InputAdornment>
-                        )
-                      }}
-                    />
-                  )
+                slotProps={{
+                  textField: {
+                    variant: 'standard'
+                  }
                 }}
               />
             </LocalizationProvider>

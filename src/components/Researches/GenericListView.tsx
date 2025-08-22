@@ -1,5 +1,5 @@
 import React, { useCallback } from 'react'
-import { Grid, Typography } from '@mui/material'
+import { Grid } from '@mui/material'
 
 import isEqual from 'lodash/isEqual'
 
@@ -93,7 +93,7 @@ const GenericCohortListView = <TItem, TTableProps = any>({
   )
 
   return (
-    <Grid container gap={2}>
+    <Grid container gap={2} size={12}>
       {!simplified && (
         <>
           {header}
