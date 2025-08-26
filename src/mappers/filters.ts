@@ -292,6 +292,7 @@ const mapFormFromRequestParams = async (parameters: URLSearchParams) => {
 const mapImagingFromRequestParams = async (parameters: URLSearchParams) => {
   const modalityParams = decodeURIComponent(parameters.get(ImagingParamsKeys.MODALITY) ?? '')
   const ipp = decodeURIComponent(parameters.get(ImagingParamsKeys.IPP) ?? '')
+  const bodySite = decodeURIComponent(parameters.get(ImagingParamsKeys.BODYSITE) ?? '')
   let modality: LabelObject[] = []
   if (modalityParams) {
     const allModalities = (await getCodeList(getConfig().features.imaging.valueSets.imagingModalities.url, true))
@@ -307,7 +308,7 @@ const mapImagingFromRequestParams = async (parameters: URLSearchParams) => {
     parameters,
     ResourceType.IMAGING
   )
-  return { modality, nda, durationRange, executiveUnits, encounterStatus, ipp }
+  return { modality, bodySite, nda, durationRange, executiveUnits, encounterStatus, ipp }
 }
 
 const mapFiltersFromRequestParams = async (parameters: URLSearchParams, type: ResourceType): Promise<Filters> => {
@@ -538,9 +539,10 @@ const mapFormToRequestParams = (filters: MaternityFormFilters) => {
 }
 
 const mapImagingToRequestParams = (filters: ImagingFilters) => {
-  const { modality, nda, durationRange, executiveUnits, ipp, encounterStatus } = filters
+  const { modality, nda, durationRange, executiveUnits, ipp, encounterStatus, bodySite } = filters
   const requestParams: string[] = []
   if (ipp) requestParams.push(`${ImagingParamsKeys.IPP}=${encodeURIComponent(ipp)}`)
+  if (bodySite) requestParams.push(`${ImagingParamsKeys.BODYSITE}=${encodeURIComponent(bodySite)}`)
   if (modality && modality.length > 0)
     requestParams.push(
       `${ImagingParamsKeys.MODALITY}=${encodeURIComponent(

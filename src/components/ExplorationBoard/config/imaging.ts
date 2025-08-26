@@ -54,6 +54,7 @@ export const initSearchCriterias = (search: string): SearchCriterias<ImagingFilt
     ipp: '',
     nda: '',
     modality: [],
+    bodySite: '',
     durationRange: [null, null],
     executiveUnits: [],
     encounterStatus: []
@@ -238,12 +239,13 @@ const fetchList = (
   groupId: string[],
   signal?: AbortSignal
 ): Promise<ExplorationResults<ImagingStudy>> => {
-  const { nda, ipp, executiveUnits, encounterStatus, durationRange, modality } = filters
+  const { nda, ipp, executiveUnits, encounterStatus, durationRange, modality, bodySite } = filters
   const params = {
     encounter: nda,
     ipp,
     minDate: durationRange[0] ?? '',
     maxDate: durationRange[1] ?? '',
+    bodySite: bodySite,
     modalities: modality.map(({ id }) => id),
     executiveUnits: executiveUnits.map((unit) => unit.id),
     encounterStatus: encounterStatus.map(({ id }) => id),
