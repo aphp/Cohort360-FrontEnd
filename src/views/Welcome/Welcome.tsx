@@ -126,7 +126,7 @@ const Welcome = () => {
           </Grid>
         </Grid>
 
-        <Grid container sx={{ paddingTop: '12px' }}>
+        <Grid size={12} container sx={{ paddingTop: '12px' }}>
           <Grid size={12}>
             <Paper id="favorite-cohort-research-card" className={classes.paper}>
               <PreviewCard
@@ -139,7 +139,7 @@ const Welcome = () => {
             </Paper>
           </Grid>
         </Grid>
-        <Grid container sx={{ paddingTop: '12px' }}>
+        <Grid size={12} container sx={{ paddingTop: '12px' }}>
           <Grid size={12}>
             <Paper id="last-created-cohort-research-card" className={classes.paper}>
               <PreviewCard

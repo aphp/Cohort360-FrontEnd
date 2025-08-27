@@ -38,7 +38,11 @@ const PopulationCard = ({ label, onEditDisabled, population, loading, onEdit }: 
       border="3px solid #D3DEE8"
       flex={1}
     >
-      <Grid size={12} container sx={{ alignItems: 'center', justifyContent: 'flex-start', gap: '8px', flexWrap: 'wrap' }}>
+      <Grid
+        container
+        size={11}
+        sx={{ alignItems: 'center', justifyContent: 'flex-start', gap: '8px', flexWrap: 'wrap' }}
+      >
         <Grid>
           <Typography padding="0 1em" variant="h6" align="left">
             {label ?? 'Population source :'}
@@ -70,7 +74,7 @@ const PopulationCard = ({ label, onEditDisabled, population, loading, onEdit }: 
           )}
         </Grid>
       </Grid>
-      <Grid sx={{ alignSelf: 'center' }}>
+      <Grid container size={1} sx={{ alignSelf: 'center' }}>
         <IconButton color="primary" size="small" onClick={onEdit} disabled={onEditDisabled}>
           <EditIcon />
         </IconButton>

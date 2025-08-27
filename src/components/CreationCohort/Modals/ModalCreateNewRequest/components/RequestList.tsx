@@ -7,6 +7,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 
 import { RequestType, ProjectType } from 'types'
 
+import { getRequestName } from 'utils/explorationUtils'
 import useStyles from '../styles'
 
 interface ProjectRowProps {
@@ -54,21 +55,15 @@ const ProjectRow: React.FC<ProjectRowProps> = ({ project, requestsList, selected
                 secondaryAction={
                   <Radio
                     checked={selectedItem === request.uuid}
-                    onChange={() => onSelectedItem(request.uuid as string)}
+                    onChange={() => onSelectedItem(request.uuid)}
                     color="secondary"
                   />
                 }
               >
                 <ListItemText onClick={() => onSelectedItem(request.uuid)}>
-                  {request.shared_by ? (
-                    <Typography noWrap style={{ marginLeft: 8 }}>
-                      {request.name} - Envoyée par : {request.shared_by}
-                    </Typography>
-                  ) : (
-                    <Typography noWrap style={{ marginLeft: 8 }}>
-                      {request.name}
-                    </Typography>
-                  )}
+                  <Typography noWrap style={{ padding: '0 8px' }}>
+                    {getRequestName(request)}
+                  </Typography>
                 </ListItemText>
               </ListItem>
             )
@@ -92,25 +87,23 @@ const RequestList: React.FC<RequestListProps> = ({ projectList, requestsList, se
   const { classes } = useStyles()
 
   return (
-    <>
-      <Grid container sx={{ flexDirection: "column", marginBottom: 3 }}>
-        <List className={classes.requestList}>
-          {projectList.length > 0 ? (
-            projectList.map((project) => (
-              <ProjectRow
-                key={project.uuid}
-                project={project}
-                requestsList={requestsList}
-                selectedItem={selectedItem}
-                onSelectedItem={onSelectedItem}
-              />
-            ))
-          ) : (
-            <ListItem>Aucune projet de recherche</ListItem>
-          )}
-        </List>
-      </Grid>
-    </>
+    <Grid container sx={{ flexDirection: 'column', marginBottom: 3 }}>
+      <List className={classes.requestList}>
+        {projectList.length > 0 ? (
+          projectList.map((project) => (
+            <ProjectRow
+              key={project.uuid}
+              project={project}
+              requestsList={requestsList}
+              selectedItem={selectedItem}
+              onSelectedItem={onSelectedItem}
+            />
+          ))
+        ) : (
+          <ListItem>Aucune projet de recherche</ListItem>
+        )}
+      </List>
+    </Grid>
   )
 }
 

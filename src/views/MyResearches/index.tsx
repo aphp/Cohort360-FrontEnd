@@ -191,7 +191,7 @@ const MyResearches = () => {
           container
           size={11}
           style={{ padding: '20px 0' }}
-          sx={{ gap: '20px', flexDirection: 'column' }}
+          sx={{ gap: '20px', flexDirection: 'column', flexWrap: 'nowrap' }}
         >
           <Breadcrumb />
           <Slide direction={direction} in={true} mountOnEnter unmountOnExit appear={slideIsActive} timeout={300}>

@@ -98,6 +98,7 @@ const ActionBar: React.FC<ActionBarProps> = ({
         <Grid container sx={{ alignItems: 'center' }} size={{ xs: 12, lg: 4 }}>
           <Grid
             container
+            size={12}
             sx={{ alignItems: 'center', gap: 1, justifyContent: isMD || isLG || isXL ? 'flex-end' : 'center' }}
             mt={isMD || isLG || isXL ? 0 : '12px'}
           >

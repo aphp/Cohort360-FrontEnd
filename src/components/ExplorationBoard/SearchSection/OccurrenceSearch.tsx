@@ -33,7 +33,7 @@ const OccurrencesSearch = ({ search, infos, onChange }: OccurrencesSearchProps) 
   }, [searchBy, searchInput, handleSubmit, onChange])
 
   return (
-    <Grid container>
+    <Grid container size={12}>
       {'searchBy' in search && (
         <Grid size={4}>
           <Controller

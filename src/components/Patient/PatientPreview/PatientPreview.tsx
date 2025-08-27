@@ -74,7 +74,7 @@ const PatientPreview: React.FC<PatientPreviewProps> = ({ patient, deidentifiedBo
 
   return (
     <Grid container sx={{ flexDirection: 'column', alignItems: 'center' }} mt={2} height={'fit-content'}>
-      <Grid component={Paper} container size={{ sm: 11 }} className={classes.patientTable}>
+      <Grid component={Paper} container className={classes.patientTable}>
         <Grid container>
           <PatientField
             fieldName={deidentifiedBoolean ? 'Âge' : 'Date de naissance'}

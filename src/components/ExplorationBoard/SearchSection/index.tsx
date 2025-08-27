@@ -55,12 +55,7 @@ const SearchSection = ({
   }
   return (
     <Grid container size={12} sx={{ justifyContent: 'space-between', mt: 0.5 }} ref={ref}>
-      <Grid
-        container
-        size={{ xs: 12, lg: displayOptions.sidebar ? 12 : 8 }}
-        sx={{ gap: isXS ? 1 : 0 }}
-        spacing={isXS ? 0 : 1}
-      >
+      <Grid container size={{ xs: 12, lg: displayOptions.sidebar ? 12 : 8 }} spacing={1}>
         {displayOptions.search && (
           <Grid container size={isXS ? 12 : 8} sx={{ alignItems: 'center' }}>
             <OccurrencesSearch search={searchCriterias} onChange={handleChangeFields} infos={infos} />
@@ -90,7 +85,7 @@ const SearchSection = ({
         {displayOptions.count && count && (
           <Grid
             container
-            display={'flex'}
+            size={12}
             sx={{
               alignItems: 'center',
               gap: 1,

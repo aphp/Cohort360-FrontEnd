@@ -339,6 +339,7 @@ const Login = () => {
             {(appConfig.system.displayJwtLogin || display_jwt_form) && (
               <Grid
                 container
+                size={9}
                 sx={{
                   flexDirection: 'column',
                   alignItems: 'center',
@@ -346,6 +347,7 @@ const Login = () => {
                 }}
               >
                 <TextField
+                  fullWidth
                   margin="normal"
                   required
                   id="identifiant"
@@ -358,6 +360,7 @@ const Login = () => {
                 />
 
                 <TextField
+                  fullWidth
                   margin="normal"
                   required
                   name="Votre mot de passe"
