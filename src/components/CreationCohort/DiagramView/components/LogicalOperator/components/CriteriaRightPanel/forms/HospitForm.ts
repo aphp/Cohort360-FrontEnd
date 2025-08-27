@@ -372,7 +372,7 @@ export const form: () => CriteriaForm<HospitDataType> = () => ({
         {
           valueKey: 'laborOrCesareanEntry',
           type: 'autocomplete',
-          label: "Présentation à l'entrée en travail ou en début de césarienne",
+          label: "Présentation à l'entrée en travail ou en début de césarienne - données jusqu'au 09/11/2023",
           noOptionsText: "Veuillez entrer une présentation à l'entrée en travail ou en début de césarienne",
           valueSetId: getConfig().features.questionnaires.valueSets.laborOrCesareanEntry.url,
           buildInfo: {
