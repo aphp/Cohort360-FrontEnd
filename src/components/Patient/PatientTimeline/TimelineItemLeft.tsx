@@ -1,6 +1,6 @@
 import React from 'react'
 import Card from '@mui/material/Card'
-import { Chip } from '@mui/material'
+import { Box, Button, Chip } from '@mui/material'
 
 import useStyles from './styles'
 import { CohortEncounter } from 'types'
@@ -39,23 +39,25 @@ const TimelineItemLeft: React.FC<TimelineItemLeftTypes> = ({ data, open, dotHeig
   const periodStart = data.period?.start ? new Date(data.period.start).toLocaleDateString('fr-FR') : '-'
   const periodEnd = data.period?.end ? new Date(data.period.end).toLocaleDateString('fr-FR') : '-'
   return (
-    <>
-      <div className={classes.timelineElementsLeft}>
-        <i className={classes.dotLeft} />
-        <div className={classes.lineLeft} />
-      </div>
-      <li className={classes.timelineItem}>
+    <Box display={'flex'} alignItems={'flex-start'}>
+      <Box flex="1">
         <Card className={classes.leftHospitCard} variant="outlined">
-          <div>
-            {data.documents && data.documents.length > 0 && (
-              <button className={classes.detailsButton} onClick={() => open(data)}>
-                + de détails
-              </button>
-            )}
-            {data.serviceProvider?.display && (
-              <Chip label={data.serviceProvider.display} size="small" className={classes.chip} />
-            )}
-            <div className={classes.hospitText}>
+          <Box padding="15px" display={'flex'} flexDirection={'column'} gap={1}>
+            <Box display={'flex'} justifyContent={'space-between'} alignItems={'center'}>
+              {data.serviceProvider?.display && (
+                <Chip label={data.serviceProvider.display} size="small" className={classes.chip} />
+              )}
+              {data.documents && data.documents.length > 0 && (
+                <Button
+                  variant="text"
+                  sx={{ color: '#999', textDecoration: 'underline', fontSize: 12 }}
+                  onClick={() => open(data)}
+                >
+                  + de détails
+                </Button>
+              )}
+            </Box>
+            <Box display={'flex'} flexDirection={'column'} gap={0.5}>
               <div className={classes.hospitTitle}>{data.class ? data.class.display : 'classe inconnue'}</div>
               {data?.class?.code === 'ext' ? (
                 <div className={classes.hospitDates}>
@@ -64,11 +66,15 @@ const TimelineItemLeft: React.FC<TimelineItemLeftTypes> = ({ data, open, dotHeig
               ) : (
                 <div className={classes.hospitDates}>{`Du ${periodStart} au ${periodEnd}`}</div>
               )}
-            </div>
-          </div>
+            </Box>
+          </Box>
         </Card>
-      </li>
-    </>
+      </Box>
+      <Box flex="0 0 30px" display="flex">
+        <Box marginTop="30px" className={classes.lineLeft} flex={1} />
+        <Box flexShrink={0} width={15} className={classes.dotLeft}></Box>
+      </Box>
+    </Box>
   )
 }
 

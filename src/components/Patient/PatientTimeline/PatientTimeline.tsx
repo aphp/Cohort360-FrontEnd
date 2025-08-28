@@ -32,6 +32,7 @@ import { getCleanGroupId } from 'utils/paginationUtils'
 import { getCodeList } from 'services/aphp/serviceValueSets'
 import { GAP } from 'types/exploration'
 import { removeElementInArray, selectFiltersAsArray } from 'utils/filters'
+import { Box } from '@mui/material'
 
 const dateFormat = 'YYYY-MM-DD'
 
@@ -242,7 +243,7 @@ const PatientTimeline: React.FC<PatientTimelineTypes> = ({
     ).reverse()
   }
 
-  const handleClickOpenHospitDialog = async (hospitOrConsult?: CohortEncounter | PMSIEntry<Procedure>) => {
+  const handleClickOpenHospitDialog = (hospitOrConsult?: CohortEncounter | PMSIEntry<Procedure>) => {
     if (hospitOrConsult) {
       setLoading(true)
       setOpenHospitDialog(true)
@@ -302,31 +303,50 @@ const PatientTimeline: React.FC<PatientTimelineTypes> = ({
     }
 
     return (
-      <>
-        {monthVisits.hospit && (
-          <div className={classes.leftElements}>
-            {monthVisits.hospit.map((hospit, index) => (
-              <TimelineItemLeft
-                key={`encounter ${hospit.data.id ?? index}`}
-                data={hospit.data}
-                open={handleClickOpenHospitDialog}
-                dotHeight={getComponentSize(hospit.data.period)}
-              />
-            ))}
-          </div>
-        )}
-        {monthVisits.pmsi && (
-          <div className={classes.rightElements}>
-            {monthVisits.pmsi.map((pmsi, index) =>
-              pmsi.data.resourceType === 'Procedure' ? (
-                <TimelineItemRightProcedure key={`procedure ${index}`} data={pmsi.data} />
-              ) : (
-                <TimelineItemRightCondition key={`condition ${index}`} data={pmsi.data} />
-              )
-            )}
-          </div>
-        )}
-      </>
+      <Box display="flex" flexDirection="column" gap={2}>
+        {monthVisits.hospit &&
+          monthVisits.hospit.map((hospit, index) => (
+            <Box zIndex={1} display="flex" flexDirection="row" key={`encounter ${hospit.data.id ?? index}`}>
+              <Box flex="0 0 calc(50% + 7.5px)">
+                <TimelineItemLeft
+                  data={hospit.data}
+                  open={handleClickOpenHospitDialog}
+                  dotHeight={getComponentSize(hospit.data.period)}
+                />
+              </Box>
+            </Box>
+          ))}
+
+        {monthVisits.pmsi &&
+          monthVisits.pmsi.map((pmsi, index) => {
+            const code =
+              pmsi.data.resourceType === 'Procedure'
+                ? pmsi.data.code?.coding?.find((code) => !getConfig().core.fhir.selectedCodeOnly || code.userSelected)
+                : pmsi.data.code?.coding?.[0]
+            const description = `${code?.display} (${code?.code})`
+            const date =
+              (pmsi.data.resourceType === 'Procedure' ? pmsi.data.performedDateTime : pmsi.data.recordedDate) ??
+              pmsi.data.meta?.lastUpdated
+            console.log('test status', pmsi.data, pmsi.data.status)
+            return (
+              <Box
+                zIndex={1}
+                display="flex"
+                flexDirection="row"
+                key={pmsi.data.resourceType === 'Procedure' ? `procedure ${index}` : `condition ${index}`}
+              >
+                <Box flex="0 0 calc(50% - 7.5px)"></Box>
+                <Box flex="1">
+                  {pmsi.data.resourceType === 'Procedure' ? (
+                    <TimelineItemRightProcedure date={date} description={description} />
+                  ) : (
+                    <TimelineItemRightCondition data={pmsi.data} description={description} date={date} />
+                  )}
+                </Box>
+              </Box>
+            )
+          })}
+      </Box>
     )
   }
 
@@ -334,9 +354,9 @@ const PatientTimeline: React.FC<PatientTimelineTypes> = ({
     <React.Fragment>
       {timelineData[year]
         ? Object.keys(timelineData[year]).map((month) => (
-            <ul className={classes.timeline} key={'ul' + year + month}>
-              {getMonthComponent(timelineData[year][month])}
-            </ul>
+            /*<ul className={classes.timeline} key={'ul' + year + month}>*/
+            <>{getMonthComponent(timelineData[year][month])}</>
+            /*</ul>*/
           ))
         : isActivityInYear(year) && <div className={classes.emptyYear}></div>}
       <span className={classes.timelabel}>{year}</span>

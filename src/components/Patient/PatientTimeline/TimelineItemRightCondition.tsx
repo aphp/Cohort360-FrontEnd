@@ -10,29 +10,28 @@ import { Condition } from 'fhir/r4'
  */
 type TimelineItemRightTypes = {
   data: PMSIEntry<Condition>
+  date?: string
+  description?: string
 }
-const TimelineItemRight: React.FC<TimelineItemRightTypes> = ({ data }) => {
+const TimelineItemRight: React.FC<TimelineItemRightTypes> = ({ data, date, description }) => {
   const { classes } = useStyles({ color: '#b7c3d9' })
 
   return (
     <li className={classes.timelineItem}>
       <div className={classes.timelineRightContent}>
+        condition
         <div className={classes.timelineElementsRight}>
           <i className={classes.dotRight} />
           <div className={classes.lineRight} />
         </div>
         <div className={classes.timelineRight}>
           <span className={classes.time}>
-            {data.recordedDate
-              ? new Date(data.recordedDate).toLocaleDateString('fr-FR')
-              : data.meta?.lastUpdated
-              ? new Date(data.meta.lastUpdated).toLocaleDateString('fr-FR')
-              : 'Date inconnue'}
+            <span className={classes.time}>{date ? new Date(date).toLocaleDateString('fr-Fr') : 'Date inconnue'}</span>
           </span>
 
           {data.code && (
             <div className={classes.timelineTextRight}>
-              {`${data.code?.coding?.[0].display} (${data.code?.coding?.[0].code})`}
+              {description && <div className={classes.timelineTextRight}>{description}</div>}
             </div>
           )}
         </div>
