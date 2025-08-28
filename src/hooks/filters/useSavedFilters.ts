@@ -60,7 +60,7 @@ export const useSavedFilters = (type: ResourceType) => {
         status: FetchStatus.ERROR,
         message:
           error.status === 400
-            ? "Erreur lors de l'enregistrement du filtre. Le nom doit être unique."
+            ? "Erreur lors de l'enregistrement du filtre. Nom déjà existant."
             : `L'enregistrement du filtre a echoué. Veuillez réessayer ultérieurement. Si le problème persiste, veuillez contacter le support: ${
                 getConfig().system.mailSupport
               }.`
@@ -94,7 +94,7 @@ export const useSavedFilters = (type: ResourceType) => {
           status: FetchStatus.ERROR,
           message:
             error.status === 400
-              ? "Erreur lors de l'enregistrement du filtre. Le nom doit être unique."
+              ? "Erreur lors de l'enregistrement du filtre. Nom déjà existant."
               : `L'enregistrement du filtre a echoué. Veuillez réessayer ultérieurement. Si le problème persiste, veuillez contacter le support: ${
                   getConfig().system.mailSupport
                 }.`
