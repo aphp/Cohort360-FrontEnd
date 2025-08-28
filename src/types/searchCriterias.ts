@@ -232,6 +232,7 @@ export function mapDocumentStatusesFromRequestParam(docStatus: string): string {
 }
 
 export enum FilterKeys {
+  BODYSITE = 'bodySite',
   IPP = 'ipp',
   GENDERS = 'genders',
   VITAL_STATUSES = 'vitalStatuses',
@@ -369,6 +370,7 @@ export type BiologyFilters = GenericFilter & {
 export type ImagingFilters = GenericFilter & {
   ipp?: string
   modality: LabelObject[]
+  bodySite: string
 }
 
 export type MaternityFormFilters = GenericFilter & {

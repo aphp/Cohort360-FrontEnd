@@ -162,6 +162,9 @@ const ExplorationFilters = ({ filters, infos, onChange, onError, hasChanged }: E
       [FilterKeys.FORM_NAME]: ({ field }) => (
         <CheckboxGroup {...field} label="Formulaire :" options={infos.questionnaires ?? []} />
       ),
+      [FilterKeys.BODYSITE]: ({ field }) => (
+        <TextInput {...field} label="Parties du corps :" placeholder="Exemple: HEAD,NECK" />
+      ),
       [FilterKeys.MODALITY]: ({ field }) => (
         <MultiSelect {...field} options={infos.modalities ?? []} label="Modalités :" placeholder="Modalités" />
       ),
