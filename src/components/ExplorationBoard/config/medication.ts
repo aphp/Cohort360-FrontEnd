@@ -6,7 +6,6 @@ import { mapToDate } from 'mappers/dates'
 import { getCodes, getMedicationDate } from 'mappers/medication'
 import { fetchMedicationAdministration, fetchMedicationRequest } from 'services/aphp/callApi'
 import { getCodeList } from 'services/aphp/serviceValueSets'
-import { PatientState } from 'state/patient'
 import { CohortMedication } from 'types'
 import {
   AdditionalInfo,
@@ -15,7 +14,8 @@ import {
   ExplorationConfig,
   ExplorationResults,
   FetchOptions,
-  FetchParams
+  FetchParams,
+  Patient
 } from 'types/exploration'
 import { ResourceType } from 'types/requestCriterias'
 import { SourceType } from 'types/scope'
@@ -198,7 +198,7 @@ const mapToTable = (
 const getMedicationFilters = (
   { nda, ipp, executiveUnits, encounterStatus, durationRange, code }: MedicationFilters,
   fetchParams: FetchParams,
-  patient: PatientState,
+  patient: Patient | null,
   groupId: string[]
 ) => ({
   encounter: nda,
@@ -209,14 +209,14 @@ const getMedicationFilters = (
   maxDate: durationRange[1] ?? '',
   code: code.map((code) => encodeURI(`${code.system}|${code.id}`)).join(','),
   uniqueFacet: ['subject'],
-  subject: patient?.patientInfo?.id,
+  subject: patient?.id,
   ...getCommonParamsList(fetchParams, groupId)
 })
 
 const fetchAdministrationList = (
   fetchParams: FetchParams,
   { filters }: FetchOptions<MedicationFilters>,
-  patient: PatientState,
+  patient: Patient | null,
   deidentified: boolean,
   groupId: string[],
   signal?: AbortSignal
@@ -231,7 +231,7 @@ const fetchAdministrationList = (
     uniqueFacet: ['subject'],
     minDate: null,
     maxDate: null,
-    subject: patient?.patientInfo?.id,
+    subject: patient?.id,
     ...getCommonParamsAll(groupId),
     signal
   }
@@ -245,7 +245,7 @@ const fetchAdministrationList = (
 const fetchRequestList = (
   fetchParams: FetchParams,
   { filters }: FetchOptions<MedicationFilters>,
-  patient: PatientState,
+  patient: Patient | null,
   deidentified: boolean,
   groupId: string[],
   signal?: AbortSignal
@@ -260,7 +260,7 @@ const fetchRequestList = (
     uniqueFacet: ['subject'],
     minDate: null,
     maxDate: null,
-    subject: patient?.patientInfo?.id,
+    subject: patient?.id,
     ...getCommonParamsAll(groupId),
     signal
   }
@@ -273,7 +273,7 @@ const fetchRequestList = (
 
 export const medicationRequestConfig = (
   deidentified: boolean,
-  patient: PatientState,
+  patient: Patient | null,
   groupId: string[],
   displayOptions = DISPLAY_OPTIONS,
   search = ''
@@ -296,7 +296,7 @@ export const medicationRequestConfig = (
 
 export const medicationAdministrationConfig = (
   deidentified: boolean,
-  patient: PatientState,
+  patient: Patient | null,
   groupId: string[],
   displayOptions = DISPLAY_OPTIONS,
   search = ''

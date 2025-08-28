@@ -4,7 +4,6 @@ import { ImagingStudy, ImagingStudySeries } from 'fhir/r4'
 import { mapToDate } from 'mappers/dates'
 import { fetchImaging } from 'services/aphp/callApi'
 import { getCodeList } from 'services/aphp/serviceValueSets'
-import { PatientState } from 'state/patient'
 import { CohortImaging } from 'types'
 import {
   AdditionalInfo,
@@ -13,7 +12,8 @@ import {
   ExplorationConfig,
   ExplorationResults,
   FetchOptions,
-  FetchParams
+  FetchParams,
+  Patient
 } from 'types/exploration'
 import { ResourceType } from 'types/requestCriterias'
 import { Direction, ImagingFilters, Order, SearchByTypes, SearchCriterias } from 'types/searchCriterias'
@@ -235,7 +235,7 @@ const mapToTable = (data: Data, deidentified: boolean, isPatient: boolean, group
 const fetchList = (
   fetchParams: FetchParams,
   { filters }: FetchOptions<ImagingFilters>,
-  patient: PatientState,
+  patient: Patient | null,
   deidentified: boolean,
   groupId: string[],
   signal?: AbortSignal
@@ -251,12 +251,12 @@ const fetchList = (
     executiveUnits: executiveUnits.map((unit) => unit.id),
     encounterStatus: encounterStatus.map(({ id }) => id),
     uniqueFacet: ['subject'],
-    patient: patient?.patientInfo?.id,
+    patient: patient?.id,
     ...getCommonParamsList(fetchParams, groupId),
     signal
   }
   const paramsFetchAll = {
-    patient: patient?.patientInfo?.id,
+    patient: patient?.id,
     uniqueFacet: ['subject'],
     ...getCommonParamsAll(groupId),
     signal
@@ -270,7 +270,7 @@ const fetchList = (
 
 export const imagingConfig = (
   deidentified: boolean,
-  patient: PatientState,
+  patient: Patient | null,
   groupId: string[],
   displayOptions = DISPLAY_OPTIONS,
   search = ''

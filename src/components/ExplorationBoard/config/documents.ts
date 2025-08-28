@@ -9,7 +9,8 @@ import {
   ExplorationConfig,
   ExplorationResults,
   FetchOptions,
-  FetchParams
+  FetchParams,
+  Patient
 } from 'types/exploration'
 import {
   Order,
@@ -40,7 +41,6 @@ import {
 } from 'utils/exploration'
 import { FhirItem } from 'types/valueSet'
 import { Buffer } from 'buffer'
-import { PatientState } from 'state/patient'
 
 const initSearchCriterias = (search: string): SearchCriterias<DocumentsFilters> => ({
   orderBy: {
@@ -64,7 +64,7 @@ const initSearchCriterias = (search: string): SearchCriterias<DocumentsFilters> 
 const fetchList = (
   fetchParams: FetchParams,
   { filters, searchBy }: FetchOptions<DocumentsFilters>,
-  patient: PatientState,
+  patient: Patient | null,
   deidentified: boolean,
   groupId: string[],
   signal?: AbortSignal
@@ -77,7 +77,7 @@ const fetchList = (
     _elements: searchInput ? [] : undefined,
     highlight_search_results: searchBy === SearchByTypes.TEXT,
     type: docTypes.map((docType) => docType.code).join(','),
-    patient: patient?.patientInfo?.id,
+    patient: patient?.id,
     'encounter-identifier': nda,
     'patient-identifier': ipp,
     onlyPdfAvailable,
@@ -90,7 +90,7 @@ const fetchList = (
     signal
   }
   const paramsFetchAll = {
-    patient: patient?.patientInfo?.id,
+    patient: patient?.id,
     uniqueFacet: ['subject'] as 'subject'[],
     ...getCommonParamsAll(groupId),
     signal
@@ -102,7 +102,7 @@ const fetchList = (
   )
 }
 
-const mapToTable = (
+export const mapToTable = (
   data: Data,
   deidentified: boolean,
   isPatient: boolean,
@@ -213,7 +213,7 @@ const getMessages = (deidentified: boolean) => {
 
 export const documentsConfig = (
   deidentified: boolean,
-  patient: PatientState,
+  patient: Patient | null,
   groupId: string[],
   displayOptions = DISPLAY_OPTIONS,
   search = ''

@@ -4,7 +4,6 @@ import { Observation } from 'fhir/r4'
 import { formatValueRange } from 'mappers/biology'
 import { mapToDate } from 'mappers/dates'
 import { fetchObservation } from 'services/aphp/callApi'
-import { PatientState } from 'state/patient'
 import { CohortObservation } from 'types'
 import {
   AdditionalInfo,
@@ -13,7 +12,8 @@ import {
   ExplorationConfig,
   ExplorationResults,
   FetchOptions,
-  FetchParams
+  FetchParams,
+  Patient
 } from 'types/exploration'
 import { ResourceType } from 'types/requestCriterias'
 import { SourceType } from 'types/scope'
@@ -167,7 +167,7 @@ const mapToTable = (data: Data, deidentified: boolean, groupId: string[], isPati
 const fetchList = (
   fetchParams: FetchParams,
   { filters }: FetchOptions<BiologyFilters>,
-  patient: PatientState,
+  patient: Patient | null,
   deidentified: boolean,
   groupId: string[],
   signal?: AbortSignal
@@ -183,12 +183,12 @@ const fetchList = (
     maxDate: durationRange[1] ?? '',
     code: code.map((code) => encodeURI(`${code.system}|${code.id}`)).join(','),
     rowStatus: validatedStatus,
-    subject: patient?.patientInfo?.id,
+    subject: patient?.id,
     ...getCommonParamsList(fetchParams, groupId),
     signal
   }
   const paramsFetchAll = {
-    subject: patient?.patientInfo?.id,
+    subject: patient?.id,
     rowStatus: validatedStatus,
     uniqueFacet: ['subject'] as 'subject'[],
     ...getCommonParamsAll(groupId),
@@ -203,7 +203,7 @@ const fetchList = (
 
 export const biologyConfig = (
   deidentified: boolean,
-  patient: PatientState,
+  patient: Patient | null,
   groupId: string[],
   displayOptions = DISPLAY_OPTIONS,
   search = ''

@@ -1,26 +1,49 @@
 import { ResourceType } from './requestCriterias'
 import { Filters, LabelObject, OrderBy, SearchBy, SearchByTypes, SearchCriterias } from './searchCriterias'
 import {
+  Claim,
+  Condition,
+  Encounter,
   ImagingStudy,
   MedicationAdministration,
   MedicationRequest,
   Meta,
   Observation,
-  Patient,
+  Procedure,
   Questionnaire,
-  QuestionnaireResponse
+  QuestionnaireResponse,
+  Patient as FhirPatient
 } from 'fhir/r4'
 import { SourceType } from './scope'
 import { Reference } from './valueSet'
 import {
   AgeRepartitionType,
   CohortComposition,
+  CohortEncounter,
   CohortPMSI,
   CohortQuestionnaireResponse,
+  PMSIEntry,
   SimpleChartDataType
 } from 'types'
 import { Table } from './table'
 import { Card } from './card'
+
+export type Patient = {
+  id: string
+  deidentified: boolean
+  groupId?: string
+  infos: IPatientDetails
+}
+
+export type IPatientDetails = FhirPatient & {
+  lastEncounter: Encounter | null
+  lastGhm: Claim | null
+  lastProcedure: Procedure | null
+  mainDiagnosis: Condition[]
+  hospits: CohortEncounter[]
+  procedures: PMSIEntry<Procedure>[]
+  diagnostics: PMSIEntry<Condition>[]
+}
 
 export type FetchOptions<T> = {
   filters: T
@@ -93,7 +116,7 @@ export type AdditionalInfo = {
 }
 
 export type DataType =
-  | Patient
+  | FhirPatient
   | CohortPMSI
   | Observation
   | ImagingStudy

@@ -13,7 +13,7 @@ import SearchInput from 'components/ui/Searchbar/SearchInput'
 
 import useCounts from 'hooks/researches/useCounts'
 
-import { ExplorationTabs } from 'types'
+import { TabType } from 'types'
 import { ExplorationsSearchParams } from 'types/cohorts'
 import { cleanSearchParams, getPathDepth } from 'utils/explorationUtils'
 import moment from 'moment'
@@ -140,7 +140,7 @@ const MyResearches = () => {
     })
   }
 
-  const handleTabChange = (newTab: ExplorationTabs) => {
+  const handleTabChange = (newTab: TabType) => {
     setSlideIsActive(false)
     const cleanedSearchParams = cleanSearchParams(searchParams)
     setSearchParams(cleanedSearchParams)

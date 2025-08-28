@@ -11,7 +11,6 @@ import exploredCohort from './exploredCohort'
 import autoLogout from './autoLogout'
 import criteria from './criteria'
 import message from './message'
-import patient from './patient'
 import project from './project'
 import request from './request'
 import drawer from './drawer'
@@ -37,7 +36,6 @@ export const rootReducer = combineReducers({
   project,
   request,
   scope,
-  patient,
   autoLogout,
   warningDialog
 })

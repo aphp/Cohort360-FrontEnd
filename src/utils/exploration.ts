@@ -14,14 +14,14 @@ import {
   Bundle
 } from 'fhir/r4'
 import { FHIR_Bundle_Promise_Response, FHIR_API_Response } from 'types'
-import { ExplorationResults, FetchOptions, FetchParams } from 'types/exploration'
+import { ExplorationResults, FetchOptions, FetchParams, Patient as PatientType } from 'types/exploration'
 import { getCodeList } from 'services/aphp/serviceValueSets'
-import { linkElementWithEncounter, PatientState } from 'state/patient'
 import { getApiResponseResources } from './apiHelpers'
 import { getResourceInfos } from './fillElement'
 import { atLeastOneSearchCriteria } from './filters'
 import { AxiosResponse } from 'axios'
 import { getExtension } from './fhir'
+import { linkElementWithEncounter } from './encounter'
 
 const getPatientsCount = <T>(list: AxiosResponse<FHIR_API_Response<Bundle<T>>>, facet = 'unique-subject') => {
   return list?.data?.resourceType === 'Bundle'
@@ -111,7 +111,7 @@ export const fetcherWithParams = async <T extends Patient | NonPatientResource, 
     FetchOptions<F> & {
       facet?: string
       deidentified: boolean
-      patient?: PatientState
+      patient: PatientType | null
       groupId?: string[]
       isPatientData?: boolean
     }
@@ -134,7 +134,7 @@ export const fetcherWithParams = async <T extends Patient | NonPatientResource, 
   } else {
     results.list = (
       patient
-        ? linkElementWithEncounter(bundle as NonPatientResource[], patient?.hospits?.list ?? [], deidentified)
+        ? linkElementWithEncounter(bundle as NonPatientResource[], patient?.infos.hospits, deidentified)
         : await getResourceInfos(bundle as NonPatientResource[], deidentified, groupId?.[0])
     ) as T[]
   }
