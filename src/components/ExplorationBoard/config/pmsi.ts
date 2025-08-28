@@ -4,9 +4,15 @@ import { Condition } from 'fhir/r4'
 import { mapToDate } from 'mappers/dates'
 import { getPmsiCodes, getPmsiDate } from 'mappers/pmsi'
 import { fetchClaimList, fetchConditionList, fetchProcedureList } from 'services/aphp/servicePmsi'
-import { PatientState } from 'state/patient'
 import { CohortPMSI } from 'types'
-import { AdditionalInfo, Data, DISPLAY_OPTIONS, ExplorationConfig, ExplorationResults } from 'types/exploration'
+import {
+  AdditionalInfo,
+  Data,
+  DISPLAY_OPTIONS,
+  ExplorationConfig,
+  ExplorationResults,
+  Patient
+} from 'types/exploration'
 import { PMSIResourceTypes, ResourceType } from 'types/requestCriterias'
 import { SourceType } from 'types/scope'
 import { Direction, Order, PMSIFilters, SearchCriterias } from 'types/searchCriterias'
@@ -136,7 +142,7 @@ const getMessages = () => [
 
 export const conditionConfig = (
   deidentified: boolean,
-  patient: PatientState,
+  patient: Patient | null,
   groupId: string[],
   displayOptions = DISPLAY_OPTIONS,
   search = ''
@@ -167,7 +173,7 @@ export const conditionConfig = (
 
 export const procedureConfig = (
   deidentified: boolean,
-  patient: PatientState,
+  patient: Patient | null,
   groupId: string[],
   displayOptions = DISPLAY_OPTIONS,
   search = ''
@@ -198,7 +204,7 @@ export const procedureConfig = (
 
 export const claimConfig = (
   deidentified: boolean,
-  patient: PatientState,
+  patient: Patient | null,
   groupId: string[],
   displayOptions = DISPLAY_OPTIONS,
   search = ''

@@ -23,7 +23,6 @@ import {
   Resource
 } from 'fhir/r4'
 import { AxiosResponse } from 'axios'
-import { SearchInputError } from 'types/error'
 import { Comparators, CriteriaType, ResourceType, SelectedCriteriaType } from 'types/requestCriterias'
 import { CriteriaForm } from 'components/CreationCohort/DiagramView/components/LogicalOperator/components/CriteriaRightPanel/CriteriaForm/types'
 import { ScopeElement } from 'types/scope'
@@ -486,89 +485,11 @@ export type Export = {
   owner: string
 }
 
-/**
- * Patient State Types
- */
-
-export type IPatientDetails = Patient & {
-  lastEncounter?: Encounter
-  lastGhm?: Claim | 'loading'
-  lastProcedure?: Procedure | 'loading'
-  mainDiagnosis?: Condition[] | 'loading'
-}
-
-export type IPatientDocuments = {
-  loading: boolean
-  count: number
-  total: number
-  list: CohortComposition[]
-  page: number
-  options?: {
-    filters?: {
-      searchInput: string
-      nda: string
-      selectedDocTypes: string[]
-      startDate: string | null
-      endDate: string | null
-    }
-    sort?: {
-      by: string
-      direction: string
-    }
-  }
-  searchInputError?: SearchInputError
-}
-
-export type IPatientPmsi<T extends Procedure | Condition | Claim> = {
-  loading: boolean
-  count: number
-  total: number
-  list: T[]
-  page: number
-  options?: {
-    filters?: {
-      searchInput: string
-      nda: string
-      startDate: string | null
-      endDate: string | null
-      code?: string
-      diagnosticTypes?: string[]
-    }
-    sort?: {
-      by: string
-      direction: string
-    }
-  }
-}
-
 export type CohortMedication<T extends MedicationRequest | MedicationAdministration> = T & {
   serviceProvider?: string
   NDA?: string
   IPP?: string
   idPatient?: string
-}
-
-export type IPatientMedication<T extends MedicationRequest | MedicationAdministration> = {
-  loading: boolean
-  count: number
-  total: number | null
-  list: T[]
-  page: number
-  options?: {
-    filters?: {
-      searchInput: string
-      nda: string
-      startDate: string | null
-      endDate: string | null
-      code?: string
-      selectedPrescriptionTypes?: { id: string; label: string }[]
-      selectedAdministrationRoutes?: { id: string; label: string }[]
-    }
-    sort?: {
-      by: string
-      direction: string
-    }
-  }
 }
 
 export enum BiologyStatus {
@@ -591,28 +512,6 @@ export type CohortObservation = Observation & {
   idPatient?: string
 }
 
-export type IPatientObservation<T extends CohortObservation> = {
-  loading: boolean
-  count: number
-  total: number
-  list: T[]
-  page: number
-  options?: {
-    filters?: {
-      searchInput: string
-      nda: string
-      loinc: string
-      anabio: string
-      startDate: string | null
-      endDate: string | null
-    }
-    sort?: {
-      by: string
-      direction: string
-    }
-  }
-}
-
 export type CohortPMSI = (Condition | Procedure | Claim) & {
   serviceProvider?: string
   idPatient?: string
@@ -627,13 +526,6 @@ export type CohortImaging = ImagingStudy & {
   IPP?: string
   diagnosticReport?: DiagnosticReport
 }
-export type IPatientImaging<T extends CohortImaging> = {
-  loading: boolean
-  count: number
-  total: number
-  list: T[]
-  page: number
-}
 
 export type TabType<T = string, TL = string> = {
   label: TL
@@ -642,8 +534,6 @@ export type TabType<T = string, TL = string> = {
   icon?: ReactElement
   wrapped?: boolean
 }
-
-export type ExplorationTabs = TabType<string, ReactNode>
 
 export type ReadRightPerimeter = {
   perimeter: ScopeElement

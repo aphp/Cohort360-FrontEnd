@@ -12,7 +12,8 @@ import {
   ExplorationConfig,
   FetchOptions,
   FetchParams,
-  ExplorationResults
+  ExplorationResults,
+  Patient as PatientType
 } from 'types/exploration'
 import { PatientTableLabels } from 'types/patient'
 import { ResourceType, VitalStatusLabel } from 'types/requestCriterias'
@@ -34,7 +35,6 @@ import { getExtension } from 'utils/fhir'
 import { getAgeRepartitionMapAphp, getGenderRepartitionMapAphp, getGenderRepartitionSimpleData } from 'utils/graphUtils'
 import { capitalizeFirstLetter, plural } from 'utils/string'
 import { Card } from 'types/card'
-import { PatientState } from 'state/patient'
 import { getConfig } from 'config'
 
 const fetchAdditionalInfos = async (additionalInfo: AdditionalInfo, deidentified?: boolean) => {
@@ -94,7 +94,18 @@ const getPatientInfos = (patient: Patient, deidentified: boolean, groupId: strin
         )?.value ??
         patient.identifier?.[0].value ??
         'inconnu'),
-    url: `/patients/${patient.id}${groupId ? `?groupId=${groupId}` : ''}` /*${_search}*/
+    url: `/patients/${patient.id}/preview/${groupId ? `?groupId=${groupId}` : ''}`,
+    getUrl: () => {
+      const url = new URL(window.location.href)
+      const pathParts = url.pathname.split('/').map((part) => part || '')
+      if (pathParts[2]) pathParts[2] = patient.id ?? ''
+      const newPath = pathParts.join('/')
+      const searchParams = new URLSearchParams(url.searchParams)
+      searchParams.delete('groupId')
+      if (groupId && groupId.length > 0) groupId.forEach((id) => searchParams.append('groupId', id))
+      const queryString = searchParams.toString()
+      return `${newPath}${queryString ? `?${queryString}` : ''}`
+    }
   }
   const age = {
     age: getAge(patient) ?? 'Non renseigné',
@@ -175,6 +186,7 @@ const mapToCards = (data: Data, deidentified: boolean, groupId: string[]) => {
     const { vitalStatus, surname, lastname, ipp, age, gender } = getPatientInfos(patient, deidentified, groupId)
     const info: Card = {
       url: ipp.url,
+      getUrl: ipp.getUrl,
       sections: []
     }
     info.sections.push({
@@ -265,7 +277,7 @@ const fetchList = (
   return fetcherWithParams(
     () => fetchPatient(params),
     () => fetchPatient(paramsFetchAll),
-    { ...fetchParams, filters, deidentified, groupId, isPatientData: true }
+    { ...fetchParams, filters, deidentified, patient: null, groupId, isPatientData: true }
   )
 }
 
@@ -294,7 +306,7 @@ const getDiagramData = (meta: Meta): Diagram[] => {
 
 export const patientsConfig = (
   deidentified: boolean,
-  patient: PatientState,
+  patient: PatientType | null,
   groupId: string[],
   displayOptions = DISPLAY_OPTIONS,
   search = ''

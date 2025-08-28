@@ -25,7 +25,7 @@ const InfoCard = ({ value }: InfoCardProps) => {
         alignItems: 'center',
         justifyContent: 'space-between'
       }}
-      onClick={() => value.url && navigate(value.url)}
+      onClick={() => navigate(value.getUrl())}
       id="card"
     >
       {value.sections.map((section) => (

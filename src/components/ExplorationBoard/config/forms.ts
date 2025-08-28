@@ -4,7 +4,6 @@ import { QuestionnaireResponse } from 'fhir/r4'
 import { mapToDate } from 'mappers/dates'
 import services from 'services/aphp'
 import { fetchForms } from 'services/aphp/callApi'
-import { PatientState } from 'state/patient'
 import { CohortQuestionnaireResponse } from 'types'
 import {
   AdditionalInfo,
@@ -13,7 +12,8 @@ import {
   ExplorationConfig,
   ExplorationResults,
   FetchOptions,
-  FetchParams
+  FetchParams,
+  Patient
 } from 'types/exploration'
 import { ResourceType } from 'types/requestCriterias'
 import { Direction, FormNames, LabelObject, MaternityFormFilters, Order, SearchCriterias } from 'types/searchCriterias'
@@ -117,7 +117,7 @@ const mapToTable = (data: Data, groupId: string[]): Table => {
 const fetchList = async (
   fetchParams: FetchParams,
   { filters }: FetchOptions<MaternityFormFilters>,
-  patient: PatientState,
+  patient: Patient | null,
   deidentified: boolean,
   groupId: string[],
   signal?: AbortSignal
@@ -131,13 +131,13 @@ const fetchList = async (
     encounterStatus: encounterStatus.map((status) => status.id),
     formName: formName.join(','),
     uniqueFacet: ['subject'],
-    patient: patient?.patientInfo?.id,
+    patient: patient?.id,
     ...getCommonParamsList(fetchParams, groupId),
     signal
   }
   const paramsFetchAll = {
     uniqueFacet: ['subject'],
-    patient: patient?.patientInfo?.id,
+    patient: patient?.id,
     ...getCommonParamsAll(groupId),
     signal
   }
@@ -161,7 +161,7 @@ const fetchList = async (
 
 export const formsConfig = (
   deidentified: boolean,
-  patient: PatientState,
+  patient: Patient | null,
   groupId: string[],
   displayOptions = DISPLAY_OPTIONS,
   search = ''

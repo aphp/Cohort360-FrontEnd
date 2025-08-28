@@ -81,7 +81,6 @@ const VersionsDialog: React.FC<VersionsDialogProps> = ({ open, onClose, versions
       cancelText="Fermer"
       disabled={isLoading}
       maxWidth="md"
-      fullWidth
     >
       <Table value={tableData} noMarginBottom />
     </Modal>

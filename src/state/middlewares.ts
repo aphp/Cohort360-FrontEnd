@@ -15,7 +15,6 @@ export const temporalConstraintsMiddleware: Middleware<RootState> = (store) => (
     const nextConstraints = nextState.cohortCreation.request.temporalConstraints
 
     const constraintWasRemoved = !isEqual(prevConstraints, nextConstraints)
-
     if (constraintWasRemoved) {
       store.dispatch(
         setMessage({
