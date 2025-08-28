@@ -88,27 +88,20 @@ const useStyles = makeStyles<{ dotHeight?: number; color?: string }>()((_theme, 
     background: '#43435B',
     zIndex: 0
   },
-  timelineElementsLeft: {
-    position: 'absolute',
-    width: `calc(100% + ${marginNextCentralLine}px)`,
-    height: '100%',
-    top: 15,
-    zIndex: 1
-  },
   dotLeft: {
-    position: 'absolute',
-    width: dotSize,
-    height: params.dotHeight,
+    //position: 'absolute',
+    //width: dotSize,
+    height: 45, //params.dotHeight,
     borderRadius: 50,
     backgroundColor: params.color,
-    display: 'inline-block',
-    transform: 'translateX(50%) translateY(-100%) translateY(10px)',
-    border: '1px solid #3B3B51',
-    zIndex: 1,
-    right: 0
+    //  display: 'inline-block',
+    //transform: 'translateX(50%) translateY(-100%) translateY(10px)',
+    border: '1px solid #3B3B51'
+    // zIndex: 1,
+    // right: 0
   },
   dotRight: {
-    position: 'relative',
+    // position: 'relative',
     width: dotSize,
     height: dotSize,
     borderRadius: 50,
@@ -119,12 +112,13 @@ const useStyles = makeStyles<{ dotHeight?: number; color?: string }>()((_theme, 
     zIndex: 1
   },
   lineLeft: {
-    position: 'absolute',
+    //position: 'absolute',
+    // width: '100%',
     height: 1,
-    width: `${2 * marginNextCentralLine}px`,
-    background: '#43435B',
-    zIndex: -2,
-    right: 0
+    //width: '80%' /*`${2 * marginNextCentralLine}px`*/,
+    background: '#43435B'
+    //zIndex: -2,
+    //right: 0
   },
   timelineTextRight: {
     textAlign: 'left',
@@ -135,8 +129,7 @@ const useStyles = makeStyles<{ dotHeight?: number; color?: string }>()((_theme, 
   },
   chip: {
     fontSize: fontSize,
-    borderRadius: 5,
-    margin: 8
+    borderRadius: 5
   },
   timelineRight: {
     display: 'flex',
@@ -157,39 +150,20 @@ const useStyles = makeStyles<{ dotHeight?: number; color?: string }>()((_theme, 
     fontWeight: 500,
     fontSize: 16,
     color: '#43435B',
-    marginBottom: '.2rem',
+    //marginBottom: '.2rem',
     textTransform: 'capitalize'
   },
-  hospitText: {
-    marginLeft: 5
-  },
-  detailsButton: {
-    fontSize: 12,
-    color: '#999',
-    float: 'right',
-    margin: 2,
-    cursor: 'pointer',
-    fontWeight: 'bold',
-    textDecoration: 'underline',
-    backgroundColor: '#fff',
-    border: 'none'
-  },
-  leftElements: {
-    position: 'relative',
-    width: `calc(50% - ${marginNextCentralLine}px)`,
-    marginRight: `${marginNextCentralLine}px`
-  },
   rightElements: {
-    position: 'relative',
-    width: `calc(50% - ${marginNextCentralLine}px)`,
-    marginLeft: `${marginNextCentralLine}px`,
-    top: 3
+    //position: 'relative',
+    //width: `calc(50% - ${marginNextCentralLine}px)`,
+    //marginLeft: `${marginNextCentralLine}px`,
+    //top: 3
   },
   leftHospitCard: {
     border: `1px solid ${params.color}`,
     borderLeft: `7px solid ${params.color}`,
-    padding: '.4rem',
-    paddingTop: '.2rem',
+    // padding: '.4rem',
+    // paddingTop: '.2rem',
     borderRadius: 5
   },
   emptyYear: {
