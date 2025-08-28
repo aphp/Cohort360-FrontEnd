@@ -138,6 +138,7 @@ const FORM_ITEM_RENDERER: { [key in CriteriaFormItemType]: CriteriaFormItemView<
         multiple={!props.definition.singleChoice}
         disabled={props.disabled}
         disableClearable={props.definition.singleChoice}
+        disableCloseOnSelect={!props.definition.singleChoice}
         options={codeSystem}
         noOptionsText={props.definition.noOptionsText}
         getOptionLabel={(option) => `${props.definition.prependCode ? option.id + ' - ' : ''}${option.label}`}
