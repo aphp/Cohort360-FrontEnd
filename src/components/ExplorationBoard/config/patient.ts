@@ -1,4 +1,5 @@
 import { ChipStatus } from 'components/ui/StatusChip'
+import { plural } from 'utils/plural'
 import { Meta, Patient } from 'fhir/r4'
 import moment from 'moment'
 import { fetchPatient } from 'services/aphp/callApi'
@@ -319,7 +320,7 @@ export const patientsConfig = (
     mapToDiagram: patient && appConfig.core.fhir.facetsExtensions ? undefined : getDiagramData,
     fetchAdditionalInfos: (additionalInfo) => fetchAdditionalInfos(additionalInfo, deidentified),
     getCount: (counts) => [
-      { label: `patient${counts[0].total > 1 ? 's' : ''}`, display: true, count: counts[0] },
+      { label: `patient${plural(counts[0].total)}`, display: true, count: counts[0] },
       { label: '', display: false, count: counts[1] }
     ]
   }
