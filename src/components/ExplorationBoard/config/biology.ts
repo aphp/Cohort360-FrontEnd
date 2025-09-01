@@ -1,4 +1,5 @@
 import { getConfig } from 'config'
+import { plural } from 'utils/string'
 import { Observation } from 'fhir/r4'
 import { formatValueRange } from 'mappers/biology'
 import { mapToDate } from 'mappers/dates'
@@ -220,7 +221,7 @@ export const biologyConfig = (
     "Les mesures de biologies correspondent aux codes dont l'utilisation à l'AP-HP est supérieure à 3 analyses biologiques. De plus, les résultats concernent uniquement les analyses quantitatives enregistrées sur GLIMS, qui ont été validées et mises à jour depuis mars 2020."
   ],
   getCount: (counts) => [
-    { label: `résultat${counts[0].total > 1 ? 's' : ''}`, display: true, count: counts[0] },
-    { label: `patient${counts[1].total > 1 ? 's' : ''}`, display: !!!patient, count: counts[1] }
+    { label: `résultat${plural(counts[0].total)}`, display: true, count: counts[0] },
+    { label: `patient${plural(counts[1].total)}`, display: !!!patient, count: counts[1] }
   ]
 })

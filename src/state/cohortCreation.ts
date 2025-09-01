@@ -305,12 +305,12 @@ const saveJson = createAsyncThunk<SaveJsonReturn, SaveJsonParams, { state: RootS
           if (newSnapshot) {
             const uuid = newSnapshot.uuid
             const created_at = newSnapshot.created_at
-            const title = newSnapshot.title
             const cohorts_count = newSnapshot.cohorts_count
+            const patients_count = newSnapshot.patients_count
             const version = newSnapshot.version
 
             currentSnapshot = { ...newSnapshot, navHistoryIndex: navHistory.length }
-            snapshotsHistory = [{ uuid, created_at, title, cohorts_count, version }]
+            snapshotsHistory = [{ uuid, created_at, cohorts_count, patients_count, version }]
             _navHistory.push(currentSnapshot)
           }
         }
@@ -320,12 +320,12 @@ const saveJson = createAsyncThunk<SaveJsonReturn, SaveJsonParams, { state: RootS
         if (newSnapshot) {
           const uuid = newSnapshot.uuid
           const created_at = newSnapshot.created_at
-          const title = newSnapshot.title
           const cohorts_count = newSnapshot.cohorts_count
+          const patients_count = newSnapshot.patients_count
           const version = newSnapshot.version
 
           currentSnapshot = { ...newSnapshot, navHistoryIndex: navHistory.length }
-          snapshotsHistory = [{ uuid, created_at, title, cohorts_count, version }, ...snapshotsHistory]
+          snapshotsHistory = [{ uuid, created_at, cohorts_count, patients_count, version }, ...snapshotsHistory]
           _navHistory.push(currentSnapshot)
         }
       }
@@ -620,6 +620,7 @@ const addRequestToCohortCreation = createAsyncThunk<
  * - Count management and status
  *
  * Actions:
+ * - editSnapshotHistory: Updates a specific snapshot in the snapshots history
  * - resetCohortCreation: Resets to initial state
  * - setCohortName: Sets the cohort name
  * - setPopulationSource: Sets the selected population
@@ -650,6 +651,22 @@ const cohortCreationSlice = createSlice({
   initialState: defaultInitialState(),
   reducers: {
     /**
+     * Updates a specific snapshot in the snapshots history.
+     *
+     * @param state - Current cohort creation state
+     * @param action - Action containing the updated snapshot information
+     */
+    editSnapshotHistory: (state: CohortCreationState, action: PayloadAction<QuerySnapshotInfo>) => {
+      const updatedVersion = action.payload
+      const updatedVersions = [...state.snapshotsHistory].map((version) =>
+        version.uuid === updatedVersion.uuid ? updatedVersion : version
+      )
+      state.snapshotsHistory = updatedVersions
+      if (state.currentSnapshot.uuid === action.payload.uuid) {
+        state.currentSnapshot = { ...state.currentSnapshot, name: action.payload.name }
+      }
+    },
+    /**
      * Resets the cohort creation state to initial values.
      */
     resetCohortCreation: () => defaultInitialState(),
@@ -662,7 +679,6 @@ const cohortCreationSlice = createSlice({
     setCohortName: (state: CohortCreationState, action: PayloadAction<string>) => {
       state.cohortName = action.payload
     },
-    //
     /**
      * Sets the population source/scope for the cohort.
      *
@@ -684,7 +700,6 @@ const cohortCreationSlice = createSlice({
     setSelectedCriteria: (state: CohortCreationState, action: PayloadAction<SelectedCriteriaType[]>) => {
       state.selectedCriteria = action.payload
     },
-    //
     /**
      * Deletes a selected criteria and updates all dependent structures.
      * Handles ID remapping, group assignments, and temporal constraints cleanup.
@@ -1010,7 +1025,8 @@ const cohortCreationSlice = createSlice({
         status: action.payload.status,
         includePatient: action.payload.includePatient,
         jobFailMsg: action.payload.jobFailMsg,
-        extra: action.payload.extra
+        extra: action.payload.extra,
+        snapshotId: action.payload.snapshotId
       }
     },
     /**
@@ -1095,6 +1111,7 @@ export {
   addRequestToCohortCreation
 }
 export const {
+  editSnapshotHistory,
   resetCohortCreation,
   setCohortName,
   setPopulationSource,

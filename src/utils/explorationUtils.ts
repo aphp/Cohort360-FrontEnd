@@ -10,7 +10,7 @@ import {
   Order,
   SearchCriterias
 } from 'types/searchCriterias'
-import { isDateValid } from './formatDate'
+import { isDateValid } from './dates'
 import { AppConfig } from 'config'
 import { format } from './numbers'
 import { SetURLSearchParams } from 'react-router-dom'

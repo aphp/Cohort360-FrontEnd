@@ -2,7 +2,7 @@ import React from 'react'
 import { Autocomplete, TextField, Typography } from '@mui/material'
 import { InputWrapper } from 'components/ui/Inputs/styles'
 import { LabelObject } from 'types/searchCriterias'
-import { capitalizeFirstLetter } from 'utils/capitalize'
+import { capitalizeFirstLetter } from 'utils/string'
 
 type MultiSelectProps = {
   value: LabelObject[]

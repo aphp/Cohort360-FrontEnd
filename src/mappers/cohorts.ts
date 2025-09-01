@@ -3,7 +3,7 @@ import { CohortCallbacks, ResearchesTableLabels, SubItemType } from 'types/cohor
 import { Order } from 'types/searchCriterias'
 import { Action, CellType, Column, Favorite, Row, SubItem, Table } from 'types/table'
 import { getExportTooltip, getGlobalEstimation, isCohortExportable, isExportDisabled } from 'utils/explorationUtils'
-import { formatDate } from 'utils/formatDate'
+import { formatDate } from 'utils/dates'
 import { format } from 'utils/numbers'
 import Download from 'assets/icones/download.svg?react'
 import EditIcon from '@mui/icons-material/Edit'

@@ -37,7 +37,7 @@ import { ACCESS_TOKEN, REFRESH_TOKEN } from 'constants.js'
 import services from 'services/aphp'
 
 import useStyles from './styles'
-import { getDaysLeft } from 'utils/formatDate'
+import { getDaysLeft } from 'utils/dates'
 import { AccessExpiration, User } from 'types'
 import { isAxiosError } from 'axios'
 import { saveRights } from 'state/scope'

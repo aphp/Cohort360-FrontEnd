@@ -363,8 +363,9 @@ export type RequestType = {
 
 export type QuerySnapshotInfo = {
   uuid: string
+  name?: string
   created_at: string
-  title: string
+  patients_count?: number | null
   cohorts_count: number
   version: number
 }
@@ -453,9 +454,9 @@ export type CohortCount = {
   shortCohortLimit?: number
   includePatient?: number
   byrequest?: number
-  unknownPatient?: number
   jobFailMsg?: string
   date?: string
+  snapshotId?: string
   cohort_limit?: number
   count_outdated?: boolean
   extra?: Record<string, string>
@@ -732,5 +733,6 @@ export type WSJobStatus = WebSocketMessage<{
     result_size?: number
     extra?: Record<string, string>
     global?: { measure_min: number; measure_max: number }
+    snapshot_id?: string
   }
 }> & { type: WebSocketMessageType.JOB_STATUS }
