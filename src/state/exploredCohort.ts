@@ -324,7 +324,8 @@ const exploredCohortSlice = createSlice({
      */
     updateCohort: (state: ExploredCohortState, action: PayloadAction<CohortData>) => {
       return { ...state, ...action.payload }
-    }
+    },
+    resetState: () => defaultInitialState
   },
   extraReducers: (builder) => {
     builder.addCase(login, () => defaultInitialState)
@@ -366,5 +367,6 @@ export const {
   removeImportedPatients,
   includePatients,
   removeExcludedPatients,
-  updateCohort
+  updateCohort,
+  resetState
 } = exploredCohortSlice.actions
