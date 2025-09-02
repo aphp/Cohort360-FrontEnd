@@ -67,7 +67,7 @@ export const useData = <T>(
     } catch (error) {
       if (error instanceof CanceledError) setLoadingStatus(LoadingStatus.FETCHING)
       setLoadingStatus(LoadingStatus.SUCCESS)
-      setData(null)
+      setData({ total: 0, totalAllResults: 0, totalPatients: 0, totalAllPatients: 0, list: [] })
       setCount(
         config.getCount
           ? config.getCount([
