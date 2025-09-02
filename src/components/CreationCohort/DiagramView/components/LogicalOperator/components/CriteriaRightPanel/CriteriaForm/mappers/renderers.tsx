@@ -76,6 +76,7 @@ const FORM_ITEM_RENDERER: { [key in CriteriaFormItemType]: CriteriaFormItemView<
   durationRange: (props) => {
     return (
       <DurationRange
+        sx={{ fontSize: 12, fontWeight: 600, fontFamily: '' }}
         label={props.definition.label}
         value={props.value ? [props.value.start, props.value.end] : [null, null]}
         disabled={props.disabled}
