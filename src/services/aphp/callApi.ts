@@ -957,6 +957,7 @@ type fetchImagingProps = {
   _list?: string[]
   signal?: AbortSignal
   modalities?: string[]
+  bodySite?: string
   executiveUnits?: string[]
   encounterStatus?: string[]
   uniqueFacet?: string[]
@@ -971,6 +972,7 @@ export const fetchImaging = async (args: fetchImagingProps): FHIR_Bundle_Promise
     _text,
     encounter,
     ipp,
+    bodySite,
     minDate,
     maxDate,
     signal,
@@ -995,6 +997,7 @@ export const fetchImaging = async (args: fetchImagingProps): FHIR_Bundle_Promise
   if (_text) options = [...options, `_text=${encodeURIComponent(_text)}&_tag=${LOW_TOLERANCE_TAG}`]
   if (encounter) options = [...options, `${ImagingParamsKeys.NDA}=${encounter}`]
   if (ipp) options = [...options, `${ImagingParamsKeys.IPP}=${ipp}`]
+  if (bodySite) options = [...options, `${ImagingParamsKeys.BODYSITE}=${bodySite}`]
   if (minDate) options = [...options, `${ImagingParamsKeys.DATE}=ge${minDate}`]
   if (maxDate) options = [...options, `${ImagingParamsKeys.DATE}=le${maxDate}`]
   if (modalities && modalities.length > 0) {
