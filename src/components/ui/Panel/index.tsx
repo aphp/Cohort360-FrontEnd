@@ -32,10 +32,10 @@ const Panel = ({
         paper: { style: { width: size } }
       }}
     >
-      <Grid container sx={{ flexDirection: "column", maxWidth: size, height: "100%", flexWrap: "nowrap" }}>
-        <Grid container sx={{ flexDirection: "column", flexWrap: "nowrap", overflow: "auto" }}>
+      <Grid container sx={{ flexDirection: 'column', maxWidth: size, height: '100%', flexWrap: 'nowrap' }}>
+        <Grid container sx={{ flexDirection: 'column', flexWrap: 'nowrap', overflow: 'auto' }}>
           <Paper>
-            <Grid container sx={{ justifyContent: "center", width: "100%" }}>
+            <Grid container sx={{ justifyContent: 'center', width: '100%' }}>
               {title && (
                 <Typography fontSize="22px" margin="12px 0px" style={{ color: '34F4F4f' }}>
                   {title}
@@ -49,16 +49,16 @@ const Panel = ({
         <Grid
           container
           sx={{
-            alignItems: "center",
-            justifyContent: "center",
-            flexWrap: "wrap",
-            width: "100%",
-            padding: "12px",
-            borderTop: "1px solid grey",
-            marginTop: "auto"
+            alignItems: 'center',
+            justifyContent: 'center',
+            flexWrap: 'wrap',
+            width: '100%',
+            padding: '12px',
+            borderTop: '1px solid grey',
+            marginTop: 'auto'
           }}
         >
-          <Grid size={{ xs: 4 }} container sx={{ justifyContent: "space-between" }}>
+          <Grid size={{ xs: 4 }} container sx={{ justifyContent: 'space-between' }}>
             <Button onClick={onClose} variant="outlined">
               Annuler
             </Button>

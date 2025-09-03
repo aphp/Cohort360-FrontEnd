@@ -59,7 +59,7 @@ const ModalImpersonation: React.FC<{
 
         setLoadingOnSearch(false)
       } catch (error) {
-        console.error('Erreur lors de la recherche des utilisateurs')
+        console.error('Erreur lors de la recherche des utilisateurs', error)
         setUsersSearchResults([])
         setLoadingOnSearch(false)
       }
@@ -76,7 +76,7 @@ const ModalImpersonation: React.FC<{
     <Dialog open={open} onClose={handleClose} fullWidth maxWidth="md" aria-labelledby="form-dialog-title">
       <DialogTitle>Impersonnifier un utilisateur</DialogTitle>
       <DialogContent>
-        <Grid container sx={{ flexDirection: "column" }}>
+        <Grid container sx={{ flexDirection: 'column' }}>
           <div style={{ display: 'flex', flexDirection: 'column', margin: '1em 0 0 0' }}>
             <Autocomplete
               noOptionsText="Rechercher un utilisateur"
@@ -86,7 +86,7 @@ const ModalImpersonation: React.FC<{
               onChange={(e, value) => {
                 setImpersonatedUser(value || undefined)
               }}
-              filterOptions={(options, { inputValue }) => options}
+              filterOptions={(options) => options}
               onInputChange={(event, value) => setSearchInput(value)}
               getOptionLabel={(option) =>
                 `${option.username} - ${option.lastname?.toLocaleUpperCase()} ${option.firstname} ${

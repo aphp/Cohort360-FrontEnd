@@ -38,7 +38,7 @@ const Patient = () => {
   const config = useContext(AppConfig)
   const patient = useAppSelector((state) => state.patient)
   const loading = patient !== null ? patient.loading : false
-  const deidentified = patient !== null ? patient.deidentified ?? false : false
+  const deidentified = patient !== null ? (patient.deidentified ?? false) : false
   const [searchParams] = useSearchParams()
   const subtab = searchParams.get('subtab') as ResourceType
   const groupId = useMemo(() => getCleanGroupId(searchParams.get('groupId')), [searchParams])
@@ -148,7 +148,7 @@ const Patient = () => {
             deidentifiedBoolean={deidentified}
             groupId={groupId}
           />
-          <Grid container sx={{ flexDirection: "column", alignItems: "center", backgroundColor: '#E6F1FD' }}>
+          <Grid container sx={{ flexDirection: 'column', alignItems: 'center', backgroundColor: '#E6F1FD' }}>
             <Grid container size={11}>
               <TabsWrapper
                 value={selectedTab}
@@ -174,7 +174,7 @@ const Patient = () => {
               </TabsWrapper>
             </Grid>
           </Grid>
-          <Grid container sx={{ justifyContent: "center" }}>
+          <Grid container sx={{ justifyContent: 'center' }}>
             <Grid container size={11}>
               {subTabs && (
                 <Grid container sx={{ borderBottom: '1px solid #848484' }}>

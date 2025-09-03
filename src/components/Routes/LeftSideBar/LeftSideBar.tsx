@@ -149,8 +149,8 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
 
         <List className={classes.list}>
           <ListItem>
-            <Grid container sx={{ justifyContent: "space-between", alignItems: "center" }} wrap="nowrap">
-              <Grid container wrap="nowrap" size={{ xs: 10 }} sx={{ alignItems: "center" }}>
+            <Grid container sx={{ justifyContent: 'space-between', alignItems: 'center' }} wrap="nowrap">
+              <Grid container wrap="nowrap" size={{ xs: 10 }} sx={{ alignItems: 'center' }}>
                 <Impersonation
                   UserInfo={({ practitioner }) => (
                     <>

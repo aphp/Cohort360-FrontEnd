@@ -219,16 +219,16 @@ export function mapDocumentStatusesToRequestParam(docStatus: string): string {
   return docStatus === FilterByDocumentStatus.VALIDATED
     ? DocumentStatuses.FINAL
     : docStatus === FilterByDocumentStatus.NOT_VALIDATED
-    ? DocumentStatuses.PRELIMINARY
-    : ''
+      ? DocumentStatuses.PRELIMINARY
+      : ''
 }
 
 export function mapDocumentStatusesFromRequestParam(docStatus: string): string {
   return docStatus === DocumentStatuses.FINAL
     ? FilterByDocumentStatus.VALIDATED
     : docStatus === DocumentStatuses.PRELIMINARY
-    ? FilterByDocumentStatus.NOT_VALIDATED
-    : ''
+      ? FilterByDocumentStatus.NOT_VALIDATED
+      : ''
 }
 
 export enum FilterKeys {

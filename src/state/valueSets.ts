@@ -1,10 +1,4 @@
-import {
-  createSlice,
-  createEntityAdapter,
-  createAsyncThunk,
-  PayloadAction,
-  createSelector
-} from '@reduxjs/toolkit'
+import { createSlice, createEntityAdapter, createAsyncThunk, PayloadAction, createSelector } from '@reduxjs/toolkit'
 import { CriteriaItemType } from 'types'
 import { CodesCache, Hierarchy } from 'types/hierarchy'
 import { logout } from './me'
@@ -44,12 +38,15 @@ export const prefetchSmallValueSets = async (
 
       return criterionValuesets || []
     })
-    .reduce((acc, item) => {
-      if (!acc.some((existingItem) => existingItem.id === item.id)) {
-        acc.push(item)
-      }
-      return acc
-    }, [] as { id: string; data?: LabelObject[] }[])
+    .reduce(
+      (acc, item) => {
+        if (!acc.some((existingItem) => existingItem.id === item.id)) {
+          acc.push(item)
+        }
+        return acc
+      },
+      [] as { id: string; data?: LabelObject[] }[]
+    )
 
   // fetch them
   return await Promise.all(

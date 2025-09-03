@@ -117,9 +117,9 @@ const Contact: React.FC = () => {
   return (
     <>
       <PageContainer>
-        <Grid container sx={{ flexDirection: "column", alignItems: "center" }}>
+        <Grid container sx={{ flexDirection: 'column', alignItems: 'center' }}>
           <CssBaseline />
-          <Grid container size={{ xs: 11 }} sx={{ flexDirection: "column" }}>
+          <Grid container size={{ xs: 11 }} sx={{ flexDirection: 'column' }}>
             {loading ? (
               <CircularProgress size={60} className={classes.loading} />
             ) : (

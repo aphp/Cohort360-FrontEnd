@@ -47,8 +47,8 @@ const RequestForm: React.FC<RequestFormProps> = ({
                 ? 'Le nom de la requête doit comporter au moins un caractère.'
                 : 'Le nom est trop long (255 caractères max.)'
               : error === ERROR_REGEX
-              ? "Le nom de la cohorte ne peut pas être composé uniquement d'espaces."
-              : ''
+                ? "Le nom de la cohorte ne peut pas être composé uniquement d'espaces."
+                : ''
           }
         />
       </Grid>

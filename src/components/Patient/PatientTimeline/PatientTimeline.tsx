@@ -1,4 +1,3 @@
-/* eslint-disable max-statements */
 import React, { useState, useEffect, useMemo } from 'react'
 import { useParams, useSearchParams } from 'react-router-dom'
 import moment from 'moment'

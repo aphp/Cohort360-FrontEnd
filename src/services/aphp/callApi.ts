@@ -504,11 +504,11 @@ export const fetchProcedure = async (args: fetchProcedureProps): FHIR_Bundle_Pro
   // By default, all the calls to `/Procedure` will have 'patient.active=true' in parameter
   let options: string[] = appConfig.core.fhir.filterActive ? ['subject.active=true'] : []
   if (appConfig.core.fhir.totalCount) options = [...options, '_total=accurate']
-  if (size !== undefined) options = [...options, `_count=${size}`] // eslint-disable-line
-  if (offset) options = [...options, `_offset=${offset}`] // eslint-disable-line
-  if (_sort) options = [...options, `_sort=${_sortDirection}${_sort}`] // eslint-disable-line
-  if (subject) options = [...options, `subject=${subject}`] // eslint-disable-line
-  if (code) options = [...options, `${ProcedureParamsKeys.CODE}=${code}`] // eslint-disable-line
+  if (size !== undefined) options = [...options, `_count=${size}`]
+  if (offset) options = [...options, `_offset=${offset}`]
+  if (_sort) options = [...options, `_sort=${_sortDirection}${_sort}`]
+  if (subject) options = [...options, `subject=${subject}`]
+  if (code) options = [...options, `${ProcedureParamsKeys.CODE}=${code}`]
   if (appConfig.core.fhir.useSource && source?.length)
     options = [...options, `${ProcedureParamsKeys.SOURCE}=${source.join(',')}`]
   if (_text) options = [...options, `_text=${encodeURIComponent(_text)}&_tag=${LOW_TOLERANCE_TAG}`]
@@ -583,12 +583,12 @@ export const fetchClaim = async (args: fetchClaimProps): FHIR_Bundle_Promise_Res
   // By default, all the calls to `/Claim` will have 'patient.active=true' in parameter
   let options: string[] = appConfig.core.fhir.filterActive ? ['patient.active=true'] : []
   if (appConfig.core.fhir.totalCount) options = [...options, '_total=accurate']
-  if (size !== undefined) options = [...options, `_count=${size}`] // eslint-disable-line
-  if (offset) options = [...options, `_offset=${offset}`] // eslint-disable-line
-  if (_sort) options = [...options, `_sort=${_sortDirection}${_sort}`] // eslint-disable-line
-  if (patient) options = [...options, `patient=${patient}`] // eslint-disable-line
-  if (diagnosis) options = [...options, `${ClaimParamsKeys.CODE}=${diagnosis}`] // eslint-disable-line
-  if (_text) options = [...options, `_text=${encodeURIComponent(_text)}&_tag=${LOW_TOLERANCE_TAG}`] // eslint-disable-line
+  if (size !== undefined) options = [...options, `_count=${size}`]
+  if (offset) options = [...options, `_offset=${offset}`]
+  if (_sort) options = [...options, `_sort=${_sortDirection}${_sort}`]
+  if (patient) options = [...options, `patient=${patient}`]
+  if (diagnosis) options = [...options, `${ClaimParamsKeys.CODE}=${diagnosis}`]
+  if (_text) options = [...options, `_text=${encodeURIComponent(_text)}&_tag=${LOW_TOLERANCE_TAG}`]
   if (encounterIdentifier) options = [...options, `${ClaimParamsKeys.NDA}=${encounterIdentifier}`]
   if (patientIdentifier) options = [...options, `${ClaimParamsKeys.IPP}=${patientIdentifier}`]
   if (minCreated) options = [...options, `${ClaimParamsKeys.DATE}=ge${minCreated}`]
@@ -651,17 +651,17 @@ export const fetchCondition = async (args: fetchConditionProps): FHIR_Bundle_Pro
   // By default, all the calls to `/Condition` will have 'patient.active=true' in parameter
   let options: string[] = appConfig.core.fhir.filterActive ? ['subject.active=true'] : []
   if (appConfig.core.fhir.totalCount) options = [...options, '_total=accurate']
-  if (size !== undefined) options = [...options, `_count=${size}`] // eslint-disable-line
-  if (offset !== undefined) options = [...options, `_offset=${offset}`] // eslint-disable-line
-  if (_sort) options = [...options, `_sort=${_sortDirection}${_sort}`] // eslint-disable-line
-  if (subject) options = [...options, `subject=${subject}`] // eslint-disable-line
-  if (code) options = [...options, `${ConditionParamsKeys.CODE}=${code}`] // eslint-disable-line
+  if (size !== undefined) options = [...options, `_count=${size}`]
+  if (offset !== undefined) options = [...options, `_offset=${offset}`]
+  if (_sort) options = [...options, `_sort=${_sortDirection}${_sort}`]
+  if (subject) options = [...options, `subject=${subject}`]
+  if (code) options = [...options, `${ConditionParamsKeys.CODE}=${code}`]
   if (appConfig.core.fhir.useSource && source?.length) options = [...options, `${ConditionParamsKeys.SOURCE}=${source}`]
-  if (_text) options = [...options, `_text=${encodeURIComponent(_text)}&_tag=${LOW_TOLERANCE_TAG}`] // eslint-disable-line
-  if (encounterIdentifier) options = [...options, `${ConditionParamsKeys.NDA}=${encounterIdentifier}`] // eslint-disable-line
+  if (_text) options = [...options, `_text=${encodeURIComponent(_text)}&_tag=${LOW_TOLERANCE_TAG}`]
+  if (encounterIdentifier) options = [...options, `${ConditionParamsKeys.NDA}=${encounterIdentifier}`]
   if (patientIdentifier) options = [...options, `${ConditionParamsKeys.IPP}=${patientIdentifier}`]
-  if (minRecordedDate) options = [...options, `${ConditionParamsKeys.DATE}=ge${minRecordedDate}`] // eslint-disable-line
-  if (maxRecordedDate) options = [...options, `${ConditionParamsKeys.DATE}=le${maxRecordedDate}`] // eslint-disable-line
+  if (minRecordedDate) options = [...options, `${ConditionParamsKeys.DATE}=ge${minRecordedDate}`]
+  if (maxRecordedDate) options = [...options, `${ConditionParamsKeys.DATE}=le${maxRecordedDate}`]
   if (executiveUnits && executiveUnits.length > 0)
     options = [...options, `${ConditionParamsKeys.EXECUTIVE_UNITS}=${executiveUnits}`]
   if (encounterStatus && encounterStatus.length > 0)
@@ -669,7 +669,7 @@ export const fetchCondition = async (args: fetchConditionProps): FHIR_Bundle_Pro
   if (appConfig.core.fhir.facetsExtensions && uniqueFacet && uniqueFacet.length > 0)
     options = [...options, `unique-facet=${uniqueFacet.reduce(paramValuesReducer, '')}`]
 
-  if (!subject && _list && _list.length > 0) options = [...options, `_list=${_list.reduce(paramValuesReducer, '')}`] // eslint-disable-line
+  if (!subject && _list && _list.length > 0) options = [...options, `_list=${_list.reduce(paramValuesReducer, '')}`]
   if (hasSearchParam(ResourceType.CONDITION, ConditionParamsKeys.DIAGNOSTIC_TYPES) && type && type.length > 0) {
     const diagnosticTypesUrl = appConfig.features.condition.valueSets.conditionStatus.url + '|'
     const urlString = type.map((id) => diagnosticTypesUrl + id).join(',')
@@ -744,12 +744,12 @@ export const fetchObservation = async (args: fetchObservationProps): FHIR_Bundle
   if (_sort) options = [...options, `_sort=${_sortDirection}${_sort.includes('code') ? _sort : `${_sort}`}`]
   if (_text) options = [...options, `_text=${encodeURIComponent(_text)}&_tag=${LOW_TOLERANCE_TAG}`]
   if (encounter) options = [...options, `${ObservationParamsKeys.NDA}=${encounter}`]
-  if (code) options = [...options, `${ObservationParamsKeys.CODE}=${code}`] // eslint-disable-line
-  if (subject) options = [...options, `subject=${subject}`] // eslint-disable-line
-  if (minDate) options = [...options, `${ObservationParamsKeys.DATE}=ge${minDate}`] // eslint-disable-line
-  if (maxDate) options = [...options, `${ObservationParamsKeys.DATE}=le${maxDate}`] // eslint-disable-line
+  if (code) options = [...options, `${ObservationParamsKeys.CODE}=${code}`]
+  if (subject) options = [...options, `subject=${subject}`]
+  if (minDate) options = [...options, `${ObservationParamsKeys.DATE}=ge${minDate}`]
+  if (maxDate) options = [...options, `${ObservationParamsKeys.DATE}=le${maxDate}`]
   if (appConfig.features.observation.useObservationDefaultValidated && rowStatus)
-    options = [...options, `${ObservationParamsKeys.VALIDATED_STATUS}=${BiologyStatus.VALIDATED}`] // eslint-disable-line
+    options = [...options, `${ObservationParamsKeys.VALIDATED_STATUS}=${BiologyStatus.VALIDATED}`]
   if (executiveUnits && executiveUnits.length > 0)
     options = [...options, `${ObservationParamsKeys.EXECUTIVE_UNITS}=${executiveUnits}`]
   if (encounterStatus && encounterStatus.length > 0)
@@ -922,10 +922,10 @@ export const fetchMedicationAdministration = async (
     options = [...options, `${AdministrationParamsKeys.ADMINISTRATION_ROUTES}=${encodeURIComponent(urlString)}`]
   }
   if (code) if (code) options = [...options, `${AdministrationParamsKeys.CODE}=${code}`]
-  if (minDate) options = [...options, `${AdministrationParamsKeys.DATE}=ge${minDate}`] // eslint-disable-line
-  if (maxDate) options = [...options, `${AdministrationParamsKeys.DATE}=le${maxDate}`] // eslint-disable-line
+  if (minDate) options = [...options, `${AdministrationParamsKeys.DATE}=ge${minDate}`]
+  if (maxDate) options = [...options, `${AdministrationParamsKeys.DATE}=le${maxDate}`]
   if (executiveUnits && executiveUnits.length > 0)
-    options = [...options, `${AdministrationParamsKeys.EXECUTIVE_UNITS}=${executiveUnits}`] // eslint-disable-line
+    options = [...options, `${AdministrationParamsKeys.EXECUTIVE_UNITS}=${executiveUnits}`]
   if (encounterStatus && encounterStatus.length > 0)
     options = [...options, `${AdministrationParamsKeys.ENCOUNTER_STATUS}=${encounterStatus}`]
   if (appConfig.core.fhir.facetsExtensions && uniqueFacet && uniqueFacet.length > 0)

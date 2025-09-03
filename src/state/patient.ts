@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 
 import { RootState } from 'state'
@@ -362,49 +361,49 @@ const patientSlice = createSlice({
       action.payload === null
         ? null
         : action.payload.patientInfo.id === state?.patientInfo?.id
-        ? {
-            ...state,
-            loading: false,
-            deidentified: action.payload.deidentified,
-            groupId: action.payload.groupId,
-            patientInfo: {
-              ...(state?.patientInfo ?? {}),
-              ...action.payload.patientInfo
-            },
-            hospits: action.payload.hospits
-          }
-        : {
-            ...state,
-            loading: false,
-            deidentified: action.payload.deidentified,
-            groupId: action.payload.groupId,
-            patientInfo: {
-              ...state?.patientInfo,
-              ...action.payload.patientInfo
-            },
-            hospits: action.payload.hospits,
-            documents: undefined,
-            pmsi: undefined,
-            medication: {
-              administration: {
-                loading: false,
-                count: 0,
-                total: null,
-                list: [],
-                page: 0
+          ? {
+              ...state,
+              loading: false,
+              deidentified: action.payload.deidentified,
+              groupId: action.payload.groupId,
+              patientInfo: {
+                ...(state?.patientInfo ?? {}),
+                ...action.payload.patientInfo
               },
-              prescription: {
-                loading: false,
-                count: 0,
-                total: null,
-                list: [],
-                page: 0
-              }
-            },
-            biology: undefined,
-            imaging: undefined,
-            forms: undefined
-          }
+              hospits: action.payload.hospits
+            }
+          : {
+              ...state,
+              loading: false,
+              deidentified: action.payload.deidentified,
+              groupId: action.payload.groupId,
+              patientInfo: {
+                ...state?.patientInfo,
+                ...action.payload.patientInfo
+              },
+              hospits: action.payload.hospits,
+              documents: undefined,
+              pmsi: undefined,
+              medication: {
+                administration: {
+                  loading: false,
+                  count: 0,
+                  total: null,
+                  list: [],
+                  page: 0
+                },
+                prescription: {
+                  loading: false,
+                  count: 0,
+                  total: null,
+                  list: [],
+                  page: 0
+                }
+              },
+              biology: undefined,
+              imaging: undefined,
+              forms: undefined
+            }
     )
     builder.addCase(fetchPatientInfo.rejected, () => null)
     builder.addCase(fetchLastPmsiInfo.pending, (state) =>

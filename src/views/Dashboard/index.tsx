@@ -36,7 +36,6 @@ const Dashboard = ({ context }: DashboardProps) => {
   const [selectedTab, setSelectedTab] = useState(
     (tabName ?? appConfig.core.fhir.facetsExtensions) ? ResourceType.PREVIEW : ResourceType.PATIENT
   )
-  const open = useAppSelector((state) => state.drawer)
   const dashboard = useAppSelector((state) => state.exploredCohort)
   const me = useAppSelector((state) => state.me)
   const config = useMemo(

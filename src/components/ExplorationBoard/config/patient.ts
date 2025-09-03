@@ -70,11 +70,11 @@ const getPatientInfos = (patient: Patient, deidentified: boolean, groupId: strin
   const surname = deidentified
     ? 'Prénom'
     : patient.name?.[0].given?.[0]
-    ? capitalizeFirstLetter(patient.name?.[0].given?.[0])
-    : 'Non renseigné'
+      ? capitalizeFirstLetter(patient.name?.[0].given?.[0])
+      : 'Non renseigné'
   const lastname = deidentified
     ? 'Nom'
-    : patient.name
+    : (patient.name
         ?.map((e) => {
           if (e.use === 'official') {
             return e.family ?? 'Non renseigné'
@@ -83,17 +83,17 @@ const getPatientInfos = (patient: Patient, deidentified: boolean, groupId: strin
             return `(${patient.gender === 'female' ? 'née' : 'né'} : ${e.family})`
           }
         })
-        .join(' ') ?? 'Non renseigné'
+        .join(' ') ?? 'Non renseigné')
   const ipp = {
     label: deidentified
       ? patient.id
-      : patient.identifier?.find(
+      : (patient.identifier?.find(
           (identifier) =>
             identifier.type?.coding?.[0].code === appConfig.features.patient.patientIdentifierExtensionCode?.code &&
             identifier.type?.coding?.[0].system === appConfig.features.patient.patientIdentifierExtensionCode?.system
         )?.value ??
         patient.identifier?.[0].value ??
-        'inconnu',
+        'inconnu'),
     url: `/patients/${patient.id}${groupId ? `?groupId=${groupId}` : ''}` /*${_search}*/
   }
   const age = {

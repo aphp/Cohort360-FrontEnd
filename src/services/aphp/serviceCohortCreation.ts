@@ -192,10 +192,12 @@ const servicesCohortCreation: IServiceCohortCreation = {
       }
 
       shortCohortLimit =
-        currentSnapshot.dated_measures.length > 0 ? currentSnapshot.dated_measures?.[0].cohort_limit ?? 0 : 0
+        currentSnapshot.dated_measures.length > 0 ? (currentSnapshot.dated_measures?.[0].cohort_limit ?? 0) : 0
 
       count_outdated =
-        currentSnapshot.dated_measures.length > 0 ? currentSnapshot.dated_measures?.[0].count_outdated ?? false : false
+        currentSnapshot.dated_measures.length > 0
+          ? (currentSnapshot.dated_measures?.[0].count_outdated ?? false)
+          : false
     }
 
     result = {

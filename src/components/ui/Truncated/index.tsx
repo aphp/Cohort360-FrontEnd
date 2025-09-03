@@ -21,7 +21,7 @@ const Truncated = <T,>({ values, component: Component, maxHeight = 200, gap = '5
   }, [values, maxHeight])
 
   return (
-    <Grid container sx={{ justifyContent: "space-between" }}>
+    <Grid container sx={{ justifyContent: 'space-between' }}>
       <Grid container size={{ xs: 12 }}>
         <div
           ref={containerRef}

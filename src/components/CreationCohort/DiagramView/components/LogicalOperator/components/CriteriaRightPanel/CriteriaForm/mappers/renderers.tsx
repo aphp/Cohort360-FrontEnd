@@ -164,7 +164,7 @@ const FORM_ITEM_RENDERER: { [key in CriteriaFormItemType]: CriteriaFormItemView<
 
                 return (
                   <React.Fragment>
-                    <Grid container sx={{ flexDirection: "row", alignItems: "center" }}>
+                    <Grid container sx={{ flexDirection: 'row', alignItems: 'center' }}>
                       <Checkbox
                         indeterminate={
                           groupChildren.length !== selectedWithinGroup.length && selectedWithinGroup.length > 0
@@ -261,9 +261,8 @@ const FORM_ITEM_RENDERER: { [key in CriteriaFormItemType]: CriteriaFormItemView<
     )
   },
   boolean: (props) => {
-    // eslint-disable-next-line react-hooks/rules-of-hooks
     return (
-      <BlockWrapper container sx={{ alignItems: "center" }}>
+      <BlockWrapper container sx={{ alignItems: 'center' }}>
         <CriteriaLabel
           label={props.definition.label ?? ''}
           infoIcon={props.definition.extraInfo}

@@ -32,8 +32,8 @@ const PatientsNbFilter = ({ label, values, type, onError, onChange }: PatientsNb
   return (
     <InputWrapper>
       {label && <Typography variant="h3">{label}</Typography>}
-      <Grid container sx={{ justifyContent: "space-between" }}>
-        <Grid container size={{ xs: 5 }} sx={{ alignItems: "baseline", justifyContent: "space-between" }}>
+      <Grid container sx={{ justifyContent: 'space-between' }}>
+        <Grid container size={{ xs: 5 }} sx={{ alignItems: 'baseline', justifyContent: 'space-between' }}>
           <FormLabel component="legend">Au moins :</FormLabel>
           <TextField
             type="number"
@@ -48,7 +48,7 @@ const PatientsNbFilter = ({ label, values, type, onError, onChange }: PatientsNb
           />
           <FormLabel component="legend">patient(s).</FormLabel>
         </Grid>
-        <Grid container size={{ xs: 5 }} sx={{ alignItems: "baseline", justifyContent: "space-between" }}>
+        <Grid container size={{ xs: 5 }} sx={{ alignItems: 'baseline', justifyContent: 'space-between' }}>
           <FormLabel component="legend">Jusqu'à :</FormLabel>
           <TextField
             type="number"

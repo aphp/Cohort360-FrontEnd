@@ -64,7 +64,7 @@ const Chart = ({
           </Grid>
         </ChartHeader>
       )}
-      <Grid container sx={{ justifyContent: "center", alignItems: "center", flexGrow: 1, height: "100%" }}>
+      <Grid container sx={{ justifyContent: 'center', alignItems: 'center', flexGrow: 1, height: '100%' }}>
         {isLoading ? <CircularProgress /> : children}
       </Grid>
     </ChartContainer>

@@ -62,7 +62,7 @@ const RequestShareForm: React.FC<PropsWithChildren<RequestShareFormProps>> = (
 
         setLoadingOnSearch(false)
       } catch (error) {
-        console.error('Erreur lors de la recherche des utilisateurs')
+        console.error('Erreur lors de la recherche des utilisateurs', error)
         setUsersSearchResults([])
         setLoadingOnSearch(false)
       }
@@ -82,7 +82,7 @@ const RequestShareForm: React.FC<PropsWithChildren<RequestShareFormProps>> = (
 
   return (
     <>
-      <Grid container sx={{ flexDirection: "column", marginBottom: 3 }}>
+      <Grid container sx={{ flexDirection: 'column', marginBottom: 3 }}>
         <Typography variant="h3">Nom de la requête à partager:</Typography>
         <TextField
           placeholder="Nom de la requête"
@@ -98,7 +98,7 @@ const RequestShareForm: React.FC<PropsWithChildren<RequestShareFormProps>> = (
         />
       </Grid>
 
-      <Grid container sx={{ flexDirection: "column" }}>
+      <Grid container sx={{ flexDirection: 'column' }}>
         <Typography variant="h3">Utilisateur à qui partager la requête:</Typography>
         <div style={{ display: 'flex', flexDirection: 'column', margin: '1em 0 0 0' }}>
           <Autocomplete
@@ -110,7 +110,7 @@ const RequestShareForm: React.FC<PropsWithChildren<RequestShareFormProps>> = (
               addUser(value)
               setSearchInput('')
             }}
-            filterOptions={(options, { inputValue }) => options}
+            filterOptions={(options) => options}
             onInputChange={(event, value) => setSearchInput(value)}
             getOptionLabel={(option) =>
               `${option.username} - ${option.lastname?.toLocaleUpperCase()} ${option.firstname} ${
@@ -144,7 +144,7 @@ const RequestShareForm: React.FC<PropsWithChildren<RequestShareFormProps>> = (
           <UsersTable usersList={usersToShare} onChangeUsersAssociated={onChangeValue} usersAssociated={usersToShare} />
         </div>
       </Grid>
-      <Grid container sx={{ flexDirection: "column" }}>
+      <Grid container sx={{ flexDirection: 'column' }}>
         {children}
       </Grid>
     </>

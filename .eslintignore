@@ -1,9 +1,0 @@
-# Don't check data folder
-src/data
-/test
-wdio.conf.js
-# Don't check test (for the moment)
-src/**/*.test.ts
-src/**/*.test.js
-src/**/*.test.tsx
-src/**/*.test.jsx

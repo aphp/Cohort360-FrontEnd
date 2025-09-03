@@ -32,7 +32,7 @@ const DocTypes = ({ value, options, label, disabled = false, onChange }: DocType
 
     return (
       <React.Fragment>
-        <Grid container sx={{ flexDirection: "row", alignItems: "center" }}>
+        <Grid container sx={{ flexDirection: 'row', alignItems: 'center' }}>
           <Checkbox
             indeterminate={
               currentDocTypeList.length !== currentSelectedDocTypeList.length && currentSelectedDocTypeList.length > 0

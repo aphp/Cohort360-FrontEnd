@@ -120,7 +120,7 @@ const SamplesList = () => {
         header={
           <LevelHeader
             loading={cohortLoading}
-            name={cohortId ? parentCohort?.name ?? 'N/A' : 'Tous mes échantillons'}
+            name={cohortId ? (parentCohort?.name ?? 'N/A') : 'Tous mes échantillons'}
             description={parentCohort?.description ?? ''}
             actions={
               cohortId && (

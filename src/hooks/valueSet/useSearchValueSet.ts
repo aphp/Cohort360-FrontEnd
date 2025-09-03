@@ -107,6 +107,7 @@ export const useSearchValueSet = (references: Reference[], selectedNodes: Hierar
     try {
       return await fetch()
     } catch (error) {
+      console.error(error)
       return { count: 0, results: [] }
     }
   }

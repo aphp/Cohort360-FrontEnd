@@ -78,14 +78,20 @@ const getSearchDocumentLabel = (value: string, searchBy: string | null) => {
 }
 
 const getDocumentTypesLabel = (values: string[]) => {
-  const typeGroups = allDocTypes.docTypes.reduce((acc, docType) => {
-    acc[docType.type] = acc[docType.type] ? [...acc[docType.type], docType.code] : [docType.code]
-    return acc
-  }, {} as Record<string, string[]>)
-  const typeMap = allDocTypes.docTypes.reduce((acc, docType) => {
-    acc[docType.code] = docType
-    return acc
-  }, {} as Record<string, { type: string; label: string; code: string }>)
+  const typeGroups = allDocTypes.docTypes.reduce(
+    (acc, docType) => {
+      acc[docType.type] = acc[docType.type] ? [...acc[docType.type], docType.code] : [docType.code]
+      return acc
+    },
+    {} as Record<string, string[]>
+  )
+  const typeMap = allDocTypes.docTypes.reduce(
+    (acc, docType) => {
+      acc[docType.code] = docType
+      return acc
+    },
+    {} as Record<string, { type: string; label: string; code: string }>
+  )
   return values
     .reduce((acc, selectedDocType) => {
       const selectedDocTypeGroup = typeMap[selectedDocType].type

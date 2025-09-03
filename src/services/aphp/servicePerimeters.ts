@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   AccessExpiration,
   AccessExpirationsProps,
@@ -297,6 +296,7 @@ const servicesPerimeters: IServicePerimeters = {
         results: mappedElement
       }
     } catch (error) {
+      console.error(error)
       return response
     }
   },
@@ -329,6 +329,7 @@ const servicesPerimeters: IServicePerimeters = {
         results: mappedElement
       }
     } catch (error) {
+      console.error(error)
       return response
     }
   },

@@ -143,7 +143,7 @@ const PartialConstraintLayout: React.FC<PartialConstraintLayoutProps> = ({ isEpi
                   key={criteriaId}
                   container
                   size={constraint.idList.length > 3 ? { xs: 6 } : undefined}
-                  sx={{ alignItems: "center", margin: '4px 0' }}
+                  sx={{ alignItems: 'center', margin: '4px 0' }}
                 >
                   <AvatarWrapper size={20} fontSize={12} marginLeft={0.5} marginRight={0.5}>
                     {criteriaId}
@@ -253,7 +253,7 @@ const PartialConstraintLayout: React.FC<PartialConstraintLayoutProps> = ({ isEpi
                       />
                     }
                     label={
-                      <Grid container sx={{ alignItems: "center" }} wrap="nowrap">
+                      <Grid container sx={{ alignItems: 'center' }} wrap="nowrap">
                         <AvatarWrapper size={20} fontSize={12} marginLeft={0.5} marginRight={0.5}>
                           {criteria.id}
                         </AvatarWrapper>

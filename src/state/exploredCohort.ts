@@ -208,9 +208,9 @@ const fetchExploredCohortInBackground = createAsyncThunk<
           cohort.canMakeExport = false
           cohort.deidentifiedBoolean =
             cohort.cohort && cohort.cohort && Array.isArray(cohort.cohort)
-              ? cohort.cohort.some(
+              ? (cohort.cohort.some(
                   (cohort) => getExtension(cohort, 'READ_ACCESS')?.valueString === 'DATA_PSEUDOANONYMISED'
-                ) ?? true
+                ) ?? true)
               : true
         }
       }

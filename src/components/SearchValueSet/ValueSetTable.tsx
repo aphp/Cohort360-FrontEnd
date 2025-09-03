@@ -203,14 +203,23 @@ const ValueSetTable = ({
   }
 
   return (
-    <Grid container sx={{ flexDirection: 'column', justifyContent: 'space-between' }} height="100%" className="ValueSetTable">
+    <Grid
+      container
+      sx={{ flexDirection: 'column', justifyContent: 'space-between' }}
+      height="100%"
+      className="ValueSetTable"
+    >
       <Grid container flexGrow={1}>
         <TableContainer style={{ background: 'white' }}>
           <Table>
             <TableHead>
               {loading.list === LoadingStatus.SUCCESS && !isHierarchy && (
                 <RowContainerWrapper container>
-                  <RowWrapper container sx={{ alignItems: 'center', justifyContent: 'space-between' }} style={{ paddingRight: 10 }}>
+                  <RowWrapper
+                    container
+                    sx={{ alignItems: 'center', justifyContent: 'space-between' }}
+                    style={{ paddingRight: 10 }}
+                  >
                     <CellWrapper size={1} />
                     <CellWrapper size={6}>
                       <Typography color={hierarchy.count ? 'primary' : '#4f4f4f'} fontWeight={600}>

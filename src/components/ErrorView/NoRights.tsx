@@ -20,7 +20,10 @@ const NoRights: React.FC<NoRightsProps> = ({ oidcCode }) => {
   const appConfig = useContext(AppConfig)
 
   return (
-    <Grid container sx={{ flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 2, height: '100vh' }}>
+    <Grid
+      container
+      sx={{ flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 2, height: '100vh' }}
+    >
       <Grid className={classes.item}>
         <Grid container sx={{ flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
           <Grid style={{ padding: 16 }}>
