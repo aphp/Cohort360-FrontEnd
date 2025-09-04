@@ -36,7 +36,9 @@ const useProjects = ({ filters, searchInput, orderBy, paramsReady }: UseProjects
   })
 
   useEffect(() => {
-    isError && dispatch(setMessage({ type: 'error', content: 'Erreur lors de la récupération des projets' }))
+    if (isError) {
+      dispatch(setMessage({ type: 'error', content: 'Erreur lors de la récupération des projets' }))
+    }
   }, [isError, dispatch])
 
   const projectsList = data?.results ?? []

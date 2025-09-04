@@ -81,7 +81,7 @@ export enum GenderStatusLabel {
   FEMALE = 'Femmes',
   OTHER = 'Autres',
   UNKNOWN = 'Inconnu',
-  OTHER_UNKNOWN = 'Autres'
+  OTHER_UNKNOWN = 'Autres - Inconnu'
 }
 export enum VitalStatusLabel {
   ALIVE = 'Patients vivants',

@@ -39,7 +39,7 @@ const FilterTimelineDialog: React.FC<FilterTimelineDialogProps> = ({
   const [diagnosticTypes, setDiagnosticTypes] = useState<LabelObject[]>(selectedDiagnosticTypes)
   const [encounterStatus, setEncounterStatus] = useState<LabelObject[]>(selectedEncounterStatus)
 
-  const _onChangeSelectedDiagnosticTypes = (event: React.ChangeEvent<{}>, value: LabelObject[]) => {
+  const _onChangeSelectedDiagnosticTypes = (event: React.ChangeEvent<object>, value: LabelObject[]) => {
     setDiagnosticTypes(value)
   }
 

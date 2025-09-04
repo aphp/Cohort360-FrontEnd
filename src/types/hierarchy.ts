@@ -23,12 +23,12 @@ export type HierarchyInfo<T> = {
   system: string
 }
 
-export type AbstractTree<ID = string, DATA = {}> = DATA & {
+export type AbstractTree<ID = string, DATA = object> = DATA & {
   id: ID
   subItems?: AbstractTree<ID, DATA>[]
 }
 
-export type Hierarchy<T = {}, S = string> = AbstractTree<
+export type Hierarchy<T = object, S = string> = AbstractTree<
   S,
   T & {
     label: string

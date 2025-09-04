@@ -275,7 +275,9 @@ const Login = () => {
   }
 
   const onKeyDown = (event: ReactKeyboardEvent<HTMLDivElement>) => {
-    event.key === 'Enter' ? _onSubmit(event) : null
+    if (event.key === 'Enter') {
+      _onSubmit(event)
+    }
   }
 
   useEffect(() => {

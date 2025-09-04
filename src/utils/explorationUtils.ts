@@ -180,7 +180,7 @@ export const getStatusParam = (searchParam: string | null): LabelObject[] => {
   return statusParam
 }
 
-export const parseSearchParamValue = (searchParam: string | null, options: {}) => {
+export const parseSearchParamValue = (searchParam: string | null, options: object) => {
   if (searchParam === null) {
     return null
   }
@@ -198,7 +198,11 @@ export const removeFromSearchParams = (
     ?.filter((searchValue) => searchValue !== (keyToRemove === FilterKeys.STATUS ? (value as LabelObject).id : value))
     .join()
 
-  cleanedParam ? searchParams.set(keyToRemove, cleanedParam) : searchParams.delete(keyToRemove)
+  if (cleanedParam) {
+    searchParams.set(keyToRemove, cleanedParam)
+  } else {
+    searchParams.delete(keyToRemove)
+  }
   setSearchParams(searchParams)
 }
 
@@ -313,7 +317,11 @@ const handleFilteredValues = (
   const selectedStatusParam = value?.split(',')
   const selectedStatus = selectedStatusParam?.filter((status) => validOptions.includes(status))
   if (selectedStatus?.length !== selectedStatusParam?.length) {
-    selectedStatus?.length === 0 ? searchParams.delete(paramKey) : searchParams.set(paramKey, selectedStatus?.join())
+    if (selectedStatus?.length === 0) {
+      searchParams.delete(paramKey)
+    } else {
+      searchParams.set(paramKey, selectedStatus?.join())
+    }
     return true
   }
   return false

@@ -105,7 +105,11 @@ const Contact: React.FC = () => {
 
       setContactRequest(defaultContactRequest)
       setLoading(false)
-      postIssueResp ? setCreateIssueSuccess(true) : setCreateIssueFail(true)
+      if (postIssueResp) {
+        setCreateIssueSuccess(true)
+      } else {
+        setCreateIssueFail(true)
+      }
     } catch (error) {
       console.error('Erreur lors de la création du ticket', error)
       setContactRequest(defaultContactRequest)

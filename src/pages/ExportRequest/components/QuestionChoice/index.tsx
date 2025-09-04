@@ -346,7 +346,11 @@ const QuestionSelectorDialog: React.FC<QuestionSelectorDialogProps> = ({
     setCheckedByQuestionnaire((prev) => {
       const map = new Map(prev)
       const set = new Set(map.get(selectedQuestionnaireId) ?? [])
-      set.has(linkId) ? set.delete(linkId) : set.add(linkId)
+      if (set.has(linkId)) {
+        set.delete(linkId)
+      } else {
+        set.add(linkId)
+      }
       map.set(selectedQuestionnaireId, set)
       return map
     })

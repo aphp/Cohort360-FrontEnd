@@ -35,7 +35,9 @@ const AddOrEditItem: React.FC<{
     if (isEdition) {
       onUpdate(itemData)
     } else {
-      onCreate && onCreate(itemData)
+      if (onCreate) {
+        onCreate(itemData)
+      }
     }
 
     onClose()

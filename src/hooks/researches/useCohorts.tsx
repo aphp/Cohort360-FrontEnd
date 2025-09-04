@@ -70,7 +70,9 @@ const useCohorts = ({
   })
 
   useEffect(() => {
-    isError && dispatch(setMessage({ type: 'error', content: 'Erreur lors de la récupération des cohortes' }))
+    if (isError) {
+      dispatch(setMessage({ type: 'error', content: 'Erreur lors de la récupération des cohortes' }))
+    }
   }, [isError, dispatch])
 
   const cohortsList = data?.results ?? []

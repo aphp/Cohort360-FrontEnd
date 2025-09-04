@@ -120,7 +120,7 @@ export type CohortComposition = DocumentReference & {
   encounterStatus?: string
   serviceProvider?: string
   NDA?: string
-  event?: {}
+  event?: object
   parameter?: Parameters[]
   title?: string
   encounter?: {
@@ -128,7 +128,7 @@ export type CohortComposition = DocumentReference & {
     status?: string
     serviceProvider?: string
     NDA?: string
-    event?: {}
+    event?: object
     parameter?: Parameters[]
     title?: string
   }[]
@@ -715,7 +715,7 @@ export enum WebSocketJobName {
   CREATE = 'create'
 }
 
-export type WebSocketMessage<T = {}> = {
+export type WebSocketMessage<T = object> = {
   type: WebSocketMessageType
 } & T
 

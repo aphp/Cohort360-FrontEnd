@@ -19,7 +19,9 @@ const useRequest = (requestId?: string) => {
   })
 
   useEffect(() => {
-    isError && dispatch(setMessage({ type: 'error', content: 'Erreur lors de la récupération de la requête' }))
+    if (isError) {
+      dispatch(setMessage({ type: 'error', content: 'Erreur lors de la récupération de la requête' }))
+    }
   }, [isError, dispatch])
 
   return {
