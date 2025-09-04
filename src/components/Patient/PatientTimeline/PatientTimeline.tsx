@@ -387,7 +387,7 @@ const PatientTimeline: React.FC<PatientTimelineTypes> = ({
             selectedEncounterStatus={filters.encounterStatus}
           />
 
-          <Grid container sx={{ gap: GAP }} margin={'16px 0'}>
+          <Grid container size={12} sx={{ gap: GAP }} margin={'16px 0'}>
             <Button
               onClick={() => setOpenFilter(true)}
               startIcon={<FilterList height="15px" fill="#FFF" />}
