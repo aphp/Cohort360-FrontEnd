@@ -1,6 +1,6 @@
 import { expect, afterEach } from 'vitest'
 import { cleanup } from '@testing-library/react'
-import matchers from '@testing-library/jest-dom/matchers'
+import * as matchers from '@testing-library/jest-dom/matchers'
 
 // ajoute les méthodes react-testing-library à Vitest pour l'autocompletion
 expect.extend(matchers)
