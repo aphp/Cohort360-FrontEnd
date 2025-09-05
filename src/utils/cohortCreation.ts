@@ -519,7 +519,29 @@ export function buildRequest(
   }
 
   const mainCriteriaGroups = criteriaGroup.find(({ id }) => id === 0)
-
+  let request: RequeteurGroupType | undefined = undefined
+  if (mainCriteriaGroups) {
+    const baseGroup = {
+      _id: 0,
+      isInclusive: !!mainCriteriaGroups.isInclusive,
+      criteria: exploreCriteriaGroup(mainCriteriaGroups.criteriaIds),
+      temporalConstraints: temporalConstraints.filter(({ constraintType }) => constraintType !== 'none')
+    }
+    if (mainCriteriaGroups.type === CriteriaGroupType.N_AMONG_M)
+      request = {
+        ...baseGroup,
+        _type: CriteriaGroupType.N_AMONG_M,
+        nAmongMOptions: {
+          n: mainCriteriaGroups.options.number,
+          operator: mainCriteriaGroups.options.operator
+        }
+      }
+    else
+      request = {
+        ...baseGroup,
+        _type: mainCriteriaGroups.type
+      }
+  }
   const json: RequeteurSearchType = {
     version: REQUETEUR_VERSION,
     _type: 'request',
@@ -528,18 +550,7 @@ export function buildRequest(
         ?.map((_selectedPopulation) => _selectedPopulation?.cohort_id)
         .filter((item): item is string => !!item && item !== 'loading')
     },
-    request: !mainCriteriaGroups
-      ? undefined
-      : {
-          _id: 0,
-          _type:
-            mainCriteriaGroups.type === CriteriaGroupType.OR_GROUP
-              ? CriteriaGroupType.OR_GROUP
-              : CriteriaGroupType.AND_GROUP,
-          isInclusive: !!mainCriteriaGroups.isInclusive,
-          criteria: exploreCriteriaGroup(mainCriteriaGroups.criteriaIds),
-          temporalConstraints: temporalConstraints.filter(({ constraintType }) => constraintType !== 'none')
-        }
+    request
   }
 
   return JSON.stringify(json)
