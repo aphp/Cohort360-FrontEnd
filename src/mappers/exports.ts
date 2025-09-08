@@ -5,6 +5,7 @@ import { ExportCallbacks, ExportList } from 'types/export'
 import { mapJobStatus } from 'utils/status'
 import Download from 'assets/icones/download.svg?react'
 import { JobStatus } from 'types'
+import { isDateBefore } from 'utils/formatDate'
 
 const mapExportsToRows = (list: ExportList[], callbacks: ExportCallbacks) => {
   const rows: Row[] = []
@@ -16,7 +17,8 @@ const mapExportsToRows = (list: ExportList[], callbacks: ExportCallbacks) => {
         title: 'Télécharger l’export',
         icon: Download,
         onClick: () => onDownload(elem.uuid),
-        disabled: elem.request_job_status !== JobStatus.FINISHED
+        disabled:
+          elem.request_job_status !== JobStatus.FINISHED || (elem.created_at && isDateBefore(elem.created_at, 7))
       }
     ]
     const row: Row = [
