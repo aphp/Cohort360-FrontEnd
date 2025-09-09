@@ -147,6 +147,7 @@ export const ObservationParamsKeys = {
 }
 
 export const ImagingParamsKeys = {
+  BODYSITE: 'bodysite',
   IPP: 'patient.identifier',
   MODALITY: 'modality',
   NDA: 'encounter.identifier',
