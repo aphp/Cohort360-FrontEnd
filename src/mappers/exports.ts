@@ -6,19 +6,32 @@ import { mapJobStatus } from 'utils/status'
 import Download from 'assets/icones/download.svg?react'
 import { JobStatus } from 'types'
 import { isDateBefore } from 'utils/formatDate'
+import { Refresh } from '@mui/icons-material'
 
 const mapExportsToRows = (list: ExportList[], callbacks: ExportCallbacks) => {
   const rows: Row[] = []
   const unknown = 'N/A'
-  const { onDownload } = callbacks
+  const { onDownload, onRetry } = callbacks
   list.forEach((elem) => {
     const actions = [
       {
         title: 'Télécharger l’export',
+
         icon: Download,
         onClick: () => onDownload(elem.uuid),
         disabled:
           elem.request_job_status !== JobStatus.FINISHED || (elem.created_at && isDateBefore(elem.created_at, 7))
+      },
+      {
+        title: 'Relancer l’export',
+
+        icon: Refresh,
+        onClick: () => onRetry(elem.uuid),
+        disabled: !(
+          elem.request_job_status === JobStatus.FAILED ||
+          elem.request_job_status === JobStatus.SUSPENDED ||
+          elem.request_job_status === JobStatus.FINISHED
+        )
       }
     ]
     const row: Row = [
