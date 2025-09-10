@@ -37,20 +37,18 @@ const TimelineItemRight = ({ date, description, status }: TimelineItemRightTypes
   const { classes } = useStyles({ color: color })
 
   return (
-    <li className={classes.timelineItem}>
-      <div className={classes.timelineRightContent}>
-        procedure
-        <div className={classes.timelineElementsRight}>
-          <i className={classes.dotRight} />
-          <div className={classes.lineRight} />
-        </div>
-        <div className={classes.timelineRight}>
-          <span className={classes.time}>{date ? new Date(date).toLocaleDateString('fr-Fr') : 'Date inconnue'}</span>
-          {description && <div className={classes.timelineTextRight}>{description}</div>}
-        </div>
+    <div className={classes.timelineRightContent}>
+      <div className={classes.timelineElementsRight}>
+        <i className={classes.dotRight} />
+        <div className={classes.lineRight} />
       </div>
-    </li>
+      <div className={classes.timelineRight}>
+        <span className={classes.time}>{date ? new Date(date).toLocaleDateString('fr-Fr') : 'Date inconnue'}</span>
+        {description && <div className={classes.timelineTextRight}>{description}</div>}
+      </div>
+    </div>
   )
+  
 }
 
 export default TimelineItemRight
