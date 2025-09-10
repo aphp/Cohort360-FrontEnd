@@ -26,6 +26,7 @@ import {
   getFoldersSearchParams
 } from 'utils/explorationUtils'
 import { ExplorationsSearchParams } from 'types/cohorts'
+import { plural } from 'utils/string'
 
 const ProjectsList = () => {
   const navigate = useNavigate()
@@ -131,7 +132,7 @@ const ProjectsList = () => {
           </Button>
         </Grid>
         <Grid>
-          <DisplayDigits label={`projet${total > 1 ? 's' : ''}`} nb={total} />
+          <DisplayDigits label={`projet${plural(total)}`} nb={total} />
         </Grid>
       </Grid>
       <Grid container size={12} sx={{ gap: '50px' }} id="projects-list-div">

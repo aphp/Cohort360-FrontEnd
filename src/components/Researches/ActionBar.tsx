@@ -12,6 +12,7 @@ import FilterList from '@mui/icons-material/FilterList'
 
 import { FilterKeys, FilterValue, SearchCriteriaKeys } from 'types/searchCriterias'
 import { useSizeObserver } from 'hooks/ui/useSizeObserver'
+import { plural } from 'utils/string'
 
 type ActionBarProps = {
   loading: boolean
@@ -105,16 +106,12 @@ const ActionBar: React.FC<ActionBarProps> = ({
             {totalSelected > 0 && (
               <DisplayDigits
                 nb={totalSelected}
-                label={`${label}${totalSelected > 1 ? 's' : ''} sélectionné${label !== 'échantillon' ? 'e' : ''}${
-                  totalSelected > 1 ? 's' : ''
-                } /`}
+                label={`${label}${plural(totalSelected)} sélectionné${label !== 'échantillon' ? 'e' : ''}${plural(
+                  totalSelected
+                )} /`}
               />
             )}
-            {loading ? (
-              <CircularProgress size={20} />
-            ) : (
-              <DisplayDigits nb={total} label={`${label}${total > 1 ? 's' : ''}`} />
-            )}
+            {loading ? <CircularProgress size={20} /> : <DisplayDigits nb={total} label={`${label}${plural(total)}`} />}
           </Grid>
         </Grid>
       </Grid>

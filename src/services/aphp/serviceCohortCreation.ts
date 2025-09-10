@@ -52,6 +52,10 @@ export interface IServiceCohortCreation {
    */
   fetchRequest: (requestId: string, snapshotId?: string) => Promise<FetchRequest>
   fetchSnapshot: (snapshotId: string) => Promise<Snapshot>
+  /**
+   * Permet de mettre à jour le nom d'un snapshot
+   */
+  updateSnapshotName: (snapshotId: string, newName: string) => Promise<Snapshot>
 }
 
 const servicesCohortCreation: IServiceCohortCreation = {
@@ -217,6 +221,18 @@ const servicesCohortCreation: IServiceCohortCreation = {
       (await apiBack.get<Snapshot>(`/cohort/request-query-snapshots/${snapshotId}/`)) || {}
 
     return snapshotResponse.data || {}
+  },
+
+  updateSnapshotName: async (snapshotId, newName) => {
+    try {
+      const response: AxiosResponse<Snapshot> = await apiBack.patch(`/cohort/request-query-snapshots/${snapshotId}/`, {
+        name: newName
+      })
+      return response.data
+    } catch (error) {
+      console.error('Erreur lors de la mise à jour du snapshot:', error)
+      throw error
+    }
   }
 }
 

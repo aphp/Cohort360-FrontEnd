@@ -1,4 +1,5 @@
 import { getConfig } from 'config'
+import { plural } from 'utils/string'
 import { Condition } from 'fhir/r4'
 import { mapToDate } from 'mappers/dates'
 import { getPmsiCodes, getPmsiDate } from 'mappers/pmsi'
@@ -159,8 +160,8 @@ export const conditionConfig = (
     return { ..._infos, references, sourceType }
   },
   getCount: (counts) => [
-    { label: `diagnostic${counts[0].total > 1 ? 's' : ''} CIM10`, display: true, count: counts[0] },
-    { label: `patient${counts[1].total > 1 ? 's' : ''}`, display: !!!patient, count: counts[1] }
+    { label: `diagnostic${plural(counts[0].total)} CIM10`, display: true, count: counts[0] },
+    { label: `patient${plural(counts[1].total)}`, display: !!!patient, count: counts[1] }
   ]
 })
 
@@ -190,8 +191,8 @@ export const procedureConfig = (
     return { ..._infos, references, sourceType }
   },
   getCount: (counts) => [
-    { label: `acte${counts[0].total > 1 ? 's' : ''} CCAM`, display: true, count: counts[0] },
-    { label: `patient${counts[1].total > 1 ? 's' : ''}`, display: !!!patient, count: counts[1] }
+    { label: `acte${plural(counts[0].total)} CCAM`, display: true, count: counts[0] },
+    { label: `patient${plural(counts[1].total)}`, display: !!!patient, count: counts[1] }
   ]
 })
 
@@ -219,6 +220,6 @@ export const claimConfig = (
   },
   getCount: (counts) => [
     { label: 'GHM', display: true, count: counts[0] },
-    { label: `patient${counts[1].total > 1 ? 's' : ''}`, display: !!!patient, count: counts[1] }
+    { label: `patient${plural(counts[1].total)}`, display: !!!patient, count: counts[1] }
   ]
 })

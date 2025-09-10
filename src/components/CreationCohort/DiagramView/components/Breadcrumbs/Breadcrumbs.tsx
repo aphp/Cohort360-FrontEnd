@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react'
 
-import { Breadcrumbs, Grid, Typography, useTheme } from '@mui/material'
+import { Breadcrumbs, Grid, Typography, useTheme, Tooltip } from '@mui/material'
 
 import { useAppSelector, useAppDispatch } from 'state'
 import { fetchProjects as fetchProjectsList } from 'state/project'
 import { fetchRequests as fetchRequestsList } from 'state/request'
+import { getVersionName } from 'mappers/versions'
 
 const CohortCreationBreadcrumbs: React.FC = () => {
   const theme = useTheme()
@@ -34,12 +35,27 @@ const CohortCreationBreadcrumbs: React.FC = () => {
     }
   }, [projects, requests, requestId, dispatch])
 
+  const versionName = getVersionName(currentSnapshot)
+
   return (
-    <Grid container marginBottom={theme.spacing(2)}>
-      <Breadcrumbs separator=">" aria-label="breadcrumb">
+    <Grid container marginBottom={theme.spacing(2)} sx={{ minWidth: 0 }}>
+      <Breadcrumbs separator=">" aria-label="breadcrumb" sx={{ minWidth: 0, flex: 1 }}>
         <Typography>{projectName}</Typography>
         <Typography>{requestName}</Typography>
-        {currentSnapshot && <Typography>Version {currentSnapshot.version}</Typography>}
+        {currentSnapshot && (
+          <Tooltip title={versionName}>
+            <Typography
+              sx={{
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+                maxWidth: '300px'
+              }}
+            >
+              {versionName}
+            </Typography>
+          </Tooltip>
+        )}
       </Breadcrumbs>
     </Grid>
   )

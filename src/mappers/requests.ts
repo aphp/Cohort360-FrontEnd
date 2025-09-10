@@ -3,7 +3,7 @@ import { RequestsCallbacks, ResearchesTableLabels, SubItemType } from 'types/coh
 import { Order } from 'types/searchCriterias'
 import { Action, CellType, Column, Row, SubItem, Table } from 'types/table'
 import { getCohortTotal, getRequestName } from 'utils/explorationUtils'
-import { formatDate } from 'utils/formatDate'
+import { formatDate } from 'utils/dates'
 import EditIcon from '@mui/icons-material/Edit'
 import ShareIcon from '@mui/icons-material/Share'
 import { isChecked } from 'utils/filters'

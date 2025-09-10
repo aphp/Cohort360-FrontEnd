@@ -11,8 +11,8 @@ import PatientInfo from './PatientInfo/PatientInfo'
 
 import WestIcon from '@mui/icons-material/West'
 
-import { capitalizeFirstLetter } from 'utils/capitalize'
-import { formatDate } from 'utils/formatDate'
+import { capitalizeFirstLetter } from 'utils/string'
+import { formatDate } from 'utils/dates'
 import { getAge } from 'utils/age'
 
 import { GenderStatus } from 'types/searchCriterias'

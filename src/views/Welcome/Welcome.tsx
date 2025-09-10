@@ -24,6 +24,7 @@ import { CohortsType } from 'types/cohorts'
 import { listStaticContents, WebContent } from 'services/aphp/callApi'
 import Markdown from 'react-markdown'
 import { getBannerMessageLevel, sortContent } from 'data/infoMessage'
+import { plural } from 'utils/string'
 
 const Welcome = () => {
   const { classes } = useStyles()
@@ -79,8 +80,8 @@ const Welcome = () => {
             .map((item: AccessExpiration) => (
               <CustomAlert key={item.perimeter + '-' + item.leftDays && item.leftDays} severity="warning">
                 Attention, votre accès au périmètre suivant: {item.perimeter}, arrivera à expiration dans{' '}
-                {item.leftDays} jour{item.leftDays > 1 ? 's' : ''}. Veuillez vous rapprocher de votre référent EDS pour
-                faire renouveler vos accès à l'application.
+                {item.leftDays} jour{plural(item.leftDays)}. Veuillez vous rapprocher de votre référent EDS pour faire
+                renouveler vos accès à l'application.
               </CustomAlert>
             ))}
         </Grid>

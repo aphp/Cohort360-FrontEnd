@@ -12,7 +12,7 @@ import {
   Autocomplete
 } from '@mui/material'
 
-import { capitalizeFirstLetter } from 'utils/capitalize'
+import { capitalizeFirstLetter } from 'utils/string'
 import useStyles from './styles'
 import { LabelObject, TimelineFilter } from 'types/searchCriterias'
 

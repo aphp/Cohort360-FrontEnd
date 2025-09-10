@@ -1,10 +1,51 @@
 /**
- * @fileoverview Utility functions for date formatting and validation
- * @module utils/formatDate
+ * @fileoverview Utility functions for dates
+ * @module utils/dates
  */
 
+import moment from 'moment'
 import { Month } from 'types'
-import moment from 'moment/moment'
+
+/**
+ * Generic function to group items by date field
+ *
+ * @param items - Array of items to group
+ * @param dateKey - Key of the date field in the item objects
+ * @param dateFormat - Format string for date display (default: 'DD/MM/YYYY')
+ * @returns Array of tuples containing formatted date strings and their corresponding items, sorted by date (newest first)
+ *
+ * @example
+ * ```typescript
+ * const events = [
+ *   { name: 'Event 1', eventDate: '2023-12-25T10:00:00Z' },
+ *   { name: 'Event 2', eventDate: '2023-12-24T14:00:00Z' }
+ * ]
+ * groupByDate(events, 'eventDate')
+ * // returns [
+ * //   ['25/12/2023', [event1]],
+ * //   ['24/12/2023', [event2]]
+ * // ]
+ * ```
+ */
+export function groupByDate<T>(items: T[], dateKey: keyof T, dateFormat = 'DD/MM/YYYY'): [string, T[]][] {
+  const grouped = items.reduce(
+    (acc, item) => {
+      const dateValue = item[dateKey]
+      const date = moment(dateValue as string).format(dateFormat)
+      if (!acc[date]) {
+        acc[date] = []
+      }
+      acc[date].push(item)
+      return acc
+    },
+    {} as Record<string, T[]>
+  )
+
+  // Sort dates in descending order
+  return Object.entries(grouped).sort(([a], [b]) => {
+    return moment(b, dateFormat).valueOf() - moment(a, dateFormat).valueOf()
+  })
+}
 
 /**
  * Validates if a date string is valid according to the specified format
@@ -38,9 +79,9 @@ export const isDateValid = (date?: string | null, format = 'YYYY-MM-DD') => {
  * formatDate('2023-12-25T14:30:00', true) // returns '25/12/2023 - 14:30:00'
  * ```
  */
-const formatDate = (date?: string, withHour?: boolean) => {
+export const formatDate = (date?: string, withHour?: boolean) => {
   const _date = moment(date)
-  const format = `DD/MM/YYYY${withHour ? ' - HH:mm:ss' : ''}`
+  const format = `DD/MM/YYYY${withHour ? ' - HH:mm' : ''}`
   return date && _date.isValid() ? _date.format(format) : 'N/A'
 }
 
@@ -56,7 +97,7 @@ const formatDate = (date?: string, withHour?: boolean) => {
  * getStringMonth(11) // returns Month.DECEMBER
  * ```
  */
-const getStringMonth = (monthNumber: number): Month | undefined => {
+export const getStringMonth = (monthNumber: number): Month | undefined => {
   switch (monthNumber) {
     case 0:
       return Month.JANUARY
@@ -100,7 +141,7 @@ const getStringMonth = (monthNumber: number): Month | undefined => {
  * getStringMonthAphp(12) // returns Month.DECEMBER
  * ```
  */
-const getStringMonthAphp = (monthNumber: number): Month | undefined => {
+export const getStringMonthAphp = (monthNumber: number): Month | undefined => {
   switch (monthNumber) {
     case 1:
       return Month.JANUARY
@@ -143,8 +184,6 @@ const getStringMonthAphp = (monthNumber: number): Month | undefined => {
  * getDaysLeft(new Date('2024-01-01')) // returns number of days until/since Jan 1, 2024
  * ```
  */
-const getDaysLeft = (date: Date): number => {
+export const getDaysLeft = (date: Date): number => {
   return moment(date).diff(new Date(), 'days')
 }
-
-export { formatDate, getStringMonth, getStringMonthAphp, getDaysLeft }

@@ -1,5 +1,5 @@
 import { SimpleChartDataType, GenderRepartitionType, AgeRepartitionType, VisiteRepartitionType, Month } from 'types'
-import { getStringMonth, getStringMonthAphp } from './formatDate'
+import { getStringMonth, getStringMonthAphp } from './dates'
 import { Encounter, Extension, Patient } from 'fhir/r4'
 import { GenderStatus, VitalStatusLabel } from 'types/searchCriterias'
 import { getExtension } from './fhir'
