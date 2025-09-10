@@ -2,7 +2,8 @@ import {
   fetchExportTableInfo,
   fetchExportTableRelationInfo,
   fetchExportList,
-  downloadExport as _downloadExport
+  downloadExport as _downloadExport,
+  retryExport as _retryExport
 } from 'services/aphp/callApi'
 import { getConfig } from 'config'
 import { AxiosResponse } from 'axios'
@@ -46,6 +47,18 @@ export const fetchExportTablesRelationsInfo = async (tableList: string[]) => {
 export const downloadExport = async (id: string, signal?: AbortSignal) => {
   try {
     const response = await _downloadExport({ id, signal })
+    return response
+  } catch (error) {
+    return {
+      count: 0,
+      results: []
+    }
+  }
+}
+
+export const retryExport = async (id: string, signal?: AbortSignal) => {
+  try {
+    const response = await _retryExport({ id, signal })
     return response
   } catch (error) {
     return {

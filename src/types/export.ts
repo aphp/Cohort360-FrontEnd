@@ -53,4 +53,5 @@ export type FetchExportArgs = {
 
 export type ExportCallbacks = {
   onDownload: (id: string) => void
+  onRetry: (id: string) => void
 }
