@@ -8,11 +8,9 @@
 [![Actions Status](https://github.com/aphp/Cohort360-FrontEnd/workflows/cohort360-main-pipeline/badge.svg)](https://github.com/aphp/Cohort360-FrontEnd/actions)
 [![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=aphp_Cohort360&metric=alert_status)](https://sonarcloud.io/dashboard?id=aphp_Cohort360)
 
-
-
 ## Architecture
 
-- [ ] Add Architecture schema 
+- [ ] Add Architecture schema
 
 Cohort360 consists of a React front-end and a Django back-end (REST API).
 
@@ -25,10 +23,10 @@ This third endpoint can be a FHIR API for example. This is the case for the firs
 
 ### Requirements:
 
-* A running back-end server
-* A running third party endpoint (FHIR API for example)
-* An authentication server
-* Node.js (16 or higher) installed
+- A running back-end server
+- A running third party endpoint (FHIR API for example)
+- An authentication server
+- Node.js (22 or higher) installed
 
 ### Running the front-end
 
@@ -48,7 +46,7 @@ a [nginx configuration](.templates/nginx.conf) example (useful for deployment).
 
 ## Deployment
 
-A docker image is available to build via the [Dockerfile](Dockerfile). You only need to update the location of your nginx conf. 
+A docker image is available to build via the [Dockerfile](Dockerfile). You only need to update the location of your nginx conf.
 
 ## Start Contributing
 
@@ -56,13 +54,14 @@ A contributing guide will be published soon.
 
 ## Partners
 
-* AP-HP Clinical Data Warehouse
-* Arkhn : [arkhn.org](https://arkhn.org/)
-* Akimed : [www.akimed.io](https://www.akimed.io/)
+- AP-HP Clinical Data Warehouse
+- Arkhn : [arkhn.org](https://arkhn.org/)
+- Akimed : [www.akimed.io](https://www.akimed.io/)
 
 ## Contributors
 
 Coming soon...
 
 ## License
+
 Cohort360 is licensed under Apache License 2.

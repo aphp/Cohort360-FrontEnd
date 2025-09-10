@@ -62,9 +62,9 @@ const TopBar: React.FC<TopBarProps> = ({ context, patientsNb, access }) => {
   const editCohortMutation = useEditCohort()
   const createSampleMutation = useCreateSample()
 
-  const cohortName = context === URLS.COHORT ? dashboard.name ?? '-' : headerContexts[context] ?? '-'
-  const cohortDescription = context === URLS.COHORT ? dashboard.description ?? '' : ''
-  const cohortId = context === URLS.COHORT ? dashboard.cohortId ?? '' : undefined
+  const cohortName = context === URLS.COHORT ? (dashboard.name ?? '-') : (headerContexts[context] ?? '-')
+  const cohortDescription = context === URLS.COHORT ? (dashboard.description ?? '') : ''
+  const cohortId = context === URLS.COHORT ? (dashboard.cohortId ?? '') : undefined
   const perimeters =
     context === URLS.PERIMETERS && dashboard.cohort && Array.isArray(dashboard.cohort)
       ? dashboard.cohort.map((p) => p.name ?? '-')

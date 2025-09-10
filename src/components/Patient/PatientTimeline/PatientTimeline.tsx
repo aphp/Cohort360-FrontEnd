@@ -1,4 +1,3 @@
-/* eslint-disable max-statements */
 import React, { useState, useEffect, useMemo } from 'react'
 import { useParams, useSearchParams } from 'react-router-dom'
 import moment from 'moment'
@@ -365,7 +364,7 @@ const PatientTimeline: React.FC<PatientTimelineTypes> = ({
   return (
     <>
       {hospits && consults && hospits.length === 0 && consults.length === 0 ? (
-        <Grid container justifyContent="center">
+        <Grid container sx={{ justifyContent: 'center' }}>
           <Typography variant="button">Le patient n'a pas de visites à afficher.</Typography>
         </Grid>
       ) : (
@@ -388,7 +387,7 @@ const PatientTimeline: React.FC<PatientTimelineTypes> = ({
             selectedEncounterStatus={filters.encounterStatus}
           />
 
-          <Grid container gap={GAP} margin={'16px 0'}>
+          <Grid container size={12} sx={{ gap: GAP }} margin={'16px 0'}>
             <Button
               onClick={() => setOpenFilter(true)}
               startIcon={<FilterList height="15px" fill="#FFF" />}

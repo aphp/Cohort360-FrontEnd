@@ -15,6 +15,7 @@ export const fetchExportTablesInfo = () => {
     })
     return response
   } catch (error) {
+    console.error(error)
     return []
   }
 }
@@ -32,6 +33,7 @@ export const fetchExportTablesRelationsInfo = async (tableList: string[]) => {
     const response: string[] = Array.from(new Set(result))
     return response
   } catch (error) {
+    console.error(error)
     return []
   }
 }
@@ -63,6 +65,7 @@ export const fetchExportsList = async (
     })
     return response
   } catch (error) {
+    console.error(error)
     return {
       count: 0,
       results: []

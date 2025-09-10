@@ -43,8 +43,8 @@ const OrderBy = ({ orderBy, infos, onSubmit }: OrderByProps) => {
           setToggleModal(false)
         }}
       >
-        <Grid container justifyContent="space-between" alignItems="center">
-          <Grid item xs={5}>
+        <Grid container sx={{ justifyContent: 'space-between', alignItems: 'center' }}>
+          <Grid size={5}>
             <Controller
               name="orderBy"
               control={control}
@@ -58,7 +58,7 @@ const OrderBy = ({ orderBy, infos, onSubmit }: OrderByProps) => {
               )}
             />
           </Grid>
-          <Grid item xs={6}>
+          <Grid size={6}>
             <Controller
               name="orderDirection"
               control={control}

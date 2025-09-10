@@ -97,6 +97,7 @@ const getValueSetCodes = async (parameters: URLSearchParams, key: string) => {
       )
     ).flatMap((res) => res.results)
   } catch (error) {
+    console.error(error)
     return []
   }
 }

@@ -66,6 +66,7 @@ const DownloadPopup: React.FC = () => {
       document.body.removeChild(link)
       window.URL.revokeObjectURL(url)
     } catch (error) {
+      console.error(error)
       setDownloading(false)
     }
   }

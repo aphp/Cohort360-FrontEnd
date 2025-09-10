@@ -76,16 +76,18 @@ const CheckedTextfield = ({
         minRows={4}
         style={{ width: '100%' }}
         error={displayCheckError && error}
-        InputProps={{
-          ...(displayCheckError
-            ? {
-                endAdornment: (
-                  <InputAdornment position="end" style={{ padding: '0px 25px' }}>
-                    {error && <WarningIcon style={{ fill: '#F44336', height: 20 }} />}
-                  </InputAdornment>
-                )
-              }
-            : {})
+        slotProps={{
+          input: {
+            ...(displayCheckError
+              ? {
+                  endAdornment: (
+                    <InputAdornment position="end" style={{ padding: '0px 25px' }}>
+                      {error && <WarningIcon style={{ fill: '#F44336', height: 20 }} />}
+                    </InputAdornment>
+                  )
+                }
+              : {})
+          }
         }}
       />
       {displayCheckError && error && (

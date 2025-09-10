@@ -20,13 +20,13 @@ const WarningDialog = () => {
   return (
     <Dialog open={isOpen}>
       <DialogContent style={{ paddingBottom: 0 }}>
-        <Grid container alignItems={'center'}>
-          <Grid item xs={2}>
+        <Grid container sx={{ alignItems: 'center' }}>
+          <Grid size={2}>
             {status === 'success' && <CheckCircleOutlineIcon style={{ fontSize: 52 }} htmlColor="#BDEA88" />}
             {status === 'error' && <CancelIcon style={{ fontSize: 52 }} htmlColor="#FC5656" />}
             {status === 'warning' && <WarningIcon className={classes.warningIcon} />}
           </Grid>
-          <Grid item xs={10}>
+          <Grid size={10}>
             <Typography>{message}</Typography>
           </Grid>
         </Grid>

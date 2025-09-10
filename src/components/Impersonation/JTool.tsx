@@ -50,7 +50,7 @@ export function JToolEggWrapper(props: PropsWithChildren<JToolEggWrapperClickPro
   return <>{props.children}</>
 }
 
-export function JToolComponentEggWrapper(props: PropsWithChildren<{}>) {
+export function JToolComponentEggWrapper(props: PropsWithChildren<object>) {
   const { children } = props
   const me = useAppSelector((state) => state.me)
   const appConfig = useContext(AppConfig)

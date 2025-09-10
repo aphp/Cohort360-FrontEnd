@@ -1,11 +1,4 @@
-import {
-  createSlice,
-  createEntityAdapter,
-  createAsyncThunk,
-  PayloadAction,
-  Dictionary,
-  createSelector
-} from '@reduxjs/toolkit'
+import { createSlice, createEntityAdapter, createAsyncThunk, PayloadAction, createSelector } from '@reduxjs/toolkit'
 import { CriteriaItemType } from 'types'
 import { CodesCache, Hierarchy } from 'types/hierarchy'
 import { logout } from './me'
@@ -20,7 +13,7 @@ const valueSetsAdapter = createEntityAdapter<CodesCache<FhirItem>>()
 
 export type CodeCache = { [system: string]: Hierarchy<FhirItem>[] }
 
-export type ValueSetStore = { entities: Dictionary<CodesCache<FhirItem>>; cache: CodeCache }
+export type ValueSetStore = { entities: { [id: string]: CodesCache<FhirItem> | undefined }; cache: CodeCache }
 
 export const prefetchSmallValueSets = async (
   criteriaTree: CriteriaItemType[]
@@ -45,12 +38,15 @@ export const prefetchSmallValueSets = async (
 
       return criterionValuesets || []
     })
-    .reduce((acc, item) => {
-      if (!acc.some((existingItem) => existingItem.id === item.id)) {
-        acc.push(item)
-      }
-      return acc
-    }, [] as { id: string; data?: LabelObject[] }[])
+    .reduce(
+      (acc, item) => {
+        if (!acc.some((existingItem) => existingItem.id === item.id)) {
+          acc.push(item)
+        }
+        return acc
+      },
+      [] as { id: string; data?: LabelObject[] }[]
+    )
 
   // fetch them
   return await Promise.all(

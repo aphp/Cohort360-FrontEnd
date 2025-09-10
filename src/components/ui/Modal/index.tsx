@@ -39,8 +39,8 @@ const Modal = ({
               {title}
             </Typography>
           </DialogTitle>
-          <Grid container justifyContent="center">
-            <Grid item xs={6}>
+          <Grid container sx={{ justifyContent: 'center' }}>
+            <Grid size={{ xs: 6 }}>
               <Divider />
             </Grid>
           </Grid>

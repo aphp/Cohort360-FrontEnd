@@ -127,14 +127,14 @@ const mapToTable = (data: Data, deidentified: boolean, groupId: string[], isPati
       },
       {
         id: `${elem.id}-anabio`,
-        value: anabio === 'No matching concept' ? '-' : anabio ?? '-',
+        value: anabio === 'No matching concept' ? '-' : (anabio ?? '-'),
         type: CellType.TEXT,
         sx: { fontWeight: 900 }
       },
       {
         id: `${elem.id}-loinc`,
-        value: `${codeLOINC === 'No matching concept' || codeLOINC === 'Non Renseigné' ? '' : codeLOINC ?? ''} - ${
-          libelleLOINC === 'No matching concept' ? '-' : libelleLOINC ?? '-'
+        value: `${codeLOINC === 'No matching concept' || codeLOINC === 'Non Renseigné' ? '' : (codeLOINC ?? '')} - ${
+          libelleLOINC === 'No matching concept' ? '-' : (libelleLOINC ?? '-')
         }`,
         type: CellType.TEXT,
         sx: { fontWeight: 900 }

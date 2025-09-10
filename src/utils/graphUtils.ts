@@ -376,30 +376,34 @@ export const getGenderRepartitionSimpleData = (
       color: '#D0D7D8'
     })
 
-    maleCount &&
+    if (maleCount) {
       genderData.push({
         label: 'Hommes',
         value: maleCount,
         color: '#78D4FA'
       })
-    femaleCount &&
+    }
+    if (femaleCount) {
       genderData.push({
         label: 'Femmes',
         value: femaleCount,
         color: '#FC568F'
       })
-    unknownCount &&
+    }
+    if (unknownCount) {
       genderData.push({
         label: 'Inconnus',
         value: unknownCount,
         color: '#8446E4'
       })
-    otherCount &&
+    }
+    if (otherCount) {
       genderData.push({
         label: 'Autres',
         value: otherCount,
         color: '#FCE756'
       })
+    }
   }
   return { vitalStatusData, genderData }
 }

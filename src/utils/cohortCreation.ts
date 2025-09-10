@@ -689,7 +689,7 @@ export async function unbuildRequest(_json: string): Promise<UnbuildRequestRetur
                     timeDelayMax: groupItem.nAmongMOptions.timeDelayMax ?? 0
                   }
                 })
-              } as CriteriaGroup)
+              }) as CriteriaGroup
           )
           .sort((prev, next) => next.id - prev.id)
       : []

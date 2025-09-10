@@ -1,7 +1,7 @@
-import React, { MutableRefObject, useLayoutEffect, useState } from 'react'
+import { RefObject, useLayoutEffect, useState } from 'react'
 
 type UseIsOverflowArgs = {
-  ref: MutableRefObject<HTMLDivElement | null>
+  ref: RefObject<HTMLDivElement | null>
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   additionalDependencies?: Record<string, any>
 }

@@ -43,8 +43,8 @@ const SearchPatient = () => {
   return (
     <PageContainer>
       <HeaderLayout title="Rechercher un patient" titleOnly />
-      <Grid container justifyContent="center">
-        <Grid container xs={11} mt={1}>
+      <Grid container sx={{ justifyContent: 'center' }}>
+        <Grid container size={11} mt={1}>
           {config && <ExplorationBoard config={config} />}
         </Grid>
       </Grid>

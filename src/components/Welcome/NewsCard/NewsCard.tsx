@@ -34,7 +34,7 @@ const TutorialsCard = () => {
             <Typography color="textSecondary" style={{ paddingBottom: 8, color: '#303030' }}>
               <b>{entry.title}</b>
             </Typography>
-            <Typography color="textSecondary" className={classes.markdown}>
+            <Typography component={'span'} color="textSecondary" className={classes.markdown}>
               <Markdown>{entry.content}</Markdown>
             </Typography>
           </div>

@@ -8,6 +8,7 @@ export function getApiResponseResource<T extends FhirResource>(
   try {
     return getApiResponseResourceOrThrow(response)
   } catch (e) {
+    console.error(e)
     return undefined
   }
 }
@@ -18,6 +19,7 @@ export function getApiResponseResources<T extends FhirResource>(
   try {
     return getApiResponseResourcesOrThrow(response)
   } catch (e) {
+    console.error(e)
     return undefined
   }
 }

@@ -51,8 +51,8 @@ const TimelineItemRight: React.FC<TimelineItemRightTypes> = ({ data }) => {
             {data.performedDateTime
               ? new Date(data.performedDateTime).toLocaleDateString('fr-FR')
               : data.meta?.lastUpdated
-              ? new Date(data.meta.lastUpdated).toLocaleDateString('fr-FR')
-              : 'Date inconnue'}
+                ? new Date(data.meta.lastUpdated).toLocaleDateString('fr-FR')
+                : 'Date inconnue'}
           </span>
           {data.code && (
             <div className={classes.timelineTextRight}>{`${codeToDisplay?.display} (${codeToDisplay?.code})`}</div>

@@ -173,15 +173,26 @@ const MyResearches = () => {
   return (
     <PageContainer alignItems={'center'} sx={{ backgroundColor: '#E6F1FD' }}>
       <HeaderLayout title="Mes recherches" searchArea={searchArea} />
-      <Grid container xs={11}>
+      <Grid container size={11}>
         <TabsWrapper value={selectedTab} onChange={(_, tab) => handleTabChange(tab)}>
           {explorationTabs.map((tab) => (
             <Tab key={tab.id} label={tab.label} value={tab} component="div" disableRipple />
           ))}
         </TabsWrapper>
       </Grid>
-      <Grid container bgcolor={'#FFF'} sx={{ minHeight: `calc(100vh - ${headerHeight}px)` }} justifyContent={'center'}>
-        <Grid key={location.pathname} container xs={11} style={{ padding: '20px 0' }} gap={'20px'} direction={'column'}>
+      <Grid
+        container
+        size={12}
+        bgcolor={'#FFF'}
+        sx={{ minHeight: `calc(100vh - ${headerHeight}px)`, justifyContent: 'center' }}
+      >
+        <Grid
+          key={location.pathname}
+          container
+          size={11}
+          style={{ padding: '20px 0' }}
+          sx={{ gap: '20px', flexDirection: 'column', flexWrap: 'nowrap' }}
+        >
           <Breadcrumb />
           <Slide direction={direction} in={true} mountOnEnter unmountOnExit appear={slideIsActive} timeout={300}>
             <Grid container key={location.pathname}>

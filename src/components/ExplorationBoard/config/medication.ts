@@ -56,10 +56,7 @@ const fetchAdditionalInfos = async (additionalInfo: AdditionalInfo): Promise<Add
   return { ...additionalInfo, references, sourceType, ...resolved }
 }
 
-const initSearchCriterias = (
-  search: string,
-  medType: ResourceType.MEDICATION_REQUEST | ResourceType.MEDICATION_ADMINISTRATION
-): SearchCriterias<MedicationFilters> => ({
+const initSearchCriterias = (search: string): SearchCriterias<MedicationFilters> => ({
   orderBy: {
     orderBy: Order.PERIOD_START,
     orderDirection: Direction.DESC
@@ -109,8 +106,8 @@ const mapToTable = (
         getConfig().features.medication.valueSets.medicationAtcOrbis.url
       )
       const atcDisplay: Paragraph[] = [
-        { text: `${codeATC === 'No matching concept' || codeATC === 'Non Renseigné' ? '' : codeATC ?? ''}` },
-        { text: `${displayATC === 'No matching concept' ? '-' : displayATC ?? '-'}`, sx: { fontWeight: 900 } }
+        { text: `${codeATC === 'No matching concept' || codeATC === 'Non Renseigné' ? '' : (codeATC ?? '')}` },
+        { text: `${displayATC === 'No matching concept' ? '-' : (displayATC ?? '-')}`, sx: { fontWeight: 900 } }
       ]
       const [codeUCD, displayUCD] = getCodes(
         elem,
@@ -118,8 +115,8 @@ const mapToTable = (
         '.*-ucd'
       )
       const ucdDisplay: Paragraph[] = [
-        { text: `${codeUCD === 'No matching concept' || codeUCD === 'Non Renseigné' ? '' : codeUCD ?? ''}` },
-        { text: `${displayUCD === 'No matching concept' ? '-' : displayUCD ?? '-'}`, sx: { fontWeight: 900 } }
+        { text: `${codeUCD === 'No matching concept' || codeUCD === 'Non Renseigné' ? '' : (codeUCD ?? '')}` },
+        { text: `${displayUCD === 'No matching concept' ? '-' : (displayUCD ?? '-')}`, sx: { fontWeight: 900 } }
       ]
       const prescriptionType = (elem as MedicationRequest).category?.[0].coding?.[0].display ?? '-'
       const administrationRoute =
@@ -169,7 +166,7 @@ const mapToTable = (
         },
         {
           id: `${elem.id}-administration`,
-          value: administrationRoute === 'No matching concept' ? '-' : administrationRoute ?? '-',
+          value: administrationRoute === 'No matching concept' ? '-' : (administrationRoute ?? '-'),
           type: CellType.TEXT,
           align: 'center'
         },
@@ -283,7 +280,7 @@ export const medicationRequestConfig = (
   type: ResourceType.MEDICATION_REQUEST,
   deidentified,
   displayOptions,
-  initSearchCriterias: () => initSearchCriterias(search, ResourceType.MEDICATION_REQUEST),
+  initSearchCriterias: () => initSearchCriterias(search),
   fetchList: (fetchParams, options, signal) =>
     fetchRequestList(fetchParams, options, patient, deidentified, groupId, signal),
   mapToTable: (data) => mapToTable(data, deidentified, !!patient, groupId, ResourceType.MEDICATION_REQUEST),
@@ -306,7 +303,7 @@ export const medicationAdministrationConfig = (
   type: ResourceType.MEDICATION_ADMINISTRATION,
   deidentified,
   displayOptions,
-  initSearchCriterias: () => initSearchCriterias(search, ResourceType.MEDICATION_ADMINISTRATION),
+  initSearchCriterias: () => initSearchCriterias(search),
   fetchList: (fetchParams, options, signal) =>
     fetchAdministrationList(fetchParams, options, patient, deidentified, groupId, signal),
   mapToTable: (data) => mapToTable(data, deidentified, !!patient, groupId, ResourceType.MEDICATION_ADMINISTRATION),

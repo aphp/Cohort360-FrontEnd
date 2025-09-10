@@ -35,10 +35,10 @@ const ExportRequest = () => {
 
   return (
     <PageContainer>
-      <Grid container justifyContent="center" alignItems="center">
+      <Grid container sx={{ justifyContent: 'center', alignItems: 'center' }}>
         <CssBaseline />
         <HeaderLayout id="export-form-title" title="Demande d'export" titleOnly />
-        <Grid container item xs={11} mt={2}>
+        <Grid container size={11} mt={2}>
           <ExportForm />
         </Grid>
       </Grid>

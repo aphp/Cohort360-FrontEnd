@@ -472,9 +472,8 @@ const unbuildCohortCreation = createAsyncThunk<UnbuildCohortReturn, UnbuildParam
   async ({ newCurrentSnapshot }, { dispatch }) => {
     try {
       const { serialized_query, dated_measures } = newCurrentSnapshot
-      const { population, criteria, criteriaGroup, temporalConstraints, idRemap } = await unbuildRequest(
-        serialized_query
-      )
+      const { population, criteria, criteriaGroup, temporalConstraints, idRemap } =
+        await unbuildRequest(serialized_query)
       let _temporalConstraints
       let isCriteriaNominative = false
 

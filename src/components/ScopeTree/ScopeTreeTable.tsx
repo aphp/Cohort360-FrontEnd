@@ -51,14 +51,14 @@ const ScopeTreeRow = ({ item, path, sourceType, mode, loading, onSelect, onExpan
 
   return (
     <>
-      <RowContainerWrapper container color={path.length % 2 === 0 ? '#f3f5f9' : '#fff'}>
+      <RowContainerWrapper color={path.length % 2 === 0 ? '#f3f5f9' : '#fff'}>
         <RowWrapper
           size={mode === SearchMode.RESEARCH ? '75px' : '55px'}
           container
           alignItems="center"
           marginLeft={path.length > 1 ? path.length * 20 - 20 + 'px' : '0'}
         >
-          <CellWrapper item xs={1} cursor>
+          <CellWrapper size={1} cursor>
             <>
               {internalLoading && <CircularProgress size={'15px'} color="info" />}
               {!internalLoading && (
@@ -71,7 +71,7 @@ const ScopeTreeRow = ({ item, path, sourceType, mode, loading, onSelect, onExpan
           </CellWrapper>
 
           {mode === SearchMode.RESEARCH && full_path && (
-            <CellWrapper cursor item xs={5}>
+            <CellWrapper cursor size={5}>
               <Breadcrumbs maxItems={2}>
                 {(full_path.split('/').length > 1 ? full_path.split('/').slice(1) : full_path.split('/').slice(0)).map(
                   (full_path: string, index, arr) => {
@@ -89,8 +89,7 @@ const ScopeTreeRow = ({ item, path, sourceType, mode, loading, onSelect, onExpan
           {mode === SearchMode.EXPLORATION && (
             <CellWrapper
               cursor
-              item
-              xs={5}
+              size={5}
               onClick={() => (open ? setOpen(false) : handleOpen())}
               fontSize={12.5}
               fontWeight={700}
@@ -98,20 +97,20 @@ const ScopeTreeRow = ({ item, path, sourceType, mode, loading, onSelect, onExpan
               {perimeterDisplay(source_value, name)}
             </CellWrapper>
           )}
-          <CellWrapper item xs={2} textAlign="center" fontSize={11.5}>
+          <CellWrapper size={2} textAlign="center" fontSize={11.5}>
             {format(+cohort_size)}
           </CellWrapper>
           {sourceType === SourceType.ALL && (
-            <CellWrapper item xs={3} textAlign="center" fontSize={11.5}>
+            <CellWrapper size={3} textAlign="center" fontSize={11.5}>
               {rights && <Fragment>{servicesPerimeters.getAccessFromRights(rights)}</Fragment>}
             </CellWrapper>
           )}
           {sourceType !== SourceType.ALL && (
-            <CellWrapper item xs={3} textAlign="center" fontSize={11.5}>
+            <CellWrapper size={3} textAlign="center" fontSize={11.5}>
               {type}
             </CellWrapper>
           )}
-          <CellWrapper item xs={1} container justifyContent="flex-end">
+          <CellWrapper size={1} container sx={{ justifyContent: 'flex-end' }}>
             <Checkbox
               checked={status === SelectedStatus.SELECTED}
               indeterminate={status === SelectedStatus.INDETERMINATE}
@@ -178,17 +177,17 @@ const ScopeTreeTable = ({
       <Table>
         <TableHead>
           <RowContainerWrapper alignItems="center" container color={'#d1e2f4'} height={'60px'}>
-            <CellWrapper item xs={1}></CellWrapper>
-            <CellWrapper item xs={5} color="#0063AF">
+            <CellWrapper size={1}></CellWrapper>
+            <CellWrapper size={5} color="#0063AF">
               Nom
             </CellWrapper>
-            <CellWrapper item xs={2} textAlign="center" color="#0063AF">
+            <CellWrapper size={2} textAlign="center" color="#0063AF">
               Nombre de patients
             </CellWrapper>
-            <CellWrapper item xs={3} textAlign="center" color="#0063AF">
+            <CellWrapper size={3} textAlign="center" color="#0063AF">
               {sourceType === SourceType.ALL ? 'Accès' : 'Type'}
             </CellWrapper>
-            <CellWrapper item xs={1} container justifyContent="flex-end">
+            <CellWrapper size={1} container sx={{ justifyContent: 'flex-end' }}>
               <Checkbox
                 color="secondary"
                 checked={selectAllStatus === SelectedStatus.SELECTED}
@@ -237,7 +236,7 @@ const ScopeTreeTable = ({
         </TableBody>
       </Table>
       {loading.search === LoadingStatus.FETCHING && (
-        <Grid container justifyContent="center" alignContent="center" height={500}>
+        <Grid container sx={{ justifyContent: 'center', alignContent: 'center' }} height={500}>
           <CircularProgress />
         </Grid>
       )}

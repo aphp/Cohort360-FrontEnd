@@ -18,13 +18,14 @@ const Collapse = ({ value = true, title, children, info }: PropsWithChildren<Col
   const [checked, setChecked] = useState(value)
 
   return (
-    <Grid container direction="column">
+    <Grid container sx={{ flexDirection: 'column' }}>
       <Grid
-        item
         container
-        direction="row"
-        alignItems="center"
-        marginBottom={checked ? 2 : 0}
+        sx={{
+          flexDirection: 'row',
+          alignItems: 'center',
+          marginBottom: checked ? 2 : 0
+        }}
         onClick={() => setChecked(!checked)}
       >
         <Typography style={{ cursor: 'pointer' }} variant="h6">

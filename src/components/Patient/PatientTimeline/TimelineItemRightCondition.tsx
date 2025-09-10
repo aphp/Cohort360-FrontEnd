@@ -26,8 +26,8 @@ const TimelineItemRight: React.FC<TimelineItemRightTypes> = ({ data }) => {
             {data.recordedDate
               ? new Date(data.recordedDate).toLocaleDateString('fr-FR')
               : data.meta?.lastUpdated
-              ? new Date(data.meta.lastUpdated).toLocaleDateString('fr-FR')
-              : 'Date inconnue'}
+                ? new Date(data.meta.lastUpdated).toLocaleDateString('fr-FR')
+                : 'Date inconnue'}
           </span>
 
           {data.code && (

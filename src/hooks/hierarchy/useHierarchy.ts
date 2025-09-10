@@ -93,6 +93,7 @@ export const useHierarchy = <T>(
       setLoadingStatus({ ...loadingStatus, search: LoadingStatus.SUCCESS })
       return { display: getDisplayFromTrees(endCodes, newTrees), count }
     } catch (e) {
+      console.error(e)
       return {
         display: [],
         count: 0

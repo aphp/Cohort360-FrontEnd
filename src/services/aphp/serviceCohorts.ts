@@ -175,6 +175,7 @@ const servicesCohorts: IServiceCohorts = {
         isSample
       }
     } catch (error) {
+      console.error(error)
       return {
         name: '',
         description: '',

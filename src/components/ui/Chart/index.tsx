@@ -40,8 +40,8 @@ const Chart = ({
   return (
     <ChartContainer id={id} sx={{ height: height }}>
       {title && (
-        <ChartHeader container item>
-          <Grid container item>
+        <ChartHeader container>
+          <Grid container>
             <Typography variant="h3" color="primary">
               {title}
               {tooltip && (
@@ -64,7 +64,7 @@ const Chart = ({
           </Grid>
         </ChartHeader>
       )}
-      <Grid container item justifyContent="center" alignItems="center" style={{ flexGrow: 1 }} height="100%">
+      <Grid container sx={{ justifyContent: 'center', alignItems: 'center', flexGrow: 1, height: '100%' }}>
         {isLoading ? <CircularProgress /> : children}
       </Grid>
     </ChartContainer>

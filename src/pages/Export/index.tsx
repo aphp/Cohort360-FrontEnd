@@ -103,19 +103,19 @@ const Export = () => {
 
   return (
     <PageContainer>
-      <Grid container direction="column" style={{ minHeight: '100vh' }}>
-        <Grid container justifyContent="center" alignItems="center">
+      <Grid container size={12} sx={{ flexDirection: 'column' }} style={{ minHeight: '100vh' }}>
+        <Grid container size={12} sx={{ justifyContent: 'center', alignItems: 'center' }}>
           <HeaderLayout id="export-page-title" title="Mes exports" titleOnly />
-          <Grid container xs={11} gap={GAP} style={{ flexGrow: 1 }} mt={2}>
-            <Grid item container gap={1} justifyContent="space-between">
-              <Grid container xs={12} sm={6}>
+          <Grid container size={11} sx={{ gap: GAP }} mt={2}>
+            <Grid container size={12} sx={{ gap: 1, justifyContent: 'space-between' }}>
+              <Grid container size={{ xs: 12, sm: 6 }}>
                 <SearchInput
                   value={searchInput ?? ''}
                   placeholder="Rechercher un export"
                   onChange={(input) => handleSearch({ input })}
                 />
               </Grid>
-              <Grid container xs={12} sm={5} justifyContent={'flex-end'}>
+              <Grid container size={{ xs: 12, sm: 5 }} sx={{ justifyContent: 'flex-end' }}>
                 <Tooltip title={maintenanceIsActive ? "Ce bouton est desactivé en raison d'une maintenance." : ''}>
                   <Box>
                     <Button
@@ -130,9 +130,9 @@ const Export = () => {
                 </Tooltip>
               </Grid>
             </Grid>
-            <Grid item container direction="column" flexGrow={1}>
+            <Grid container size={12} sx={{ flexDirection: 'column', flexGrow: 1 }}>
               {loadingStatus === LoadingStatus.FETCHING && (
-                <Grid container justifyContent="center" height="50vh">
+                <Grid container sx={{ justifyContent: 'center' }} height="50vh">
                   <CircularProgress />
                 </Grid>
               )}

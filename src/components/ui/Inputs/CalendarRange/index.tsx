@@ -54,14 +54,14 @@ const CalendarRange = ({
   return (
     <>
       {isString(label) ? (
-        <BlockWrapper item xs={12} margin="0px 0px 10px 0px">
+        <BlockWrapper size={{ xs: 12 }} margin="0px 0px 10px 0px">
           <CalendarLabel variant="h3">{label}</CalendarLabel>
         </BlockWrapper>
       ) : (
         label
       )}
-      <Grid item xs={12} container spacing={2}>
-        <Grid item xs={12} md={inline ? 6 : 12}>
+      <Grid size={{ xs: 12 }} container spacing={2}>
+        <Grid size={{ xs: 12, md: inline ? 6 : 12 }}>
           <CalendarInput
             disabled={disabled}
             label="Après le"
@@ -69,7 +69,7 @@ const CalendarRange = ({
             onChange={(value) => setStartDate(value)}
           />
         </Grid>
-        <Grid item xs={12} md={inline ? 6 : 12}>
+        <Grid size={{ xs: 12, md: inline ? 6 : 12 }}>
           <CalendarInput
             disabled={disabled}
             label="Avant le"

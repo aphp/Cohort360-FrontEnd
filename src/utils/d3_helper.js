@@ -21,7 +21,7 @@
  * // returns { endPoint: 10, count: 7 }
  * ```
  */
-// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+
 export const getOptimalTicksCount = (maxTick) => {
   // base step between nearby two ticks
   let step = Math.pow(10, maxTick.toString().length - 1)

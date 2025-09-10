@@ -43,9 +43,11 @@ const scopeSlice = createSlice({
       }
     },
     saveScopeCodes: (state, action) => {
-      action.payload.isRights
-        ? fetchedRightsAdapter.setOne(state.codes.rights, action.payload.values)
-        : fetchedPerimetersAdapter.setOne(state.codes.perimeters, action.payload.values)
+      if (action.payload.isRights) {
+        fetchedRightsAdapter.setOne(state.codes.rights, action.payload.values)
+      } else {
+        fetchedPerimetersAdapter.setOne(state.codes.perimeters, action.payload.values)
+      }
     }
   },
   extraReducers: (builder) => {

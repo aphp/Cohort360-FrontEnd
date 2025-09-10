@@ -9,7 +9,7 @@ import DiagramView from './DiagramView'
 import ModalCreateNewRequest from './Modals/ModalCreateNewRequest/ModalCreateNewRequest'
 
 import { useAppDispatch, useAppSelector } from 'state'
-import { fetchRequestCohortCreation, resetCohortCreation, unbuildCohortCreation } from 'state/cohortCreation'
+import { fetchRequestCohortCreation, resetCohortCreation } from 'state/cohortCreation'
 import { setSelectedRequest } from 'state/request'
 
 import { CurrentSnapshot } from 'types'
@@ -118,10 +118,6 @@ const Requeteur = () => {
       setCriteriaLoading((criteriaLoading) => criteriaLoading - 1)
     }
   }, [dispatch, selectedCriteria, allowSearchIpp, selectedPopulation])
-
-  const _unbuildRequest = async (newCurrentSnapshot: CurrentSnapshot) => {
-    dispatch(unbuildCohortCreation({ newCurrentSnapshot }))
-  }
 
   useEffect(() => {
     if (selectedPopulation?.some((perimeter) => perimeter?.access === 'Pseudonymisé') && isCriteriaNominative) {

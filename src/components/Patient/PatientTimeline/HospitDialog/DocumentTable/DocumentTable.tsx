@@ -32,9 +32,8 @@ import { DocumentStatuses } from 'types/searchCriterias'
 type DocumentRowTypes = {
   deidentified: boolean
   document: CohortComposition
-  groupId: string
 }
-const DocumentRow: React.FC<DocumentRowTypes> = ({ deidentified, document, groupId }) => {
+const DocumentRow: React.FC<DocumentRowTypes> = ({ deidentified, document }) => {
   const { classes } = useStyles()
   const [documentDialogOpen, setDocumentDialogOpen] = useState(false)
 
@@ -103,9 +102,6 @@ type DocumentTableTypes = {
 const DocumentTable: React.FC<DocumentTableTypes> = ({ deidentified, documents, page, documentLines }) => {
   const { classes } = useStyles()
 
-  const search = new URLSearchParams(location.search)
-  const groupId = search.get('groupId') ?? ''
-
   return (
     <>
       {documents && documents.length > 0 ? (
@@ -132,18 +128,13 @@ const DocumentTable: React.FC<DocumentTableTypes> = ({ deidentified, documents, 
             </TableHead>
             <TableBody>
               {documents.slice((page - 1) * documentLines, page * documentLines).map((document, index) => (
-                <DocumentRow
-                  key={`docRow ${index}`}
-                  document={document}
-                  deidentified={deidentified}
-                  groupId={groupId}
-                />
+                <DocumentRow key={`docRow ${index}`} document={document} deidentified={deidentified} />
               ))}
             </TableBody>
           </Table>
         </TableContainer>
       ) : (
-        <Grid container justifyContent="center">
+        <Grid container sx={{ justifyContent: 'center' }}>
           <Typography variant="button"> Aucun document à afficher </Typography>
         </Grid>
       )}

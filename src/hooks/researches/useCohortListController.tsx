@@ -87,18 +87,26 @@ const useCohortListController = <TItem,>({
 
   const applyFilters = (newFilters: CohortsFilters) => {
     if (!simplified) {
-      newFilters.status.length > 0
-        ? searchParams.set(ExplorationsSearchParams.STATUS, newFilters.status.map((status) => status.id).join())
-        : searchParams.delete(ExplorationsSearchParams.STATUS)
-      newFilters.favorite.length > 0
-        ? searchParams.set(ExplorationsSearchParams.FAVORITE, newFilters.favorite.join())
-        : searchParams.delete(ExplorationsSearchParams.FAVORITE)
-      newFilters.minPatients
-        ? searchParams.set(ExplorationsSearchParams.MIN_PATIENTS, newFilters.minPatients)
-        : searchParams.delete(ExplorationsSearchParams.MIN_PATIENTS)
-      newFilters.maxPatients
-        ? searchParams.set(ExplorationsSearchParams.MAX_PATIENTS, newFilters.maxPatients)
-        : searchParams.delete(ExplorationsSearchParams.MAX_PATIENTS)
+      if (newFilters.status.length > 0) {
+        searchParams.set(ExplorationsSearchParams.STATUS, newFilters.status.map((status) => status.id).join())
+      } else {
+        searchParams.delete(ExplorationsSearchParams.STATUS)
+      }
+      if (newFilters.favorite.length > 0) {
+        searchParams.set(ExplorationsSearchParams.FAVORITE, newFilters.favorite.join())
+      } else {
+        searchParams.delete(ExplorationsSearchParams.FAVORITE)
+      }
+      if (newFilters.minPatients) {
+        searchParams.set(ExplorationsSearchParams.MIN_PATIENTS, newFilters.minPatients)
+      } else {
+        searchParams.delete(ExplorationsSearchParams.MIN_PATIENTS)
+      }
+      if (newFilters.maxPatients) {
+        searchParams.set(ExplorationsSearchParams.MAX_PATIENTS, newFilters.maxPatients)
+      } else {
+        searchParams.delete(ExplorationsSearchParams.MAX_PATIENTS)
+      }
       setSearchParams(searchParams)
       setOpenFiltersModal(false)
     }

@@ -264,9 +264,9 @@ const ExportTable: React.FC<ExportTableProps> = ({
   }, [exportTableResourceType === ResourceType.QUESTIONNAIRE_RESPONSE && checkedTable === true && oneFile])
 
   return (
-    <Grid container className={classes.exportTableGrid} id={exportTable.name}>
-      <Grid item container alignItems="center">
-        <Grid item container alignItems="center" xs={6}>
+    <Grid container size={12} className={classes.exportTableGrid} id={exportTable.name}>
+      <Grid container size={12} alignItems="center">
+        <Grid container alignItems="center" size={6}>
           <Typography
             variant="subtitle2"
             className={tableSetting?.isChecked ? classes.selectedTable : classes.notSelectedTable}
@@ -294,7 +294,7 @@ const ExportTable: React.FC<ExportTableProps> = ({
           </div>
         </Grid>
 
-        <Grid container item xs={4}>
+        <Grid container size={4}>
           {exportTableResourceType !== ResourceType.UNKNOWN && (
             <>
               {countLoading ? (
@@ -315,7 +315,7 @@ const ExportTable: React.FC<ExportTableProps> = ({
           )}
         </Grid>
 
-        <Grid container item xs={2} justifyContent={'end'}>
+        <Grid container size={2} sx={{ justifyContent: 'end' }}>
           <Checkbox
             id={tableSetting?.tableName + '_selectTable'}
             disabled={onDisableSelectedTable()}
@@ -347,9 +347,8 @@ const ExportTable: React.FC<ExportTableProps> = ({
       )}
 
       {exportTable.name === ResourceType.QUESTIONNAIRE_RESPONSE && (
-        <Grid container alignItems={'center'}>
+        <Grid container size={12} sx={{ alignItems: 'center' }}>
           <Switch
-            // style={{ padding: '0, 0, 0, 0' }}
             color="secondary"
             disabled={!checkedTable}
             checked={checkedPivotMerge}
@@ -364,9 +363,9 @@ const ExportTable: React.FC<ExportTableProps> = ({
         </Grid>
       )}
 
-      <Grid container justifyContent={'space-between'}>
+      <Grid container size={12} sx={{ justifyContent: 'space-between' }}>
         {!checkedPivotMerge && (
-          <Grid container xs={6} alignItems={'center'} id={tableSetting?.tableName + 'columnsFilters'}>
+          <Grid container size={6} sx={{ alignItems: 'center' }} id={tableSetting?.tableName + 'columnsFilters'}>
             <Typography marginRight={'5px'} className={classes.textBody2}>
               Sélectionner les colonnes à exporter :
             </Typography>
@@ -429,7 +428,7 @@ const ExportTable: React.FC<ExportTableProps> = ({
           </Grid>
         )}
 
-        <Grid container xs={6} alignItems="center" id={tableSetting?.tableName + 'ResourceFilters'}>
+        <Grid container size={6} sx={{ alignItems: 'center' }} id={tableSetting?.tableName + 'ResourceFilters'}>
           {exportTableResourceType !== ResourceType.UNKNOWN &&
             exportTableResourceType !== ResourceType.QUESTIONNAIRE_RESPONSE && (
               <>
@@ -457,7 +456,7 @@ const ExportTable: React.FC<ExportTableProps> = ({
       </Grid>
 
       {exportTable.name === ResourceType.QUESTIONNAIRE_RESPONSE && checkedPivotMerge && (
-        <Grid container alignItems={'center'} id={tableSetting?.tableName + 'questionChoice'}>
+        <Grid container size={12} sx={{ alignItems: 'center' }} id={tableSetting?.tableName + 'questionChoice'}>
           <QuestionForm
             open={isQuestionChoiceOpen}
             onClose={() => handleQuestionChoiceOpen(isQuestionChoiceOpen)}
@@ -466,7 +465,7 @@ const ExportTable: React.FC<ExportTableProps> = ({
             onConfirm={onSelectedQuestionsChange}
           />
 
-          <Grid item>
+          <Grid>
             <Typography marginRight={'5px'} className={classes.textBody2}>
               {selectedQuestions.length > 0 ? 'Modifier' : 'Sélectionner'} les questions à exporter :
             </Typography>
@@ -474,9 +473,8 @@ const ExportTable: React.FC<ExportTableProps> = ({
 
           <Grid
             container
-            item
-            xs={selectedQuestions.length > 0 ? 12 : 3.59}
-            alignItems={selectedQuestions.length ? 'flex-start' : 'center'}
+            size={selectedQuestions.length > 0 ? 12 : 3.59}
+            sx={{ alignItems: selectedQuestions.length ? 'flex-start' : 'center' }}
             border="1px solid rgba(0, 0, 0, 0.25)"
             borderRadius="4px"
             padding="6px 1px 6px 8px"
@@ -489,9 +487,8 @@ const ExportTable: React.FC<ExportTableProps> = ({
           >
             <Grid
               container
-              alignItems="center"
-              item
-              xs={selectedQuestions.length > 0 ? 11.4 : 10}
+              sx={{ alignItems: 'center' }}
+              size={selectedQuestions.length > 0 ? 11.4 : 10}
               tabIndex={0}
               style={{ cursor: 'pointer' }}
               onClick={handleOpen}
@@ -511,7 +508,7 @@ const ExportTable: React.FC<ExportTableProps> = ({
                 ))}
               </div>
             </Grid>
-            <Grid item xs={selectedQuestions.length > 0 ? 0.6 : 2} container justifyContent="flex-end">
+            <Grid size={selectedQuestions.length > 0 ? 0.6 : 2} container sx={{ justifyContent: 'flex-end' }}>
               {isExtended && selectedQuestions.length > 0 && (
                 <IconButton size="small" sx={{ color: '#5BC5F2' }} onClick={() => setIsExtended(false)}>
                   <CloseIcon />

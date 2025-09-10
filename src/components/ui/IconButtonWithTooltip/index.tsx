@@ -31,9 +31,8 @@ const IconButtonWithTooltip: React.FC<IconButtonWithTooltipProps> = ({
           }}
         >
           {React.cloneElement(icon, {
-            fill: disabled ? '#CBCFCF' : color,
             htmlColor: disabled ? '#CBCFCF' : color
-          })}
+          } as any)}
         </IconButton>
       </span>
     </Tooltip>

@@ -52,7 +52,9 @@ const useRequests = ({
   })
 
   useEffect(() => {
-    isError && dispatch(setMessage({ type: 'error', content: 'Erreur lors de la récupération des requêtes' }))
+    if (isError) {
+      dispatch(setMessage({ type: 'error', content: 'Erreur lors de la récupération des requêtes' }))
+    }
   }, [isError, dispatch])
 
   const requestsList = data?.results ?? []

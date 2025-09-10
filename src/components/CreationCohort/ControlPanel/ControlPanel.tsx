@@ -21,21 +21,17 @@ import {
   Snackbar
 } from '@mui/material'
 
-import ArrowBackIcon from '@mui/icons-material/ArrowBack'
-import ArrowForwardIcon from '@mui/icons-material/ArrowForward'
 import DescriptionIcon from '@mui/icons-material/Description'
 import HighlightOffIcon from '@mui/icons-material/HighlightOff'
 import InfoIcon from '@mui/icons-material/Info'
 import ShareIcon from '@mui/icons-material/Share'
 import SupervisedUserCircleIcon from '@mui/icons-material/SupervisedUserCircle'
-import UpdateSharpIcon from '@mui/icons-material/UpdateSharp'
 
 import ModalCohortTitle from '../Modals/ModalCohortTitle/ModalCohortTitle'
 import ModalShareRequest from 'components/Researches/Modals/ModalShareRequest'
 
 import { useAppSelector, useAppDispatch } from 'state'
 import {
-  resetCohortCreation,
   countCohortCreation,
   deleteCriteriaGroup,
   buildCohortCreation,
@@ -197,6 +193,7 @@ const ControlPanel: React.FC<{
       }
       setReportLoading(LoadingStatus.SUCCESS)
     } catch (error) {
+      console.error(error)
       setReportLoading(LoadingStatus.IDDLE)
       setReportError(true)
     }
@@ -335,8 +332,8 @@ const ControlPanel: React.FC<{
             </>
           )}
         </Grid>
-        <Grid className={classes.container}>
-          <Grid container justifyContent="space-between">
+        <Grid container className={classes.container}>
+          <Grid container size={12} justifyContent="space-between">
             <Typography className={cx(classes.boldText, classes.patientTypo)}>ACCÈS :</Typography>
             <Typography className={cx(classes.blueText, classes.boldText, classes.patientTypo)}>
               {accessIsPseudonymize === null ? '-' : accessIsPseudonymize ? 'Pseudonymisé' : 'Nominatif'}
@@ -350,8 +347,8 @@ const ControlPanel: React.FC<{
           )}
         </JToolComponentEggWrapper>
 
-        <Grid className={classes.container}>
-          <Grid container justifyContent="space-between">
+        <Grid container className={classes.container}>
+          <Grid container size={12} justifyContent="space-between">
             <Typography className={cx(classes.boldText, classes.patientTypo)}>PATIENTS INCLUS :</Typography>
             {isLoading && prevCountDisplay === undefined ? (
               <CircularProgress

@@ -59,24 +59,24 @@ const CriteriaCard = ({
   return (
     <Grid
       container
-      alignItems={'center'}
+      sx={{ alignItems: 'center' }}
       className={classes.criteriaItem}
       style={{ backgroundColor: criterion.isInclusive ? '#D1E2F4' : '#F2B0B0' }}
     >
       <CriteriaCount criteriaCount={criteriaCount} extraLeftMargin={3} />
       <Grid
         container
-        alignItems="center"
-        item
-        xs={7}
-        xl={3}
-        padding={'5px'}
-        justifyContent={isXl ? 'space-around' : 'flex-start'}
+        size={{ xs: 7, xl: 3 }}
+        sx={{
+          alignItems: 'center',
+          padding: '5px',
+          justifyContent: isXl ? 'space-around' : 'flex-start'
+        }}
       >
-        <Grid container item xs={1} justifyContent={'center'}>
+        <Grid container size={1} sx={{ justifyContent: 'center' }}>
           <AvatarWrapper size={20}>{criterion.id}</AvatarWrapper>
         </Grid>
-        <Grid container item xs={10}>
+        <Grid container size={10}>
           <Typography className={classes.title} fontWeight={700}>
             {criterion.title} :
           </Typography>
@@ -84,14 +84,12 @@ const CriteriaCard = ({
       </Grid>
       <Grid
         container
-        item
-        xs={12}
-        xl={7}
+        size={{ xs: 12, xl: 7 }}
         ref={containerRef}
         style={{ height: openCollapse ? '' : 42 }}
         className={classes.secondItem}
       >
-        <Grid item xs={11} container ref={childrenRef} style={{ overflow: 'hidden' }}>
+        <Grid size={11} container ref={childrenRef} style={{ overflow: 'hidden' }}>
           {criteriasAsArray(criterion, criteriaDefinitions, { entities, cache }).map((label, index) => (
             <ChipWrapper
               key={index}
@@ -102,7 +100,7 @@ const CriteriaCard = ({
             />
           ))}
         </Grid>
-        <Grid item xs={1}>
+        <Grid size={1}>
           {needCollapse && (
             <IconButton onClick={() => setOpenCollapse(!openCollapse)} size="small">
               {openCollapse ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
@@ -110,7 +108,7 @@ const CriteriaCard = ({
           )}
         </Grid>
       </Grid>
-      <Grid container xs={5} xl={2} justifyContent="flex-end">
+      <Grid container size={{ xs: 5, xl: 2 }} sx={{ justifyContent: 'flex-end' }}>
         {criterion.error && (
           <IconButton
             size="small"
