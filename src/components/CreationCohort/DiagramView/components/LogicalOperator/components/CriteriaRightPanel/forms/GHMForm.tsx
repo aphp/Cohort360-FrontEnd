@@ -10,7 +10,7 @@ import {
 import { Link } from '@mui/material'
 import { SourceType } from 'types/scope'
 import { getConfig } from 'config'
-import { getValueSetsFromSystems } from 'utils/valueSets'
+import { getValueSetsByUrls } from 'utils/valueSets'
 import { Hierarchy } from 'types/hierarchy'
 import { FhirItem } from 'types/valueSet'
 
@@ -74,12 +74,14 @@ export const form: () => CriteriaForm<GhmDataType> = () => ({
         {
           valueKey: 'code',
           type: 'codeSearch',
-          valueSetsInfo: getValueSetsFromSystems([getConfig().features.claim.valueSets.claimHierarchy.url]),
+          valueSetsInfo: getValueSetsByUrls([getConfig().features.claim.valueSets.claimHierarchy.url]),
           noOptionsText: 'Aucun GHM trouvé',
           label: 'Sélectionner les codes GHM',
           buildInfo: {
             fhirKey: ClaimParamsKeys.CODE,
-            buildMethodExtraArgs: [{ type: 'string', value: getConfig().features.claim.valueSets.claimHierarchy.url }],
+            buildMethodExtraArgs: [
+              { type: 'string', value: getConfig().features.claim.valueSets.claimHierarchy.codeSystemUrls?.at(0) || '' }
+            ],
             chipDisplayMethodExtraArgs: [
               { type: 'string', value: '' },
               { type: 'boolean', value: true }
