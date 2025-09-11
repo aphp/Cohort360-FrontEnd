@@ -72,7 +72,7 @@ const VersionsSection: React.FC<VersionsSectionProps> = ({
                 const hasCohorts = version.cohorts_count > 0
                 const versionProps = {
                   isActive,
-                  count: displayVersionsCount(isActive ? count.includePatient : version.patients_count),
+                  count: displayVersionsCount(isActive ? count?.includePatient : version.patients_count),
                   isLoading: isLoading && isActive,
                   name: getVersionName(version),
                   versionId: version.uuid,
