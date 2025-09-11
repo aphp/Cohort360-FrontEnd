@@ -8,8 +8,6 @@ import Typography from '@mui/material/Typography'
 
 import Button from 'components/ui/Button'
 import CriteriasSection from 'components/ExplorationBoard/CriteriasSection'
-import TimelineItemRightProcedure from './TimelineItemRightProcedure'
-import TimelineItemRightCondition from './TimelineItemRightCondition'
 import HospitDialog from './HospitDialog/HospitDialog'
 import FilterTimelineDialog from './FilterTimelineDialog/FilterTimelineDialog'
 
@@ -22,7 +20,7 @@ import { useAppDispatch } from 'state'
 import { fetchAllProcedures } from 'state/patient'
 
 import useStyles from './styles'
-import { Condition, Encounter, Period, Procedure } from 'fhir/r4'
+import { Condition, Encounter, Procedure } from 'fhir/r4'
 import { FilterKeys, FilterValue, LabelObject, SearchCriteriaKeys, TimelineFilter } from 'types/searchCriterias'
 import { getExtension } from 'utils/fhir'
 import { getConfig } from 'config'
@@ -31,7 +29,8 @@ import { getCodeList } from 'services/aphp/serviceValueSets'
 import { GAP } from 'types/exploration'
 import { removeElementInArray, selectFiltersAsArray } from 'utils/filters'
 import { Box } from '@mui/material'
-import Hospit from './Hospit'
+import PmsiItem from './PmsiItem'
+import HospitItem from './HospitItem'
 
 const dateFormat = 'YYYY-MM-DD'
 
@@ -278,13 +277,23 @@ const PatientTimeline: React.FC<PatientTimelineTypes> = ({
 
   const getMonthComponent = (monthVisits: MonthVisit) => {
     return (
-      <Box display="flex" flexDirection="column" gap={2}>
+      <Box display="flex" flexDirection="column">
         {monthVisits.hospit &&
           monthVisits.hospit.map((hospit, index) => (
-            <Box zIndex={1} display="flex" flexDirection="row" key={`encounter ${hospit.data.id ?? index}`}>
-              {`${console.log('test period', hospit)}`}
+            <Box
+              zIndex={1}
+              display="flex"
+              flexDirection="row"
+              key={`encounter ${hospit.data.id ?? index}`}
+              marginBottom={1}
+              marginTop={1}
+            >
               <Box flex="0 0 calc(50% + 7.5px)">
-                <Hospit data={hospit.data} open={handleClickOpenHospitDialog} isPeriod={!!hospit.data.period?.end} />
+                <HospitItem
+                  data={hospit.data}
+                  open={handleClickOpenHospitDialog}
+                  isPeriod={hospit.end !== hospit.start}
+                />
               </Box>
             </Box>
           ))}
@@ -307,10 +316,12 @@ const PatientTimeline: React.FC<PatientTimelineTypes> = ({
                 display="flex"
                 flexDirection="row"
                 key={pmsi.data.resourceType === 'Procedure' ? `procedure ${index}` : `condition ${index}`}
+                marginBottom={2}
+                marginTop={2}
               >
                 <Box flex="0 0 calc(50% - 7.5px)"></Box>
                 <Box flex="1">
-                  <TimelineItemRightProcedure date={date} description={description} status={status} />
+                  <PmsiItem date={date} description={description} status={status} />
                   {/*pmsi.data.resourceType === 'Procedure' ? (
                     <TimelineItemRightProcedure date={date} description={description} status={pmsi.data.status} />
                   ) : (
@@ -327,11 +338,7 @@ const PatientTimeline: React.FC<PatientTimelineTypes> = ({
   const getYearComponent = (year: number) => (
     <React.Fragment>
       {timelineData[year]
-        ? Object.keys(timelineData[year]).map((month) => (
-            /*<ul className={classes.timeline} key={'ul' + year + month}>*/
-            <>{getMonthComponent(timelineData[year][month])}</>
-            /*</ul>*/
-          ))
+        ? Object.keys(timelineData[year]).map((month) => getMonthComponent(timelineData[year][month]))
         : isActivityInYear(year) && <div className={classes.emptyYear}></div>}
       <span className={classes.timelabel}>{year}</span>
     </React.Fragment>

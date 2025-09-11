@@ -6,37 +6,30 @@ import useStyles from './styles'
 import { CohortEncounter } from 'types'
 import { Encounter } from 'fhir/r4'
 
-type HospitTypes = {
+type HospitItemTypes = {
   data: CohortEncounter
   isPeriod: boolean
   open: (encounter?: Encounter) => void
 }
-const Hospit = ({ data, open, isPeriod }: HospitTypes) => {
-  let color = ''
-  switch (data?.class?.code) {
-    case 'hosp':
-      color = '#C3DCA5'
-      break
-    case 'urg':
-      color = '#FC568F'
-      break
-    case 'ext':
-      color = '#FFE755'
-      break
-    case 'incomp':
-      color = '#A7E5FF'
-      break
-    default:
-      color = '#A7E5FF'
-  }
 
-  const { classes } = useStyles({ dotHeight: isPeriod ? 45 : 16, color: color })
-  const periodStart = data.period?.start ? new Date(data.period.start).toLocaleDateString('fr-FR') : '-'
-  const periodEnd = data.period?.end ? new Date(data.period.end).toLocaleDateString('fr-FR') : '-'
+const classColorMap: Record<string, string> = {
+  hosp: '#C3DCA5',
+  urg: '#FC568F',
+  ext: '#FFE755',
+  incomp: '#A7E5FF'
+}
+
+const HospitItem = ({ data, open, isPeriod }: HospitItemTypes) => {
+  const { classes } = useStyles({
+    dotHeight: isPeriod ? 45 : 16,
+    color: data?.class?.code ? (classColorMap[data.class.code] ?? '#A7E5FF') : '#A7E5FF'
+  })
+  const periodStart = data.period?.start ? new Date(data.period.start).toLocaleDateString('fr-FR') : ''
+  const periodEnd = data.period?.end ? new Date(data.period.end).toLocaleDateString('fr-FR') : ''
   return (
     <Box display={'flex'} alignItems={'center'}>
       <Box flex="1">
-        <Card className={classes.leftHospitCard} variant="outlined">
+        <Card className={classes.hospitCard} variant="outlined">
           <Box padding="15px" display={'flex'} flexDirection={'column'} gap={1}>
             <Box display={'flex'} justifyContent={'space-between'} alignItems={'center'} flexWrap={'wrap'}>
               {data.serviceProvider?.display && (
@@ -54,23 +47,23 @@ const Hospit = ({ data, open, isPeriod }: HospitTypes) => {
             </Box>
             <Box display={'flex'} flexDirection={'column'} gap={0.5}>
               <div className={classes.hospitTitle}>{data.class ? data.class.display : 'classe inconnue'}</div>
-              {data?.class?.code === 'ext' ? (
-                <div className={classes.hospitDates}>
-                  {data.period?.start ? `Le ${new Date(data.period.start).toLocaleDateString('fr-FR')}` : 'Pas de date'}
-                </div>
+              {periodStart === periodEnd ? (
+                <div className={classes.hospitDates}>{periodStart ? `Le ${periodStart}` : 'Pas de date'}</div>
               ) : (
-                <div className={classes.hospitDates}>{`Du ${periodStart} au ${periodEnd}`}</div>
+                <div className={classes.hospitDates}>
+                  {periodStart && periodEnd ? `Du ${periodStart} au ${periodEnd}` : `Depuis le ${periodStart}`}
+                </div>
               )}
             </Box>
           </Box>
         </Card>
       </Box>
       <Box flex="0 0 30px" display="flex" alignItems={'center'}>
-        <Box className={classes.lineLeft} flex={1} />
-        <Box flexShrink={0} width={15} className={classes.dotLeft}></Box>
+        <Box className={classes.line} flex={1} />
+        <Box flexShrink={0} width={15} className={classes.hospitDot}></Box>
       </Box>
     </Box>
   )
 }
 
-export default Hospit
+export default HospitItem
