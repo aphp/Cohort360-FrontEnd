@@ -50,9 +50,7 @@ const useStyles = makeStyles<{ dotHeight?: number; color?: string }>()((_theme, 
   },
   time: {
     fontSize: fontSize,
-    color: '#999',
-    textAlign: 'left',
-    marginRight: 8
+    color: '#999'
   },
   timelabel: {
     fontSize: fontSize,
@@ -81,17 +79,17 @@ const useStyles = makeStyles<{ dotHeight?: number; color?: string }>()((_theme, 
     display: 'flex'
   },
   lineRight: {
-    position: 'absolute',
-    display: 'inline-block',
+    //position: 'absolute',
+    //display: 'inline-block',
     height: 1,
-    width: `${1.5 * marginNextCentralLine}px`,
-    background: '#43435B',
-    zIndex: 0
+    //width: `${1.5 * marginNextCentralLine}px`,
+    background: '#43435B'
+    //zIndex: 0
   },
   dotLeft: {
     //position: 'absolute',
     //width: dotSize,
-    height: 45, //params.dotHeight,
+    height: params.dotHeight,
     borderRadius: 50,
     backgroundColor: params.color,
     //  display: 'inline-block',
@@ -102,14 +100,14 @@ const useStyles = makeStyles<{ dotHeight?: number; color?: string }>()((_theme, 
   },
   dotRight: {
     // position: 'relative',
-    width: dotSize,
-    height: dotSize,
+    width: 16,
+    height: 16,
     borderRadius: 50,
     backgroundColor: params.color,
-    display: 'inline-block',
-    transform: 'translateX(-50%)',
-    border: '1px solid #3B3B51',
-    zIndex: 1
+    //display: 'inline-block',
+    // transform: 'translateX(-50%)',
+    border: '1px solid #3B3B51'
+    //zIndex: 1
   },
   lineLeft: {
     //position: 'absolute',
@@ -121,15 +119,16 @@ const useStyles = makeStyles<{ dotHeight?: number; color?: string }>()((_theme, 
     //right: 0
   },
   timelineTextRight: {
-    textAlign: 'left',
+    //textAlign: 'left',
     fontSize: fontSize,
-    marginRight: '.7rem',
+    //marginRight: '.7rem',
     color: '#43435B',
-    zIndex: 5
+    //zIndex: 5
   },
   chip: {
     fontSize: fontSize,
-    borderRadius: 5
+    borderRadius: 5,
+   // maxWidth: 350
   },
   timelineRight: {
     display: 'flex',

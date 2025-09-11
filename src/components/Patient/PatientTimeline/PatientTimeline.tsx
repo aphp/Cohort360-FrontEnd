@@ -10,7 +10,6 @@ import Button from 'components/ui/Button'
 import CriteriasSection from 'components/ExplorationBoard/CriteriasSection'
 import TimelineItemRightProcedure from './TimelineItemRightProcedure'
 import TimelineItemRightCondition from './TimelineItemRightCondition'
-import TimelineItemLeft from './TimelineItemLeft'
 import HospitDialog from './HospitDialog/HospitDialog'
 import FilterTimelineDialog from './FilterTimelineDialog/FilterTimelineDialog'
 
@@ -32,6 +31,7 @@ import { getCodeList } from 'services/aphp/serviceValueSets'
 import { GAP } from 'types/exploration'
 import { removeElementInArray, selectFiltersAsArray } from 'utils/filters'
 import { Box } from '@mui/material'
+import Hospit from './Hospit'
 
 const dateFormat = 'YYYY-MM-DD'
 
@@ -84,7 +84,7 @@ const generateTimelineFormattedData = (
   selectedTypes?: LabelObject[]
 ): TimelineData => {
   const data: TimelineData = {}
-
+  console.log('test valueSet', consults)
   hospits = hospits?.filter((item) => (encounterStatusIds.length > 0 ? encounterStatusIds.includes(item.status) : item))
 
   hospits?.forEach((item) => {
@@ -277,41 +277,14 @@ const PatientTimeline: React.FC<PatientTimelineTypes> = ({
   }
 
   const getMonthComponent = (monthVisits: MonthVisit) => {
-    const getComponentSize = (period?: Period) => {
-      // get the size of the hospit dot
-      if (period) {
-        if (period.end) {
-          let size = 45 // 45px for the current year
-
-          for (
-            let i = new Date(period.start ?? '').getFullYear() + 1;
-            // +1 because we don't consider the first year component size (45px taken into account)
-            i <= new Date(period.end).getFullYear() - 1;
-            // -1 because we don't consider the last year component size because we want it to stop during this last year
-            i++
-          ) {
-            size += yearComponentSize[i] ?? 0
-          }
-          return size
-        } else {
-          return 16
-        }
-      } else {
-        return 16
-      }
-    }
-
     return (
       <Box display="flex" flexDirection="column" gap={2}>
         {monthVisits.hospit &&
           monthVisits.hospit.map((hospit, index) => (
             <Box zIndex={1} display="flex" flexDirection="row" key={`encounter ${hospit.data.id ?? index}`}>
+              {`${console.log('test period', hospit)}`}
               <Box flex="0 0 calc(50% + 7.5px)">
-                <TimelineItemLeft
-                  data={hospit.data}
-                  open={handleClickOpenHospitDialog}
-                  dotHeight={getComponentSize(hospit.data.period)}
-                />
+                <Hospit data={hospit.data} open={handleClickOpenHospitDialog} isPeriod={!!hospit.data.period?.end} />
               </Box>
             </Box>
           ))}
@@ -326,7 +299,8 @@ const PatientTimeline: React.FC<PatientTimelineTypes> = ({
             const date =
               (pmsi.data.resourceType === 'Procedure' ? pmsi.data.performedDateTime : pmsi.data.recordedDate) ??
               pmsi.data.meta?.lastUpdated
-            console.log('test status', pmsi.data, pmsi.data.status)
+            const status = pmsi.data.resourceType === 'Procedure' ? pmsi.data.status : null
+            if (pmsi.data.resourceType === 'Procedure') console.log('test status', description, pmsi.data.status)
             return (
               <Box
                 zIndex={1}
@@ -336,11 +310,12 @@ const PatientTimeline: React.FC<PatientTimelineTypes> = ({
               >
                 <Box flex="0 0 calc(50% - 7.5px)"></Box>
                 <Box flex="1">
-                  {pmsi.data.resourceType === 'Procedure' ? (
-                    <TimelineItemRightProcedure date={date} description={description} />
+                  <TimelineItemRightProcedure date={date} description={description} status={status} />
+                  {/*pmsi.data.resourceType === 'Procedure' ? (
+                    <TimelineItemRightProcedure date={date} description={description} status={pmsi.data.status} />
                   ) : (
                     <TimelineItemRightCondition data={pmsi.data} description={description} date={date} />
-                  )}
+                  )*/}
                 </Box>
               </Box>
             )

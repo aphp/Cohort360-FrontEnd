@@ -6,17 +6,12 @@ import useStyles from './styles'
 import { CohortEncounter } from 'types'
 import { Encounter } from 'fhir/r4'
 
-/**
- * @usage
- * <TimelineItemLeft time={time} text={text} />
- */
-
-type TimelineItemLeftTypes = {
+type HospitTypes = {
   data: CohortEncounter
+  isPeriod: boolean
   open: (encounter?: Encounter) => void
-  dotHeight: number
 }
-const TimelineItemLeft: React.FC<TimelineItemLeftTypes> = ({ data, open, dotHeight }) => {
+const Hospit = ({ data, open, isPeriod }: HospitTypes) => {
   let color = ''
   switch (data?.class?.code) {
     case 'hosp':
@@ -35,15 +30,15 @@ const TimelineItemLeft: React.FC<TimelineItemLeftTypes> = ({ data, open, dotHeig
       color = '#A7E5FF'
   }
 
-  const { classes } = useStyles({ dotHeight: dotHeight, color: color })
+  const { classes } = useStyles({ dotHeight: isPeriod ? 45 : 16, color: color })
   const periodStart = data.period?.start ? new Date(data.period.start).toLocaleDateString('fr-FR') : '-'
   const periodEnd = data.period?.end ? new Date(data.period.end).toLocaleDateString('fr-FR') : '-'
   return (
-    <Box display={'flex'} alignItems={'flex-start'}>
+    <Box display={'flex'} alignItems={'center'}>
       <Box flex="1">
         <Card className={classes.leftHospitCard} variant="outlined">
           <Box padding="15px" display={'flex'} flexDirection={'column'} gap={1}>
-            <Box display={'flex'} justifyContent={'space-between'} alignItems={'center'}>
+            <Box display={'flex'} justifyContent={'space-between'} alignItems={'center'} flexWrap={'wrap'}>
               {data.serviceProvider?.display && (
                 <Chip label={data.serviceProvider.display} size="small" className={classes.chip} />
               )}
@@ -70,12 +65,12 @@ const TimelineItemLeft: React.FC<TimelineItemLeftTypes> = ({ data, open, dotHeig
           </Box>
         </Card>
       </Box>
-      <Box flex="0 0 30px" display="flex">
-        <Box marginTop="30px" className={classes.lineLeft} flex={1} />
+      <Box flex="0 0 30px" display="flex" alignItems={'center'}>
+        <Box className={classes.lineLeft} flex={1} />
         <Box flexShrink={0} width={15} className={classes.dotLeft}></Box>
       </Box>
     </Box>
   )
 }
 
-export default TimelineItemLeft
+export default Hospit
