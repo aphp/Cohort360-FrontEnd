@@ -101,7 +101,7 @@ const fetchList = (
   )
 }
 
-const mapToTable = (
+export const mapToTable = (
   data: Data,
   deidentified: boolean,
   isPatient: boolean,

@@ -42,6 +42,7 @@ const HospitDialog: React.FC<HospitDialogTypes> = ({ deidentified, open, onClose
           <CircularProgress className={classes.loading} />
         ) : (
           <>
+            {/*<DataTable value={documentsTable} orderBy={orderBy} onSort={onSort} />*/}
             {documents && (
               <DocumentTable
                 documentLines={documentLines}

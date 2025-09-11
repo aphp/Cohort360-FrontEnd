@@ -31,6 +31,9 @@ import { removeElementInArray, selectFiltersAsArray } from 'utils/filters'
 import { Box } from '@mui/material'
 import PmsiItem from './PmsiItem'
 import HospitItem from './HospitItem'
+import Modal from 'components/ui/Modal'
+import Table from 'components/ui/Table'
+import { mapToTable } from 'components/ExplorationBoard/config/documents'
 
 const dateFormat = 'YYYY-MM-DD'
 
@@ -162,7 +165,7 @@ const PatientTimeline: React.FC<PatientTimelineTypes> = ({
   const [searchParams, setSearchParams] = useSearchParams()
   const [timelineData, setTimelineData] = useState<TimelineData>({})
   const [openHospitDialog, setOpenHospitDialog] = useState(false)
-  const [dialogDocuments, setDialogDocuments] = useState<CohortComposition[] | undefined>([])
+  const [currentDocuments, setCurrentDocuments] = useState<CohortComposition[]>([])
   const [openFilter, setOpenFilter] = useState(false)
 
   const [diagnosticTypesList, setDiagnosticTypesList] = useState<LabelObject[]>([])
@@ -241,18 +244,9 @@ const PatientTimeline: React.FC<PatientTimelineTypes> = ({
     ).reverse()
   }
 
-  const handleClickOpenHospitDialog = (hospitOrConsult?: CohortEncounter | PMSIEntry<Procedure>) => {
-    if (hospitOrConsult) {
-      setLoading(true)
-      setOpenHospitDialog(true)
-      const docs = hospitOrConsult.documents
-      setDialogDocuments(docs)
-      setLoading(false)
-    }
-  }
-
-  const handleClose = () => {
-    setOpenHospitDialog(false)
+  const handleClickDocuments = (documents: CohortComposition[]) => {
+    setOpenHospitDialog(true)
+    setCurrentDocuments(documents)
   }
 
   const isActivityInYear = (yearSearched: number) => {
@@ -289,11 +283,7 @@ const PatientTimeline: React.FC<PatientTimelineTypes> = ({
               marginTop={1}
             >
               <Box flex="0 0 calc(50% + 7.5px)">
-                <HospitItem
-                  data={hospit.data}
-                  open={handleClickOpenHospitDialog}
-                  isPeriod={hospit.end !== hospit.start}
-                />
+                <HospitItem data={hospit.data} onClick={handleClickDocuments} isPeriod={hospit.end !== hospit.start} />
               </Box>
             </Box>
           ))}
@@ -363,6 +353,18 @@ const PatientTimeline: React.FC<PatientTimelineTypes> = ({
 
   const filtersAsArray = useMemo(() => selectFiltersAsArray(filters, undefined), [filters])
 
+  const documentsTable = useMemo(
+    () =>
+      mapToTable(
+        { list: currentDocuments, total: 0, totalAllPatients: 0, totalAllResults: 0, totalPatients: 0 },
+        deidentified,
+        true,
+        groupId ? [groupId] : [],
+        false
+      ),
+    [currentDocuments, deidentified, groupId]
+  )
+
   return (
     <>
       {hospits && consults && hospits.length === 0 && consults.length === 0 ? (
@@ -371,13 +373,16 @@ const PatientTimeline: React.FC<PatientTimelineTypes> = ({
         </Grid>
       ) : (
         <>
-          <HospitDialog
+          {/*<HospitDialog
             open={openHospitDialog}
             onClose={handleClose}
             loading={loading}
             documents={dialogDocuments}
             deidentified={deidentified}
-          />
+          />*/}
+          <Modal open={openHospitDialog} readonly color="secondary" onClose={() => setOpenHospitDialog(false)}>
+            <Table value={documentsTable} />
+          </Modal>
 
           <FilterTimelineDialog
             diagnosticTypesList={diagnosticTypesList}

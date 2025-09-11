@@ -3,13 +3,12 @@ import Card from '@mui/material/Card'
 import { Box, Button, Chip } from '@mui/material'
 
 import useStyles from './styles'
-import { CohortEncounter } from 'types'
-import { Encounter } from 'fhir/r4'
+import { CohortComposition, CohortEncounter } from 'types'
 
 type HospitItemTypes = {
   data: CohortEncounter
   isPeriod: boolean
-  open: (encounter?: Encounter) => void
+  onClick: (documents: CohortComposition[]) => void
 }
 
 const classColorMap: Record<string, string> = {
@@ -19,7 +18,7 @@ const classColorMap: Record<string, string> = {
   incomp: '#A7E5FF'
 }
 
-const HospitItem = ({ data, open, isPeriod }: HospitItemTypes) => {
+const HospitItem = ({ data, onClick, isPeriod }: HospitItemTypes) => {
   const { classes } = useStyles({
     dotHeight: isPeriod ? 45 : 16,
     color: data?.class?.code ? (classColorMap[data.class.code] ?? '#A7E5FF') : '#A7E5FF'
@@ -39,7 +38,7 @@ const HospitItem = ({ data, open, isPeriod }: HospitItemTypes) => {
                 <Button
                   variant="text"
                   sx={{ color: '#999', textDecoration: 'underline', fontSize: 12 }}
-                  onClick={() => open(data)}
+                  onClick={() => onClick(data.documents ?? [])}
                 >
                   + de détails
                 </Button>
