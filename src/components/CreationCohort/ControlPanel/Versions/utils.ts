@@ -61,17 +61,17 @@ export const getVersionsTable = (
     const row: Row = [
       {
         id: `cohortTotal-${version.uuid}`,
-        type: version.cohorts_count > 0 ? CellType.TEXT : CellType.ICON,
+        type: version.cohorts_count > 0 ? CellType.ICON : CellType.TEXT,
         value:
           version.cohorts_count > 0
-            ? ''
-            : {
+            ? {
                 icon: SupervisedUserCircleIcon,
                 style: { color: '#f7a600b3', fontSize: '1.25rem' },
                 tooltip: `${version.cohorts_count} cohorte${plural(version.cohorts_count)} créée${plural(
                   version.cohorts_count
                 )} à partir de cette version.`
-              },
+              }
+            : '',
         align: 'center',
         sx: {
           width: '40px'
