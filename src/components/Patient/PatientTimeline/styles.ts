@@ -1,5 +1,4 @@
 import { makeStyles } from 'tss-react/mui'
-const marginNextCentralLine = 10
 const fontSize = 16
 const emptyYearHeight = '0.7em'
 

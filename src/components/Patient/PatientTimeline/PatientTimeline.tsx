@@ -8,7 +8,6 @@ import Typography from '@mui/material/Typography'
 
 import Button from 'components/ui/Button'
 import CriteriasSection from 'components/ExplorationBoard/CriteriasSection'
-import HospitDialog from './HospitDialog/HospitDialog'
 import FilterTimelineDialog from './FilterTimelineDialog/FilterTimelineDialog'
 
 import MoreVertIcon from '@mui/icons-material/MoreVert'
@@ -34,6 +33,7 @@ import HospitItem from './HospitItem'
 import Modal from 'components/ui/Modal'
 import Table from 'components/ui/Table'
 import { mapToTable } from 'components/ExplorationBoard/config/documents'
+import Filters from './Filters'
 
 const dateFormat = 'YYYY-MM-DD'
 
@@ -86,7 +86,6 @@ const generateTimelineFormattedData = (
   selectedTypes?: LabelObject[]
 ): TimelineData => {
   const data: TimelineData = {}
-  console.log('test valueSet', consults)
   hospits = hospits?.filter((item) => (encounterStatusIds.length > 0 ? encounterStatusIds.includes(item.status) : item))
 
   hospits?.forEach((item) => {
@@ -166,15 +165,13 @@ const PatientTimeline: React.FC<PatientTimelineTypes> = ({
   const [timelineData, setTimelineData] = useState<TimelineData>({})
   const [openHospitDialog, setOpenHospitDialog] = useState(false)
   const [currentDocuments, setCurrentDocuments] = useState<CohortComposition[]>([])
-  const [openFilter, setOpenFilter] = useState(false)
-
+  //const [openFilter, setOpenFilter] = useState(false)
   const [diagnosticTypesList, setDiagnosticTypesList] = useState<LabelObject[]>([])
   const [encounterStatusList, setEncounterStatusList] = useState<LabelObject[]>([])
   const [filters, setFilters] = useState<TimelineFilter>({
     diagnosticTypes: [],
     encounterStatus: []
   })
-  const [loading, setLoading] = useState(false)
   const yearComponentSize: { [year: number]: number } = {}
 
   const groupId = searchParams.get('groupId') ?? undefined
@@ -312,11 +309,6 @@ const PatientTimeline: React.FC<PatientTimelineTypes> = ({
                 <Box flex="0 0 calc(50% - 7.5px)"></Box>
                 <Box flex="1">
                   <PmsiItem date={date} description={description} status={status} />
-                  {/*pmsi.data.resourceType === 'Procedure' ? (
-                    <TimelineItemRightProcedure date={date} description={description} status={pmsi.data.status} />
-                  ) : (
-                    <TimelineItemRightCondition data={pmsi.data} description={description} date={date} />
-                  )*/}
                 </Box>
               </Box>
             )
@@ -334,7 +326,7 @@ const PatientTimeline: React.FC<PatientTimelineTypes> = ({
     </React.Fragment>
   )
 
-  const handleDeleteChip = (key: FilterKeys | SearchCriteriaKeys, value: FilterValue) => {
+ /* const handleDeleteChip = (key: FilterKeys | SearchCriteriaKeys, value: FilterValue) => {
     switch (key) {
       case FilterKeys.DIAGNOSTIC_TYPES: {
         const selectedDiagnosticTypes = removeElementInArray(filters.diagnosticTypes, value as LabelObject)
@@ -349,9 +341,9 @@ const PatientTimeline: React.FC<PatientTimelineTypes> = ({
       default:
         break
     }
-  }
+  }*/
 
-  const filtersAsArray = useMemo(() => selectFiltersAsArray(filters, undefined), [filters])
+  //const filtersAsArray = useMemo(() => selectFiltersAsArray(filters, undefined), [filters])
 
   const documentsTable = useMemo(
     () =>
@@ -373,18 +365,17 @@ const PatientTimeline: React.FC<PatientTimelineTypes> = ({
         </Grid>
       ) : (
         <>
-          {/*<HospitDialog
+          <Modal
             open={openHospitDialog}
-            onClose={handleClose}
-            loading={loading}
-            documents={dialogDocuments}
-            deidentified={deidentified}
-          />*/}
-          <Modal open={openHospitDialog} readonly color="secondary" onClose={() => setOpenHospitDialog(false)}>
+            width="fit-content"
+            readonly
+            color="secondary"
+            onClose={() => setOpenHospitDialog(false)}
+          >
             <Table value={documentsTable} />
           </Modal>
 
-          <FilterTimelineDialog
+          {/*<FilterTimelineDialog
             diagnosticTypesList={diagnosticTypesList}
             selectedDiagnosticTypes={filters.diagnosticTypes}
             onChangeFilters={(newFilters: TimelineFilter) => setFilters(newFilters)}
@@ -392,18 +383,23 @@ const PatientTimeline: React.FC<PatientTimelineTypes> = ({
             onClose={() => setOpenFilter(false)}
             encounterStatusList={encounterStatusList}
             selectedEncounterStatus={filters.encounterStatus}
-          />
+          />*/}
 
           <Grid container size={12} sx={{ gap: GAP }} margin={'16px 0'}>
-            <Button
+            <Filters
+              encounterStatusList={encounterStatusList}
+              diagnosticTypesList={diagnosticTypesList}
+              onChange={(newFilters: TimelineFilter) => setFilters(newFilters)}
+            />
+            {/*<Button
               onClick={() => setOpenFilter(true)}
               startIcon={<FilterList height="15px" fill="#FFF" />}
               width="fit-content"
             >
               Filtrer
-            </Button>
+            </Button>*/}
 
-            <CriteriasSection
+            {/*<CriteriasSection
               value={filtersAsArray}
               displayOptions={{
                 myFilters: false,
@@ -417,7 +413,7 @@ const PatientTimeline: React.FC<PatientTimelineTypes> = ({
                 sidebar: false
               }}
               onDelete={handleDeleteChip}
-            />
+            />*/}
 
             {loadingPmsi && (
               <div className={classes.loadingContainer}>

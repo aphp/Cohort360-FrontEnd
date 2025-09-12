@@ -1,8 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { PropsWithChildren } from 'react'
 
-import { Button, Dialog, DialogActions, DialogTitle, Divider, Grid, Typography } from '@mui/material'
-import { DialogContentWrapper } from './styles'
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Divider, Grid, Typography } from '@mui/material'
 
 type ModalProps = {
   open: boolean
@@ -31,7 +30,18 @@ const Modal = ({
   onClose
 }: PropsWithChildren<ModalProps>) => {
   return (
-    <Dialog open={open} onClose={onClose}>
+    <Dialog
+      open={open}
+      onClose={onClose}
+      slotProps={{
+        paper: {
+          sx: {
+            width,
+            maxWidth: '90vw'
+          }
+        }
+      }}
+    >
       {title && (
         <>
           <DialogTitle sx={{ padding: '25px 30px' }}>
@@ -46,9 +56,7 @@ const Modal = ({
           </Grid>
         </>
       )}
-      <DialogContentWrapper width={width} style={{ padding: '25px 30px' }}>
-        {children}
-      </DialogContentWrapper>
+      <DialogContent sx={{ padding: '25px 30px' }}>{children}</DialogContent>
       {!readonly && (
         <DialogActions style={{ backgroundColor: '#00000011', padding: '10px 30px' }}>
           <Button color="info" onClick={onClose}>
