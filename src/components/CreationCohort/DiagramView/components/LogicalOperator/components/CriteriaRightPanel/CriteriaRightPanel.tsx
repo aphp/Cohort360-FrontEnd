@@ -94,7 +94,7 @@ const CriteriaListItem: React.FC<CriteriaListItemProps> = (props) => {
       onClick={disabled ? undefined : () => subItems || handleClick(criteriaItem)}
       className={classes.criteriaItem}
     >
-      <Grid container flexDirection="column">
+      <Grid container sx={{ width: '100%' }} flexDirection="column">
         <Grid container flexDirection="row">
           <ListItemIcon style={{ minWidth: '2rem', color: 'currentcolor' }}>{svgIcon}</ListItemIcon>
           <ListItemText
