@@ -85,7 +85,7 @@ const Welcome = () => {
               </CustomAlert>
             ))}
         </Grid>
-        <Grid container spacing={1}>
+        <Grid container size={12} spacing={1}>
           <Grid container className={classes.newsGrid} size={{ xs: 12, md: 6 }}>
             <Grid className={classes.pt3}>
               <Paper
