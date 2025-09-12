@@ -1,3 +1,4 @@
+import { AppDispatch } from 'state'
 import { cleanSearchParams, getCleanGroupId } from 'utils/paginationUtils'
 import { validatePageNumber } from 'utils/url'
 import { vi } from 'vitest'
@@ -9,7 +10,7 @@ describe('validatePageNumber', () => {
     const setPage = vi.fn()
     const dispatch = vi.fn()
 
-    validatePageNumber(totalPages, currentPage, setPage, dispatch)
+    validatePageNumber(totalPages, currentPage, setPage, dispatch as unknown as AppDispatch)
     expect(dispatch).not.toHaveBeenCalled()
   })
   it('should return dispatch with error', () => {
@@ -18,7 +19,7 @@ describe('validatePageNumber', () => {
     const setPage = vi.fn()
     const dispatch = vi.fn()
 
-    validatePageNumber(currentPage, totalPages, setPage, dispatch)
+    validatePageNumber(currentPage, totalPages, setPage, dispatch as unknown as AppDispatch)
     expect(dispatch).toHaveBeenCalled()
   })
 })
