@@ -41,6 +41,7 @@ import FavStar from '../FavStar'
 import SublevelButton from '../SublevelButton'
 import TooltipChip from '../TooltipChip'
 import IconButtonWithTooltip from '../IconButtonWithTooltip'
+import { useNavigate } from 'react-router-dom'
 
 type RowProps = {
   row: Row
@@ -54,6 +55,8 @@ const renderIcon = (IconComponent: ReactElement | undefined) => {
 }
 
 const TableRow = ({ row, sx }: RowProps) => {
+  const navigate = useNavigate()
+
   const [subitemIndex, setSubitemIndex] = useState<number | null>(null)
   const docContentIndex = row.findIndex((cell) => cell.type === CellType.DOCUMENT_CONTENT)
   const showSubContent =
@@ -172,7 +175,7 @@ const TableRow = ({ row, sx }: RowProps) => {
               {cell.type === CellType.LINK && (
                 <div style={{ display: 'flex' }}>
                   {cell.value && <p>{(cell.value as Link).label}</p>}
-                  <IconButton id="searchButton" onClick={() => window.open((cell.value as Link).url)}>
+                  <IconButton id="searchButton" onClick={() => navigate((cell.value as Link).url)}>
                     <SearchIcon height="15px" fill="#ED6D91" />
                   </IconButton>
                 </div>

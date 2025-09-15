@@ -87,7 +87,7 @@ const ValueSetRow = ({
           container
           alignItems="center"
           marginLeft={path.length > 1 ? path.length * 20 - 20 + 'px' : '0'}
-          style={{ paddingRight: 10 }}
+          style={{ paddingRight: 10, width: '100%' }}
         >
           <CellWrapper size={1} cursor>
             {mode === SearchMode.EXPLORATION && isHierarchy && (
@@ -217,7 +217,7 @@ const ValueSetTable = ({
                 <RowContainerWrapper container>
                   <RowWrapper
                     container
-                    sx={{ alignItems: 'center', justifyContent: 'space-between' }}
+                    sx={{ alignItems: 'center', justifyContent: 'space-between', width: '100%' }}
                     style={{ paddingRight: 10 }}
                   >
                     <CellWrapper size={1} />
