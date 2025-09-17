@@ -8,7 +8,7 @@ import {
 } from '../CriteriaForm/types'
 import { SourceType } from 'types/scope'
 import { getConfig } from 'config'
-import { getValueSetsFromSystems } from 'utils/valueSets'
+import { getValueSetsByUrls } from 'utils/valueSets'
 import { FhirItem } from 'types/valueSet'
 import { Hierarchy } from 'types/hierarchy'
 
@@ -90,13 +90,16 @@ export const form: () => CriteriaForm<Cim10DataType> = () => ({
         {
           valueKey: 'code',
           type: 'codeSearch',
-          valueSetsInfo: getValueSetsFromSystems([getConfig().features.condition.valueSets.conditionHierarchy.url]),
+          valueSetsInfo: getValueSetsByUrls([getConfig().features.condition.valueSets.conditionHierarchy.url]),
           noOptionsText: 'Veuillez entrer un code ou un diagnostic CIM10',
           label: 'Sélectionner les codes CIM10',
           buildInfo: {
             fhirKey: ConditionParamsKeys.CODE,
             buildMethodExtraArgs: [
-              { type: 'string', value: getConfig().features.condition.valueSets.conditionHierarchy.url }
+              {
+                type: 'string',
+                value: getConfig().features.condition.valueSets.conditionHierarchy.codeSystemUrls?.at(0) || ''
+              }
             ],
             chipDisplayMethodExtraArgs: [
               { type: 'string', value: '' },

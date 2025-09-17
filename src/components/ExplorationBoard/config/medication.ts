@@ -30,7 +30,7 @@ import {
   narrowSearchCriterias,
   resolveAdditionalInfos
 } from 'utils/exploration'
-import { getValueSetsFromSystems } from 'utils/valueSets'
+import { getValueSetsByUrls } from 'utils/valueSets'
 
 const fetchAdditionalInfos = async (additionalInfo: AdditionalInfo): Promise<AdditionalInfo> => {
   const config = getConfig().features
@@ -49,7 +49,7 @@ const fetchAdditionalInfos = async (additionalInfo: AdditionalInfo): Promise<Add
         : Promise.resolve(undefined)
   }
   const resolved = await resolveAdditionalInfos(fetchersMap)
-  const references: Reference[] = getValueSetsFromSystems([
+  const references: Reference[] = getValueSetsByUrls([
     getConfig().features.medication.valueSets.medicationAtc.url,
     getConfig().features.medication.valueSets.medicationUcd.url
   ])
