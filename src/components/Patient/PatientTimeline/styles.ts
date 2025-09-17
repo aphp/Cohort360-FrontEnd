@@ -1,6 +1,5 @@
 import { makeStyles } from 'tss-react/mui'
 const fontSize = 16
-const emptyYearHeight = '0.7em'
 
 const useStyles = makeStyles<{ dotHeight?: number; color?: string }>()((_theme, params) => ({
   centeredTimeline: {
@@ -21,10 +20,6 @@ const useStyles = makeStyles<{ dotHeight?: number; color?: string }>()((_theme, 
       zIndex: 0,
       transform: 'translateX(-50%)'
     }
-  },
-  loadingContainer: {
-    width: '50%',
-    marginLeft: '50%'
   },
   time: {
     fontSize: fontSize,
@@ -93,9 +88,6 @@ const useStyles = makeStyles<{ dotHeight?: number; color?: string }>()((_theme, 
     border: `1px solid ${params.color}`,
     borderLeft: `7px solid ${params.color}`,
     borderRadius: 5
-  },
-  emptyYear: {
-    height: emptyYearHeight
   }
 }))
 

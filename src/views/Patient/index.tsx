@@ -5,7 +5,7 @@ import ChevronLeftIcon from '@mui/icons-material/ChevronLeft'
 import PatientNotExist from 'components/ErrorView/PatientNotExist'
 import PatientHeader from 'components/Patient/PatientHeader/PatientHeader'
 import PatientPreview from 'components/Patient/PatientPreview/PatientPreview'
-import PatientTimeline from 'components/Patient/PatientTimeline/PatientTimeline'
+import PatientTimeline from 'components/Patient/PatientTimeline'
 import { useAppSelector, useAppDispatch } from 'state'
 import { fetchPatientInfo } from 'state/patient'
 import { AppConfig } from 'config'
@@ -203,7 +203,7 @@ const Patient = () => {
               )}
               {selectedTab === ResourceType.TIMELINE && (
                 <PatientTimeline
-                  loadingPmsi={(patient?.pmsi?.procedure?.loading || patient?.pmsi?.condition?.loading) ?? false}
+                  loading={(patient?.pmsi?.procedure?.loading || patient?.pmsi?.condition?.loading) ?? false}
                   hospits={patient?.hospits?.list ?? []}
                   consults={patient?.pmsi?.procedure?.list ?? []}
                   diagnostics={patient?.pmsi?.condition?.list ?? []}
