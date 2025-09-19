@@ -19,11 +19,10 @@ type TableProps = {
   orderBy?: OrderBy
   onSort?: (orderBy: OrderBy) => void
   sxColumn?: SxProps<Theme>
-  sxRow?: SxProps<Theme>
   noMarginBottom?: boolean
 }
 
-const Table = ({ value, orderBy, onSort, sxColumn, sxRow, noMarginBottom }: TableProps) => {
+const Table = ({ value, orderBy, onSort, sxColumn, noMarginBottom }: TableProps) => {
   return (
     <TableContainer sx={{ borderRadius: 1, marginBottom: noMarginBottom ? 0 : 5 }}>
       <TableMui>
@@ -57,7 +56,8 @@ const Table = ({ value, orderBy, onSort, sxColumn, sxRow, noMarginBottom }: Tabl
               sx={{
                 height: 42,
                 '&:hover': { backgroundColor: '#f8f9fa' },
-                ...sxRow
+                cursor: row._onClick ? 'pointer' : 'inherit',
+                ...row.sx
               }}
             />
           ))}

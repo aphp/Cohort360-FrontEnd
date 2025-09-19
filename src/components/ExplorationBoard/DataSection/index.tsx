@@ -75,7 +75,7 @@ const DataSection = ({
       {data.timeline && (
         <Timeline questionnaireResponses={data.timeline.data} questionnaires={data.timeline.questionnaires} />
       )}
-      <Grid container id="list">
+      <Grid container id="list" size={12}>
         {displayOptions.sidebar && data.cards.map((card, index) => <InfoCard key={index} value={card} />)}
         {!displayOptions.sidebar && data.table && !data.timeline && (
           <DataTable value={data.table} orderBy={orderBy} onSort={onSort} />
