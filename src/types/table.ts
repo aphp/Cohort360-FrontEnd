@@ -101,6 +101,7 @@ export type Cell = {
 
 export type Row = Cell[] & {
   _onClick?: () => void
+  sx?: React.CSSProperties
 }
 
 export type Column = {

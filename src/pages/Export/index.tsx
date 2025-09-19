@@ -137,12 +137,7 @@ const Export = () => {
                 </Grid>
               )}
               {loadingStatus === LoadingStatus.SUCCESS && (
-                <DataTable
-                  value={table}
-                  orderBy={orderBy}
-                  onSort={(orderBy) => handleSearch({ orderBy })}
-                  sxRow={{ backgroundColor: 'white', flexGrow: 1 }}
-                />
+                <DataTable value={table} orderBy={orderBy} onSort={(orderBy) => handleSearch({ orderBy })} />
               )}
             </Grid>
           </Grid>

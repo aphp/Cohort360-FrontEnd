@@ -66,7 +66,7 @@ const TableRow = ({ row, sx }: RowProps) => {
 
   return (
     <>
-      <TableRowMui sx={{ ...sx, cursor: row._onClick ? 'pointer' : 'inherit' }} onClick={row._onClick}>
+      <TableRowMui sx={{ ...sx }} onClick={row._onClick}>
         {row.map((cell, index) => {
           if (cell.isHidden) return <Fragment key={index} />
           return (
@@ -250,8 +250,6 @@ const TableRow = ({ row, sx }: RowProps) => {
                   backgroundColor: (sx as any)?.backgroundColor ?? '#fafafa',
                   fontSize: 10
                 }}
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                sxRow={{ backgroundColor: (sx as any)?.backgroundColor ?? '#fff', fontSize: 12 }}
               />
             </Collapse>
           </TableCell>

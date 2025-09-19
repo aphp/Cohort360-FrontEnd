@@ -148,7 +148,7 @@ const Patient = () => {
             deidentifiedBoolean={deidentified}
             groupId={groupId}
           />
-          <Grid container sx={{ flexDirection: 'column', alignItems: 'center', backgroundColor: '#E6F1FD' }}>
+          <Grid container size={12} sx={{ flexDirection: 'column', alignItems: 'center', backgroundColor: '#E6F1FD' }}>
             <Grid container size={11}>
               <TabsWrapper
                 value={selectedTab}

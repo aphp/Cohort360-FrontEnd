@@ -161,7 +161,7 @@ const TemporalConstraintConfig: React.FC<{
       alignItems="center"
       style={{ margin: '1em', backgroundColor: '#F6F9FD', padding: '1em', width: 'auto' }}
     >
-      <Grid container alignItems="baseline" justifyContent="center">
+      <Grid container size={12} alignItems="baseline" justifyContent="center">
         <FormControl
           style={{ margin: '0 8px', minWidth: 200 }}
           error={noSelectedConstraintError && firstCriteriaValue === null}
@@ -218,7 +218,7 @@ const TemporalConstraintConfig: React.FC<{
           )}
         </FormControl>
       </Grid>
-      <Grid container alignItems="center" justifyContent="center">
+      <Grid container size={12} alignItems="center" justifyContent="center">
         <Grid container size={6} sx={{ justifyContent: 'flex-end' }}>
           <Typography style={{ fontWeight: 700 }}>dans un intervalle </Typography>
         </Grid>
@@ -256,7 +256,7 @@ const TemporalConstraintConfig: React.FC<{
           </Select>
         </Grid>
       </Grid>
-      <Grid container alignItems="center" justifyContent="flex-end">
+      <Grid container size={12} alignItems="center" justifyContent="flex-end">
         <Grid container size={6} sx={{ alignItems: 'center' }}>
           <Checkbox
             checked={isSecondTimeValueChecked}

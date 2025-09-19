@@ -157,7 +157,8 @@ const mapCohortsToRows = (
         type: CellType.SUB_ITEM
       }
     ]
-    row._onClick = () => onClickRow(cohort)
+    row._onClick = () => cohort.request_job_status === JobStatus.FINISHED && onClickRow(cohort)
+    row.sx = { cursor: cohort.request_job_status === JobStatus.FINISHED ? 'pointer' : 'not-allowed' }
     rows.push(row)
   })
 

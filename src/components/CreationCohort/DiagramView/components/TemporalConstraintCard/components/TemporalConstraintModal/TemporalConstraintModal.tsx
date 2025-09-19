@@ -55,41 +55,39 @@ const TemporalConstraint: React.FC<{
   }
 
   return (
-    <>
-      <Dialog fullWidth maxWidth="lg" open onClose={handleClose} aria-labelledby="form-dialog-title">
-        <DialogTitle>Contraintes temporelles</DialogTitle>
-        <DialogContent>
-          <StayConstraints constraints={stayConstraints} onChangeConstraints={setStayConstraints} />
-          {criteriaGroup[0].type !== CriteriaGroupType.OR_GROUP && (
-            <Grid>
-              <Grid container sx={{ flexDirection: 'row', alignItems: 'center' }}>
-                <Typography variant="h3">Séquence d'évènements entre deux critères</Typography>
-                <Tooltip title="Les contraintes temporelles ne peuvent être ajoutées que sur le groupe ET principal.">
-                  <InfoIcon fontSize="small" color="primary" style={{ marginLeft: 4 }} />
-                </Tooltip>
-              </Grid>
-              <TemporalConstraintConfig
-                newConstraintsList={chronologicalConstraints}
-                onChangeNewConstraintsList={setChronologicalConstraints}
-              />
-              <EventSequenceTable
-                temporalConstraints={chronologicalConstraints}
-                onChangeConstraints={setChronologicalConstraints}
-              />
+    <Dialog fullWidth maxWidth="lg" open onClose={handleClose} aria-labelledby="form-dialog-title">
+      <DialogTitle>Contraintes temporelles</DialogTitle>
+      <DialogContent>
+        <StayConstraints constraints={stayConstraints} onChangeConstraints={setStayConstraints} />
+        {criteriaGroup[0].type !== CriteriaGroupType.OR_GROUP && (
+          <Grid>
+            <Grid container sx={{ flexDirection: 'row', alignItems: 'center' }}>
+              <Typography variant="h3">Séquence d'évènements entre deux critères</Typography>
+              <Tooltip title="Les contraintes temporelles ne peuvent être ajoutées que sur le groupe ET principal.">
+                <InfoIcon fontSize="small" color="primary" style={{ marginLeft: 4 }} />
+              </Tooltip>
             </Grid>
-          )}
-          <EpisodeConstraints constraints={episodeConstraints} onChangeConstraints={setEpisodeConstraints} />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleClose} color="secondary">
-            Annuler
-          </Button>
-          <Button onClick={handleConfirm} color="primary">
-            Valider
-          </Button>
-        </DialogActions>
-      </Dialog>
-    </>
+            <TemporalConstraintConfig
+              newConstraintsList={chronologicalConstraints}
+              onChangeNewConstraintsList={setChronologicalConstraints}
+            />
+            <EventSequenceTable
+              temporalConstraints={chronologicalConstraints}
+              onChangeConstraints={setChronologicalConstraints}
+            />
+          </Grid>
+        )}
+        <EpisodeConstraints constraints={episodeConstraints} onChangeConstraints={setEpisodeConstraints} />
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={handleClose} color="secondary">
+          Annuler
+        </Button>
+        <Button onClick={handleConfirm} color="primary">
+          Valider
+        </Button>
+      </DialogActions>
+    </Dialog>
   )
 }
 
