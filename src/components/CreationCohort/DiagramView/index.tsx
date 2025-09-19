@@ -14,6 +14,7 @@ import ModalRightError from './components/PopulationCard/components/ModalRightEr
 import { checkNominativeCriteria, cleanNominativeCriterias } from 'utils/cohortCreation'
 import ScopeTree from 'components/ScopeTree'
 import CustomAlert from 'components/ui/Alert'
+import { HiddenScrollBar } from 'components/ui/Scrollbar/styles'
 
 const DiagramView = () => {
   const dispatch = useAppDispatch()
@@ -51,7 +52,7 @@ const DiagramView = () => {
   }, [selectedPopulation, rights])
 
   return (
-    <Grid
+    <HiddenScrollBar
       container
       flexDirection="column"
       flexWrap="nowrap"
@@ -107,7 +108,7 @@ const DiagramView = () => {
         />
       </Panel>
       <ModalRightError open={rightsError} handleClose={() => setOpenDrawer(true)} />
-    </Grid>
+    </HiddenScrollBar>
   )
 }
 

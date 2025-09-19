@@ -3,14 +3,15 @@
  * Exports typed Redux hooks and state types for the application.
  */
 
-import { store } from 'state/store'
+import { rootReducer, store } from 'state/store'
 import { useSelector, TypedUseSelectorHook, useDispatch } from 'react-redux'
 
 /**
  * Root state type inferred from the store's getState return type.
  * This type represents the complete application state structure.
  */
-export type RootState = ReturnType<typeof store.getState>
+export type RootState = ReturnType<typeof rootReducer>
+//export type RootState = ReturnType<typeof store.getState>
 
 /**
  * Typed version of the useSelector hook for use throughout the application.
