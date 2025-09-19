@@ -60,10 +60,10 @@ type PatientTimelineTypes = {
   loading: boolean
   deidentified: boolean
   hospits?: CohortEncounter[]
-  consults?: Procedure[]
+  procedures?: Procedure[]
   diagnostics?: Condition[]
 }
-const PatientTimeline = ({ loading, deidentified, hospits, consults, diagnostics }: PatientTimelineTypes) => {
+const PatientTimeline = ({ loading, deidentified, hospits, procedures, diagnostics }: PatientTimelineTypes) => {
   const dispatch = useAppDispatch()
   const { classes } = useStyles({})
   const [_loading, setLoading] = useState(loading)
@@ -80,10 +80,6 @@ const PatientTimeline = ({ loading, deidentified, hospits, consults, diagnostics
   const { patientId } = useParams<{ patientId: string }>()
 
   useEffect(() => {
-    if (patientId) dispatch(fetchAllProcedures({ patientId, groupId }))
-  }, [dispatch, patientId, groupId])
-
-  useEffect(() => {
     const _fetch = async () => {
       const [diagnosticTypes, encounterStatus] = await Promise.all([
         getCodeList(getConfig().features.condition.valueSets.conditionStatus.url),
@@ -94,6 +90,10 @@ const PatientTimeline = ({ loading, deidentified, hospits, consults, diagnostics
     }
     _fetch()
   }, [])
+
+  useEffect(() => {
+    if (patientId) dispatch(fetchAllProcedures({ patientId, groupId }))
+  }, [dispatch, patientId, groupId])
 
   useEffect(() => {
     setLoading(true)
@@ -108,13 +108,13 @@ const PatientTimeline = ({ loading, deidentified, hospits, consults, diagnostics
     const timeline = generateTimelineFormattedData(
       filters.encounterStatus.map(({ id }) => id),
       hospits,
-      consults,
+      procedures,
       diagnostics,
       filters.diagnosticTypes
     )
     setTimeline(timeline)
     setLoading(false)
-  }, [hospits, consults, diagnostics, filters])
+  }, [hospits, procedures, diagnostics, filters])
 
   const criterias = useMemo(() => {
     return filters ? selectFiltersAsArray(filters, '') : []

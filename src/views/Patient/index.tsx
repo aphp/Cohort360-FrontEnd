@@ -205,7 +205,7 @@ const Patient = () => {
                 <PatientTimeline
                   loading={(patient?.pmsi?.procedure?.loading || patient?.pmsi?.condition?.loading) ?? false}
                   hospits={patient?.hospits?.list ?? []}
-                  consults={patient?.pmsi?.procedure?.list ?? []}
+                  procedures={patient?.pmsi?.procedure?.list ?? []}
                   diagnostics={patient?.pmsi?.condition?.list ?? []}
                   deidentified={deidentified}
                 />

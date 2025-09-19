@@ -51,11 +51,10 @@ const Timeline = ({ timeline, deidentified, groupId }: TimelineTypes) => {
         <Table value={documentsTable} />
       </Modal>
       <Box className={classes.verticalBar}>
-        {timeline.map((period) => {
+        {timeline.map((period, index) => {
           const [year, months] = Object.entries(period)[0]
           return (
-            <Box key={`generalTimelineDiv-${year}`}>
-              <span className={classes.timelabel}>{year}</span>
+            <Box key={`timeline-${year}`} textAlign="left">
               {months && months.length > 0 ? (
                 months.map((monthObj) => {
                   const [month, content] = Object.entries(monthObj)[0]
@@ -80,7 +79,6 @@ const Timeline = ({ timeline, deidentified, groupId }: TimelineTypes) => {
                             </Box>
                           </Box>
                         ))}
-
                       {content.pmsi &&
                         content.pmsi.map((pmsi, index) => {
                           const code =
@@ -118,10 +116,15 @@ const Timeline = ({ timeline, deidentified, groupId }: TimelineTypes) => {
                   )
                 })
               ) : (
-                <Box className={classes.collapsedYear}>
-                  <MoreVertIcon />
-                </Box>
+                <>
+                  {index !== 0 && (
+                    <Box className={classes.collapsedYear}>
+                      <MoreVertIcon />
+                    </Box>
+                  )}
+                </>
               )}
+              <span className={classes.timelabel}>{year}</span>
             </Box>
           )
         })}

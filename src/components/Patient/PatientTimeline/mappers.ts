@@ -32,7 +32,7 @@ const getTimelineFormattedDataItem = (item: CohortEncounter | PMSIEntry<Procedur
 export const generateTimelineFormattedData = (
   encounterStatusIds: string[],
   hospits?: CohortEncounter[],
-  consults?: PMSIEntry<Procedure>[],
+  procedures?: PMSIEntry<Procedure>[],
   diagnostics?: PMSIEntry<Condition>[],
   selectedTypes?: LabelObject[]
 ): TimelineOutput => {
@@ -60,7 +60,7 @@ export const generateTimelineFormattedData = (
     ?.filter((item) => (encounterStatusIds.length > 0 ? encounterStatusIds.includes(item.status) : true))
     .forEach((item) => addItem(item, 'hospit'))
 
-  consults
+  procedures
     ?.filter((item) => item.code?.coding?.[0].display !== 'No matching concept')
     .forEach((item) => addItem(item, 'pmsi'))
 
@@ -84,29 +84,39 @@ export const generateTimelineFormattedData = (
   const years = Object.keys(data)
     .map(Number)
     .filter((y) => !isNaN(y))
+
   if (years.length === 0) return []
 
   const minYear = Math.min(...years)
   const maxYear = Math.max(...years)
 
   const result: TimelineOutput = []
+  let emptyStart: number | null = null
 
   for (let year = maxYear; year >= minYear; year--) {
     const yKey = String(year)
     const yearData = data[yKey]
 
     if (!yearData || Object.keys(yearData).length === 0) {
-      result.push({ [year]: [] })
-      continue
+      emptyStart = year
+      if (year === minYear) {
+        result.push({ [emptyStart]: [] })
+      }
+    } else {
+      if (emptyStart !== null) {
+        result.push({ [emptyStart]: [] })
+        emptyStart = null
+      }
+
+      const months: YearData = Object.entries(yearData)
+        .map(([month, value]) => [Number(month), value] as const)
+        .sort((a, b) => b[0] - a[0])
+        .map(([month, value]) => ({ [month]: value }))
+
+      result.push({ [year]: months })
     }
-
-    const months: YearData = Object.entries(yearData)
-      .map(([month, value]) => [Number(month), value] as const)
-      .sort((a, b) => b[0] - a[0])
-      .map(([month, value]) => ({ [month]: value }))
-
-    result.push({ [year]: months })
   }
+  result.unshift({ [maxYear + 1]: [] })
 
   return result
 }

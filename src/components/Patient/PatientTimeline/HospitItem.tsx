@@ -23,8 +23,10 @@ const HospitItem = ({ data, onClick, isPeriod }: HospitItemTypes) => {
     dotHeight: isPeriod ? 45 : 16,
     color: data?.class?.code ? (classColorMap[data.class.code] ?? '#A7E5FF') : '#A7E5FF'
   })
-  const periodStart = data.period?.start ? new Date(data.period.start).toLocaleDateString('fr-FR') : ''
-  const periodEnd = data.period?.end ? new Date(data.period.end).toLocaleDateString('fr-FR') : ''
+  const periodStart = data.period?.start
+    ? new Date(data.period.start).toLocaleDateString('fr-FR', { timeZone: 'UTC' })
+    : ''
+  const periodEnd = data.period?.end ? new Date(data.period.end).toLocaleDateString('fr-FR', { timeZone: 'UTC' }) : ''
   return (
     <Box display={'flex'} alignItems={'center'}>
       <Box flex="1">
