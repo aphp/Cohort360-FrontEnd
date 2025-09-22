@@ -172,7 +172,15 @@ const TableRow = ({ row, sx }: RowProps) => {
               {cell.type === CellType.LINK && (
                 <div style={{ display: 'flex' }}>
                   {cell.value && <p>{(cell.value as Link).label}</p>}
-                  <IconButton id="searchButton" onClick={() => window.open((cell.value as Link).url)}>
+                  <IconButton
+                    id="searchButton"
+                    onClick={() => {
+                      const url = (cell.value as Link).url
+                      // Ensure absolute URL for proper new tab opening
+                      const absoluteUrl = url.startsWith('/') ? `${window.location.origin}${url}` : url
+                      window.open(absoluteUrl, '_blank', 'noopener,noreferrer')
+                    }}
+                  >
                     <SearchIcon height="15px" fill="#ED6D91" />
                   </IconButton>
                 </div>
