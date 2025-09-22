@@ -176,15 +176,9 @@ const TableRow = ({ row, sx }: RowProps) => {
                     id="searchButton"
                     onClick={() => {
                       const { url } = cell.value as Link
+                      // Ensure absolute URL for new tab opening
                       const absoluteUrl = url.startsWith('/') ? `${window.location.origin}${url}` : url
-
-                      const a = document.createElement('a')
-                      a.href = absoluteUrl
-                      a.target = '_blank'
-                      a.rel = 'noopener noreferrer'
-                      document.body.appendChild(a) // certains navigateurs l’exigent
-                      a.click()
-                      a.remove()
+                      window.open(absoluteUrl, '_blank', 'noopener,noreferrer')
                     }}
                   >
                     <SearchIcon height="15px" fill="#ED6D91" />

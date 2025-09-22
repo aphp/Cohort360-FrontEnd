@@ -23,8 +23,14 @@ export const addRequestConfigHook = (hook: (config: InternalAxiosRequestConfig<a
 apiBackend.interceptors.request.use((config) => {
   const oidcAuthState = localStorage.getItem('oidcAuth')
   const token = localStorage.getItem(ACCESS_TOKEN)
-  config.headers.Authorization = `Bearer ${token}`
-  config.headers.authorizationMethod = oidcAuthState === 'true' ? 'OIDC' : 'JWT'
+
+  // Only add authorization if we have a token
+  // This prevents sending requests with null/undefined authorization
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`
+    config.headers.authorizationMethod = oidcAuthState === 'true' ? 'OIDC' : 'JWT'
+  }
+
   requestsConfigHooks.forEach((hook) => hook(config))
   return config
 })
