@@ -35,10 +35,11 @@ apiBackend.interceptors.response.use(
   },
   function (error) {
     if (error.response) {
-      if ((error.response.status === 401 || error.response.status === 403) && window.location.pathname !== '/') {
-        localStorage.clear()
-        window.location.assign('/')
-      }
+      // if ((error.response.status === 401 || error.response.status === 403) && window.location.pathname !== '/') {
+      //   localStorage.clear()
+      //   window.location.assign('/')
+      // }
+      console.log("Coucou je suis une erreur d'API Backend")
       return error
     }
   }
