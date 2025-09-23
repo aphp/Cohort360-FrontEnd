@@ -82,29 +82,29 @@ export const store = configureStore({
     middleware.prepend(stateSyncMiddleware)
 
     // Add logger in development
-    if (process.env.NODE_ENV === 'development') {
-      const logger = createLogger({
-        predicate: (getState, action) => {
-          // Filter out noisy actions
-          const ignoredActions = [
-            'persist/PERSIST',
-            'persist/REHYDRATE',
-            'persist/FLUSH',
-            'persist/PAUSE',
-            'persist/PURGE',
-            'persist/REGISTER'
-          ]
-          return !ignoredActions.includes(action.type)
-        },
-        collapsed: false,
-        duration: true,
-        timestamp: true,
-        level: 'log'
-      })
-      return middleware.concat(logger)
-    }
+    // if (process.env.NODE_ENV === 'development') {
+    const logger = createLogger({
+      predicate: (getState, action) => {
+        // Filter out noisy actions
+        const ignoredActions = [
+          'persist/PERSIST',
+          'persist/REHYDRATE',
+          'persist/FLUSH',
+          'persist/PAUSE',
+          'persist/PURGE',
+          'persist/REGISTER'
+        ]
+        return !ignoredActions.includes(action.type)
+      },
+      collapsed: false,
+      duration: true,
+      timestamp: true,
+      level: 'log'
+    })
+    return middleware.concat(logger)
+    // }
 
-    return middleware
+    // return middleware
   },
   devTools: true
 })
