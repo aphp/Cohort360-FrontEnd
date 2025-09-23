@@ -125,37 +125,37 @@ const PrivateRoute: React.FC = () => {
   }, [me, authToken, fetchedFhirMetadata])
 
   // Authentication check: user must be authenticated and have a valid token
-  if (!me || (!me && !authToken)) {
-    // If user has confirmed the dialog, redirect to login page
-    if (allowRedirect === true) return <Navigate to="/" replace />
+  // if (!me || (!me && !authToken)) {
+  //   // If user has confirmed the dialog, redirect to login page
+  //   if (allowRedirect === true) return <Navigate to="/" replace />
 
-    // Show authentication expired dialog before redirect
-    return (
-      <Dialog open aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
-        <DialogTitle id="alert-dialog-title">{''}</DialogTitle>
-        <DialogContent>
-          <DialogContentText id="alert-dialog-description">
-            Il semblerait que vous n'êtes plus connecté. Vous allez être redirigé vers la page de connexion
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button
-            onClick={() => {
-              // Preserve current path for post-login redirection
-              localStorage.setItem('old-path', location.pathname + location.search)
-              setAllowRedirect(true)
-            }}
-            autoFocus
-          >
-            Ok
-          </Button>
-        </DialogActions>
-      </Dialog>
-    )
-  } else {
-    // User is authenticated, render the protected route content
-    return <Outlet />
-  }
+  //   // Show authentication expired dialog before redirect
+  //   return (
+  //     <Dialog open aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
+  //       <DialogTitle id="alert-dialog-title">{''}</DialogTitle>
+  //       <DialogContent>
+  //         <DialogContentText id="alert-dialog-description">
+  //           Il semblerait que vous n'êtes plus connecté. Vous allez être redirigé vers la page de connexion
+  //         </DialogContentText>
+  //       </DialogContent>
+  //       <DialogActions>
+  //         <Button
+  //           onClick={() => {
+  //             // Preserve current path for post-login redirection
+  //             localStorage.setItem('old-path', location.pathname + location.search)
+  //             setAllowRedirect(true)
+  //           }}
+  //           autoFocus
+  //         >
+  //           Ok
+  //         </Button>
+  //       </DialogActions>
+  //     </Dialog>
+  //   )
+  // } else
+
+  // User is authenticated, render the protected route content
+  return <Outlet />
 }
 
 export default PrivateRoute
