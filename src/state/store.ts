@@ -55,7 +55,11 @@ const persistedReducer = persistReducer(persistConfig, rootReducer)
 
 // Redux-state-sync middleware
 const stateSyncMiddleware = createStateSyncMiddleware({
-  predicate: (action) => action.type === 'autoLogout/open' || action.type === 'autoLogout/close'
+  predicate: (action) =>
+    action.type === 'autoLogout/open' ||
+    action.type === 'autoLogout/close' ||
+    action.type === 'persist/REHYDRATE' ||
+    !action.type.startsWith('persist/')
 })
 
 // Configure store
