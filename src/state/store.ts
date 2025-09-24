@@ -1,6 +1,6 @@
 import { configureStore, combineReducers } from '@reduxjs/toolkit'
 import { persistReducer, persistStore, FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER } from 'redux-persist'
-// import { createStateSyncMiddleware, initStateWithPrevTab } from 'redux-state-sync'
+import { createStateSyncMiddleware, initStateWithPrevTab } from 'redux-state-sync'
 import localforage from 'localforage'
 
 import { createLogger } from 'redux-logger'
@@ -44,8 +44,7 @@ const rootReducer = combineReducers({
 // Persist configuration
 const persistConfig = {
   key: 'root',
-  storage: localforage,
-  whitelist: ['me']
+  storage: localforage
 }
 
 /**
@@ -55,13 +54,9 @@ const persistConfig = {
 const persistedReducer = persistReducer(persistConfig, rootReducer)
 
 // Redux-state-sync middleware
-// const stateSyncMiddleware = createStateSyncMiddleware({
-//   predicate: (action) =>
-//     action.type === 'autoLogout/open' ||
-//     action.type === 'autoLogout/close' ||
-//     action.type === 'persist/REHYDRATE' ||
-//     !action.type.startsWith('persist/')
-// })
+const stateSyncMiddleware = createStateSyncMiddleware({
+  predicate: (action) => action.type === 'autoLogout/open' || action.type === 'autoLogout/close'
+})
 
 // Configure store
 export const store = configureStore({
@@ -84,7 +79,7 @@ export const store = configureStore({
     })
 
     // Add custom middleware
-    // middleware.prepend(stateSyncMiddleware)
+    middleware.prepend(stateSyncMiddleware)
 
     // Add logger in development
     // if (process.env.NODE_ENV === 'development') {
@@ -115,7 +110,7 @@ export const store = configureStore({
 })
 
 // Initialize state sync
-// initStateWithPrevTab(store)
+initStateWithPrevTab(store)
 
 // Create persistor
 export const persistor = persistStore(store)
