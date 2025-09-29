@@ -5,7 +5,7 @@ import { Order } from 'types/searchCriterias'
 import { Action, CellType, Column, Favorite, Row, Table } from 'types/table'
 import { getExportTooltip, getGlobalEstimation, isCohortExportable, isExportDisabled } from 'utils/explorationUtils'
 import { formatDate } from 'utils/dates'
-import { format } from 'utils/numbers'
+import { format, formatPercentage } from 'utils/numbers'
 import Download from 'assets/icones/download.svg?react'
 import EditIcon from '@mui/icons-material/Edit'
 import FluentNavigation from 'assets/icones/fluent_navigation.svg?react'
@@ -20,7 +20,8 @@ const getSamplesInfos = (cohort: Cohort) => {
   const globalTotal = getGlobalEstimation(cohort)
   const createdAt = formatDate(cohort.created_at)
   const samples = cohort.sample_cohorts?.length ?? 0
-  const samplingRatio = cohort.sampling_ratio ? `${(cohort.sampling_ratio * 100).toString()} %` : 'N/A'
+  // const samplingRatio = cohort.sampling_ratio ? `${(cohort.sampling_ratio * 100).toString()} %` : 'N/A'
+  const samplingRatio = formatPercentage(cohort.sampling_ratio)
   return {
     name,
     parentName,
