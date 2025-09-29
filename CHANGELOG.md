@@ -2,6 +2,141 @@
 
 All notable changes to this project will be documented in this file.
 
+## [3.1.16](https://github.com/aphp/Cohort360-FrontEnd/compare/3.1.15..3.1.16) - 2025-09-29
+
+### 🐛 Bug Fixes
+
+- Prod fixes - ([d4f90c0](https://github.com/aphp/Cohort360-FrontEnd/commit/d4f90c0cb1dc281f005487bfafec4aa9b9255b8c))
+- Fixed versions section long names display and ui mistakes - Ref gestion-de-projet#3073 - ([051d4b1](https://github.com/aphp/Cohort360-FrontEnd/commit/051d4b1598ac5d68cbd8bcbdb7fe96e45f7025d0))
+
+## [3.1.15](https://github.com/aphp/Cohort360-FrontEnd/compare/3.1.14..3.1.15) - 2025-09-24
+
+### 🐛 Bug Fixes
+
+- Localforage fixes - Ref gestion-de-projet#3073 - ([c075418](https://github.com/aphp/Cohort360-FrontEnd/commit/c07541894cce27288f7e223185be5e4dff9aa913))
+
+## [3.1.14](https://github.com/aphp/Cohort360-FrontEnd/compare/3.1.13..3.1.14) - 2025-09-24
+
+### 🐛 Bug Fixes
+
+- Localforage fixes - Ref gestion-de-projet#3073 - ([3a68ec4](https://github.com/aphp/Cohort360-FrontEnd/commit/3a68ec44ceab530f7cb12b8bdfa5d895cb8fa539))
+
+## [3.1.13](https://github.com/aphp/Cohort360-FrontEnd/compare/3.1.12..3.1.13) - 2025-09-24
+
+### 🐛 Bug Fixes
+
+- Deletion of user library in state - Ref gestion-de-projet#3073 - ([00589d8](https://github.com/aphp/Cohort360-FrontEnd/commit/00589d8bc2b9839d85e78ba1349efc3cc2f40007))
+
+## [3.1.12](https://github.com/aphp/Cohort360-FrontEnd/compare/3.1.11..3.1.12) - 2025-09-23
+
+### 🐛 Bug Fixes
+
+- Put persist and rehydrate in store - Ref gestion-de-projet#3073 - ([6c410d4](https://github.com/aphp/Cohort360-FrontEnd/commit/6c410d450c1231bd4b41082b4e7936c8a13405bd))
+
+## [3.1.11](https://github.com/aphp/Cohort360-FrontEnd/compare/3.1.10..3.1.11) - 2025-09-23
+
+### 🐛 Bug Fixes
+
+- Temporary put logger back - Ref gestion-de-projet#3073 - ([3424ef1](https://github.com/aphp/Cohort360-FrontEnd/commit/3424ef1b9d9a8930264f43209525d500cf17fdb8))
+
+## [3.1.10](https://github.com/aphp/Cohort360-FrontEnd/compare/3.1.9..3.1.10) - 2025-09-23
+
+### 🐛 Bug Fixes
+
+- Test - Ref gestion-de-projet#3073 - ([a809a7a](https://github.com/aphp/Cohort360-FrontEnd/commit/a809a7a0b453ad5ba5a69ad1a0440db96f3eb278))
+
+## [3.1.9](https://github.com/aphp/Cohort360-FrontEnd/compare/3.1.8..3.1.9) - 2025-09-22
+
+### 🐛 Bug Fixes
+
+- Fixed fhir interceptor - Ref gestion-de-projet#3073 - ([7a2becb](https://github.com/aphp/Cohort360-FrontEnd/commit/7a2becb60cc8cdb1d7fd51c94149c6808e8d4000))
+
+## [3.1.8](https://github.com/aphp/Cohort360-FrontEnd/compare/3.1.7..3.1.8) - 2025-09-22
+
+### 🐛 Bug Fixes
+
+- Another tab fix - Ref gestion-de-projet#3073 - ([f14fec9](https://github.com/aphp/Cohort360-FrontEnd/commit/f14fec95ba2ca83b189f8341bd5de77ee1574719))
+
+## [3.1.7](https://github.com/aphp/Cohort360-FrontEnd/compare/3.1.6..3.1.7) - 2025-09-22
+
+### 🐛 Bug Fixes
+
+- Another tab fix - Ref gestion-de-projet#3073 - ([67a9a51](https://github.com/aphp/Cohort360-FrontEnd/commit/67a9a51d509070f60790afec4c87973cae56dc3a))
+
+## [3.1.6](https://github.com/aphp/Cohort360-FrontEnd/compare/3.1.5..3.1.6) - 2025-09-22
+
+### 🐛 Bug Fixes
+
+- Temp fix - Ref gestion-de-projet#3073 - ([2677458](https://github.com/aphp/Cohort360-FrontEnd/commit/2677458f5c7ed2190f132b4a0b425867446cbf7e))
+
+## [3.1.5](https://github.com/aphp/Cohort360-FrontEnd/compare/3.1.4..3.1.5) - 2025-09-22
+
+### 🐛 Bug Fixes
+
+- Fix when click on patient - Ref gestion-de-projet#3073 - ([1481fa1](https://github.com/aphp/Cohort360-FrontEnd/commit/1481fa138099b3e3f5736b66bdc602e727ced52e))
+
+## [3.1.4](https://github.com/aphp/Cohort360-FrontEnd/compare/3.1.3..3.1.4) - 2025-09-22
+
+### 🐛 Bug Fixes
+
+- Fixed ui issues - Ref gestion-de-projet#3073 - ([ad5cb1e](https://github.com/aphp/Cohort360-FrontEnd/commit/ad5cb1ec64f85dc31e596da81c2461b059331b95))
+- Revert temp fix when click on patient - Ref gestion-de-projet#3073 - ([a782684](https://github.com/aphp/Cohort360-FrontEnd/commit/a782684f567bc7cf8050273c615fad498122e015))
+
+## [3.1.3](https://github.com/aphp/Cohort360-FrontEnd/compare/3.1.2..3.1.3) - 2025-09-15
+
+### 🐛 Bug Fixes
+
+- Fixed ui after packages upgrade in code search + temp change to debug patients - Ref gestion-de-projet#3073 - ([fe1a2c7](https://github.com/aphp/Cohort360-FrontEnd/commit/fe1a2c79ea6548bf29e250b7f3a7feded988b5af))
+
+## [3.1.2](https://github.com/aphp/Cohort360-FrontEnd/compare/3.1.1..3.1.2) - 2025-09-12
+
+### 🐛 Bug Fixes
+
+- Fixed ui after packages upgrade - Ref gestion-de-projet#3073 - ([88c5549](https://github.com/aphp/Cohort360-FrontEnd/commit/88c55492ad2c02082d930c29d048feca4e2f932a))
+
+## [3.1.1](https://github.com/aphp/Cohort360-FrontEnd/compare/3.1.0..3.1.1) - 2025-09-11
+
+### 🐛 Bug Fixes
+
+- Fixed cohort icon displaying in version dialog - Ref gestion-de-projet#2923 - ([00e94ea](https://github.com/aphp/Cohort360-FrontEnd/commit/00e94eafd008191a10146a9f67a34ce1136241fa))
+
+## [3.1.0](https://github.com/aphp/Cohort360-FrontEnd/compare/3.0.8..3.1.0) - 2025-09-10
+
+### 🚀 Features
+
+- *(exploration)* Add same name filter error - Ref gestion-de-projet… (#1148) - ([1f36fcc](https://github.com/aphp/Cohort360-FrontEnd/commit/1f36fcc69c2efe421fe92dc0d05afdd523b45903))
+- Add-N-among-M-operator - Ref gestion-de-projet#2564 - ([5734e9d](https://github.com/aphp/Cohort360-FrontEnd/commit/5734e9db10a7546b2e7fe5a137e2029eb8588f54))
+- Added info to hospit form - Ref gestion-de-projet#3000 - ([9a9734c](https://github.com/aphp/Cohort360-FrontEnd/commit/9a9734c824da2106fb9271a1f224ee9b84f32f7c))
+- *(exports)* Add additionnal condition - Ref gestion-de-projet#3039 (#1151) - ([2a88b7a](https://github.com/aphp/Cohort360-FrontEnd/commit/2a88b7a292c601661470be9c5a06e99a1ea3b1c2))
+- *(imaging)* Add bodysite filter - Ref gestion-de-projet#2426 - ([ace8e38](https://github.com/aphp/Cohort360-FrontEnd/commit/ace8e3854a857706a22d59707b048c754c7fd70d))
+- Requests versions renaming - Ref gestion-de-projet#2923 - ([c18cb8f](https://github.com/aphp/Cohort360-FrontEnd/commit/c18cb8f9ed2d8526582eab95baaebba1773e439d))
+
+### 🐛 Bug Fixes
+
+- Fixed patient list not showing in sidebar - ([ceb22ba](https://github.com/aphp/Cohort360-FrontEnd/commit/ceb22ba975e2969c97a99b8d15b29fe53c50fb71))
+- *(cohortList)* Add missing status mapping - ([3810d33](https://github.com/aphp/Cohort360-FrontEnd/commit/3810d33eeddcf314ba44055436610e4f7a0b668c))
+- *(cohortCreation)* Use config shortCohortLimit value instead of back one - ([246fcb9](https://github.com/aphp/Cohort360-FrontEnd/commit/246fcb9bc930e59954f58b3d273bfa461397283e))
+- *(valuesetfield)* Display stat header instead of empty value for hierarchy first row - ([1093f53](https://github.com/aphp/Cohort360-FrontEnd/commit/1093f53ec9aeafba6decdd0febea22c2c0c8095c))
+- Several bug - ([4c72715](https://github.com/aphp/Cohort360-FrontEnd/commit/4c72715683755155d56179c0fdf8465a49324a52))
+- *(explorationBoard)* Medication date and ghm total patient count facet - ([2a049dd](https://github.com/aphp/Cohort360-FrontEnd/commit/2a049dd08103efec362523a01bd6d1467198a9a7))
+- *(diagram)* Use diagram title - ([554c5f2](https://github.com/aphp/Cohort360-FrontEnd/commit/554c5f21802f9c6ee1c3874465d7244fda5fa27b))
+- *(tnr)* Add badge class to my research tab counts - ([d14b647](https://github.com/aphp/Cohort360-FrontEnd/commit/d14b647f089fc049186289abf6011c6a30be69b8))
+- Fixed bugs leading to TNR regressions - Ref gestion-de-projet#3074 - ([f66ddac](https://github.com/aphp/Cohort360-FrontEnd/commit/f66ddac0126c23c9480c1ed356c0dd67e7d2ce08))
+- Fixed label size to age in advanced criteria - Ref gestion-de-projet#1500 - ([c793574](https://github.com/aphp/Cohort360-FrontEnd/commit/c79357430a9926bb0a7021d5049471f15a55173e))
+- *(exploration)* Same filter errror wording-Ref gestion-de-projet#2738 - ([6a1bd2a](https://github.com/aphp/Cohort360-FrontEnd/commit/6a1bd2a9918466a1803c0810edb137671c729e81))
+- Fix for n among m feature - Ref gestion-de-projet#2564 - ([9068059](https://github.com/aphp/Cohort360-FrontEnd/commit/906805950493527bf3f48a6e18f2a39b4f29d6ba))
+- Updated eslint config file, fixed errors and upgraded node versions - Ref gestion-de-projet#3073 - ([32b414e](https://github.com/aphp/Cohort360-FrontEnd/commit/32b414eca035e2d7c3801ccfcf32dd4d557f3aec))
+- Fixed lint errors - Ref gestion-de-projet#3073 - ([63db235](https://github.com/aphp/Cohort360-FrontEnd/commit/63db2356699a0aeaa612005d2ced3aa2251544fb))
+- Fixed tests errors - Ref gestion-de-projet#3073 - ([04815da](https://github.com/aphp/Cohort360-FrontEnd/commit/04815da7f21cf14a7b83f3dbf8813db0e5daaebc))
+- Fixed ui issue in timelin - Ref gestion-de-projet#3073 - ([d33ae01](https://github.com/aphp/Cohort360-FrontEnd/commit/d33ae0168275c86bd218346812ebb76db54eb4e9))
+
+### ⚙️ Miscellaneous Tasks
+
+- Release version 3.1.0 - ([adc1a40](https://github.com/aphp/Cohort360-FrontEnd/commit/adc1a401a713af0b92e9b40fdefa7678a047fea4))
+- Upgrade package.json - ([2c69bdb](https://github.com/aphp/Cohort360-FrontEnd/commit/2c69bdb5b258168189cb300d3b189054430b083e))
+
+<!-- generated by git-cliff -->
+
 ## [3.1.15](https://github.com/aphp/Cohort360-FrontEnd/compare/3.1.14..3.1.15) - 2025-09-24
 
 ### 🐛 Bug Fixes
