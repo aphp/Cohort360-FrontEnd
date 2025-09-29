@@ -35,9 +35,9 @@ const List = ({ values, count, onSelect, fetchPaginateData }: PropsWithChildren<
 
   return (
     <Grid container sx={{ gap: 4, marginTop: 2 }}>
-      <Grid container>
+      <Grid container size={12}>
         {Boolean(allElements.length) ? (
-          <Grid size={{ xs: 12 }}>
+          <Grid size={12}>
             <FormControlLabel
               labelPlacement="end"
               color="warning"

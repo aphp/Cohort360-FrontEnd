@@ -62,6 +62,8 @@ const useStyles = makeStyles()(() => ({
     WebkitBoxOrient: 'vertical',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
+    wordBreak: 'break-word', // Breaks long words
+    overflowWrap: 'break-word', // Alternative for better browser support
     lineHeight: 1.1,
     fontSize: 13,
     flex: 1,
