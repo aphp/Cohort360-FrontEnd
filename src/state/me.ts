@@ -50,11 +50,14 @@ export type MeState = null | {
 /**
  * Logout action defined outside of the meSlice because it is being used by all reducers.
  * Calls the logout service and returns null to clear the user state.
+ * Also clears impersonation data from localStorage.
  *
  * @returns Promise resolving to null (cleared state)
  */
 const logout = createAsyncThunk<MeState, void, { state: RootState }>('scope/logout', async () => {
   services.practitioner.logout()
+  // Clear impersonation data from localStorage on logout
+  localStorage.removeItem(IMPERSONATED_USER)
   return null
 })
 
