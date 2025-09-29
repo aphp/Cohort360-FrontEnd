@@ -44,7 +44,8 @@ const rootReducer = combineReducers({
 // Persist configuration
 const persistConfig = {
   key: 'root',
-  storage: localforage
+  storage: localforage,
+  blacklist: ['message', 'warningDialog']
 }
 
 /**

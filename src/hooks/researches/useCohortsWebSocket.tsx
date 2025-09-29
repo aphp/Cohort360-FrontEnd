@@ -13,6 +13,10 @@ const useCohortsWebSocket = () => {
       ? (await fetchCohortAccesses([message.extra_info?.group_id])).data
       : []
 
+    const attributeNewRights = () => {
+      return newRights.find((right) => right.cohort_id === message.extra_info?.group_id)?.rights
+    }
+
     const queryKeys = queryClient.getQueriesData<{
       count: number
       next: string | null
@@ -26,11 +30,11 @@ const useCohortsWebSocket = () => {
         cohort.uuid === message.uuid
           ? {
               ...cohort,
-              measure_min: message.extra_info?.global?.measure_min,
-              measure_max: message.extra_info?.global?.measure_max,
+              measure_min: message.extra_info?.global?.measure_min ?? null,
+              measure_max: message.extra_info?.global?.measure_max ?? null,
               request_job_status: message.status,
               group_id: message.extra_info?.group_id,
-              rights: newRights.find((right) => right.cohort_id == cohort.group_id)?.rights,
+              rights: attributeNewRights(),
               result_size: message.extra_info?.result_size
             }
           : cohort

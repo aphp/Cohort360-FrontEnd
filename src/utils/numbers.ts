@@ -73,3 +73,13 @@ export const displayVersionsCount = (criteriaCount?: number | null) => {
     ? `${displayCount(criteriaCount, true)} patient${plural(criteriaCount)}`
     : '-'
 }
+
+export const formatPercentage = (nb: number | null | undefined, decimalPlaces = 2) => {
+  const formatter = new Intl.NumberFormat('fr-FR', {
+    style: 'percent',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: decimalPlaces
+  })
+  if (nb === null || nb === undefined) return 'N/A'
+  return `${formatter.format(nb)}`
+}
