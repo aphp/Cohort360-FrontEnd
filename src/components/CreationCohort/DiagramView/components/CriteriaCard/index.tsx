@@ -13,7 +13,7 @@ import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
 
 import { useAppSelector } from 'state'
 
-import useStyles from './styles'
+import { CriteriaWrapper, ExtendedWrapper } from './styles'
 import { ChipWrapper } from 'components/ui/Chip/styles'
 import { SelectedCriteriaType } from 'types/requestCriterias'
 import theme from 'theme'
@@ -36,8 +36,6 @@ const CriteriaCard = ({
   editCriteria,
   deleteCriteria
 }: CriteriaCardProps) => {
-  const { classes } = useStyles()
-
   const maintenanceIsActive = useAppSelector((state) => state.me?.maintenance?.active || false)
   const { entities, cache } = useAppSelector((state) => state.valueSets)
   const criteriaDefinitions = getAllCriteriaItems(criteriaList())
@@ -57,11 +55,10 @@ const CriteriaCard = ({
   }, [containerRef.current?.clientWidth])
 
   return (
-    <Grid
+    <CriteriaWrapper
+      sx={{ backgroundColor: criterion.isInclusive ? '#D1E2F4' : '#F2B0B0' }}
       container
-      sx={{ alignItems: 'center' }}
-      className={classes.criteriaItem}
-      style={{ backgroundColor: criterion.isInclusive ? '#D1E2F4' : '#F2B0B0' }}
+      alignItems={'center'}
     >
       <CriteriaCount criteriaCount={criteriaCount} extraLeftMargin={3} />
       <Grid
@@ -77,18 +74,12 @@ const CriteriaCard = ({
           <AvatarWrapper size={20}>{criterion.id}</AvatarWrapper>
         </Grid>
         <Grid container size={10}>
-          <Typography className={classes.title} fontWeight={700}>
+          <Typography marginLeft="4px" fontWeight={700}>
             {criterion.title} :
           </Typography>
         </Grid>
       </Grid>
-      <Grid
-        container
-        size={{ xs: 12, xl: 7 }}
-        ref={containerRef}
-        style={{ height: openCollapse ? '' : 42 }}
-        className={classes.secondItem}
-      >
+      <ExtendedWrapper container size={{ xs: 12, xl: 7 }} ref={containerRef} isExtended={openCollapse}>
         <Grid size={11} container ref={childrenRef} style={{ overflow: 'hidden' }}>
           {criteriasAsArray(criterion, criteriaDefinitions, { entities, cache }).map((label, index) => (
             <ChipWrapper
@@ -107,8 +98,8 @@ const CriteriaCard = ({
             </IconButton>
           )}
         </Grid>
-      </Grid>
-      <Grid container size={{ xs: 5, xl: 2 }} sx={{ justifyContent: 'flex-end' }}>
+      </ExtendedWrapper>
+      <Grid container size={{ xs: 5, xl: 2 }} justifyContent="flex-end">
         {criterion.error && (
           <IconButton
             size="small"
@@ -144,7 +135,7 @@ const CriteriaCard = ({
           <DeleteIcon />
         </IconButton>
       </Grid>
-    </Grid>
+    </CriteriaWrapper>
   )
 }
 

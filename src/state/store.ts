@@ -20,9 +20,10 @@ import me from './me'
 import warningDialog from './warningDialog'
 import valueSets from './valueSets'
 import preferences from './preferences'
+import { temporalConstraintsMiddleware } from './middlewares'
 
 // Combine reducers
-const rootReducer = combineReducers({
+export const rootReducer = combineReducers({
   me,
   preferences,
   cohortCreation: combineReducers({
@@ -77,7 +78,7 @@ export const store = configureStore({
         ],
         ignoredPaths: ['warningDialog.showDialog', 'warningDialog.onConfirm']
       }
-    })
+    }).concat(temporalConstraintsMiddleware)
 
     // Add custom middleware
     middleware.prepend(stateSyncMiddleware)
