@@ -22,7 +22,7 @@ import { logout, login, impersonate } from './me'
 import { addRequest } from './request'
 
 import services from 'services/aphp'
-import { SelectedCriteriaType } from 'types/requestCriterias'
+import { CriteriaType, SelectedCriteriaType } from 'types/requestCriterias'
 import { Hierarchy } from 'types/hierarchy'
 import { getConfig } from 'config'
 import { ScopeElement } from 'types/scope'
@@ -665,37 +665,41 @@ const reassignNegativeCriteriaIdsFromSnapshot = (
   })
 }
 
-// Nettoie et remappe les contraintes temporelles
-const deleteTemporalConstraints = (
+const getTemporalConstraints = (
   constraints: TemporalConstraintsType[],
   criteriaId: number,
-  idMap: Record<number, number>
+  idMap: Record<number, number>,
+  groups: CriteriaGroup[],
+  criterias: SelectedCriteriaType[]
 ) => {
   const isNumberArray = (idList: number[] | ['All']): idList is number[] => typeof idList[0] === 'number'
+  const checkIfGroupPairs = (groups: CriteriaGroup[], criterias: SelectedCriteriaType[]): boolean => {
+    return groups.some((group) => {
+      if (group.type !== CriteriaGroupType.AND_GROUP) return false
+      const relevantCriteria = group.criteriaIds
+        .filter((id) => id > 0)
+        .map((id) => criterias.find((c) => c.id === id))
+        .filter(
+          (c): c is SelectedCriteriaType => !!c && c.type !== CriteriaType.PATIENT && c.type !== CriteriaType.IPP_LIST
+        )
+      return relevantCriteria.length > 1
+    })
+  }
 
   return constraints.flatMap((constraint) => {
+    let shouldRemove = false
+    const isAll = constraint.constraintType !== TemporalConstraintsKind.NONE && constraint.idList[0] === 'All'
     const includesId = isNumberArray(constraint.idList) && constraint.idList.includes(criteriaId)
-
-    const shouldRemove =
-      includesId &&
-      (constraint.constraintType === TemporalConstraintsKind.DIRECT_CHRONOLOGICAL_ORDERING ||
-        (constraint.constraintType === TemporalConstraintsKind.SAME_ENCOUNTER && constraint.idList.length <= 2) ||
-        (constraint.constraintType === TemporalConstraintsKind.SAME_EPISODE_OF_CARE && constraint.idList.length <= 2))
+    shouldRemove = isAll
+      ? !checkIfGroupPairs(groups, criterias)
+      : includesId &&
+        (constraint.constraintType === TemporalConstraintsKind.DIRECT_CHRONOLOGICAL_ORDERING ||
+          (constraint.constraintType === TemporalConstraintsKind.SAME_ENCOUNTER && constraint.idList.length <= 2) ||
+          (constraint.constraintType === TemporalConstraintsKind.SAME_EPISODE_OF_CARE && constraint.idList.length <= 2))
 
     if (shouldRemove) return []
-
-    let updatedIdList = constraint.idList
-    if (
-      isNumberArray(constraint.idList) &&
-      includesId &&
-      (constraint.constraintType === TemporalConstraintsKind.SAME_ENCOUNTER ||
-        constraint.constraintType === TemporalConstraintsKind.SAME_EPISODE_OF_CARE)
-    ) {
-      updatedIdList = constraint.idList.filter((id) => id !== criteriaId)
-    }
-
+    const updatedIdList = constraint.idList.filter((id) => id !== criteriaId) as number[] | ['All']
     const newIds = isNumberArray(updatedIdList) ? updatedIdList.map((id) => idMap[id] ?? id) : updatedIdList
-
     return [{ ...constraint, idList: newIds }]
   })
 }
@@ -857,14 +861,26 @@ const cohortCreationSlice = createSlice({
 
       state.selectedCriteria = newSelected
       state.criteriaGroup = reassignNegativeCriteriaIdsFromSnapshot(newGroups, snapshot)
-      state.temporalConstraints = deleteTemporalConstraints(state.temporalConstraints, criteriaId, idMap)
+      state.temporalConstraints = getTemporalConstraints(
+        state.temporalConstraints,
+        criteriaId,
+        idMap,
+        newGroups,
+        state.selectedCriteria
+      )
       state.nextCriteriaId = getNextCriteriaId(state.selectedCriteria, state.criteriaGroup)
     },
     moveCriteria: (state, action: PayloadAction<MoveCriteriaPayload>) => {
       const { active, over } = action.payload
       const updatedGroups = moveCriterionInGroups(state.criteriaGroup, { active, over })
       const idMap = Object.fromEntries(state.selectedCriteria.map((c) => [c.id, c.id]))
-      const updatedConstraints = deleteTemporalConstraints(state.temporalConstraints, active.id, idMap)
+      const updatedConstraints = getTemporalConstraints(
+        state.temporalConstraints,
+        active.id,
+        idMap,
+        updatedGroups,
+        state.selectedCriteria
+      )
       const nextId = getNextCriteriaId(state.selectedCriteria, updatedGroups)
 
       state.criteriaGroup = updatedGroups

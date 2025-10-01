@@ -66,15 +66,14 @@ const OperatorItem: React.FC<OperatorItemProps> = ({
 
   const [isExpanded, setIsExpanded] = useState(false)
 
-  const { list, operator } = useMemo(() => {
+  const { list, operators } = useMemo(() => {
     const currentGroup = groups.find((group) => group.id === itemId)
-    if (!currentGroup) return { list: [], operator: null }
-
+    if (!currentGroup) return { list: [], operators: [] }
     const toDisplay = currentGroup.criteriaIds
       .map((id) => groups.find((g) => g.id === id) ?? criterias.find((c) => c.id === id))
       .filter((item): item is SelectedCriteriaType | CriteriaGroup => !!item)
     const criteriaList = toDisplay.filter((item) => item.id > 0) as SelectedCriteriaType[]
-    const operatorGroup = toDisplay.find((item) => item.id < 0) as CriteriaGroup | null
+    const operatorGroup = toDisplay.filter((item) => item.id < 0) as CriteriaGroup[]
     const listWithPlaceholders: (SelectedCriteriaType | { id: string; disabled: true })[] = [
       { id: `start-${itemId}`, disabled: true },
       ...criteriaList,
@@ -82,7 +81,7 @@ const OperatorItem: React.FC<OperatorItemProps> = ({
     ]
     return {
       list: listWithPlaceholders,
-      operator: operatorGroup
+      operators: operatorGroup
     }
   }, [groups, criterias, itemId])
 
@@ -122,8 +121,9 @@ const OperatorItem: React.FC<OperatorItemProps> = ({
             </Grid>
           )
         })}
-        {operator && (
+        {operators.map((operator) => (
           <OperatorItem
+            key={operator.id}
             itemId={operator.id}
             groups={groups}
             addNewCriteria={addNewCriteria}
@@ -132,7 +132,7 @@ const OperatorItem: React.FC<OperatorItemProps> = ({
             deleteCriteria={deleteCriteria}
             editCriteria={editCriteria}
           />
-        )}
+        ))}
       </div>
 
       <div className={classes.operatorChild} style={{ height: 12, marginBottom: -14 }}></div>
