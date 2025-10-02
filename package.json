@@ -22,7 +22,7 @@
     "@types/redux-state-sync": "^3.1.5",
     "ace-builds": "^1.43.2",
     "antlr4": "^4.13.1-patch-1",
-    "axios": "^1.11.0",
+    "axios": "^1.12.0",
     "buffer": "^6.0.3",
     "canvas": "^3.1.2",
     "client-oauth2": "^4.2.4",
