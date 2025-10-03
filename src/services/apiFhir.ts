@@ -28,8 +28,10 @@ export const getAuthorizationMethod = () => {
 
 apiFhir.interceptors.request.use((config) => {
   const token = localStorage.getItem(ACCESS_TOKEN)
+
   config.headers.Authorization = `Bearer ${token}`
   config.headers.authorizationMethod = getAuthorizationMethod()
+
   requestsConfigHooks.forEach((hook) => hook(config))
   return config
 })
