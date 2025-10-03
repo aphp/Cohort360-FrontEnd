@@ -1,22 +1,22 @@
-import { useEffect, useState } from 'react'
-import { useNavigate, useLocation, useSearchParams } from 'react-router-dom'
+import { useState, useEffect } from 'react'
+import { useSearchParams, useNavigate, useLocation } from 'react-router'
 import { ResourceType } from 'types/requestCriterias'
 
 type SubTab = {
   value: ResourceType
 }
 
-export const useValidatedSubtab = (subTabs: SubTab[] | null): ResourceType | null => {
+export const useValidatedSubTab = (subTabs: SubTab[] | null) => {
   const [searchParams] = useSearchParams()
   const navigate = useNavigate()
   const location = useLocation()
 
   const subtabParam = searchParams.get('subtab')
-  const [validatedSubtab, setValidatedSubtab] = useState<ResourceType | null>(null)
+  const [selectedSubTab, setSelectedSubTab] = useState<ResourceType | null>(null)
 
   useEffect(() => {
     if (!subTabs || subTabs.length === 0) {
-      setValidatedSubtab(null)
+      setSelectedSubTab(null)
       return
     }
 
@@ -29,8 +29,14 @@ export const useValidatedSubtab = (subTabs: SubTab[] | null): ResourceType | nul
       navigate(`${location.pathname}?${newParams.toString()}`, { replace: true })
     }
 
-    setValidatedSubtab(matched?.value ?? defaultSubtab)
-  }, [subtabParam, subTabs, location.pathname, navigate])
+    setSelectedSubTab(matched?.value ?? defaultSubtab)
+  }, [subtabParam, subTabs, location.pathname, navigate, searchParams])
 
-  return validatedSubtab
+  const handleChangeSubTab = (newSubtab: ResourceType) => {
+    const newParams = new URLSearchParams(searchParams)
+    newParams.set('subtab', newSubtab)
+    navigate(`${location.pathname}?${newParams.toString()}`, { replace: true })
+  }
+
+  return { selectedSubTab, handleChangeSubTab }
 }

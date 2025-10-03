@@ -2,7 +2,7 @@ import React from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAppSelector } from 'state'
 
-import { CohortPatient, IPatientDetails } from 'types'
+import { CohortPatient } from 'types'
 
 import { AccessLevel } from 'components/ui/AccessBadge'
 import Button from 'components/ui/Button'
@@ -16,27 +16,21 @@ import { formatDate } from 'utils/dates'
 import { getAge } from 'utils/age'
 
 import { GenderStatus } from 'types/searchCriterias'
-import { URLS } from 'types/exploration'
+import { Patient, URLS } from 'types/exploration'
 import { ScopeElement } from 'types/scope'
 import { ResourceType } from 'types/requestCriterias'
 import { getConfig } from 'config'
 
 type PatientHeaderProps = {
-  loading: boolean
-  patient?: IPatientDetails
-  deidentifiedBoolean: boolean
+  patient: Patient
   groupId?: string
 }
 
-const PatientHeader: React.FC<PatientHeaderProps> = ({
-  loading,
-  patient = { resourceType: 'Patient' },
-  deidentifiedBoolean,
-  groupId
-}) => {
+const PatientHeader = ({ patient, groupId }: PatientHeaderProps) => {
   const appConfig = getConfig()
   const navigate = useNavigate()
   const { cohort, cohortId } = useAppSelector((state) => state.exploredCohort)
+  const { deidentified, id, infos } = patient
 
   const goBackToExploredCohort = () => {
     const returnTo = {
@@ -58,42 +52,41 @@ const PatientHeader: React.FC<PatientHeaderProps> = ({
   }
 
   const goBackButtonInfo = goBackToExploredCohort()
-  const age = getAge(patient as CohortPatient)
-  const birthdate = formatDate(patient.birthDate)
-  const firstName = patient.name?.[0].given?.[0]
+  const age = getAge(infos as CohortPatient)
+  const birthdate = formatDate(infos.birthDate)
+  const firstName = infos.name?.[0].given?.[0]
   const lastName =
-    patient.name
+    infos.name
       ?.map((e) => {
         if (e.use === 'official') {
           return e.family ?? 'Non renseigné'
         }
         if (e.use === 'maiden') {
-          return `(${patient.gender === 'female' ? 'née' : 'né'} : ${e.family})`
+          return `(${infos.gender === 'female' ? 'née' : 'né'} : ${e.family})`
         }
       })
       .join(' ') ?? 'Non renseigné'
 
-  const ipp = deidentifiedBoolean
-    ? `${patient.id ?? '-'}`
+  const ipp = deidentified
+    ? `${id ?? '-'}`
     : `${
-        patient.identifier?.find(
+        infos.identifier?.find(
           (identifier) =>
             identifier.type?.coding?.[0].code === appConfig.features.patient.patientIdentifierExtensionCode?.code &&
             identifier.type?.coding?.[0].system === appConfig.features.patient.patientIdentifierExtensionCode?.system
-        )?.value ?? patient.identifier?.[0].value
+        )?.value ?? infos.identifier?.[0].value
       }`
 
   return (
     <HeaderLayout
-      title={deidentifiedBoolean ? 'Information Patient' : `${capitalizeFirstLetter(firstName)} ${lastName}`}
-      accessLevel={deidentifiedBoolean ? AccessLevel.DEIDENTIFIED : AccessLevel.NOMINATIVE}
-      loading={loading}
+      title={deidentified ? 'Information Patient' : `${capitalizeFirstLetter(firstName)} ${lastName}`}
+      accessLevel={deidentified ? AccessLevel.DEIDENTIFIED : AccessLevel.NOMINATIVE}
       patientCard={
         <PatientInfo
-          age={deidentifiedBoolean ? age : `${birthdate} (${age})`}
+          age={deidentified ? age : `${birthdate} (${age})`}
           ipp={ipp}
-          gender={patient.gender as GenderStatus}
-          deidentified={deidentifiedBoolean}
+          gender={infos.gender as GenderStatus}
+          deidentified={deidentified}
         />
       }
       goBackButton={

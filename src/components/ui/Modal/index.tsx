@@ -1,8 +1,17 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { PropsWithChildren } from 'react'
 
-import { Breakpoint, Button, Dialog, DialogActions, DialogTitle, Divider, Grid, Typography } from '@mui/material'
-import { DialogContentWrapper } from './styles'
+import {
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Divider,
+  Grid,
+  Typography,
+  Breakpoint
+} from '@mui/material'
 
 type ModalProps = {
   open: boolean
@@ -15,7 +24,6 @@ type ModalProps = {
   isError?: boolean
   disabled?: boolean
   maxWidth?: Breakpoint
-  fullWidth?: boolean
   onSubmit?: (value: any) => void
   onClose?: () => void
 }
@@ -32,12 +40,22 @@ const Modal = ({
   isError = false,
   disabled = false,
   maxWidth = 'sm',
-  fullWidth = false,
   onSubmit,
   onClose
 }: PropsWithChildren<ModalProps>) => {
   return (
-    <Dialog open={open} onClose={onClose} maxWidth={maxWidth} fullWidth={fullWidth}>
+    <Dialog
+      open={open}
+      onClose={onClose}
+      slotProps={{
+        paper: {
+          sx: {
+            width,
+            maxWidth
+          }
+        }
+      }}
+    >
       {title && (
         <>
           <DialogTitle sx={{ padding: '25px 30px' }}>
@@ -52,9 +70,7 @@ const Modal = ({
           </Grid>
         </>
       )}
-      <DialogContentWrapper width={width} style={{ padding: '25px 30px' }}>
-        {children}
-      </DialogContentWrapper>
+      <DialogContent sx={{ padding: '25px 30px' }}>{children}</DialogContent>
       {!readonly && (
         <DialogActions style={{ backgroundColor: '#00000011', padding: '10px 30px' }}>
           <Button color="info" onClick={onClose}>

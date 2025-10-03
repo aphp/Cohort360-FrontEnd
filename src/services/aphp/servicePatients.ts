@@ -17,9 +17,13 @@ import {
 
 import servicesPerimeters from './servicePerimeters'
 import servicesCohorts from './serviceCohorts'
-import { Claim, Condition, Encounter, Identifier, Patient, Procedure, Questionnaire } from 'fhir/r4'
+import { Condition, Encounter, Identifier, Procedure, Questionnaire } from 'fhir/r4'
 import { Direction, FormNames, Order } from 'types/searchCriterias'
 import { getExtension } from 'utils/fhir'
+import { fetchLastPmsi } from './servicePmsi'
+import services from '.'
+import { isCustomError } from 'utils/perimeters'
+import { Patient as PatientType } from 'types/exploration'
 
 export interface IServicePatients {
   /*
@@ -35,31 +39,6 @@ export interface IServicePatients {
    ** Elle ne prend aucun argument, et retourne un object CohortData ou undefined en cas d'erreur
    */
   fetchMyPatients: () => Promise<CohortData | undefined>
-
-  /*
-   ** Cette fonction permet de récupérer les informations necessaire a l'affichage de la page "Aperçu patient" (state/patient)
-   **
-   ** Argument:
-   **   - patientId: identifiant technique d'un patient
-   **   - groupId: (optionnel) Périmètre auquel le patient est lié
-   **
-   ** Retourne une partie du type du store Redux lié au patient (state/patient) ou undefined en cas d'erreur
-   */
-  fetchPatientInfo: (
-    patientId: string,
-    groupId?: string
-  ) => Promise<
-    | {
-        patientInfo: Patient & {
-          lastEncounter?: Encounter
-          lastGhm?: Claim
-          lastProcedure?: Procedure
-          mainDiagnosis?: Condition[]
-        }
-        hospits?: (CohortEncounter | Encounter)[]
-      }
-    | undefined
-  >
 
   /**
    * Cette fonction retourne la totalité des Procedures d'un patient donné
@@ -93,9 +72,81 @@ export interface IServicePatients {
    *   - Retourne true si les droits de vision sont en pseudo / false si c'est en nomi
    */
   fetchRights: (groupId: string) => Promise<boolean>
+
+  fetchPatientInfo: (patientId: string, groupId?: string) => Promise<PatientType | null>
 }
 
 const servicesPatients: IServicePatients = {
+  fetchPatientInfo: async (patientId, groupId) => {
+    try {
+      let hospits: CohortEncounter[] = []
+      let lastEncounter: Encounter | null = null
+      const [patientResponse, encounterResponse] = await Promise.all([
+        fetchPatient({ _id: patientId, _list: groupId ? [groupId] : [] }),
+        fetchEncounter({
+          patient: patientId,
+          _sort: 'date',
+          sortDirection: Direction.DESC,
+          _list: groupId ? [groupId] : [],
+          size: 0
+        })
+      ])
+      const patientData = getApiResponseResources(patientResponse)?.[0]
+      if (!patientData) return null
+      const size = (encounterResponse.data as any).total
+      if (size) {
+        const totalEncounters =
+          getApiResponseResources(
+            await fetchEncounter({
+              patient: patientId,
+              _sort: 'date',
+              sortDirection: Direction.DESC,
+              _list: groupId ? [groupId] : [],
+              size
+            })
+          ) ?? []
+        const encounters = totalEncounters.filter((encounter) => !encounter.partOf)
+        const encountersDetails = totalEncounters.filter((encounter) => encounter.partOf)
+        hospits = (await getEncounterDocuments(encounters, encountersDetails, groupId)) ?? []
+        lastEncounter = encounters[0]
+      }
+
+      let deidentified = true
+      if (groupId) deidentified = (await services.patients.fetchRights(groupId)) ?? true
+      else {
+        const rights = await services.perimeters.getRights({})
+        if (!isCustomError(rights))
+          deidentified = rights.results.some(
+            (right) => right.rights && servicesPerimeters.getAccessFromRights(right.rights) === 'Pseudonymisé'
+          )
+      }
+
+      const basePatient: PatientType = {
+        id: patientId,
+        deidentified,
+        groupId,
+        infos: {
+          ...patientData,
+          lastEncounter,
+          lastGhm: null,
+          lastProcedure: null,
+          mainDiagnosis: [],
+          diagnostics: [],
+          procedures: [],
+          hospits
+        }
+      }
+
+      const pmsi = await fetchLastPmsi({ patient: basePatient, groupId })
+      return {
+        ...basePatient,
+        infos: { ...basePatient.infos, ...pmsi }
+      }
+    } catch (error) {
+      console.error('Error fetching patient info:', error)
+      throw error
+    }
+  },
   fetchPatientsCount: async (signal?: AbortSignal) => {
     try {
       const response = await fetchPatient({ size: 0, signal })
@@ -192,39 +243,6 @@ const servicesPatients: IServicePatients = {
     const questionnaireList = await fetchQuestionnaires({ name: maternityQuestionnaires, _elements: ['id', 'name'] })
 
     return getApiResponseResources(questionnaireList) ?? []
-  },
-
-  fetchPatientInfo: async (patientId, groupId) => {
-    const [patientResponse, encounterResponse] = await Promise.all([
-      fetchPatient({ _id: patientId, _list: groupId ? [groupId] : [] }),
-      fetchEncounter({
-        patient: patientId,
-        _sort: 'date',
-        sortDirection: Direction.DESC,
-        _list: groupId ? [groupId] : [],
-        size: 1000
-      })
-    ])
-
-    const patientDataList = getApiResponseResources(patientResponse)
-    if (patientDataList === undefined || (patientDataList && patientDataList.length === 0)) return undefined
-    const patientData = patientDataList[0]
-
-    const cleanedEncounters: Encounter[] = getApiResponseResources(encounterResponse) || []
-    const encounters = cleanedEncounters.filter((encounter) => !encounter.partOf)
-    const encountersDetails = cleanedEncounters.filter((encounter) => encounter.partOf)
-
-    const hospits = await getEncounterDocuments(encounters, encountersDetails, groupId)
-
-    const patientInfo = {
-      ...patientData,
-      lastEncounter: encounters && encounters.length > 0 ? encounters[0] : undefined
-    }
-
-    return {
-      patientInfo,
-      hospits
-    }
   },
 
   fetchRights: async (groupId) => {
