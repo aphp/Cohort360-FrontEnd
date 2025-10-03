@@ -9,7 +9,6 @@ export const temporalConstraintsMiddleware: Middleware<RootState> = (store) => (
   const result = next(action)
   const nextState = store.getState()
   const isTemporalConstraintAction = action.type === moveCriteria.type || action.type === deleteSelectedCriteria.type
-
   if (isTemporalConstraintAction) {
     const prevConstraints = prevState.cohortCreation.request.temporalConstraints
     const nextConstraints = nextState.cohortCreation.request.temporalConstraints
