@@ -65,10 +65,7 @@ export const WebSocketProvider = ({ children }: PropsWithChildren) => {
 
   useEffect(() => {
     if (websocketRef.current.readyState !== websocket.readyState && websocket.readyState === ReadyState.OPEN) {
-      // Newly Open Websocket - only authenticate if we have a token
-      if (token) {
-        websocket.sendJsonMessage({ token: token, auth_method: oidcAuthState === 'true' ? 'OIDC' : 'JWT' })
-      }
+      websocket.sendJsonMessage({ token: token, auth_method: oidcAuthState === 'true' ? 'OIDC' : 'JWT' })
     }
     websocketRef.current = websocket
   }, [websocket, token, oidcAuthState])

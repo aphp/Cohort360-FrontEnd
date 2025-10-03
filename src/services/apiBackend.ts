@@ -38,16 +38,16 @@ apiBackend.interceptors.request.use((config) => {
 apiBackend.interceptors.response.use(
   (response) => {
     return response
+  },
+  function (error) {
+    if (error.response) {
+      if ((error.response.status === 401 || error.response.status === 403) && window.location.pathname !== '/') {
+        localStorage.clear()
+        window.location.assign('/')
+      }
+      return error
+    }
   }
-  // function (error) {
-  //   if (error.response) {
-  //     if ((error.response.status === 401 || error.response.status === 403) && window.location.pathname !== '/') {
-  //       localStorage.clear()
-  //       window.location.assign('/')
-  //     }
-  //     return error
-  //   }
-  // }
 )
 
 export default apiBackend

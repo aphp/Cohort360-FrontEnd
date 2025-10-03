@@ -190,9 +190,8 @@ const Login = () => {
             )
           )
         } else if (error.errorType === 'noRight') {
-          console.log('coucou')
-          // localStorage.clear()
-          // setLoading(false)
+          localStorage.clear()
+          setLoading(false)
           return setNoRights(true)
         }
       }
