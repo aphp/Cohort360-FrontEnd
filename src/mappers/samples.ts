@@ -20,7 +20,6 @@ const getSamplesInfos = (cohort: Cohort) => {
   const globalTotal = getGlobalEstimation(cohort)
   const createdAt = formatDate(cohort.created_at)
   const samples = cohort.sample_cohorts?.length ?? 0
-  // const samplingRatio = cohort.sampling_ratio ? `${(cohort.sampling_ratio * 100).toString()} %` : 'N/A'
   const samplingRatio = formatPercentage(cohort.sampling_ratio)
   return {
     name,
