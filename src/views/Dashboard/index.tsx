@@ -84,7 +84,7 @@ const Dashboard = ({ context }: DashboardProps) => {
         label: 'Documents',
         value: ResourceType.DOCUMENTS,
         to: `/${context}/${ResourceType.DOCUMENTS}`,
-        show: appConfig.features.documentReference.enabled
+        show: appConfig.features.documentReference.enabled && !dashboard.deidentifiedBoolean
       },
       {
         label: 'PMSI',
