@@ -39,7 +39,11 @@ const PatientBoard = ({ patient }: PatientBoardProps) => {
     () => [
       { label: 'Aperçu patient', value: ResourceType.PREVIEW, show: true },
       { label: 'Parcours patient', value: ResourceType.TIMELINE, show: true },
-      { label: 'Documents cliniques', value: ResourceType.DOCUMENTS, show: true },
+      {
+        label: 'Documents cliniques',
+        value: ResourceType.DOCUMENTS,
+        show: config.features.documentReference.enabled && !patient.deidentified
+      },
       {
         label: 'PMSI',
         value: ResourceType.CONDITION,
