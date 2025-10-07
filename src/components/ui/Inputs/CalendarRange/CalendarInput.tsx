@@ -19,13 +19,13 @@ interface CalendarInputProps {
 }
 
 const CalendarInput = ({ value, label, disabled = false, onChange }: CalendarInputProps) => {
-  const [date, setDate] = useState(value)
+  const [date, setDate] = useState<moment.Moment | null>(value ? moment(value) : null)
   const [error, setError] = useState<ErrorType>({ isError: false, errorMessage: '' })
 
   useEffect(() => {
     setError({ isError: false, errorMessage: '' })
-    if (moment(date).isValid()) {
-      onChange(moment(date as string).format('YYYY-MM-DD'))
+    if (date && moment(date).isValid()) {
+      onChange(moment(date).format('YYYY-MM-DD'))
     } else {
       if (date === null) onChange(null)
       else setError({ isError: true, errorMessage: 'La date sélectionnée est invalide.' })
@@ -45,8 +45,8 @@ const CalendarInput = ({ value, label, disabled = false, onChange }: CalendarInp
             >
               <DatePickerWrapper
                 disabled={disabled}
-                onChange={(newValue: unknown) => setDate(newValue as string)}
-                value={date as any}
+                onChange={(newValue: moment.Moment | null) => setDate(newValue)}
+                value={date}
                 slotProps={{
                   textField: {
                     variant: 'standard'
