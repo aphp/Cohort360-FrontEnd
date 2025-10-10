@@ -27,7 +27,7 @@ export const useSearchValueSet = (references: Reference[], selectedNodes: Hierar
   const controllerRef = useRef<AbortController | null>(null)
 
   const fetchChildren = useCallback(
-    async (ids: string, system: string) => (await getChildrenFromCodes(system, ids.split(','))).results,
+    async (ids: string, valueSetUrl: string) => (await getChildrenFromCodes(valueSetUrl, ids.split(','))).results,
     []
   )
 
@@ -70,7 +70,8 @@ export const useSearchValueSet = (references: Reference[], selectedNodes: Hierar
 
   const isSelectionDisabled = useCallback(
     (node: Hierarchy<FhirItem>) => {
-      const isAll = selectedCodes.get(node.system)?.get(HIERARCHY_ROOT)
+      const nodeKey = node.valueSetUrl || node.system
+      const isAll = selectedCodes.get(nodeKey)?.get(HIERARCHY_ROOT)
       if (mode === SearchMode.RESEARCH && isAll) return true
       else {
         const ref = explorationParameters.options.references.find((ref) => ref.checked)
@@ -115,7 +116,7 @@ export const useSearchValueSet = (references: Reference[], selectedNodes: Hierar
   const initExploration = (references: Reference[]) => {
     const hierachyReferences = references.map((ref, index) => ({ ...ref, checked: index === 0 }))
     const initHandlers = references.map((ref) => ({
-      system: ref.url,
+      valueSetUrl: ref.url,
       fetchBaseTree: () => fetchBaseTree(ref)
     }))
     explorationParameters.onChangeReferences(hierachyReferences)
@@ -137,7 +138,8 @@ export const useSearchValueSet = (references: Reference[], selectedNodes: Hierar
 
   const handleDeleteSelectedCodes = (code: Hierarchy<FhirItem>) => {
     const isRoot = code.id === HIERARCHY_ROOT
-    if (isRoot) selectAll(code.system, false)
+    const codeKey = code.valueSetUrl || code.system
+    if (isRoot) selectAll(codeKey, false)
     else select([code], false, SearchMode.EXPLORATION)
   }
 
