@@ -22,8 +22,7 @@ const BadgeContainer = styled(Box)(({ theme }) => ({
   padding: '2px 8px',
   position: 'relative',
   overflow: 'hidden',
-  minHeight: 20,
-  margin: '0 8px'
+  minHeight: 20
 }))
 
 const ShimmerOverlay = styled(Box)({
