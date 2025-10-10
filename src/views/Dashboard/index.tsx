@@ -110,7 +110,11 @@ const Dashboard = ({ context }: DashboardProps) => {
     dispatch(fetchExploredCohort({ context, id: groupId }))
   }, [context, groupId, dispatch])
 
-  if (dashboard.loading === false && dashboard.rightToExplore === false) return <CohortRightOrNotExist />
+  if (
+    (dashboard.loading === false && dashboard.rightToExplore === false) ||
+    (selectedTab === ResourceType.DOCUMENTS && dashboard.deidentifiedBoolean)
+  )
+    return <CohortRightOrNotExist />
   else if (dashboard.loading === false && dashboard.totalPatients === 0) return <CohortNoPatient />
   return (
     <PageContainer alignItems="center">
