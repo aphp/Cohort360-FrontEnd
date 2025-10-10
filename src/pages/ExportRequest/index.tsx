@@ -1,5 +1,5 @@
 /**
- * @fileoverview Export request page component for creating new data export requests.
+ * @fileoverview Export request page component for creating new export requests.
  * This component provides a form interface for users to configure and submit export requests.
  */
 
