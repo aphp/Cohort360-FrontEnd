@@ -131,7 +131,7 @@ const mapToTable = (
 }
 
 const getMessages = () => [
-  'Attention : Les données AREM sont disponibles uniquement pour la période du 07/12/2009 au 31/07/2024. Seuls les diagnostics rattachés à une visite Orbis (avec un Dossier Administratif - NDA) sont actuellement disponibles.'
+  "Les données AREM sont disponibles pour la période du 07/12/2009 jusqu'à la dernière période validée pour l'année courante dans le Datalake et la base centrale de l'EDS, à savoir avec un décalage d’environ 1-2 mois. Contrairement à la source ORBIS, les données provenant d'AREM sont décalées. Ce décalage d’environ 2 mois est lié au temps de traitement pour la phase de codification et de vérification par l'équipe DIM (Département d'Information Médicale)."
 ]
 
 export const conditionConfig = (
