@@ -14,6 +14,7 @@ import { SidebarButton, SidebarWrapper } from 'components/ui/Sidebar/style'
 import { buildExplorationConfig, ExplorationResourceType } from 'components/ExplorationBoard/config/config'
 import { Patient as PatientType } from 'types/exploration'
 import { useTabs } from 'hooks/tabs/useTabs'
+import CohortRightOrNotExist from 'components/ErrorView/CohortRightOrNotExist'
 
 const SIDEBAR_OPTONS = {
   myFilters: false,
@@ -87,6 +88,9 @@ const PatientBoard = ({ patient }: PatientBoardProps) => {
     () => expConfig.get((selectedSubTab ?? selectedTab) as ExplorationResourceType),
     [expConfig, selectedSubTab, selectedTab]
   )
+
+  if (patient && selectedTab === ResourceType.DOCUMENTS && patient.deidentified) return <CohortRightOrNotExist />
+
 
   return (
     <>
