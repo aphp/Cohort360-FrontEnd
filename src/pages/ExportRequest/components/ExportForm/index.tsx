@@ -399,7 +399,7 @@ const ExportForm: React.FC = () => {
   ])
 
   return (
-    <Grid container>
+    <Grid container size={12}>
       <Grid container className={classes.selectedCohortGrid}>
         <>
           {displayForm ? (
