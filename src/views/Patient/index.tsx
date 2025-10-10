@@ -19,6 +19,7 @@ import { buildExplorationConfig, ExplorationResourceType } from 'components/Expl
 import { useValidatedSubtab } from 'components/ExplorationBoard/useValidatedSubTab'
 import { useCleanSearchParams } from 'components/ExplorationBoard/useCleanSearchParams'
 import PageContainer from 'components/ui/PageContainer'
+import CohortRightOrNotExist from 'components/ErrorView/CohortRightOrNotExist'
 
 const SIDEBAR_OPTONS = {
   myFilters: false,
@@ -134,6 +135,7 @@ const Patient = () => {
   }
 
   if (patient === null && !loading) return <PatientNotExist />
+  if (tabName === ResourceType.DOCUMENTS && deidentified) return <CohortRightOrNotExist />
 
   return (
     <PageContainer>
