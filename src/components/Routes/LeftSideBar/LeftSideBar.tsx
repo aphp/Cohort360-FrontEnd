@@ -432,10 +432,7 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
                 </ListItemIcon>
               </Tooltip>
 
-              <>
-                <ListItemText className={classes.title} primary="Documentation" style={{ flex: 'unset' }} />
-                <ShimmerBadge>Nouveau</ShimmerBadge>
-              </>
+              <ListItemText className={classes.title} primary={<ShimmerBadge>Documentation</ShimmerBadge>} />
             </ListItem>
           )}
         </List>
