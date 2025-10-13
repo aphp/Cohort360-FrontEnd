@@ -5,8 +5,8 @@ import { ExportCallbacks, ExportList } from 'types/export'
 import { mapJobStatus } from 'utils/status'
 import Download from 'assets/icones/download.svg?react'
 import { JobStatus } from 'types'
-import { isDateBefore } from 'utils/formatDate'
 import { Refresh } from '@mui/icons-material'
+import { isDateBefore } from 'utils/dates'
 
 const mapExportsToRows = (list: ExportList[], callbacks: ExportCallbacks) => {
   const rows: Row[] = []
