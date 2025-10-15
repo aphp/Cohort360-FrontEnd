@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useAppDispatch, useAppSelector } from 'state'
 import {
   buildCohortCreation,
@@ -6,7 +6,7 @@ import {
   editCriteriaGroup,
   updateTemporalConstraints
 } from 'state/cohortCreation'
-import { CriteriaGroup, CriteriaGroupType } from 'types'
+import { CriteriaGroup, CriteriaGroupType, TemporalConstraintsType } from 'types'
 import { getOptionsForGroupType, hasOptions } from './utils'
 
 export const useLogicalOperator = (itemId: number) => {
@@ -16,6 +16,7 @@ export const useLogicalOperator = (itemId: number) => {
 
   const isMainOperator = useMemo(() => itemId === 0, [itemId])
   const currentOperator = useMemo(() => criteriaGroup.find(({ id }) => id === itemId), [criteriaGroup, itemId])
+  const [needsConfirmation, setNeedsConfirmation] = useState<boolean>(false)
 
   const edit = useCallback(
     (payload: CriteriaGroup) => {
@@ -30,16 +31,18 @@ export const useLogicalOperator = (itemId: number) => {
     dispatch(buildCohortCreation({ selectedPopulation: null }))
   }
 
+  const findValidConstraint = (constraint: TemporalConstraintsType) => {
+    const currentLogicalOperatorCriteriaIds = currentOperator?.criteriaIds ?? []
+    const constraintsInAndGroup = !(constraint.idList as number[]).some((criteriaId: number) =>
+      currentLogicalOperatorCriteriaIds.includes(criteriaId)
+    )
+    const noGlobalConstraints = itemId !== 0 || !constraint.idList.includes('All' as never)
+    return constraintsInAndGroup && noGlobalConstraints
+  }
+
   const deleteInvalidConstraints = () => {
     if (!currentOperator) return
-    const currentLogicalOperatorCriteriaIds = currentOperator.criteriaIds ?? []
-    const correctConstraints = temporalConstraints.filter((constraint) => {
-      const constraintsInAndGroup = !(constraint.idList as number[]).some((criteriaId: number) =>
-        currentLogicalOperatorCriteriaIds.includes(criteriaId)
-      )
-      const noGlobalConstraints = itemId !== 0 || !constraint.idList.includes('All' as never)
-      return constraintsInAndGroup && noGlobalConstraints
-    })
+    const correctConstraints = temporalConstraints.filter((constraint) => findValidConstraint(constraint))
     dispatch(updateTemporalConstraints(correctConstraints))
   }
 
@@ -69,10 +72,10 @@ export const useLogicalOperator = (itemId: number) => {
   )
 
   const handleChangeOperator = useCallback(
-    (value: CriteriaGroupType) => {
+    (newType: CriteriaGroupType) => {
       if (!currentOperator) return
       const { id, title, criteriaIds, isSubGroup, isInclusive } = currentOperator
-      const newOperator = getOptionsForGroupType(value)
+      const newOperator = getOptionsForGroupType(newType)
       const logicalOperator = {
         id,
         title,
@@ -89,6 +92,15 @@ export const useLogicalOperator = (itemId: number) => {
     [currentOperator, edit]
   )
 
+  const handleConfimation = useCallback((newType: CriteriaGroupType) => {
+    if (
+      newType !== CriteriaGroupType.AND_GROUP &&
+      !temporalConstraints.filter((constraint) => findValidConstraint(constraint)).length
+    )
+      setNeedsConfirmation(true)
+    else handleChangeOperator(newType)
+  }, [])
+
   useEffect(() => {
     if (hasOptions(currentOperator)) {
       const { number } = currentOperator.options
@@ -101,9 +113,12 @@ export const useLogicalOperator = (itemId: number) => {
   return {
     isMainOperator,
     currentOperator,
+    needsConfirmation,
+    setNeedsConfirmation,
     handleChangeInclusive,
     handleChangeNumber,
     handleChangeOperator,
+    handleConfimation,
     deleteLogicalOperator,
     deleteInvalidConstraints
   }
