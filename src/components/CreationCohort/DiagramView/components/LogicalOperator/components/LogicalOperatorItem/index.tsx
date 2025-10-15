@@ -2,7 +2,6 @@ import React, { useRef, useState } from 'react'
 import { Box, IconButton, MenuItem, Select, Typography } from '@mui/material'
 import DeleteIcon from '@mui/icons-material/Delete'
 import useStyles from './styles'
-import ConfirmationDialog from 'components/ui/ConfirmationDialog/ConfirmationDialog'
 import { CriteriaGroup, CriteriaGroupType } from 'types'
 import CriteriaCount, { CriteriaCountType } from '../../../CriteriaCount'
 import { useLogicalOperator } from './useLogicalOperator'
@@ -10,6 +9,8 @@ import { Comparators } from 'types/requestCriterias'
 import { hasOptions } from './utils'
 import IncludesIcon from 'assets/icones/includes.svg?react'
 import ExcludesIcon from 'assets/icones/excludes.svg?react'
+import Modal from 'components/ui/Modal'
+import WarningIcon from '@mui/icons-material/Warning'
 
 type LogicalOperatorItemProps = {
   itemId: number
@@ -19,7 +20,6 @@ type LogicalOperatorItemProps = {
 type OperatorSelectorProps = {
   currentOperator: CriteriaGroup
   onChange: (value: CriteriaGroupType) => void
-  onConfirm: (open: boolean) => void
 }
 
 type NumberSelectorProps = {
@@ -124,7 +124,7 @@ const NumberSelector = ({ currentOperator, onChange }: NumberSelectorProps) => {
   )
 }
 
-const OperatorSelector = ({ currentOperator, onChange, onConfirm }: OperatorSelectorProps) => {
+const OperatorSelector = ({ currentOperator, onChange }: OperatorSelectorProps) => {
   const { classes } = useStyles()
 
   const getDisplayType = (operator: CriteriaGroup): CriteriaGroupType => {
@@ -151,7 +151,6 @@ const OperatorSelector = ({ currentOperator, onChange, onConfirm }: OperatorSele
       className={classes.inputSelect}
       onChange={(event) => {
         const newType = event.target.value as CriteriaGroupType
-        if (newType !== CriteriaGroupType.AND_GROUP) onConfirm(true)
         onChange(newType)
       }}
       style={{ color: 'currentColor' }}
@@ -161,7 +160,6 @@ const OperatorSelector = ({ currentOperator, onChange, onConfirm }: OperatorSele
       <MenuItem value={CriteriaGroupType.OR_GROUP}>un des</MenuItem>
       <MenuItem value={CriteriaGroupType.AT_LEAST}>au moins</MenuItem>
       <MenuItem value={CriteriaGroupType.EXACTLY}>exactement</MenuItem>
-      {/* <MenuItem value={CriteriaGroupType.AT_MOST}>au plus</MenuItem> */}
     </Select>
   )
 }
@@ -172,15 +170,17 @@ const LogicalOperatorItem: React.FC<LogicalOperatorItemProps> = ({ itemId, crite
   const timeout = useRef<NodeJS.Timeout | null>(null)
 
   const [isOpen, setIsOpen] = useState<boolean>(false)
-  const [openConfirmationDialog, setOpenConfirmationDialog] = useState<boolean>(false)
   const {
     isMainOperator,
     currentOperator,
+    needsConfirmation,
     handleChangeInclusive,
     handleChangeNumber,
     handleChangeOperator,
+    handleConfimation,
     deleteLogicalOperator,
-    deleteInvalidConstraints
+    deleteInvalidConstraints,
+    setNeedsConfirmation
   } = useLogicalOperator(itemId)
 
   if (!currentOperator) return <></>
@@ -212,11 +212,7 @@ const LogicalOperatorItem: React.FC<LogicalOperatorItemProps> = ({ itemId, crite
             <Typography variant="h5" className={classes.descriptionText}>
               les patients validant
             </Typography>
-            <OperatorSelector
-              currentOperator={currentOperator}
-              onChange={handleChangeOperator}
-              onConfirm={setOpenConfirmationDialog}
-            />
+            <OperatorSelector currentOperator={currentOperator} onChange={handleConfimation} />
             {hasOptions(currentOperator) && (
               <NumberSelector currentOperator={currentOperator} onChange={handleChangeNumber} />
             )}
@@ -232,19 +228,23 @@ const LogicalOperatorItem: React.FC<LogicalOperatorItemProps> = ({ itemId, crite
         )}
         {!isOpen && <LogicalOperatorDisplay value={currentOperator} />}
       </Box>
-
-      <ConfirmationDialog
-        open={openConfirmationDialog}
-        onCancel={() => setOpenConfirmationDialog(false)}
-        onClose={() => setOpenConfirmationDialog(false)}
-        onConfirm={() => {
+      <Modal
+        open={needsConfirmation}
+        onClose={() => {
+          setNeedsConfirmation(false)
+        }}
+        onSubmit={() => {
           deleteInvalidConstraints()
           handleChangeOperator(CriteriaGroupType.OR_GROUP)
         }}
-        message={
-          "L'ajout de contraintes temporelles n'étant possible que sur un groupe de critères ET, passer sur un groupe de critères OU vous fera perdre toutes les contraintes temporelles de ce groupe."
-        }
-      />
+        submitText="Confirmer"
+        cancelText="Annuler"
+        maxWidth="md"
+      >
+        <WarningIcon color="warning" style={{ verticalAlign: 'middle', marginRight: 8 }} />
+        L'ajout de contraintes temporelles n'étant possible que sur un groupe de critères ET, passer sur un groupe de
+        critères OU vous fera perdre toutes les contraintes temporelles de ce groupe.
+      </Modal>
     </>
   )
 }
