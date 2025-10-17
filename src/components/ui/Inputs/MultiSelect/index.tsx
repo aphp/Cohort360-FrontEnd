@@ -20,10 +20,11 @@ const MultiSelect = ({ value, placeholder, label, options, disabled = false, onC
       <Autocomplete
         disabled={disabled}
         multiple
-        onChange={(event, value) => {
-          onChange(value)
+        onChange={(event, newValues) => {
+          onChange(newValues)
         }}
         options={options}
+        isOptionEqualToValue={(option, value) => option.id === value.id}
         value={value}
         disableCloseOnSelect
         getOptionLabel={(elem) => capitalizeFirstLetter(elem.label)}
