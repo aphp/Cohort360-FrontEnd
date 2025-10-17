@@ -173,14 +173,14 @@ const LogicalOperatorItem: React.FC<LogicalOperatorItemProps> = ({ itemId, crite
   const {
     isMainOperator,
     currentOperator,
-    needsConfirmation,
+    operatorConfirmation,
     handleChangeInclusive,
     handleChangeNumber,
     handleChangeOperator,
     handleConfimation,
     deleteLogicalOperator,
     deleteInvalidConstraints,
-    setNeedsConfirmation
+    setOperatorConfirmation
   } = useLogicalOperator(itemId)
 
   if (!currentOperator) return <></>
@@ -229,13 +229,13 @@ const LogicalOperatorItem: React.FC<LogicalOperatorItemProps> = ({ itemId, crite
         {!isOpen && <LogicalOperatorDisplay value={currentOperator} />}
       </Box>
       <Modal
-        open={needsConfirmation}
+        open={operatorConfirmation.confirmation}
         onClose={() => {
-          setNeedsConfirmation(false)
+          setOperatorConfirmation({ nextType: CriteriaGroupType.OR_GROUP, confirmation: false })
         }}
         onSubmit={() => {
           deleteInvalidConstraints()
-          handleChangeOperator(CriteriaGroupType.OR_GROUP)
+          handleChangeOperator(operatorConfirmation.nextType)
         }}
         submitText="Confirmer"
         cancelText="Annuler"
