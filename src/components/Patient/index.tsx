@@ -91,7 +91,6 @@ const PatientBoard = ({ patient }: PatientBoardProps) => {
 
   if (patient && selectedTab === ResourceType.DOCUMENTS && patient.deidentified) return <CohortRightOrNotExist />
 
-
   return (
     <>
       <SidebarButton role="button" onClick={() => setIsSidebarOpened(true)}>
