@@ -16,7 +16,10 @@ export const useLogicalOperator = (itemId: number) => {
 
   const isMainOperator = useMemo(() => itemId === 0, [itemId])
   const currentOperator = useMemo(() => criteriaGroup.find(({ id }) => id === itemId), [criteriaGroup, itemId])
-  const [needsConfirmation, setNeedsConfirmation] = useState<boolean>(false)
+  const [operatorConfirmation, setOperatorConfirmation] = useState({
+    nextType: CriteriaGroupType.OR_GROUP,
+    confirmation: false
+  })
 
   const edit = useCallback(
     (payload: CriteriaGroup) => {
@@ -93,12 +96,15 @@ export const useLogicalOperator = (itemId: number) => {
   )
 
   const handleConfimation = useCallback((newType: CriteriaGroupType) => {
-    if (
-      newType !== CriteriaGroupType.AND_GROUP &&
-      !temporalConstraints.filter((constraint) => findValidConstraint(constraint)).length
-    )
-      setNeedsConfirmation(true)
-    else handleChangeOperator(newType)
+    if (newType !== CriteriaGroupType.AND_GROUP && currentOperator?.type === CriteriaGroupType.AND_GROUP) {
+      const count = temporalConstraints.length
+      const newCount = temporalConstraints.filter((constraint) => findValidConstraint(constraint)).length
+      if (count !== newCount) {
+        setOperatorConfirmation({ nextType: newType, confirmation: true })
+        return
+      }
+    }
+    handleChangeOperator(newType)
   }, [])
 
   useEffect(() => {
@@ -113,8 +119,8 @@ export const useLogicalOperator = (itemId: number) => {
   return {
     isMainOperator,
     currentOperator,
-    needsConfirmation,
-    setNeedsConfirmation,
+    operatorConfirmation,
+    setOperatorConfirmation,
     handleChangeInclusive,
     handleChangeNumber,
     handleChangeOperator,
