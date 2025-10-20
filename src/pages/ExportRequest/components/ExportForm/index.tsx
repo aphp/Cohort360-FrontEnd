@@ -424,7 +424,7 @@ const ExportForm: React.FC = () => {
                 getOptionLabel={(option) => {
                   return `${option.name}`
                 }}
-                renderInput={(params) => <TextField {...params} label="Sélectionnez une Cohorte" />}
+                renderInput={(params) => <TextField {...params} label="Sélectionner une cohorte" />}
                 value={exportCohort}
                 onChange={(_, value) => {
                   setExportCohort(value)
