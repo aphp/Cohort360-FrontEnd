@@ -223,7 +223,7 @@ const fetchAdministrationList = (
 ): Promise<ExplorationResults<MedicationAdministration>> => {
   const { administrationRoutes } = filters
   const params = {
-    type: administrationRoutes?.map((type) => type.id),
+    route: administrationRoutes?.map((type) => type.id),
     ...getMedicationFilters(filters, fetchParams, patient, groupId),
     signal
   }
