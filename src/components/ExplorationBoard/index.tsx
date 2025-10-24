@@ -9,14 +9,14 @@ import { FetchStatus } from 'types'
 import CustomAlert from 'components/ui/Alert'
 import { GAP, ExplorationConfig } from 'types/exploration'
 import { useSearchParams } from 'react-router-dom'
+import { usePagination } from 'components/ui/Pagination/usePagination'
+import { useEffect } from 'storybook/internal/preview-api'
 
 type ExplorationBoardProps<T> = {
   config: ExplorationConfig<T>
 }
 
 const ExplorationBoard = <T,>({ config }: ExplorationBoardProps<T>) => {
-  const [searchParams] = useSearchParams()
-  const pageFromUrl = parseInt(searchParams.get('page') ?? '1', 10)
   const {
     fetchStatus,
     additionalInfo,
@@ -30,7 +30,8 @@ const ExplorationBoard = <T,>({ config }: ExplorationBoardProps<T>) => {
     onSaveFilter,
     resetFetchStatus
   } = useExplorationBoard(config)
-  const { count, pagination, data, dataLoading, onChangePage } = useData(config, searchCriterias, pageFromUrl)
+  const { count, fetch, data, dataLoading } = useData(/* config */)
+  const { pagination, onChangePage } = usePagination<T>(config, searchCriterias, fetch)
 
   return (
     <Grid size={12} container sx={{ gap: GAP }} margin={'16px 0'}>
@@ -61,7 +62,7 @@ const ExplorationBoard = <T,>({ config }: ExplorationBoardProps<T>) => {
         orderBy={searchCriterias.orderBy}
         pagination={pagination}
         displayOptions={config.displayOptions}
-        onChangePage={onChangePage}
+        onChangePage={(page) => onChangePage(page)}
         onSort={onSort}
       />
       {fetchStatus && (

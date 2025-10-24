@@ -19,7 +19,10 @@ export const useExplorationBoard = <T>(config: ExplorationConfig<T>) => {
 
   const narrowSearch = useMemo(() => config.narrowSearchCriterias, [config])
 
-  const narrowedSearchCriterias = useMemo(() => narrowSearch(searchCriterias as SearchCriterias<T>), [searchCriterias])
+  const narrowedSearchCriterias = useMemo(
+    () => narrowSearch(searchCriterias as SearchCriterias<T>),
+    [searchCriterias, narrowSearch]
+  )
 
   const narrowedSelectedFilter = useMemo(
     () =>
@@ -29,7 +32,7 @@ export const useExplorationBoard = <T>(config: ExplorationConfig<T>) => {
             filterParams: narrowSearch(selectedSavedFilter.filterParams as SearchCriterias<T>)
           }
         : null,
-    [selectedSavedFilter]
+    [selectedSavedFilter, narrowSearch]
   )
 
   const criterias = useMemo(() => {
@@ -53,10 +56,11 @@ export const useExplorationBoard = <T>(config: ExplorationConfig<T>) => {
   useEffect(() => {
     const fetchInfos = async () => {
       const newInfo = await config.fetchAdditionalInfos(additionalInfo)
-      setAdditionalInfo({ ...additionalInfo, ...newInfo, type: config.type })
+      setAdditionalInfo((prev) => ({ ...prev, ...newInfo, type: config.type }))
     }
     fetchInfos()
-  }, [config.type])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [config])
 
   return {
     savedFiltersData: {
