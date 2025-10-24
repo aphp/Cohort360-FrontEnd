@@ -1246,7 +1246,7 @@ export const fetchExportTableInfo = async (args: fetchExportTableInfoProps) => {
 
   const response = await apiDatamodel.get(`/models?${queryParams}`)
 
-  return response.data
+  return response.data.filter((table: any) => table.fhirResourceName !== ResourceType.CLAIM)
 }
 
 export const fetchExportTableRelationInfo = async (args: fetchExportTableInfoProps) => {

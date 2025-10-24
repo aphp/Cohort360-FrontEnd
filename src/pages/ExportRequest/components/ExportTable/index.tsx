@@ -43,6 +43,7 @@ import { TableInfo, TableSetting } from 'types/export'
 
 import { Error } from '../ExportForm'
 import QuestionForm, { QuestionLeaf } from 'pages/ExportRequest/components/QuestionChoice'
+import { plural } from 'utils/string'
 
 /**
  * Props interface for the ExportTable component.
@@ -250,7 +251,7 @@ const ExportTable: React.FC<ExportTableProps> = ({
         showDialog({
           isOpen: true,
           message:
-            "Il n'est pas possible de réunir les tables en un seul fichier car l'un des dossiers de spécialités est vide. Veuillez exporter les tables séparément. Si vous souhaitez tout de même exporter des tables en un seul fichier, veuillez choisir d'autres tables.",
+            "Il n'est pas possible de réunir les tables en un seul fichier car l'un des dossiers de spécialité est vide. Veuillez exporter les tables séparément. Si vous souhaitez tout de même exporter des tables en un seul fichier, veuillez choisir d'autres tables.",
           status: 'warning',
           onConfirm: () => {
             removeTableSetting(exportTable.name)
@@ -306,9 +307,7 @@ const ExportTable: React.FC<ExportTableProps> = ({
                   fontSize={12}
                   color={tableSetting?.isChecked ? '#153D8A' : '#888'}
                 >
-                  {`${count} ${
-                    exportTableResourceType !== ResourceType.QUESTIONNAIRE_RESPONSE ? 'ligne' : 'Dossiers de Spécialité'
-                  }${count && count > 1 ? 's' : ''}`}
+                  {`${count} ${exportTableResourceType === ResourceType.QUESTIONNAIRE_RESPONSE ? `dossier${plural(count ?? 0)} de spécialité` : `ligne${plural(count ?? 0)}`}`}
                 </Typography>
               )}
             </>
