@@ -39,7 +39,7 @@ export const mapParamsToNetworkParams = (params: string[]) => {
  * validatePageNumber(5, 10, (page) => navigate(`/page/${page}`), dispatch)
  * ```
  */
-export const validatePageNumber = (
+/*export const validatePageNumber = (
   requestedPage: number,
   totalPages: number,
   onRedirect: (newPage: number) => void,
@@ -76,4 +76,4 @@ export const validatePageNumber = (
       })
     )
   }
-}
+}*/

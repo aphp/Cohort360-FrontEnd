@@ -21,7 +21,7 @@ type DataSectionProps = {
   data: { table: Table; cards: Card[]; diagrams: Diagram[]; timeline: TimelineT | null }
   orderBy: OrderBy
   isLoading: boolean
-  pagination: { currentPage: number; total: number }
+  pagination: { current: number; total: number }
   displayOptions: DisplayOptions
   onChangePage: (page: number) => void
   onSort: (orderBy: OrderBy) => void
@@ -82,7 +82,7 @@ const DataSection = ({
         )}
         <StickyPagination
           count={pagination.total}
-          currentPage={pagination.currentPage}
+          currentPage={pagination.current}
           onPageChange={onChangePage}
           sidebarDisplay={displayOptions.sidebar}
         />
