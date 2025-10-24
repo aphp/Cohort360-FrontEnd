@@ -41,7 +41,7 @@ const PatientPreview: React.FC<PatientPreviewProps> = ({ patient }) => {
   const lastProcedure =
     infos.lastProcedure?.code?.coding?.find((code) => !appConfig.core.fhir.selectedCodeOnly || code.userSelected)
       ?.display ?? '-'
-  const lastGhm = infos.lastGhm?.diagnosis?.[0].packageCode?.coding?.[0].display ?? '-'
+  // const lastGhm = infos.lastGhm?.diagnosis?.[0].packageCode?.coding?.[0].display ?? '-'
 
   return (
     <Grid container sx={{ flexDirection: 'column', alignItems: 'center' }} mt={2} height={'fit-content'}>
@@ -55,7 +55,7 @@ const PatientPreview: React.FC<PatientPreviewProps> = ({ patient }) => {
           <PatientField fieldName="Dernière prise en charge" fieldValue={lastEncounter} />
           <PatientField fieldName="Durée de prise en charge" fieldValue={lastEncounterDuration} />
           <PatientField fieldName="Dernier acte" fieldValue={lastProcedure} />
-          <PatientField fieldName="Dernier GHM" fieldValue={lastGhm} />
+          {/* <PatientField fieldName="Dernier GHM" fieldValue={lastGhm} /> */}
         </Grid>
       </Grid>
     </Grid>

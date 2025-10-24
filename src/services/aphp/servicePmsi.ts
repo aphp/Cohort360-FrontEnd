@@ -150,16 +150,16 @@ export const fetchLastPmsi = async ({ patient, groupId }: { patient: Patient; gr
         : { list: [] },
       procSize
         ? fetchProcedureList({ ...fetchParams, size: procSize }, { filters }, patient, deidentified, groupIds)
-        : { list: [] },
-      fetchClaimList({ ...fetchParams, size: 1 }, { filters }, patient, deidentified, groupIds)
+        : { list: [] }
+      // fetchClaimList({ ...fetchParams, size: 1 }, { filters }, patient, deidentified, groupIds)
     ])
     if (fetchPatientResponse === undefined) return null
     const conditionList = fetchPatientResponse[0].list
     const procedureList = fetchPatientResponse[1].list
-    const claimList = fetchPatientResponse[2].list
+    // const claimList = fetchPatientResponse[2].list
 
     return {
-      lastGhm: claimList ? claimList[0] : null,
+      // lastGhm: claimList ? claimList[0] : null,
       lastProcedure: procedureList ? procedureList[0] : null,
       mainDiagnosis: conditionList.filter(
         (condition) =>
