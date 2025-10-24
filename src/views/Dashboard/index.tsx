@@ -56,8 +56,8 @@ const Dashboard = ({ context }: DashboardProps) => {
         show: true,
         subs: [
           { label: PMSILabel.DIAGNOSTIC, value: ResourceType.CONDITION },
-          { label: PMSILabel.CCAM, value: ResourceType.PROCEDURE },
-          { label: PMSILabel.GHM, value: ResourceType.CLAIM }
+          { label: PMSILabel.CCAM, value: ResourceType.PROCEDURE }
+          // { label: PMSILabel.GHM, value: ResourceType.CLAIM }
         ]
       },
       {
@@ -112,7 +112,8 @@ const Dashboard = ({ context }: DashboardProps) => {
 
   if (
     (dashboard.loading === false && dashboard.rightToExplore === false) ||
-    (selectedTab === ResourceType.DOCUMENTS && dashboard.deidentifiedBoolean)
+    (selectedTab === ResourceType.DOCUMENTS && dashboard.deidentifiedBoolean) ||
+    selectedTab === ResourceType.CLAIM
   )
     return <CohortRightOrNotExist />
   else if (dashboard.loading === false && dashboard.totalPatients === 0) return <CohortNoPatient />

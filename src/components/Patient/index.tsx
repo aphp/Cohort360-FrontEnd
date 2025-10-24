@@ -51,8 +51,8 @@ const PatientBoard = ({ patient }: PatientBoardProps) => {
         show: true,
         subs: [
           { label: PMSILabel.DIAGNOSTIC, value: ResourceType.CONDITION },
-          { label: PMSILabel.CCAM, value: ResourceType.PROCEDURE },
-          { label: PMSILabel.GHM, value: ResourceType.CLAIM }
+          { label: PMSILabel.CCAM, value: ResourceType.PROCEDURE }
+          // { label: PMSILabel.GHM, value: ResourceType.CLAIM }
         ]
       },
       {
@@ -89,7 +89,11 @@ const PatientBoard = ({ patient }: PatientBoardProps) => {
     [expConfig, selectedSubTab, selectedTab]
   )
 
-  if (patient && selectedTab === ResourceType.DOCUMENTS && patient.deidentified) return <CohortRightOrNotExist />
+  if (
+    patient &&
+    ((selectedTab === ResourceType.DOCUMENTS && patient.deidentified) || selectedTab === ResourceType.CLAIM)
+  )
+    return <CohortRightOrNotExist />
 
   return (
     <>
