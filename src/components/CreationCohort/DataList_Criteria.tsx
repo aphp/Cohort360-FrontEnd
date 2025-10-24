@@ -104,9 +104,10 @@ const criteriaList: () => CriteriaItemType[] = () => {
         {
           id: CriteriaType.CLAIM,
           title: CriteriaTypeLabels.CLAIM,
-          color: '#0063AF',
+          color: '#808080',
           fontWeight: 'normal',
-          formDefinition: ghmForm()
+          formDefinition: ghmForm(),
+          disabled: true
         }
       ]
     },
