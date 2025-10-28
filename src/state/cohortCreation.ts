@@ -374,7 +374,13 @@ const buildCohortCreation = createAsyncThunk<BuildCohortReturn, BuildCohortParam
     try {
       const state = getState()
       const _selectedPopulation = selectedPopulation ?? state.cohortCreation.request.selectedPopulation
-      const _selectedCriteria = state.cohortCreation.request.selectedCriteria
+      // DELETE GHM temporarly
+      const _selectedCriteria = state.cohortCreation.request.selectedCriteria.filter(
+        (criteria) => criteria.type !== CriteriaType.CLAIM
+      )
+      if (_selectedCriteria.length !== state.cohortCreation.request.selectedCriteria.length) {
+      //  dispatch(editAllCriteria(_selectedCriteria))
+      }
       const _criteriaGroup: CriteriaGroup[] =
         state.cohortCreation.request.criteriaGroup && state.cohortCreation.request.criteriaGroup.length > 0
           ? state.cohortCreation.request.criteriaGroup
@@ -858,7 +864,6 @@ const cohortCreationSlice = createSlice({
         criteriaId,
         snapshot
       )
-
       state.selectedCriteria = newSelected
       state.criteriaGroup = reassignNegativeCriteriaIdsFromSnapshot(newGroups, snapshot)
       state.temporalConstraints = getTemporalConstraints(

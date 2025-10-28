@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { Button, Grid } from '@mui/material'
 
 import LogicalOperator from './components/LogicalOperator'
@@ -15,6 +15,7 @@ import { checkNominativeCriteria, cleanNominativeCriterias } from 'utils/cohortC
 import ScopeTree from 'components/ScopeTree'
 import CustomAlert from 'components/ui/Alert'
 import { HiddenScrollBar } from 'components/ui/Scrollbar/styles'
+import { CriteriaType } from 'types/requestCriterias'
 
 const DiagramView = () => {
   const dispatch = useAppDispatch()
@@ -51,6 +52,11 @@ const DiagramView = () => {
       dispatch(buildCohortCreation({ selectedPopulation: rights }))
   }, [selectedPopulation, rights])
 
+  const hasClaim = useMemo(
+    () => requestState.selectedCriteria.some((criteria) => criteria.type === CriteriaType.CLAIM),
+    [requestState.selectedCriteria]
+  )
+
   return (
     <HiddenScrollBar
       container
@@ -69,12 +75,19 @@ const DiagramView = () => {
             activées. Les créations, éditions et suppressions de cohortes et de requêtes sont désactivées.
           </CustomAlert>
         )}
+        {hasClaim && (
+          <CustomAlert severity="warning" style={{ marginTop: '-12px', marginBottom: '10px' }}>
+            En raison de la suppression temporaire du critère de GHM, seules les consultations de cohortes, requêtes et
+            données patients sont activées. Les créations, éditions et suppressions de cohortes et de requêtes sont
+            désactivées.
+          </CustomAlert>
+        )}
         <CohortCreationBreadcrumbs />
 
         <Grid container justifyContent="center" alignItems="center">
           {selectedPopulation && selectedPopulation.length > 0 && (
             <PopulationCard
-              onEditDisabled={maintenanceIsActive}
+              onEditDisabled={maintenanceIsActive || hasClaim}
               onEdit={() => setOpenDrawer(true)}
               loading={requestState.loading}
               population={selectedPopulation}

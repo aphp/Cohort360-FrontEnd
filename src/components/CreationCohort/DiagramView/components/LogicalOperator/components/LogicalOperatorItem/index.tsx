@@ -15,6 +15,7 @@ import WarningIcon from '@mui/icons-material/Warning'
 type LogicalOperatorItemProps = {
   itemId: number
   criteriaCount?: CriteriaCountType
+  disabled: boolean
 }
 
 type OperatorSelectorProps = {
@@ -164,7 +165,7 @@ const OperatorSelector = ({ currentOperator, onChange }: OperatorSelectorProps) 
   )
 }
 
-const LogicalOperatorItem: React.FC<LogicalOperatorItemProps> = ({ itemId, criteriaCount }) => {
+const LogicalOperatorItem: React.FC<LogicalOperatorItemProps> = ({ itemId, criteriaCount, disabled }) => {
   const { classes } = useStyles()
 
   const timeout = useRef<NodeJS.Timeout | null>(null)
@@ -190,13 +191,14 @@ const LogicalOperatorItem: React.FC<LogicalOperatorItemProps> = ({ itemId, crite
         className={isMainOperator ? classes.mainLogicalOperator : classes.logicalOperator}
         id={`logical-operator-${itemId}`}
         style={{
-          background: !currentOperator.isInclusive ? '#F2B0B0' : '#19235A',
-          color: !currentOperator.isInclusive ? '#19235a' : 'white',
+          border: disabled ? '3px solid #00000042' : '',
+          background: disabled ? '#0000001F' : !currentOperator.isInclusive ? '#F2B0B0' : '#19235A',
+          color: disabled ? '#00000042' : !currentOperator.isInclusive ? '#19235a' : 'white',
           padding: '0px 10px',
           width: 'fit-content'
         }}
         onMouseEnter={() => {
-          setIsOpen(true)
+          if (!disabled) setIsOpen(true)
           if (timeout.current) clearTimeout(timeout.current)
         }}
         onMouseLeave={() => (timeout.current = setTimeout(() => setIsOpen(false), 800))}
