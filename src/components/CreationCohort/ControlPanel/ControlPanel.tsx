@@ -1,5 +1,5 @@
 /* eslint-disable max-statements */
-import React, { useState, useEffect, useContext } from 'react'
+import React, { useState, useEffect, useContext, useMemo, useCallback } from 'react'
 import moment from 'moment'
 
 import {
@@ -64,6 +64,7 @@ import { AppConfig } from 'config'
 import { setRequestDetailedMode } from 'state/preferences'
 import { hasStageDetails } from '../DiagramView/components/CriteriaCount'
 import { isRequestFinished } from './utils'
+import { CriteriaType } from 'types/requestCriterias'
 
 const ControlPanel: React.FC<{
   onExecute?: (cohortName: string, cohortDescription: string, globalCount: boolean) => void
@@ -116,6 +117,11 @@ const ControlPanel: React.FC<{
 
   const cohortLimit = appConfig.features.cohort.shortCohortLimit
 
+  const hasClaim = useMemo(
+    () => selectedCriteria.some((criteria) => criteria.type === CriteriaType.CLAIM),
+    [selectedCriteria]
+  )
+
   const accessIsPseudonymize: boolean | null =
     selectedPopulation === null
       ? null
@@ -159,6 +165,10 @@ const ControlPanel: React.FC<{
         requestId
       })
     )
+  }
+
+  const handleDeleteGhm = () => {
+    dispatch(buildCohortCreation({ selectedPopulation: null }))
   }
 
   const handleOpenSharedModal = () => {
@@ -297,7 +307,8 @@ const ControlPanel: React.FC<{
               typeof onExecute !== 'function' ||
               maintenanceIsActive ||
               count_outdated ||
-              includePatient === 0
+              includePatient === 0 ||
+              hasClaim
             }
             onClick={() => setOpenModal('executeCohortConfirmation')}
             className={classes.requestExecution}
@@ -314,7 +325,9 @@ const ControlPanel: React.FC<{
           </Button>
           {appConfig.features.feasibilityReport.enabled && (
             <Button
-              disabled={isLoading || typeof onExecute !== 'function' || maintenanceIsActive || count_outdated}
+              disabled={
+                isLoading || typeof onExecute !== 'function' || maintenanceIsActive || count_outdated || hasClaim
+              }
               onClick={handleGenerateReport}
               className={classes.requestExecution}
               startIcon={<DescriptionIcon color="action" className={classes.iconBorder} />}
@@ -337,7 +350,7 @@ const ControlPanel: React.FC<{
             }}
             className={classes.actionButton}
             startIcon={<ShareIcon color="action" className={classes.iconBorder} />}
-            disabled={maintenanceIsActive}
+            disabled={maintenanceIsActive || hasClaim}
           >
             <Typography className={classes.boldText}>Partager ma requête</Typography>
           </Button>
@@ -349,7 +362,7 @@ const ControlPanel: React.FC<{
                 onClick={cleanLogicalOperator}
                 className={classes.actionButton}
                 startIcon={<HighlightOffIcon color="action" className={classes.iconBorder} />}
-                disabled={maintenanceIsActive}
+                disabled={maintenanceIsActive || hasClaim}
               >
                 <Tooltip title="Supprimer les groupes ne contenant aucun élément">
                   <Typography className={classes.boldText}>Nettoyer le diagramme</Typography>
@@ -420,7 +433,7 @@ const ControlPanel: React.FC<{
                     setCriteriaDetailCalculation(e.target.checked)
                   }}
                   color="primary"
-                  disabled={maintenanceIsActive}
+                  disabled={maintenanceIsActive || hasClaim}
                 />
               }
               label="Calcul sur la population source"
@@ -436,10 +449,14 @@ const ControlPanel: React.FC<{
                     value={detailCalculationType}
                     onChange={(e) => setDetailCalculationType(e.target.value as 'all' | 'ratio')}
                   >
-                    <FormControlLabel value="all" control={<Radio disabled={maintenanceIsActive} />} label="Chiffres" />
+                    <FormControlLabel
+                      value="all"
+                      control={<Radio disabled={maintenanceIsActive || hasClaim} />}
+                      label="Chiffres"
+                    />
                     <FormControlLabel
                       value="ratio"
-                      control={<Radio disabled={maintenanceIsActive} />}
+                      control={<Radio disabled={maintenanceIsActive || hasClaim} />}
                       label="Pourcentages"
                     />
                   </RadioGroup>
@@ -512,6 +529,23 @@ const ControlPanel: React.FC<{
             >
               Relancer la requête
             </Button>
+          </Alert>
+        )}
+        {hasClaim && (
+          <Alert className={classes.errorAlert} severity="error">
+            Vous devez relancer votre requête pour avoir un nombre de patients à jour et créer une cohorte.
+            <div>
+              <Button
+                onClick={handleDeleteGhm}
+                variant="outlined"
+                color="secondary"
+                size="small"
+                style={{ marginTop: 8 }}
+                disabled={maintenanceIsActive}
+              >
+                Relancer sans GHM
+              </Button>
+            </div>
           </Alert>
         )}
         <VersionsSection
