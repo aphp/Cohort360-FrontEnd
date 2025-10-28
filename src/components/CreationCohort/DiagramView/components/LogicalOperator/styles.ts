@@ -37,6 +37,11 @@ const useStyles = makeStyles()(() => ({
     position: 'relative',
     '&:hover': {
       background: '#19235A'
+    },
+    '&.Mui-disabled': {
+      background: '#0000001F',
+      color: 'rgba(0,0,0,0.26)',
+      cursor: 'auto'
     }
   },
   operatorChild: {

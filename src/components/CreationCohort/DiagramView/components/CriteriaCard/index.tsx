@@ -24,6 +24,7 @@ import CriteriaCount, { CriteriaCountType } from '../CriteriaCount'
 type CriteriaCardProps = {
   criterion: SelectedCriteriaType
   criteriaCount?: CriteriaCountType
+  disabled: boolean
   duplicateCriteria: (criteriaId: number) => void
   deleteCriteria: (criteriaId: number) => void
   editCriteria: (criteria: SelectedCriteriaType) => void
@@ -32,11 +33,11 @@ type CriteriaCardProps = {
 const CriteriaCard = ({
   criterion,
   criteriaCount,
+  disabled,
   duplicateCriteria,
   editCriteria,
   deleteCriteria
 }: CriteriaCardProps) => {
-  const maintenanceIsActive = useAppSelector((state) => state.me?.maintenance?.active || false)
   const { entities, cache } = useAppSelector((state) => state.valueSets)
   const criteriaDefinitions = getAllCriteriaItems(criteriaList())
 
@@ -101,36 +102,31 @@ const CriteriaCard = ({
       </ExtendedWrapper>
       <Grid container size={{ xs: 5, xl: 2 }} justifyContent="flex-end">
         {criterion.error && (
-          <IconButton
-            size="small"
-            onClick={() => editCriteria(criterion)}
-            color="secondary"
-            disabled={maintenanceIsActive}
-          >
+          <IconButton size="small" onClick={() => editCriteria(criterion)} color="secondary" disabled={disabled}>
             <WarningIcon />
           </IconButton>
         )}
         <IconButton
           size="small"
           onClick={() => duplicateCriteria(criterion.id)}
-          style={maintenanceIsActive ? { color: '#CBCFCF' } : { color: 'currentcolor' }}
-          disabled={maintenanceIsActive}
+          style={disabled ? { color: '#CBCFCF' } : { color: 'currentcolor' }}
+          disabled={disabled}
         >
           <LibraryAddIcon />
         </IconButton>
         <IconButton
           size="small"
           onClick={() => editCriteria(criterion)}
-          style={maintenanceIsActive ? { color: '#CBCFCF' } : { color: 'currentcolor' }}
-          disabled={maintenanceIsActive}
+          style={disabled ? { color: '#CBCFCF' } : { color: 'currentcolor' }}
+          disabled={disabled}
         >
           <EditIcon />
         </IconButton>
         <IconButton
           size="small"
           onClick={() => deleteCriteria(criterion.id)}
-          style={maintenanceIsActive ? { color: '#CBCFCF' } : { color: 'currentcolor' }}
-          disabled={maintenanceIsActive}
+          style={disabled ? { color: '#CBCFCF' } : { color: 'currentcolor' }}
+          disabled={disabled}
         >
           <DeleteIcon />
         </IconButton>
