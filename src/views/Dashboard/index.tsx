@@ -48,7 +48,7 @@ const Dashboard = ({ context }: DashboardProps) => {
       {
         label: 'Documents',
         value: ResourceType.DOCUMENTS,
-        show: appConfig.features.documentReference.enabled && !dashboard.deidentifiedBoolean
+        show: appConfig.features.documentReference.enabled
       },
       {
         label: 'PMSI',
@@ -110,11 +110,7 @@ const Dashboard = ({ context }: DashboardProps) => {
     dispatch(fetchExploredCohort({ context, id: groupId }))
   }, [context, groupId, dispatch])
 
-  if (
-    (dashboard.loading === false && dashboard.rightToExplore === false) ||
-    (selectedTab === ResourceType.DOCUMENTS && dashboard.deidentifiedBoolean)
-  )
-    return <CohortRightOrNotExist />
+  if (dashboard.loading === false && dashboard.rightToExplore === false) return <CohortRightOrNotExist />
   else if (dashboard.loading === false && dashboard.totalPatients === 0) return <CohortNoPatient />
   return (
     <PageContainer alignItems="center">
