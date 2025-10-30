@@ -184,7 +184,7 @@ export const getChildrenFromCodes = async (
 
   const batchResults = await Promise.all(batchPromises)
 
-  const combinedResults = batchResults.reduce(
+  return batchResults.reduce(
     (acc, batch) => {
       acc.results.push(...batch.results)
       acc.count += batch.count
@@ -192,8 +192,6 @@ export const getChildrenFromCodes = async (
     },
     { results: [] as Hierarchy<FhirItem>[], count: 0 }
   )
-
-  return combinedResults
 }
 
 /**
@@ -278,7 +276,7 @@ export const searchInValueSets = async (
   const searchValue = search || HIERARCHY_ROOT
   try {
     const res = await apiFhir.get<FHIR_API_Response<ValueSet>>(
-      `/ValueSet/$expand?url=${codeSystems.join(',')}&filter=${encodeURIComponent(
+      `/ValueSet/$expand?activeOnly=true&url=${codeSystems.join(',')}&filter=${encodeURIComponent(
         searchValue
       )}&excludeNested=false&_tag=text-search-rank&_tag=${LOW_TOLERANCE_TAG}${options}`,
       { signal }
