@@ -43,7 +43,7 @@ const PatientBoard = ({ patient }: PatientBoardProps) => {
       {
         label: 'Documents cliniques',
         value: ResourceType.DOCUMENTS,
-        show: config.features.documentReference.enabled && !patient.deidentified
+        show: config.features.documentReference.enabled
       },
       {
         label: 'PMSI',
@@ -89,11 +89,7 @@ const PatientBoard = ({ patient }: PatientBoardProps) => {
     [expConfig, selectedSubTab, selectedTab]
   )
 
-  if (
-    patient &&
-    ((selectedTab === ResourceType.DOCUMENTS && patient.deidentified) || selectedTab === ResourceType.CLAIM)
-  )
-    return <CohortRightOrNotExist />
+  if (patient && selectedTab === ResourceType.CLAIM) return <CohortRightOrNotExist />
 
   return (
     <>
