@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import { Button, Badge, Tooltip } from '@mui/material'
 
 import { buildCohortCreation, deleteTemporalConstraint } from 'state/cohortCreation'
@@ -9,6 +9,7 @@ import TemporalConstraintModal from './components/TemporalConstraintModal/Tempor
 import useStyles from './styles'
 import { TemporalConstraintsKind } from 'types'
 import { getSelectableGroups } from 'utils/temporalConstraints'
+import { CriteriaType } from 'types/requestCriterias'
 
 const TemporalConstraint: React.FC = () => {
   const [modalIsOpen, setModalIsOpen] = useState(false)
@@ -57,9 +58,14 @@ const TemporalConstraint: React.FC = () => {
     setModalIsOpen(true)
   }
 
+  const hasClaim = useMemo(
+    () => selectedCriteria.some((criteria) => criteria.type === CriteriaType.CLAIM),
+    [selectedCriteria]
+  )
+
   return (
     <>
-      {!disableTemporalConstraint ? (
+      {!disableTemporalConstraint && !hasClaim ? (
         <Badge
           badgeContent={temporalConstraintsNumber}
           color="secondary"
@@ -84,9 +90,10 @@ const TemporalConstraint: React.FC = () => {
               onClick={handleOnClick}
               className={classes.root}
               style={{
-                backgroundColor: temporalConstraintExist && !disableTemporalConstraint ? '#FFE2A9' : '#DEDEDE'
+                backgroundColor:
+                  temporalConstraintExist && !disableTemporalConstraint && !hasClaim ? '#FFE2A9' : '#DEDEDE'
               }}
-              disabled={maintenanceIsActive || disableTemporalConstraint}
+              disabled={maintenanceIsActive || disableTemporalConstraint || hasClaim}
             >
               Contraintes temporelles
             </Button>

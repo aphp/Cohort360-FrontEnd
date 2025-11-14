@@ -26,7 +26,7 @@ import {
 } from 'state/cohortCreation'
 
 import useStyles from './styles'
-import { SelectedCriteriaType } from 'types/requestCriterias'
+import { CriteriaType, SelectedCriteriaType } from 'types/requestCriterias'
 import { getStageDetails } from '../CriteriaCount'
 import { DndContext, DragEndEvent, PointerSensor, UniqueIdentifier, useSensor, useSensors } from '@dnd-kit/core'
 import { SortableContext } from '@dnd-kit/sortable'
@@ -39,6 +39,7 @@ const HEADER = 74
 type OperatorItemProps = {
   itemId: number
   groups: CriteriaGroup[]
+  disabled: boolean
   addNewCriteria: (parentId: number) => void
   addNewGroup: (parentId: number) => void
   deleteCriteria: (criteriaId: number) => void
@@ -49,6 +50,7 @@ type OperatorItemProps = {
 const OperatorItem: React.FC<OperatorItemProps> = ({
   itemId,
   groups,
+  disabled,
   addNewCriteria,
   addNewGroup,
   deleteCriteria,
@@ -59,9 +61,6 @@ const OperatorItem: React.FC<OperatorItemProps> = ({
   const { request } = useAppSelector((state) => state.cohortCreation || {})
   const { loading = false, selectedCriteria: criterias = [], count = {}, idRemap } = request
   const { extra: stageDetails } = count
-
-  const maintenanceIsActive = useAppSelector((state) => state.me?.maintenance?.active ?? false)
-
   let timeout: NodeJS.Timeout | null = null
 
   const [isExpanded, setIsExpanded] = useState(false)
@@ -88,7 +87,11 @@ const OperatorItem: React.FC<OperatorItemProps> = ({
   return (
     <>
       <Draggable data={{ id: `operator-${itemId}`, groupId: itemId }} disabled>
-        <LogicalOperatorItem itemId={itemId} criteriaCount={getStageDetails(itemId, idRemap, stageDetails)} />
+        <LogicalOperatorItem
+          disabled={disabled}
+          itemId={itemId}
+          criteriaCount={getStageDetails(itemId, idRemap, stageDetails)}
+        />
       </Draggable>
       <Grid
         container
@@ -109,8 +112,9 @@ const OperatorItem: React.FC<OperatorItemProps> = ({
           const dropZone = typeof item.id === 'string'
           return (
             <Grid margin={dropZone ? 0 : '15px 0px'} key={`${itemId}-${item.id}`}>
-              <Draggable data={{ ...item, groupId: itemId }} dropZone={dropZone}>
+              <Draggable data={{ ...item, groupId: itemId }} dropZone={dropZone} disabled={disabled}>
                 <CriteriaCardItem
+                  disabled={disabled}
                   criteriaCount={getStageDetails(item?.id as number, idRemap, stageDetails)}
                   criterion={item as SelectedCriteriaType}
                   duplicateCriteria={duplicateCriteria}
@@ -123,6 +127,7 @@ const OperatorItem: React.FC<OperatorItemProps> = ({
         })}
         {operators.map((operator) => (
           <OperatorItem
+            disabled={disabled}
             key={operator.id}
             itemId={operator.id}
             groups={groups}
@@ -141,8 +146,9 @@ const OperatorItem: React.FC<OperatorItemProps> = ({
         <IconButton
           size="small"
           className={classes.addButton}
+          disabled={disabled}
           onMouseEnter={() => {
-            setIsExpanded(true)
+            if (!disabled) setIsExpanded(true)
             if (timeout) clearInterval(timeout)
           }}
           onMouseLeave={() => (timeout = setTimeout(() => setIsExpanded(false), 1500))}
@@ -150,13 +156,7 @@ const OperatorItem: React.FC<OperatorItemProps> = ({
           <AddIcon />
         </IconButton>
       ) : (
-        <ButtonGroup
-          disableElevation
-          className={classes.buttonContainer}
-          variant="contained"
-          color="primary"
-          disabled={maintenanceIsActive}
-        >
+        <ButtonGroup disableElevation className={classes.buttonContainer} variant="contained" color="primary">
           {loading && (
             <Button disabled>
               <CircularProgress />
@@ -175,7 +175,7 @@ const OperatorItem: React.FC<OperatorItemProps> = ({
                 if (timeout) clearInterval(timeout)
               }}
               style={{ borderRadius: '18px 0 0 18px', zIndex: 1000 }}
-              disabled={maintenanceIsActive}
+              disabled={disabled}
             >
               Ajouter un critère
             </Button>
@@ -193,7 +193,7 @@ const OperatorItem: React.FC<OperatorItemProps> = ({
                 if (timeout) clearInterval(timeout)
               }}
               style={{ borderRadius: '0 18px 18px 0', zIndex: 1000 }}
-              disabled={maintenanceIsActive}
+              disabled={disabled}
             >
               Ajouter un opérateur logique
             </Button>
@@ -337,6 +337,13 @@ const LogicalOperator: React.FC = () => {
     _buildCohortCreation()
   }
 
+  const hasClaim = useMemo(
+    () => request.selectedCriteria.some((criteria) => criteria.type === CriteriaType.CLAIM),
+    [request.selectedCriteria]
+  )
+
+  const maintenanceIsActive = useAppSelector((state) => state.me?.maintenance?.active ?? false)
+
   return (
     <>
       <div ref={topRef}>
@@ -346,8 +353,9 @@ const LogicalOperator: React.FC = () => {
           sensors={sensors}
           modifiers={[snapVerticalCenterToCursor]}
         >
-          <SortableContext items={criteriasIds}>
+          <SortableContext items={criteriasIds} disabled={hasClaim}>
             <OperatorItem
+              disabled={hasClaim || maintenanceIsActive}
               groups={criteriaGroup}
               itemId={0}
               addNewCriteria={_addNewCriteria}
