@@ -14,7 +14,7 @@ import {
   Procedure,
   QuestionnaireResponse
 } from 'fhir/r4'
-import { fetchPatient, fetchEncounter } from 'services/aphp/callApi'
+import { fetchPatient, fetchEncounter, fetchOrganization } from 'services/aphp/callApi'
 import {
   CohortComposition,
   CohortImaging,
@@ -100,6 +100,14 @@ export const retrievePatientIds = (elementEntries: ResourceToFill[]) => {
     .join()
 }
 
+const retrieveOrganizationIds = (elementEntries: DocumentReference[]) => {
+  const ids = elementEntries.flatMap(
+    (entry) => entry.author?.map((a) => a.reference?.replace(/^Organization\//, '')).filter((id) => !!id) ?? []
+  )
+
+  return [...new Set(ids)]
+}
+
 export const getLinkedPatient = (patients: Patient[], entry: ResourceToFill) => {
   const patientId = getPatientIdPath(entry)
   return patients.find((patient) => patient.id === patientId)
@@ -108,6 +116,32 @@ export const getLinkedPatient = (patients: Patient[], entry: ResourceToFill) => 
 export const getLinkedEncounter = (encounters: Encounter[], entry: ResourceToFill) => {
   const encounterId = getEncounterIdPath(entry)
   return encounters.find((encounter) => encounter.id === encounterId)
+}
+
+export const fillServiceProviderWithOrganization = async (entries: DocumentReference[]) => {
+  const organizationIds = retrieveOrganizationIds(entries).join()
+  const organizations = await fetchOrganization(organizationIds)
+  const _organizations = getApiResponseResources(organizations) ?? []
+
+  const UF_CODE = 'Unité Fonctionnelle (UF)'
+
+  const ufs = _organizations.filter(
+    (org) => org.type?.some((typeEntry) => typeEntry.coding?.some((coding) => coding.code === UF_CODE)) ?? false
+  )
+
+  return entries.map((entry) => {
+    const organizationReferences = entry.author?.map((a) => a.reference) ?? []
+    const matchingUf = ufs.find((uf) => organizationReferences.includes(`Organization/${uf.id}`))
+
+    if (matchingUf) {
+      return {
+        ...entry,
+        serviceProvider: matchingUf.name
+      }
+    }
+
+    return entry
+  })
 }
 
 export const getResourceInfos = async <
@@ -149,7 +183,7 @@ export const getResourceInfos = async <
   const _patients = getApiResponseResources(patients) ?? []
   const _encounters = getApiResponseResources(encounters) ?? []
 
-  const filledEntries: U[] = elementEntries.map((entry) => {
+  let filledEntries: U[] = elementEntries.map((entry) => {
     const idPatient = retrievePatientIds([entry])
     const IPP = deidentifiedBoolean
       ? idPatient
@@ -174,6 +208,10 @@ export const getResourceInfos = async <
       serviceProvider
     } as unknown as U
   })
+
+  if (filledEntries.length > 0 && filledEntries[0].resourceType === ResourceType.DOCUMENTS) {
+    filledEntries = (await fillServiceProviderWithOrganization(filledEntries as DocumentReference[])) as U[]
+  }
 
   return filledEntries
 }

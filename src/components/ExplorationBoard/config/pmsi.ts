@@ -33,8 +33,9 @@ const fetchAdditionalInfos = async (additionalInfo: AdditionalInfo): Promise<Add
         ? fetchValueSet(getConfig().core.valueSets.encounterStatus.url)
         : Promise.resolve(undefined)
   }
+  const sourceType = SourceType.CCAM
   const resolved = await resolveAdditionalInfos(fetchersMap)
-  return { ...additionalInfo, ...resolved }
+  return { ...additionalInfo, sourceType, ...resolved }
 }
 
 const initSearchCriterias = (search: string): SearchCriterias<PMSIFilters> => ({
