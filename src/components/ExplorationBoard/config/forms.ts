@@ -28,6 +28,7 @@ import {
   resolveAdditionalInfos
 } from 'utils/exploration'
 import { getFormDetails, getFormLabel, getFormName } from 'utils/formUtils'
+import { SourceType } from 'types/scope'
 
 export const fetchAdditionalInfos = async (additionalInfo: AdditionalInfo): Promise<AdditionalInfo> => {
   const fetchersMap: Record<string, () => Promise<FhirItem[] | LabelObject[] | undefined>> = {
@@ -45,8 +46,9 @@ export const fetchAdditionalInfos = async (additionalInfo: AdditionalInfo): Prom
           )
         : Promise.resolve(undefined)
   }
+  const sourceType = SourceType.MATERNITY
   const resolved = await resolveAdditionalInfos(fetchersMap)
-  return { ...additionalInfo, ...resolved }
+  return { ...additionalInfo, sourceType, ...resolved }
 }
 
 export const initSearchCriterias = (search: string): SearchCriterias<MaternityFormFilters> => ({

@@ -28,6 +28,7 @@ import {
   resolveAdditionalInfos
 } from 'utils/exploration'
 import { getExtension } from 'utils/fhir'
+import { SourceType } from 'types/scope'
 
 const fetchAdditionalInfos = async (additionalInfo: AdditionalInfo): Promise<AdditionalInfo> => {
   const fetchersMap: Record<string, () => Promise<FhirItem[] | undefined>> = {
@@ -40,8 +41,9 @@ const fetchAdditionalInfos = async (additionalInfo: AdditionalInfo): Promise<Add
         ? getCodeList(getConfig().features.imaging.valueSets.imagingModalities.url, true).then((res) => res.results)
         : Promise.resolve(undefined)
   }
+  const sourceType = SourceType.IMAGING
   const resolved = await resolveAdditionalInfos(fetchersMap)
-  return { ...additionalInfo, ...resolved }
+  return { ...additionalInfo, sourceType, ...resolved }
 }
 
 export const initSearchCriterias = (search: string): SearchCriterias<ImagingFilters> => ({

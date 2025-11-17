@@ -33,6 +33,7 @@ import {
   MedicationRequest,
   Observation,
   OperationOutcome,
+  Organization,
   Parameters,
   ParametersParameter,
   Patient,
@@ -208,6 +209,10 @@ export const fetchEncounter = async (args: fetchEncounterProps): FHIR_Bundle_Pro
   )
 
   return response
+}
+
+export const fetchOrganization = async (encounterIds: string) => {
+  return await apiFhir.get<FHIR_Bundle_Response<Organization>>(`/Organization?_id=${encounterIds}`)
 }
 
 /**
