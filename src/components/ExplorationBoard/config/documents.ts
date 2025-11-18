@@ -41,6 +41,7 @@ import {
 } from 'utils/exploration'
 import { FhirItem } from 'types/valueSet'
 import { Buffer } from 'buffer'
+import { SourceType } from 'types/scope'
 
 const initSearchCriterias = (search: string): SearchCriterias<DocumentsFilters> => ({
   orderBy: {
@@ -197,8 +198,9 @@ const fetchAdditionalInfos = async (additionalInfo: AdditionalInfo): Promise<Add
         : Promise.resolve(undefined),
     searchByList: () => Promise.resolve(searchByListDocuments)
   }
+  const sourceType = SourceType.DOCUMENT
   const resolved = await resolveAdditionalInfos(fetchersMap)
-  return { ...additionalInfo, ...resolved }
+  return { ...additionalInfo, sourceType, ...resolved }
 }
 
 const getMessages = (deidentified: boolean) => {
