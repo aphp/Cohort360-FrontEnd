@@ -8,7 +8,7 @@ import {
 } from '../CriteriaForm/types'
 import { SourceType } from 'types/scope'
 import { getConfig } from 'config'
-import { getValueSetsFromSystems } from 'utils/valueSets'
+import { getValueSetsByUrls } from 'utils/valueSets'
 import { Hierarchy } from 'types/hierarchy'
 import { FhirItem } from 'types/valueSet'
 
@@ -90,12 +90,15 @@ export const form: () => CriteriaForm<CcamDataType> = () => ({
           valueKey: 'code',
           type: 'codeSearch',
           label: "Sélectionner les codes d'actes CCAM",
-          valueSetsInfo: getValueSetsFromSystems([getConfig().features.procedure.valueSets.procedureHierarchy.url]),
+          valueSetsInfo: getValueSetsByUrls([getConfig().features.procedure.valueSets.procedureHierarchy.url]),
           noOptionsText: 'Veuillez entrer un code ou un acte CCAM',
           buildInfo: {
             fhirKey: ProcedureParamsKeys.CODE,
             buildMethodExtraArgs: [
-              { type: 'string', value: getConfig().features.procedure.valueSets.procedureHierarchy.url }
+              {
+                type: 'string',
+                value: getConfig().features.procedure.valueSets.procedureHierarchy.codeSystemUrls?.at(0) || ''
+              }
             ],
             chipDisplayMethodExtraArgs: [
               { type: 'string', value: '' },

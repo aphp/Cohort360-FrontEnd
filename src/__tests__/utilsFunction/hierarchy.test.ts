@@ -5,7 +5,7 @@ import {
   getHierarchyRootCodes,
   cleanNode,
   mapHierarchyToMap,
-  getMissingCodesWithSystems,
+  getMissingCodesWithValueSets,
   getMissingCodes,
   buildMultipleTrees,
   buildTree,
@@ -136,9 +136,9 @@ describe('Utility Functions', () => {
         ['system1', [{ id: 'root1', label: 'Root1', system: 'system1' }]],
         ['system2', [{ id: 'root1', label: 'Root1', system: 'system2', inferior_levels_ids: 'root3' }]]
       ])
-      const groupBySystem = [
+      const groupByValueSet = [
         {
-          system: 'system2',
+          valueSetUrl: 'system2',
           codes: [{ id: 'root4', label: 'Root4', system: 'system2', above_levels_ids: 'root1,root3' }]
         }
       ]
@@ -154,7 +154,7 @@ describe('Utility Functions', () => {
         .mockResolvedValue([
           { id: 'root3', label: 'Root3', system: 'system2', above_levels_ids: 'root1', inferior_levels_ids: 'root4' }
         ])
-      const result = await getMissingCodesWithSystems(trees, groupBySystem, codes, fetchHandler)
+      const result = await getMissingCodesWithValueSets(trees, groupByValueSet, codes, fetchHandler)
       expect(fetchHandler).toHaveBeenCalledWith('root3', 'system2')
       expect(result.get('system1')).toEqual(new Map([['root1', { id: 'root1', label: 'Root1', system: 'system1' }]]))
       expect(result.get('system2')).toEqual(
@@ -233,6 +233,7 @@ describe('Utility Functions', () => {
         above_levels_ids: '',
         inferior_levels_ids: '',
         system,
+        valueSetUrl: system,
         status
       })
     })
@@ -464,9 +465,9 @@ describe('Utility Functions', () => {
 
   describe('buildMultipleTrees', () => {
     it('should build multiple trees according to different systems', () => {
-      const groupBySystem: GroupedBySystem<any>[] = [
+      const groupByValueSet: Array<{ valueSetUrl: string; codes: any[] }> = [
         {
-          system: 'system1',
+          valueSetUrl: 'system1',
           codes: [
             {
               id: HIERARCHY_ROOT,
@@ -476,7 +477,7 @@ describe('Utility Functions', () => {
           ]
         },
         {
-          system: 'system2',
+          valueSetUrl: 'system2',
           codes: [
             {
               id: 'code1',
@@ -560,7 +561,7 @@ describe('Utility Functions', () => {
         ]
       ])
       const mode = Mode.INIT
-      const result = buildMultipleTrees(baseTrees, groupBySystem, codes, new Map(), mode)
+      const result = buildMultipleTrees(baseTrees, groupByValueSet, codes, new Map(), mode)
       expect(result.get('system1')).toEqual([
         {
           id: HIERARCHY_ROOT,

@@ -20,7 +20,7 @@ import { CellType, Column, Row, Table } from 'types/table'
 import { FhirItem, Reference } from 'types/valueSet'
 import { fetchValueSet, narrowSearchCriterias, resolveAdditionalInfos } from 'utils/exploration'
 import { getCategory } from 'utils/fhir'
-import { getValueSetsFromSystems } from 'utils/valueSets'
+import { getValueSetsByUrls } from 'utils/valueSets'
 
 const fetchAdditionalInfos = async (additionalInfo: AdditionalInfo): Promise<AdditionalInfo> => {
   const fetchersMap: Record<string, () => Promise<FhirItem[] | undefined>> = {
@@ -160,7 +160,7 @@ export const conditionConfig = (
     narrowSearchCriterias(deidentified, searchCriterias, !!patient, [], ['searchBy']),
   fetchAdditionalInfos: async (infos) => {
     const _infos = await fetchAdditionalInfos(infos)
-    const references: Reference[] = getValueSetsFromSystems([
+    const references: Reference[] = getValueSetsByUrls([
       getConfig().features.condition.valueSets.conditionHierarchy.url
     ])
     const sourceType = SourceType.CIM10
@@ -191,7 +191,7 @@ export const procedureConfig = (
     narrowSearchCriterias(deidentified, searchCriterias, !!patient, ['diagnosticTypes'], ['searchBy']),
   fetchAdditionalInfos: async (infos) => {
     const _infos = await fetchAdditionalInfos(infos)
-    const references: Reference[] = getValueSetsFromSystems([
+    const references: Reference[] = getValueSetsByUrls([
       getConfig().features.procedure.valueSets.procedureHierarchy.url
     ])
     const sourceType = SourceType.CCAM
@@ -221,7 +221,7 @@ export const claimConfig = (
     narrowSearchCriterias(deidentified, searchCriterias, !!patient, ['diagnosticTypes', 'source'], ['searchBy']),
   fetchAdditionalInfos: async (infos) => {
     const _infos = await fetchAdditionalInfos(infos)
-    const references: Reference[] = getValueSetsFromSystems([getConfig().features.claim.valueSets.claimHierarchy.url])
+    const references: Reference[] = getValueSetsByUrls([getConfig().features.claim.valueSets.claimHierarchy.url])
     const sourceType = SourceType.GHM
     return { ..._infos, references, sourceType }
   },

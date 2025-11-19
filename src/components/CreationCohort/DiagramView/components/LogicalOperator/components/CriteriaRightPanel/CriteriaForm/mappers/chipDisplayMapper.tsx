@@ -23,6 +23,7 @@ import allDocTypes from 'assets/docTypes.json'
 import moment from 'moment'
 import { getDurationRangeLabel } from 'utils/age'
 import { getConfig } from 'config'
+import { getValueSetFromCodeSystem } from 'utils/valueSets'
 
 /************************************************************************************/
 /*                        Criteria Form Item Chip Display                           */
@@ -143,9 +144,22 @@ const getLabelsForCodeSearchItem = (
 ): LabelObject[] => {
   return val
     .map((value) => {
+      let cacheKey: string | undefined
+
+      if (value.system) {
+        // value.system is a CodeSystem URL, we need to find the corresponding ValueSet URL
+        const valueSetUrl = getValueSetFromCodeSystem(value.system)
+        if (valueSetUrl) {
+          cacheKey = valueSetUrl
+        } else {
+          // Fallback: try to find in any of the configured valueSets
+          cacheKey = item.valueSetsInfo.find((valueset) => valueSets.cache[valueset.url])?.url
+        }
+      }
+
       return (
-        (value.system
-          ? valueSets.cache[value.system]
+        (cacheKey
+          ? valueSets.cache[cacheKey]
           : item.valueSetsInfo.flatMap((valueset) => valueSets.cache[valueset.url])) || []
       ).find((code) => code && code.id === value.id) as LabelObject
     })
@@ -200,7 +214,12 @@ const chipFromCodeSearch = (
 
 // TODO refacto this to be more generic using config
 const displaySystem = (system?: string) => {
-  switch (system) {
+  if (!system) return ''
+
+  // system might be a CodeSystem URL, so we need to find the corresponding ValueSet URL first
+  const valueSetUrl = getValueSetFromCodeSystem(system) || system
+
+  switch (valueSetUrl) {
     case getConfig().features.medication.valueSets.medicationAtc.url:
       return `${getConfig().features.medication.valueSets.medicationAtc.title}: `
     case getConfig().features.medication.valueSets.medicationUcd.url:
