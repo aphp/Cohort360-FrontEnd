@@ -579,7 +579,6 @@ export const mapSearchCriteriasToRequestParams = (
     case ResourceType.CONDITION:
       filtersParam.push(...mapConditionToRequestParams(filters as PMSIFilters))
       break
-
     case ResourceType.PROCEDURE:
       filtersParam.push(...mapProcedureToRequestParams(filters as PMSIFilters))
       break
