@@ -61,8 +61,8 @@ const mapExportsToRows = (list: ExportList[], callbacks: ExportCallbacks) => {
         type: CellType.TEXT
       },
       {
-        id: `${elem.cohort_id}-created_at`,
-        value: elem.created_at ? mapToDateHours(elem.created_at) : unknown,
+        id: `${elem.cohort_id}-date`,
+        value: elem.modified_at ? mapToDateHours(elem.modified_at) : unknown,
         type: CellType.TEXT
       },
       {
