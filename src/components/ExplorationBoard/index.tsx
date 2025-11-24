@@ -3,21 +3,19 @@ import { Alert, Grid, Snackbar } from '@mui/material'
 import SearchSection from './SearchSection'
 import CriteriasSection from './CriteriasSection'
 import { useExplorationBoard } from './useExplorationBoard'
-import { useData } from './useData'
 import DataSection from './DataSection'
 import { FetchStatus } from 'types'
 import CustomAlert from 'components/ui/Alert'
 import { GAP, ExplorationConfig } from 'types/exploration'
-import { useSearchParams } from 'react-router-dom'
 
 type ExplorationBoardProps<T> = {
   config: ExplorationConfig<T>
 }
 
 const ExplorationBoard = <T,>({ config }: ExplorationBoardProps<T>) => {
-  const [searchParams] = useSearchParams()
-  const pageFromUrl = parseInt(searchParams.get('page') ?? '1', 10)
   const {
+    page: { pagination, onChangePage },
+    data: { data, count, dataLoading },
     fetchStatus,
     additionalInfo,
     criterias,
@@ -30,7 +28,6 @@ const ExplorationBoard = <T,>({ config }: ExplorationBoardProps<T>) => {
     onSaveFilter,
     resetFetchStatus
   } = useExplorationBoard(config)
-  const { count, pagination, data, dataLoading, onChangePage } = useData(config, searchCriterias, pageFromUrl)
 
   return (
     <Grid size={12} container sx={{ gap: GAP }} margin={'16px 0'}>
