@@ -13,8 +13,9 @@ import {
 } from 'fhir/r4'
 import { CohortEncounter, CohortComposition } from 'types'
 import { ResourceType } from 'types/requestCriterias'
+import { fillServiceProviderWithOrganization } from './fillElement'
 
-export function linkElementWithEncounter<
+export async function linkElementWithEncounter<
   T extends
     | Procedure
     | Condition
@@ -77,6 +78,14 @@ export function linkElementWithEncounter<
     elementList = [...elementList, newElement]
   }
 
+  if (elementList.length > 0 && elementList[0].resourceType === ResourceType.DOCUMENTS) {
+    elementList = (await fillServiceProviderWithOrganization(elementList as unknown as DocumentReference[])) as (T & {
+      serviceProvider?: string
+      NDA?: string
+      documents?: CohortComposition[]
+      hospitDates?: string[]
+    })[]
+  }
   return elementList
 }
 
