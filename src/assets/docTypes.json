@@ -2,6 +2,11 @@
   "docTypes": [
     {
       "type": "Comptes Rendus Autres",
+      "code": "CR-AUTRE",
+      "label": "CR-AUTRE"
+    },
+    {
+      "type": "Comptes Rendus Autres",
       "code": "CR-BILFONC",
       "label": "CR-BILFONC"
     },
@@ -77,6 +82,11 @@
     },
     {
       "type": "Comptes Rendus Consultation",
+      "code": "CR-CONS",
+      "label": "CR-CONS"
+    },
+    {
+      "type": "Comptes Rendus Consultation",
       "code": "CR-CONS-ANESTH",
       "label": "CR-CONS-ANESTH"
     },
@@ -89,6 +99,11 @@
       "type": "Comptes Rendus Consultation",
       "code": "CR-TELECONS",
       "label": "CR-TELECONS"
+    },
+    {
+      "type": "Comptes Rendus Examens",
+      "code": "CR-EXAM",
+      "label": "CR-EXAM"
     },
     {
       "type": "Comptes Rendus Examens",
@@ -172,6 +187,11 @@
     },
     {
       "type": "Comptes Rendus Hospitalisation",
+      "code": "CRH",
+      "label": "CRH"
+    },
+    {
+      "type": "Comptes Rendus Hospitalisation",
       "code": "CRH-GHR",
       "label": "CRH-GHR"
     },
@@ -227,6 +247,11 @@
     },
     {
       "type": "Lettres",
+      "code": "LT",
+      "label": "LT"
+    },
+    {
+      "type": "Lettres",
       "code": "SYNTH",
       "label": "SYNTH"
     },
@@ -274,6 +299,11 @@
       "type": "Lettres",
       "code": "PPS",
       "label": "PPS"
+    },
+    {
+      "type": "Ordonnances",
+      "code": "ORDO",
+      "label": "ORDO"
     },
     {
       "type": "Ordonnances",
