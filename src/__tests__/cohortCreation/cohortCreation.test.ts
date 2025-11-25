@@ -307,7 +307,7 @@ describe('test of buildDocumentFilter', () => {
     const result = [
       'contenttype=text/plain',
       'subject.active=true&type:not=doc-impor',
-      'encounter.encounter-care-site=8312016825',
+      'author=8312016825',
       '_text=cancer',
       'docstatus=http://hl7.org/fhir/CodeSystem/composition-status|final,http://hl7.org/fhir/CodeSystem/composition-status|preliminary',
       'type=crh-j,crh-chir',
