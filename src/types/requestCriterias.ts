@@ -79,7 +79,7 @@ export const DocumentsParamsKeys = {
   ONLY_PDF_AVAILABLE: 'onlyPdfAvailable',
   NDA: 'encounter.identifier',
   DATE: 'date',
-  EXECUTIVE_UNITS: `encounter.${encounterCareSite}`,
+  EXECUTIVE_UNITS: `author`,
   ENCOUNTER_STATUS: 'encounter.status'
 }
 
@@ -266,7 +266,6 @@ onUpdateConfig((config) => {
     : 'service-provider'
 
   EncounterParamsKeys.SERVICE_PROVIDER = encounterCareSite
-  DocumentsParamsKeys.EXECUTIVE_UNITS = `encounter.${encounterCareSite}`
   ConditionParamsKeys.EXECUTIVE_UNITS = `encounter.${encounterCareSite}`
   ProcedureParamsKeys.EXECUTIVE_UNITS = `encounter.${encounterCareSite}`
   ClaimParamsKeys.EXECUTIVE_UNITS = `encounter.${encounterCareSite}`
