@@ -296,13 +296,12 @@ export const fetchDocumentReference = async (
   uniqueFacet = uniqueFacet ? uniqueFacet.filter(uniq) : []
   _elements = _elements ? _elements.filter(uniq) : []
 
-  // By default, all the calls to `/DocumentReference` will have `type:not=https://terminology.eds.aphp.fr/aphp-orbis-document-textuel-hospitalier|doc-impor`, contenttype=text/plain, and patient.active=true in parameter
+  // By default, all the calls to `/DocumentReference` will have`'type:not=https://terminology.eds.aphp.fr/fhir/CodeSystem/aphp-document-class|doc-impor'`, contenttype=text/plain, and patient.active=true in parameter
   let options: string[] = [
-    `type:not=${encodeURIComponent(
-      'https://terminology.eds.aphp.fr/aphp-orbis-document-textuel-hospitalier|doc-impor'
-    )}`,
+    `type:not=${encodeURIComponent('https://terminology.eds.aphp.fr/fhir/CodeSystem/aphp-document-class|doc-impor')}`,
     `contenttype=${encodeURIComponent('text/plain')}`
   ]
+
   if (appConfig.core.fhir.totalCount) options = [...options, '_total=accurate']
   if (appConfig.core.fhir.filterActive) options = [...options, 'patient.active=true']
   if (_id) options = [...options, `_id=${_id}`]
@@ -926,7 +925,7 @@ export const fetchMedicationAdministration = async (
     const urlString = route.map((id) => routeUrl + id).join(',')
     options = [...options, `${AdministrationParamsKeys.ADMINISTRATION_ROUTES}=${encodeURIComponent(urlString)}`]
   }
-  if (code) if (code) options = [...options, `${AdministrationParamsKeys.CODE}=${code}`]
+  if (code) options = [...options, `${AdministrationParamsKeys.CODE}=${code}`]
   if (minDate) options = [...options, `${AdministrationParamsKeys.DATE}=ge${minDate}`]
   if (maxDate) options = [...options, `${AdministrationParamsKeys.DATE}=le${maxDate}`]
   if (executiveUnits && executiveUnits.length > 0)
