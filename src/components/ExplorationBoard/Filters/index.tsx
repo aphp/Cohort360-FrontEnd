@@ -14,6 +14,7 @@ import DocTypes from 'components/ui/Inputs/DocTypes'
 import { AdditionalInfo } from 'types/exploration'
 import { Typography } from '@mui/material'
 import { isEqual } from 'lodash'
+import { getConfig } from 'config'
 
 type ExplorationFiltersProps = {
   filters: Filters
@@ -43,11 +44,11 @@ const documentsStatusOptions = [
 
 const sourceOptions = [
   {
-    id: Source.AREM,
+    id: getConfig().features.condition.filters?.sources.arem ?? Source.AREM,
     label: Source.AREM
   },
   {
-    id: Source.ORBIS,
+    id: getConfig().features.condition.filters?.sources.orbis ?? Source.ORBIS,
     label: Source.ORBIS
   }
 ]
