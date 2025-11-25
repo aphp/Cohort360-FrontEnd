@@ -18,17 +18,29 @@ type FeatureConfig = {
   enabled: boolean
 }
 
+type PmsiFilters = {
+  sources: {
+    arem: string
+    orbis: string
+  }
+}
+
+type FiltersConfig<F> = {
+  filters?: F
+}
+
 export type ResourceFeatureConfig = FeatureConfig & {
   fhir: {
     searchParams: string[]
   }
 }
 
-type ResourceWithValuesetsFeatureConfig<ValueSetEnum> = ResourceFeatureConfig & {
-  valueSets: {
-    [K in keyof ValueSetEnum]: ValueSetConfig
+type ResourceWithValuesetsFeatureConfig<ValueSetEnum, F = void> = ResourceFeatureConfig &
+  FiltersConfig<F> & {
+    valueSets: {
+      [K in keyof ValueSetEnum]: ValueSetConfig
+    }
   }
-}
 
 export type AppConfig = {
   labels: {
@@ -65,15 +77,18 @@ export type AppConfig = {
       medicationPrescriptionTypes: ValueSetConfig
       medicationUcd: ValueSetConfig
     }>
-    condition: ResourceWithValuesetsFeatureConfig<{
-      conditionHierarchy: ValueSetConfig
-      conditionStatus: ValueSetConfig
-    }> & {
+    condition: ResourceWithValuesetsFeatureConfig<
+      {
+        conditionHierarchy: ValueSetConfig
+        conditionStatus: ValueSetConfig
+      },
+      PmsiFilters
+    > & {
       extensions: {
         orbisStatus?: string
       }
     }
-    procedure: ResourceWithValuesetsFeatureConfig<{ procedureHierarchy: ValueSetConfig }>
+    procedure: ResourceWithValuesetsFeatureConfig<{ procedureHierarchy: ValueSetConfig }, PmsiFilters>
     documentReference: ResourceFeatureConfig & {
       useDocStatus: boolean
     }
@@ -303,6 +318,12 @@ let config: AppConfig = {
       }
     },
     procedure: {
+      filters: {
+        sources: {
+          arem: '',
+          orbis: ''
+        }
+      },
       enabled: true,
       fhir: { searchParams: [] },
       valueSets: {

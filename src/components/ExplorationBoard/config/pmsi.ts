@@ -78,6 +78,8 @@ const mapToTable = (
     const hasDiagnosticType = type === ResourceType.CONDITION
     const date = getPmsiDate(type, elem)
     const codes = getPmsiCodes(type, elem)
+    const source = elem.meta?.source?.split('/').filter(Boolean).pop()?.toUpperCase()
+
     const row: Row = [
       !isPatient && {
         id: `${elem.id}-ipp`,
@@ -101,7 +103,7 @@ const mapToTable = (
       },
       {
         id: `${elem.id}-source`,
-        value: elem.meta?.source ?? 'Non renseigné',
+        value: source ?? 'Non renseigné',
         type: CellType.TEXT,
         sx: { fontWeight: 700, fontSize: 12 }
       },
