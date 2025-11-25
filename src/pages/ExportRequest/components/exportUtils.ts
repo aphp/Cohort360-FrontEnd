@@ -385,9 +385,9 @@ export const getResourceType = (tableName: string): ResourceType => {
   const resourceType = {
     imaging_study: ResourceType.IMAGING,
     drug_exposure_administration: ResourceType.MEDICATION_ADMINISTRATION,
-    measurement: ResourceType.OBSERVATION,
+    observation_laboratory: ResourceType.OBSERVATION,
     imaging_series: ResourceType.UNKNOWN,
-    condition_occurrence: ResourceType.CONDITION,
+    condition: ResourceType.CONDITION,
     iris: ResourceType.UNKNOWN,
     visit_detail: ResourceType.UNKNOWN,
     person: ResourceType.PATIENT,
@@ -397,7 +397,7 @@ export const getResourceType = (tableName: string): ResourceType => {
     care_site: ResourceType.UNKNOWN,
     visit_occurrence: ResourceType.UNKNOWN,
     cost: ResourceType.CLAIM,
-    procedure_occurrence: ResourceType.PROCEDURE,
+    procedure: ResourceType.PROCEDURE,
     drug_exposure_prescription: ResourceType.MEDICATION_REQUEST,
     QuestionnaireResponse: ResourceType.QUESTIONNAIRE_RESPONSE
   }[tableName]
@@ -415,9 +415,9 @@ export const getExportTableLabel = (tableName: string) => {
   const tableLabel = {
     imaging_study: 'Fait - Imagerie - Étude',
     drug_exposure_administration: 'Fait - Médicaments - Administration',
-    measurement: 'Fait - Biologie',
+    Observation_Laboratory: 'Fait - Biologie',
     imaging_series: 'Fait - Imagerie - Séries',
-    condition_occurrence: 'Fait - PMSI - Diagnostics',
+    Condition: 'Fait - PMSI - Diagnostics',
     care_site: 'Structure hospitalière',
     iris: 'Zone géographique',
     visit_detail: 'Détail de prise en charge',
@@ -427,7 +427,7 @@ export const getExportTableLabel = (tableName: string) => {
     fact_relationship: 'Référentiel',
     visit_occurrence: 'Prise en charge',
     cost: 'Fait - PMSI - GHM',
-    procedure_occurrence: 'Fait - PMSI - Actes',
+    Procedure: 'Fait - PMSI - Actes',
     drug_exposure_prescription: 'Fait - Médicaments - Prescription',
     QuestionnaireResponse: 'Dossier de Spécialité'
   }[tableName]
