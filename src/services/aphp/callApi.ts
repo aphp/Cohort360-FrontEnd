@@ -15,6 +15,7 @@ import {
   UserAccesses
 } from 'types'
 
+import { addParentCodesToDocTypes } from 'utils/docTypesHelper'
 import { ExportList } from 'types/export'
 
 import { AxiosError, AxiosResponse } from 'axios'
@@ -308,7 +309,11 @@ export const fetchDocumentReference = async (
   if (size !== undefined) options = [...options, `_count=${size}`]
   if (offset) options = [...options, `_offset=${offset}`]
   if (_sort) options = [...options, `_sort=${_sortDirection}${_sort}`]
-  if (type) options = [...options, `${DocumentsParamsKeys.DOC_TYPES}=${type}`]
+  if (type) {
+    const typeCodes = type.split(',') // Ajouter les codes parents aux codes de docTypes
+    const typeCodesWithParents = addParentCodesToDocTypes(typeCodes)
+    options = [...options, `${DocumentsParamsKeys.DOC_TYPES}=${typeCodesWithParents.join(',')}`]
+  }
   if (_text)
     options = [...options, `${searchBy === SearchByTypes.TEXT ? `_text` : 'description'}=${encodeURIComponent(_text)}`]
   if (highlight_search_results)

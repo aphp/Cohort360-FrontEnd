@@ -1,8 +1,10 @@
 import { getConfig } from 'config'
+// @ts-ignore
 import { Procedure, Condition } from 'fhir/r4'
 import { CohortEncounter, PMSIEntry } from 'types'
 import { LabelObject } from 'types/searchCriterias'
 import { getExtension } from 'utils/fhir'
+// @ts-ignore
 import moment from 'moment'
 import { TimelineMonth, TimelineOutput, TimelineType, YearData } from './types'
 
@@ -70,12 +72,7 @@ export const generateTimelineFormattedData = (
       ? !!selectedTypes.find(
           (selectedType) =>
             selectedType.id ===
-            getExtension(
-              item,
-              getConfig().features.condition.extensions.orbisStatus
-            )?.valueCodeableConcept?.coding?.find(
-              (elem) => elem?.system === getConfig().features.condition.valueSets.conditionStatus.url
-            )?.code
+            getExtension(item, getConfig().features.condition.extensions.conditionDiagType)?.valueString
         )
       : true
   )
