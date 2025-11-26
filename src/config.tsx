@@ -307,6 +307,12 @@ let config: AppConfig = {
       }
     },
     condition: {
+      filters: {
+        sources: {
+          arem: '',
+          orbis: ''
+        }
+      },
       enabled: true,
       fhir: { searchParams: [] },
       valueSets: {
