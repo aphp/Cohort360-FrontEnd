@@ -42,17 +42,6 @@ const documentsStatusOptions = [
   }
 ]
 
-const sourceOptions = [
-  {
-    id: getConfig().features.condition.filters?.sources.arem ?? Source.AREM,
-    label: Source.AREM
-  },
-  {
-    id: getConfig().features.condition.filters?.sources.orbis ?? Source.ORBIS,
-    label: Source.ORBIS
-  }
-]
-
 const docStatusesList = [
   { id: FilterByDocumentStatus.VALIDATED, label: FilterByDocumentStatus.VALIDATED },
   { id: FilterByDocumentStatus.NOT_VALIDATED, label: FilterByDocumentStatus.NOT_VALIDATED }
@@ -93,6 +82,20 @@ const ExplorationFilters = ({ filters, infos, onChange, onError, hasChanged }: E
 
     return () => clearInterval(interval)
   }, [getValues, handleSubmit, onChange, hasChanged, isSubmitting])
+
+  const sourceOptions = useMemo(
+    () => [
+      {
+        id: getConfig().features.condition.filters?.sources.arem ?? Source.AREM,
+        label: Source.AREM
+      },
+      {
+        id: getConfig().features.condition.filters?.sources.orbis ?? Source.ORBIS,
+        label: Source.ORBIS
+      }
+    ],
+    []
+  )
 
   const fields: Partial<Record<FilterKeys, React.FC<{ field: ControllerRenderProps }>>> = useMemo(
     () => ({
@@ -186,7 +189,7 @@ const ExplorationFilters = ({ filters, infos, onChange, onError, hasChanged }: E
         />
       )
     }),
-    [infos, onError]
+    [infos, onError, sourceOptions]
   )
 
   return (
