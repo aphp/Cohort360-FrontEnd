@@ -27,7 +27,8 @@ export type Reference = {
   label: string
   title: string
   standard: boolean
-  url: string
+  url: string // ValueSet URL (for searching/listing valuesets)
+  codeSystemUrls?: string[] // Array of CodeSystem URLs (for individual codes within valuesets)
   checked: boolean
   isHierarchy: boolean
   joinDisplayWithCode: boolean
@@ -47,7 +48,12 @@ export type FhirItem = {
   label: string
   parentIds?: string[]
   childrenIds?: string[]
-  system: string
+  system: string // CodeSystem URL (for individual code identification)
+  valueSetUrl?: string // ValueSet URL (for grouping and API calls)
   statTotal?: number
   statTotalUnique?: number
 }
+
+// Utility types for reverse lookup functionality
+export type CodeSystemToValueSetMap = Record<string, string>
+export type ValueSetToCodeSystemMap = Record<string, string>
