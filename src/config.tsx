@@ -321,8 +321,7 @@ let config: AppConfig = {
         conditionStatus: { url: '' }
       },
       extensions: {
-        orbisStatus: '',
-        conditionDiagType: ''
+        orbisStatus: ''
       }
     },
     procedure: {

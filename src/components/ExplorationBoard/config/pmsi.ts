@@ -19,7 +19,7 @@ import { Direction, Order, PMSIFilters, SearchCriterias } from 'types/searchCrit
 import { CellType, Column, Row, Table } from 'types/table'
 import { FhirItem, Reference } from 'types/valueSet'
 import { fetchValueSet, narrowSearchCriterias, resolveAdditionalInfos } from 'utils/exploration'
-import { getCategory } from 'utils/fhir'
+import { getCategory, getExtensionStringValue } from 'utils/fhir'
 import { getValueSetsFromSystems } from 'utils/valueSets'
 
 const fetchAdditionalInfos = async (additionalInfo: AdditionalInfo): Promise<AdditionalInfo> => {
@@ -122,10 +122,10 @@ const mapToTable = (
       hasDiagnosticType && {
         id: `${elem.id}-type`,
         value:
-          getCategory(
+          getExtensionStringValue(
             elem as Condition,
-            getConfig().features.condition.valueSets.conditionStatus.url
-          )?.coding?.[0]?.code?.toUpperCase() ?? '-',
+            getConfig().features.condition.extensions.orbisStatus
+          )?.toUpperCase() ?? '-',
         type: CellType.TEXT
       },
       {
