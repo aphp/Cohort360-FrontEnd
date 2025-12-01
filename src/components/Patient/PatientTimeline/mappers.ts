@@ -71,8 +71,7 @@ export const generateTimelineFormattedData = (
     selectedTypes && selectedTypes.length > 0
       ? !!selectedTypes.find(
           (selectedType) =>
-            selectedType.id ===
-            getExtension(item, getConfig().features.condition.extensions.conditionDiagType)?.valueString
+            selectedType.id === getExtension(item, getConfig().features.condition.extensions.orbisStatus)?.valueString
         )
       : true
   )

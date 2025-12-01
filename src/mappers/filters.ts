@@ -427,8 +427,7 @@ const mapConditionToRequestParams = (filters: PMSIFilters) => {
   const { diagnosticTypes, code, source, nda, ipp, durationRange, executiveUnits, encounterStatus } = filters
   const requestParams: string[] = []
   if (diagnosticTypes && diagnosticTypes.length > 0) {
-    const diagnosticTypesUrl = `${getConfig().features.condition.valueSets.conditionStatus.url}|`
-    const urlString = diagnosticTypes.map((elem) => diagnosticTypesUrl + elem.id).join(',')
+    const urlString = diagnosticTypes.map((elem) => elem.id).join(',')
     requestParams.push(`${ConditionParamsKeys.DIAGNOSTIC_TYPES}=${encodeURIComponent(urlString)}`)
   }
   if (code.length)

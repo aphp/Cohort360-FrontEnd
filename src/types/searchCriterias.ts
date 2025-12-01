@@ -184,6 +184,7 @@ export enum Order {
   DISPLAY = 'display',
   PROCEDURE = 'procedureCode',
   RECORDED_DATE = 'recorded-date',
+  ONSET_DATE = 'onset-date',
   RESULT_SIZE = 'result_size',
   STUDY_DATE = 'started',
   TYPE = 'type-name'

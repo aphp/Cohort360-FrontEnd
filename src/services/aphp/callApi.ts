@@ -680,8 +680,7 @@ export const fetchCondition = async (args: fetchConditionProps): FHIR_Bundle_Pro
 
   if (!subject && _list && _list.length > 0) options = [...options, `_list=${_list.reduce(paramValuesReducer, '')}`]
   if (hasSearchParam(ResourceType.CONDITION, ConditionParamsKeys.DIAGNOSTIC_TYPES) && type && type.length > 0) {
-    const diagnosticTypesUrl = appConfig.features.condition.valueSets.conditionStatus.url + '|'
-    const urlString = type.map((id) => diagnosticTypesUrl + id).join(',')
+    const urlString = type.map((id) => id).join(',')
     options = [...options, `${ConditionParamsKeys.DIAGNOSTIC_TYPES}=${encodeURIComponent(urlString)}`]
   }
 

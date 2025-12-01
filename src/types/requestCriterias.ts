@@ -86,8 +86,8 @@ export const DocumentsParamsKeys = {
 export const ConditionParamsKeys = {
   NDA: 'encounter.identifier',
   CODE: 'code',
-  DIAGNOSTIC_TYPES: 'orbis-status',
-  DATE: 'recorded-date',
+  DIAGNOSTIC_TYPES: 'diagnosisType',
+  DATE: 'onset-date',
   EXECUTIVE_UNITS: `encounter.${encounterCareSite}`,
   SOURCE: '_source',
   ENCOUNTER_STATUS: 'encounter.status',
