@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [3.3.3](https://github.com/aphp/Cohort360-FrontEnd/compare/3.3.2..3.3.3) - 2025-12-02
+
+### 🚜 Refactor
+- *(pmsi)* adapt condition Fhir resource change schema (orbis status)
+- *(document)* add type multivalue in table restitution
+
+
 ## [3.3.2](https://github.com/aphp/Cohort360-FrontEnd/compare/3.3.1..3.3.2) - 2025-11-26
 
 ### 🐛 Bug Fixes
