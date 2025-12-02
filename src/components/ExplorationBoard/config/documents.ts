@@ -42,6 +42,7 @@ import {
 import { FhirItem } from 'types/valueSet'
 import { Buffer } from 'buffer'
 import { SourceType } from 'types/scope'
+import { getDocTypeLabel } from '../../../utils/docTypesHelper'
 
 const initSearchCriterias = (search: string): SearchCriterias<DocumentsFilters> => ({
   orderBy: {
@@ -121,9 +122,22 @@ export const mapToTable = (
     { label: 'Aperçu' }
   ].filter((elem) => elem) as Column[]
   ;(data as ExplorationResults<CohortComposition>).list?.forEach((elem) => {
-    const docType = docTypes.docTypes.find(
-      ({ code }) => code.toLowerCase() === (elem?.type?.coding?.[0] ? elem.type.coding[0].code : '-')?.toLowerCase()
-    )
+    // On récupère tous les codes présents dans elem.type.coding
+    const typeCodings = elem?.type?.coding ?? []
+
+    // Pour chaque code, on va chercher le label via getDocTypeLabel,
+    // et on garde soit le label, soit le code à défaut
+    const docTypeLabels = typeCodings
+      .map((coding) => coding.code)
+      .filter((code): code is string => !!code)
+      .map((code) => {
+        const info = getDocTypeLabel(code)
+        return info?.label ?? code
+      })
+
+    // Concaténation des labels avec " - "
+    const concatenatedDocTypes = docTypeLabels.length > 0 ? docTypeLabels.join(' - ') : '-'
+
     const status = {
       label: getDocumentStatus(elem.docStatus),
       status: elem.docStatus === DocumentStatuses.FINAL ? ChipStatus.VALID : ChipStatus.CANCELLED,
@@ -169,7 +183,7 @@ export const mapToTable = (
       },
       {
         id: `${elem.id}-docType`,
-        value: docType?.label ?? '-',
+        value: concatenatedDocTypes,
         type: CellType.TEXT
       },
       {
