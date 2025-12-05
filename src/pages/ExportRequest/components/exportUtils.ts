@@ -415,9 +415,9 @@ export const getExportTableLabel = (tableName: string) => {
   const tableLabel = {
     imaging_study: 'Fait - Imagerie - Étude',
     drug_exposure_administration: 'Fait - Médicaments - Administration',
-    Observation_Laboratory: 'Fait - Biologie',
+    observation_laboratory: 'Fait - Biologie',
     imaging_series: 'Fait - Imagerie - Séries',
-    Condition: 'Fait - PMSI - Diagnostics',
+    condition: 'Fait - PMSI - Diagnostics',
     care_site: 'Structure hospitalière',
     iris: 'Zone géographique',
     visit_detail: 'Détail de prise en charge',
@@ -427,10 +427,10 @@ export const getExportTableLabel = (tableName: string) => {
     fact_relationship: 'Référentiel',
     visit_occurrence: 'Prise en charge',
     cost: 'Fait - PMSI - GHM',
-    Procedure: 'Fait - PMSI - Actes',
+    procedure: 'Fait - PMSI - Actes',
     drug_exposure_prescription: 'Fait - Médicaments - Prescription',
-    QuestionnaireResponse: 'Dossier de Spécialité'
-  }[tableName]
+    questionnaireresponse: 'Dossier de Spécialité'
+  }[tableName.toLowerCase()]
   return tableLabel ?? '-'
 }
 

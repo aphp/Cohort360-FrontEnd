@@ -11,6 +11,7 @@ import { getConfig } from 'config'
 import { getValueSetsFromSystems } from 'utils/valueSets'
 import { Hierarchy } from 'types/hierarchy'
 import { FhirItem } from 'types/valueSet'
+import { Sources } from 'types/searchCriterias'
 
 export type CcamDataType = CommonCriteriaData &
   WithOccurenceCriteriaDataType &
@@ -36,7 +37,7 @@ export const form: () => CriteriaForm<CcamDataType> = () => ({
     encounterEndDate: null,
     encounterStatus: [],
     code: null,
-    source: 'AREM'
+    source: getConfig().features.procedure.filters?.sources.arem ?? Sources.AREM
   },
   infoAlert: ['Tous les éléments des champs multiples sont liés par une contrainte OU'],
   buildInfo: {
@@ -60,12 +61,13 @@ export const form: () => CriteriaForm<CcamDataType> = () => ({
           type: 'radioChoice',
           label: 'Source',
           choices: [
-            { id: 'AREM', label: 'AREM' },
-            { id: 'ORBIS', label: 'ORBIS' }
+            { id: getConfig().features.procedure.filters?.sources.arem ?? Sources.AREM, label: Sources.AREM },
+            { id: getConfig().features.procedure.filters?.sources.orbis ?? Sources.ORBIS, label: Sources.ORBIS }
           ],
           buildInfo: {
             fhirKey: ProcedureParamsKeys.SOURCE,
-            chipDisplayMethodExtraArgs: [{ type: 'string', value: 'Source: ' }]
+            chipDisplayMethodExtraArgs: [{ type: 'string', value: 'Source: ' }],
+            chipDisplayMethod: 'getRadioLabel'
           }
         },
         {
