@@ -48,6 +48,8 @@ const docStatusesList = [
 ]
 
 const ExplorationFilters = ({ filters, infos, onChange, onError, hasChanged }: ExplorationFiltersProps) => {
+  const aremSource = getConfig().features.condition.filters?.sources.arem
+  const orbisSource = getConfig().features.condition.filters?.sources.orbis
   const {
     control,
     handleSubmit,
@@ -86,15 +88,15 @@ const ExplorationFilters = ({ filters, infos, onChange, onError, hasChanged }: E
   const sourceOptions = useMemo(
     () => [
       {
-        id: getConfig().features.condition.filters?.sources.arem ?? Source.AREM,
+        id: aremSource ?? Source.AREM,
         label: Source.AREM
       },
       {
-        id: getConfig().features.condition.filters?.sources.orbis ?? Source.ORBIS,
+        id: orbisSource ?? Source.ORBIS,
         label: Source.ORBIS
       }
     ],
-    []
+    [aremSource, orbisSource]
   )
 
   const fields: Partial<Record<FilterKeys, React.FC<{ field: ControllerRenderProps }>>> = useMemo(

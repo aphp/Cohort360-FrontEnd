@@ -13,7 +13,8 @@ import {
   DocumentAttachmentMethod,
   DocumentAttachmentMethodLabel,
   LabelObject,
-  SearchByTypes
+  SearchByTypes,
+  Sources
 } from 'types/searchCriterias'
 import { Hierarchy } from 'types/hierarchy'
 import { ScopeElement } from 'types/scope'
@@ -308,6 +309,15 @@ export const CHIPS_DISPLAY_METHODS = {
     valueSets: ValueSetStore,
     args: Array<ChipDisplayMethod | DataTypes>
   ) => getSearchDocumentLabel(val as string, args[0] as string),
+  getRadioLabel: (
+    val: DataTypes,
+    item: GenericCriteriaItem,
+    valueSets: ValueSetStore,
+    args: Array<ChipDisplayMethod | DataTypes>
+  ) => {
+    const choice = ('choices' in item && item.choices?.find((c) => c.id === val)?.label) ?? Sources.AREM
+    return `${item.label} ${choice}`
+  },
   getDocumentTypesLabel: (
     val: DataTypes,
     item: GenericCriteriaItem,
