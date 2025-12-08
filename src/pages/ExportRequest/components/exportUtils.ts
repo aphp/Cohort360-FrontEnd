@@ -385,7 +385,7 @@ export const getResourceType = (tableName: string): ResourceType => {
   const resourceType = {
     imaging_study: ResourceType.IMAGING,
     drug_exposure_administration: ResourceType.MEDICATION_ADMINISTRATION,
-    observation_laboratory: ResourceType.OBSERVATION,
+    Observation_Laboratory: ResourceType.OBSERVATION,
     imaging_series: ResourceType.UNKNOWN,
     condition: ResourceType.CONDITION,
     iris: ResourceType.UNKNOWN,
