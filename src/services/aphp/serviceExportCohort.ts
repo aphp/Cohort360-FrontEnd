@@ -6,10 +6,10 @@ import apiBackend from 'services/apiBackend'
 import { TableSetting } from 'types/export'
 import { Direction, OrderBy } from 'types/searchCriterias'
 
-export const fetchExportTablesInfo = () => {
+export const fetchExportTablesInfo = async () => {
   try {
     const columnCategory = ['none', 'confidential']
-    const response = fetchExportTableInfo({
+    const response = await fetchExportTableInfo({
       tableNames: getConfig().features.export.exportTables,
       columnCategory: columnCategory
     })
