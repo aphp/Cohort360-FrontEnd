@@ -35,7 +35,13 @@ const CreateSample: React.FC<{
   const noName = !name?.trim()
   const parsedPercentage = parseFloat(percentage)
   const percentageError = isNaN(parsedPercentage) || parsedPercentage < 0.01 || parsedPercentage > 99.99
-  const error = nameTooLong || noName || percentageError
+
+  // Calculate expected patient count and check if it would result in 0 patients
+  const parentPatientCount = parentCohort.result_size ?? 0
+  const expectedPatientCount = Math.floor((parsedPercentage / 100) * parentPatientCount)
+  const zeroPatientError = !isNaN(parsedPercentage) && !percentageError && expectedPatientCount === 0
+
+  const error = nameTooLong || noName || percentageError || zeroPatientError
 
   const handleSubmit = () => {
     if (!name || error) {
@@ -108,11 +114,13 @@ const CreateSample: React.FC<{
               value={percentage}
               onChange={handlePercentageChange}
               placeholder="Entrez une valeur entre 0.01 et 99.99%"
-              error={hasInteractedPercentage && percentageError}
+              error={hasInteractedPercentage && (percentageError || zeroPatientError)}
               helperText={
-                percentageError && hasInteractedPercentage
+                hasInteractedPercentage && percentageError
                   ? 'Le pourcentage doit être compris entre 0.01 et 99.99.'
-                  : ''
+                  : hasInteractedPercentage && zeroPatientError
+                    ? `Ce pourcentage donnerait 0 patient. La cohorte parente contient ${parentPatientCount} patient(s), veuillez augmenter le pourcentage.`
+                    : ''
               }
             />
           </Grid>
