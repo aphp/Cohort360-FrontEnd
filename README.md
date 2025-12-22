@@ -48,6 +48,33 @@ a [nginx configuration](.templates/nginx.conf) example (useful for deployment).
 
 A docker image is available to build via the [Dockerfile](Dockerfile). You only need to update the location of your nginx conf.
 
+## Local Development with Vite Proxy
+
+The recommended way to develop locally without Docker. Vite handles API proxying with automatic NSC_TMAS cookie injection:
+
+```bash
+# 1. Copy .env.example to .env (one-time setup)
+cp .env.example .env
+
+# 2. Get your NSC_TMAS cookie from browser DevTools → Application → Cookies
+# 3. Start dev server with cookie injection
+
+# Using qualif environment (default):
+NSC_TMAS=your_cookie_value npm run start
+
+# Or target a different environment:
+NSC_TMAS=your_cookie_value BACKEND_ENV=develop npm run start
+```
+
+Available environments: `develop`, `qualif` (default), `preprod`, `prod`
+
+Access: `http://localhost:3000`
+
+The Vite proxy automatically:
+- Proxies `/api/fhir`, `/api/back`, `/api/datamodel` to the backend
+- Injects the NSC_TMAS cookie into all proxied requests
+- Supports WebSocket connections for `/api/back/ws`
+
 ## Start Contributing
 
 A contributing guide will be published soon.
