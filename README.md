@@ -75,7 +75,10 @@ The Vite proxy automatically:
 - Injects the NSC_TMAS cookie into all proxied requests
 - Supports WebSocket connections for `/api/back/ws`
 
-> **Note:** TLS certificate verification is disabled for the dev proxy to handle self-signed certificates on internal endpoints. This mirrors nginx's default `proxy_ssl_verify off` behavior. Do not use this configuration on untrusted networks.
+> **Note:** If you encounter TLS certificate errors with internal endpoints, run with:
+> ```bash
+> NODE_OPTIONS='--use-system-ca' NSC_TMAS=your_cookie npm run start
+> ```
 
 ## Start Contributing
 

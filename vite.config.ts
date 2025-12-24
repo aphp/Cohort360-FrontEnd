@@ -31,12 +31,12 @@ const BACKEND_ENVS = {
   preprod: {
     fhir: 'https://fhir-r4-preprod-ext-k8s.eds.aphp.fr/fhir/',
     back: 'https://django-preprod-ext-k8s.eds.aphp.fr/',
-    datamodel: 'https://data-models-api-pre-ext-k8s.eds.aphp.fr/'
+    datamodel: 'https://data-models-api-qua-ext-k8s.eds.aphp.fr/'
   },
   prod: {
     fhir: 'https://fhir-r4-prod-ext-k8s.eds.aphp.fr/fhir/',
     back: 'https://django-prod-ext-k8s.eds.aphp.fr/',
-    datamodel: 'https://data-models-api-prod-ext-k8s.eds.aphp.fr/'
+    datamodel: 'https://data-models-api-qua-ext-k8s.eds.aphp.fr/'
   }
 } as const
 
@@ -53,13 +53,12 @@ export default defineConfig(() => {
   }
   const backend = BACKEND_ENVS[BACKEND_ENV]
 
-  // TLS verification is disabled for dev proxy (self-signed certs on internal endpoints).
-  // This is standard for local development and mirrors nginx default behavior (proxy_ssl_verify off).
-  // WARNING: Do not use this configuration on untrusted networks.
+  // TLS verification is enabled by default. If you encounter certificate errors with
+  // internal endpoints, run Node with: NODE_OPTIONS='--use-system-ca' npm run start
   const createProxyConfig = (target: string, ws = false): ProxyOptions => ({
     target,
     changeOrigin: true,
-    secure: false,
+    secure: true,
     ws,
     rewrite: (path: string) => path.replace(/^\/api\/(fhir|back|datamodel)/, ''),
     configure: (proxy, _options) => {
