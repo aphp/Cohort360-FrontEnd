@@ -75,9 +75,9 @@ The Vite proxy automatically:
 - Injects the NSC_TMAS cookie into all proxied requests
 - Supports WebSocket connections for `/api/back/ws`
 
-> **Note:** If you encounter TLS certificate errors with internal endpoints, run with:
+> **Note:** If you encounter TLS certificate errors with internal endpoints, add `VITE_INSECURE_PROXY=true`:
 > ```bash
-> NODE_OPTIONS='--use-system-ca' NSC_TMAS=your_cookie npm run start
+> VITE_INSECURE_PROXY=true NSC_TMAS=your_cookie npm run start
 > ```
 
 ## Start Contributing

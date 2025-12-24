@@ -53,12 +53,13 @@ export default defineConfig(() => {
   }
   const backend = BACKEND_ENVS[BACKEND_ENV]
 
-  // TLS verification is enabled by default. If you encounter certificate errors with
-  // internal endpoints, run Node with: NODE_OPTIONS='--use-system-ca' npm run start
+  // TLS verification is enabled by default. To disable for internal endpoints with
+  // self-signed certs, set VITE_INSECURE_PROXY=true (not recommended on untrusted networks)
+  const insecureProxy = process.env.VITE_INSECURE_PROXY === 'true'
   const createProxyConfig = (target: string, ws = false): ProxyOptions => ({
     target,
     changeOrigin: true,
-    secure: true,
+    secure: !insecureProxy,
     ws,
     rewrite: (path: string) => path.replace(/^\/api\/(fhir|back|datamodel)/, ''),
     configure: (proxy, _options) => {
