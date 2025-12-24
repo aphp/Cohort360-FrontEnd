@@ -50,7 +50,7 @@ A docker image is available to build via the [Dockerfile](Dockerfile). You only 
 
 ## Local Development with Vite Proxy
 
-The recommended way to develop locally without Docker. Vite handles API proxying with automatic NSC_TMAS cookie injection:
+The recommended way to develop locally is using Vite's built-in dev server; it handles API proxying with automatic NSC_TMAS cookie injection:
 
 ```bash
 # 1. Copy .env.example to .env (one-time setup)
@@ -74,6 +74,8 @@ The Vite proxy automatically:
 - Proxies `/api/fhir`, `/api/back`, `/api/datamodel` to the backend
 - Injects the NSC_TMAS cookie into all proxied requests
 - Supports WebSocket connections for `/api/back/ws`
+
+> **Note:** TLS certificate verification is disabled for the dev proxy to handle self-signed certificates on internal endpoints. This mirrors nginx's default `proxy_ssl_verify off` behavior. Do not use this configuration on untrusted networks.
 
 ## Start Contributing
 
