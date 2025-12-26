@@ -64,7 +64,7 @@
     "postcss": "8.4.31"
   },
   "scripts": {
-    "start": "vite",
+    "dev": "NODE_OPTIONS='--use-system-ca' vite",
     "type": "tsc --noEmit --watch",
     "build": "vite build",
     "serve": "vite preview",

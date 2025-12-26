@@ -184,12 +184,17 @@ const AutoLogoutContainer = () => {
       if (res.status === 200) {
         localStorage.setItem(ACCESS_TOKEN, res.data.access_token)
         localStorage.setItem(REFRESH_TOKEN, res.data.refresh_token)
-      } else {
+      } else if (!import.meta.env.DEV) {
+        // Only logout on refresh failure in production
+        // In dev mode with injected tokens, refresh may fail but session can still be valid
         logout()
       }
     } catch (error) {
       console.error(error)
-      logout()
+      if (!import.meta.env.DEV) {
+        // Only logout on error in production
+        logout()
+      }
     }
   }
 

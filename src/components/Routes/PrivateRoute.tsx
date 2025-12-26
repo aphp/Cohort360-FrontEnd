@@ -73,6 +73,7 @@ declare const window: any
  */
 const PrivateRoute: React.FC = () => {
   const me = useAppSelector((state) => state.me)
+  const isRehydrated = useAppSelector((state) => state._persist?.rehydrated)
   const dispatch = useAppDispatch()
   const appConfig = useContext(AppConfig)
   const location = useLocation()
@@ -123,6 +124,11 @@ const PrivateRoute: React.FC = () => {
       }
     }
   }, [me, authToken, fetchedFhirMetadata])
+
+  // Wait for redux-persist to rehydrate before checking authentication
+  if (!isRehydrated) {
+    return null // Or a loading spinner
+  }
 
   // Authentication check: user must be authenticated and have a valid token
   if (!me || (!me && !authToken)) {

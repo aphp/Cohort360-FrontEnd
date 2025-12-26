@@ -1,6 +1,6 @@
 import { defineConfig, normalizePath } from 'vite'
 import type { ProxyOptions } from 'vite'
-import type { ClientRequest, IncomingMessage } from 'node:http'
+import type { ClientRequest, IncomingMessage, ServerResponse } from 'node:http'
 import react from '@vitejs/plugin-react'
 import tsconfigPaths from 'vite-tsconfig-paths'
 import svgr from 'vite-plugin-svgr'
@@ -61,18 +61,52 @@ export default defineConfig(() => {
     changeOrigin: true,
     secure: !insecureProxy,
     ws,
+    timeout: 60000, // 60 seconds timeout
     rewrite: (path: string) => path.replace(/^\/api\/(fhir|back|datamodel)/, ''),
     configure: (proxy, _options) => {
-      if (NSC_TMAS) {
-        proxy.on('proxyReq', (proxyReq: ClientRequest, req: IncomingMessage) => {
+      proxy.on('error', (err, _req, res) => {
+        console.error('[vite proxy error]', err.message)
+        // Ensure we send a response to prevent ERR_EMPTY_RESPONSE
+        if (res && 'writeHead' in res && !res.headersSent) {
+          res.writeHead(502, { 'Content-Type': 'text/plain' })
+          res.end(`Proxy error: ${err.message}`)
+        }
+      })
+      proxy.on('proxyReq', (proxyReq: ClientRequest, req: IncomingMessage) => {
+        // Inject NSC_TMAS cookie for authentication (HTTP requests)
+        if (NSC_TMAS) {
           const existingCookie = (req.headers.cookie as string) || ''
           proxyReq.setHeader('Cookie', `NSC_TMAS=${NSC_TMAS}; ${existingCookie}`)
-        })
-      }
+        }
+      })
+      // Inject NSC_TMAS cookie for WebSocket upgrade requests
+      proxy.on('proxyReqWs', (proxyReq: ClientRequest, req: IncomingMessage) => {
+        if (NSC_TMAS) {
+          const existingCookie = (req.headers.cookie as string) || ''
+          proxyReq.setHeader('Cookie', `NSC_TMAS=${NSC_TMAS}; ${existingCookie}`)
+        }
+      })
+      proxy.on('proxyRes', (proxyRes, req) => {
+        // Detect strong auth redirect (expired NSC_TMAS cookie)
+        const location = proxyRes.headers.location
+        if (proxyRes.statusCode && proxyRes.statusCode >= 300 && proxyRes.statusCode < 400 && location) {
+          if (location.includes('authentification-forte.aphp.fr')) {
+            console.error(
+              '\n[vite proxy] ⚠️  NSC_TMAS cookie expired! Backend redirecting to strong auth.',
+              '\n  Request:', req.url,
+              '\n  Get a new cookie from https://django-qualif-ext-k8s.eds.aphp.fr/ and restart the dev server.\n'
+            )
+          }
+        }
+      })
     }
   })
 
   return {
+    define: {
+      // Expose BACKEND_ENV to client code for dev login UI
+      'import.meta.env.VITE_BACKEND_ENV': JSON.stringify(BACKEND_ENV)
+    },
     build: {
       outDir: 'build'
     },

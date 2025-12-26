@@ -4,11 +4,15 @@ import React, {
   UIEvent,
   useContext,
   useEffect,
+  useRef,
   useState
 } from 'react'
 import { useNavigate } from 'react-router-dom'
 import localforage from 'localforage'
 import {
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
   Alert,
   Button,
   CircularProgress,
@@ -23,6 +27,7 @@ import {
   TextField,
   Typography
 } from '@mui/material'
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 
 import NoRights from 'components/ErrorView/NoRights'
 
@@ -68,6 +73,62 @@ const ErrorSnackBarAlert = ({ open, setError, errorMessage }: ErrorSnackBarAlert
         {errorMessage}
       </Alert>
     </Snackbar>
+  )
+}
+
+// Bookmarklet to extract tokens from qualif - drag to bookmark bar for 1-click install
+const BOOKMARKLET = `javascript:void(function(){var r=indexedDB.open('localforage');r.onsuccess=function(){var db=r.result,tx=db.transaction('keyvaluepairs','readonly'),s=tx.objectStore('keyvaluepairs'),g=s.get('persist:root');g.onsuccess=function(){var d={access_token:localStorage.getItem('access_token'),refresh_token:localStorage.getItem('refresh_token'),oidcAuth:localStorage.getItem('oidcAuth'),persistRoot:g.result};if(!d.access_token){alert('❌ Pas de tokens');return}var j=JSON.stringify(d),ta=document.createElement('textarea');ta.value=j;ta.style.cssText='position:fixed;left:-9999px';document.body.appendChild(ta);ta.focus();ta.select();var ok=document.execCommand('copy');document.body.removeChild(ta);if(ok)alert('✅ Tokens copiés!')}};r.onerror=function(){alert('❌ Erreur IndexedDB')}}())`
+
+/**
+ * Draggable bookmarklet link for 1-click install.
+ * Uses ref + useEffect to bypass React's javascript: URL blocking.
+ * Users can drag this link to their bookmark bar.
+ */
+const BookmarkletLink = () => {
+  const linkRef = useRef<HTMLAnchorElement>(null)
+
+  // Set href directly on DOM to bypass React's javascript: URL sanitization
+  useEffect(() => {
+    if (linkRef.current) {
+      linkRef.current.href = BOOKMARKLET
+    }
+  }, [])
+
+  return (
+    <Typography
+      variant="body2"
+      component="div"
+      sx={{
+        mb: 2,
+        p: 2,
+        bgcolor: 'grey.100',
+        borderRadius: 1,
+        textAlign: 'center',
+        border: '2px dashed',
+        borderColor: 'grey.400'
+      }}
+    >
+      <Typography variant="caption" display="block" sx={{ mb: 1, color: 'text.secondary' }}>
+        Glisser-déposer sur la barre de favoris :
+      </Typography>
+      <a
+        ref={linkRef}
+        onClick={(e) => e.preventDefault()} // Prevent execution, only allow drag
+        draggable
+        style={{
+          display: 'inline-block',
+          padding: '8px 16px',
+          backgroundColor: '#0063AF',
+          color: 'white',
+          borderRadius: '4px',
+          textDecoration: 'none',
+          fontWeight: 'bold',
+          cursor: 'grab'
+        }}
+      >
+        📋 Copier Tokens Cohort360
+      </a>
+    </Typography>
   )
 }
 
@@ -124,6 +185,7 @@ const Login = () => {
   const [open, setOpen] = useState(false)
   const urlParams = new URLSearchParams(window.location.search)
   const [display_jwt_form, setDisplay_jwt_form] = useState(false)
+  const [devTokenInput, setDevTokenInput] = useState('')
   const oidcCode = urlParams.get('code')
 
   useEffect(() => {
@@ -280,6 +342,52 @@ const Login = () => {
     }
   }
 
+  // Dev login token injection (only works in dev mode)
+  const injectDevTokens = async () => {
+    if (!import.meta.env.DEV) return
+
+    try {
+      setLoading(true)
+      const data = JSON.parse(devTokenInput)
+
+      if (!data.access_token || !data.refresh_token || !data.persistRoot) {
+        throw new Error('Invalid token data')
+      }
+
+      // Inject into localStorage
+      localStorage.setItem('access_token', data.access_token)
+      localStorage.setItem('refresh_token', data.refresh_token)
+      localStorage.setItem('oidcAuth', data.oidcAuth || 'true')
+
+      // Inject into IndexedDB (localforage)
+      await new Promise<void>((resolve, reject) => {
+        const request = indexedDB.open('localforage')
+        request.onerror = () => reject(new Error('Failed to open IndexedDB'))
+        request.onsuccess = () => {
+          const db = request.result
+          const tx = db.transaction('keyvaluepairs', 'readwrite')
+          const store = tx.objectStore('keyvaluepairs')
+          store.put(data.persistRoot, 'persist:root')
+          tx.oncomplete = () => resolve()
+          tx.onerror = () => reject(new Error('Failed to write to IndexedDB'))
+        }
+        request.onupgradeneeded = (event) => {
+          const db = (event.target as IDBOpenDBRequest).result
+          if (!db.objectStoreNames.contains('keyvaluepairs')) {
+            db.createObjectStore('keyvaluepairs')
+          }
+        }
+      })
+
+      // Full page reload to rehydrate redux-persist
+      window.location.href = '/home'
+    } catch (err) {
+      setLoading(false)
+      setError(true)
+      setErrorMessage(err instanceof Error ? err.message : 'Invalid token JSON')
+    }
+  }
+
   useEffect(() => {
     const code_display_jwt = appConfig.system.codeDisplayJWT.split(',')
     let code_display_jwtPosition = 0
@@ -374,14 +482,81 @@ const Login = () => {
                   onKeyDown={onKeyDown}
                 />
 
+                {/* Dev token injection - collapsible, dev mode only */}
+                {import.meta.env.DEV && (
+                  <Accordion
+                    sx={{
+                      mt: 2,
+                      width: '100%',
+                      backgroundColor: 'transparent',
+                      boxShadow: 'none',
+                      '&:before': { display: 'none' },
+                      border: '1px dashed',
+                      borderColor: 'grey.400',
+                      borderRadius: 1
+                    }}
+                  >
+                    <AccordionSummary
+                      expandIcon={<ExpandMoreIcon />}
+                      sx={{
+                        minHeight: 40,
+                        '& .MuiAccordionSummary-content': { my: 0.5 }
+                      }}
+                    >
+                      <Typography variant="body2" color="text.secondary">
+                        🔧 Dev: Injection de tokens
+                      </Typography>
+                    </AccordionSummary>
+                    <AccordionDetails sx={{ pt: 0 }}>
+                      {(() => {
+                        const envUrls: Record<string, string> = {
+                          qualif: 'https://cohort-qualif-ext-k8s.eds.aphp.fr/',
+                          develop: 'https://cohort-develop-ext-k8s.eds.aphp.fr/',
+                          preprod: 'https://cohort-preprod-ext-k8s.eds.aphp.fr/',
+                          prod: 'https://cohort360.eds.aphp.fr/'
+                        }
+                        const env = import.meta.env.VITE_BACKEND_ENV || 'qualif'
+                        const url = envUrls[env] || envUrls.qualif
+                        return (
+                          <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 1 }}>
+                            0. Se connecter sur{' '}
+                            <Link href={url} target="_blank" rel="noopener" sx={{ fontWeight: 'bold' }}>
+                              {env}
+                            </Link>
+                          </Typography>
+                        )
+                      })()}
+                      <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 1 }}>
+                        1. Glisser le bookmarklet sur votre barre de favoris, puis cliquer dessus :
+                      </Typography>
+                      <BookmarkletLink />
+                      <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 1 }}>
+                        2. Coller le JSON copié ici, puis cliquer sur Connexion
+                      </Typography>
+                      <TextField
+                        fullWidth
+                        size="small"
+                        multiline
+                        rows={2}
+                        id="dev-tokens"
+                        label="Token JSON"
+                        placeholder='{"access_token": "...", "persistRoot": "..."}'
+                        value={devTokenInput}
+                        onChange={(event) => setDevTokenInput(event.target.value)}
+                      />
+                    </AccordionDetails>
+                  </Accordion>
+                )}
+
                 <Button
                   type="submit"
-                  onClick={_onSubmit}
+                  onClick={devTokenInput.trim() ? injectDevTokens : _onSubmit}
                   variant="contained"
                   className={classes.submit}
                   id="connection-button-submit"
+                  disabled={loading}
                 >
-                  {loading ? <CircularProgress /> : 'Connexion'}
+                  {loading ? <CircularProgress size={24} /> : 'Connexion'}
                 </Button>
               </Grid>
             )}

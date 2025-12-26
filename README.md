@@ -75,10 +75,22 @@ The Vite proxy automatically:
 - Injects the NSC_TMAS cookie into all proxied requests
 - Supports WebSocket connections for `/api/back/ws`
 
-> **Note:** If you encounter TLS certificate errors with internal endpoints, add `VITE_INSECURE_PROXY=true`:
-> ```bash
-> VITE_INSECURE_PROXY=true NSC_TMAS=your_cookie npm run start
-> ```
+### TLS Certificate Setup
+
+The AP-HP backend uses a Sectigo-signed certificate. Install the intermediate CA to avoid TLS errors:
+
+**macOS:**
+```bash
+curl -o ~/Downloads/SectigoDVR36.crt "https://crt.sh/?d=4267304690"
+sudo security add-trusted-cert -d -r trustAsRoot -k /Library/Keychains/System.keychain ~/Downloads/SectigoDVR36.crt
+```
+
+**Linux:**
+```bash
+curl -o /tmp/SectigoDVR36.crt "https://crt.sh/?d=4267304690"
+sudo cp /tmp/SectigoDVR36.crt /usr/local/share/ca-certificates/SectigoDVR36.crt
+sudo update-ca-certificates
+```
 
 ## Start Contributing
 
