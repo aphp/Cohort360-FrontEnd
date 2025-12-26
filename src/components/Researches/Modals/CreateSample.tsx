@@ -37,7 +37,7 @@ const CreateSample: React.FC<{
   const percentageError = isNaN(parsedPercentage) || parsedPercentage < 0.01 || parsedPercentage > 99.99
 
   // Calculate expected patient count and check if it would result in 0 patients
-  const parentPatientCount = parentCohort.result_size ?? 0
+  const parentPatientCount = parentCohort?.result_size ?? 0
   const expectedPatientCount = Math.floor((parsedPercentage / 100) * parentPatientCount)
   const zeroPatientError = !isNaN(parsedPercentage) && !percentageError && expectedPatientCount === 0
 
