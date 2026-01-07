@@ -107,6 +107,11 @@ export default defineConfig(() => {
     }
   })
 
+  // Convert HTTP(S) URL to WS(S) URL for WebSocket proxy
+  const toWsUrl = (url: string): string => {
+    return url.replace(/^https:\/\//, 'wss://').replace(/^http:\/\//, 'ws://')
+  }
+
   return {
     define: {
       // Expose BACKEND_ENV to client code for dev login UI
@@ -118,7 +123,7 @@ export default defineConfig(() => {
     server: {
       port: 3000,
       proxy: {
-        '/api/back/ws': createProxyConfig(backend.back.replace('https://', 'wss://'), true),
+        '/api/back/ws': createProxyConfig(toWsUrl(backend.back), true),
         '/api/fhir': createProxyConfig(backend.fhir),
         '/api/back': createProxyConfig(backend.back),
         '/api/datamodel': createProxyConfig(backend.datamodel)
