@@ -31,7 +31,7 @@ import {
   SearchCriterias,
   VitalStatus
 } from 'types/searchCriterias'
-import { substructAgeString } from 'utils/age'
+import { birthdateRangeToAge } from 'utils/age'
 import { getApiResponseResourceOrThrow } from 'utils/apiHelpers'
 
 /**
@@ -46,20 +46,16 @@ const fetchPatientCount = async (cohortId: string, patientsFilters?: SearchCrite
     let patientsResp
     if (patientsFilters && patientsFilters !== null) {
       const { birthdatesRanges, genders, vitalStatuses } = patientsFilters.filters
-      const birthdates: [string, string] = [
-        moment(substructAgeString(birthdatesRanges?.[0] || '')).format('MM/DD/YYYY'),
-        moment(substructAgeString(birthdatesRanges?.[1] || '')).format('MM/DD/YYYY')
-      ]
-      const minBirthdate = birthdates && Math.abs(moment(birthdates[0]).diff(moment(), 'days'))
-      const maxBirthdate = birthdates && Math.abs(moment(birthdates[1]).diff(moment(), 'days'))
+      const minBirthdate = birthdateRangeToAge(birthdatesRanges?.[0], false)
+      const maxBirthdate = birthdateRangeToAge(birthdatesRanges?.[1], false)
       patientsResp = await fetchPatient({
         size: 0,
         _list: [cohortId],
         gender: genders.join(),
         searchBy: patientsFilters.searchBy,
         _text: patientsFilters.searchInput,
-        minBirthdate: minBirthdate,
-        maxBirthdate: maxBirthdate,
+        minBirthdate,
+        maxBirthdate,
         deceased:
           vitalStatuses && vitalStatuses.length === 1
             ? vitalStatuses.includes(VitalStatus.DECEASED)

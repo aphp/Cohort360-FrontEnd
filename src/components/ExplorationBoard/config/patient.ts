@@ -29,7 +29,7 @@ import {
   VitalStatus
 } from 'types/searchCriterias'
 import { Table, Row, CellType, Column } from 'types/table'
-import { getAge, substructAgeString } from 'utils/age'
+import { birthdateRangeToAge, getAge } from 'utils/age'
 import { fetcherWithParams, getCommonParamsAll, getCommonParamsList, narrowSearchCriterias } from 'utils/exploration'
 import { getExtension } from 'utils/fhir'
 import { getAgeRepartitionMapAphp, getGenderRepartitionMapAphp, getGenderRepartitionSimpleData } from 'utils/graphUtils'
@@ -242,20 +242,16 @@ const fetchList = (
 ): Promise<ExplorationResults<Patient>> => {
   const { genders, vitalStatuses, birthdatesRanges } = filters
   const { includeFacets } = fetchParams
-  const birthdates: [string, string] = [
-    moment(substructAgeString(birthdatesRanges?.[0] || '')).format('MM/DD/YYYY'),
-    moment(substructAgeString(birthdatesRanges?.[1] || '')).format('MM/DD/YYYY')
-  ]
-  const minBirthdate = birthdates && Math.abs(moment(birthdates[0]).diff(moment(), deidentified ? 'months' : 'days'))
-  const maxBirthdate = birthdates && Math.abs(moment(birthdates[1]).diff(moment(), deidentified ? 'months' : 'days'))
+  const minBirthdate = birthdateRangeToAge(birthdatesRanges?.[0], deidentified)
+  const maxBirthdate = birthdateRangeToAge(birthdatesRanges?.[1], deidentified)
   const params = {
     pivotFacet: includeFacets
       ? (['age-month_gender', 'deceased_gender'] as ('age-month_gender' | 'deceased_gender')[])
       : [],
     gender: genders.join(','),
     searchBy,
-    minBirthdate: minBirthdate,
-    maxBirthdate: maxBirthdate,
+    minBirthdate,
+    maxBirthdate,
     deceased: vitalStatuses.length === 1 ? (vitalStatuses.includes(VitalStatus.DECEASED) ? true : false) : undefined,
     deidentified,
     _elements: ['gender', 'name', 'birthDate', 'deceased', 'identifier', 'extension'] as (

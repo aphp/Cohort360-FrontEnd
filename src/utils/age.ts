@@ -314,3 +314,28 @@ export const convertTimestampToDuration = (timestamp: number | null, deidentifie
   }
   return duration
 }
+
+/**
+ * Converts a birthdate range string to an age in days/months for FHIR queries.
+ * Returns undefined if the range is null/empty, preventing spurious filters.
+ *
+ * @param range - The duration string (DD/MM/YYYY format) or null
+ * @param deidentified - If true, returns age in months; otherwise in days
+ * @returns The age as a number, or undefined if no range is set
+ *
+ * @example
+ * ```typescript
+ * birthdateRangeToAge('15/6/25', false) // returns age in days
+ * birthdateRangeToAge(null, false) // returns undefined
+ * ```
+ */
+export const birthdateRangeToAge = (
+  range: string | null | undefined,
+  deidentified: boolean
+): number | undefined => {
+  if (!range) return undefined
+  const duration = convertStringToDuration(range)
+  if (!duration) return undefined
+  const date = substructDurationType(duration)
+  return Math.abs(moment(date).diff(moment(), deidentified ? 'months' : 'days'))
+}
