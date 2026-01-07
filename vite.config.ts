@@ -18,6 +18,11 @@ const standardFontsDir = normalizePath(
 
 // Backend environment configuration for local development proxy
 const BACKEND_ENVS = {
+  local: {
+    fhir: 'http://localhost:8081/fhir/',
+    back: 'http://localhost:8000/',
+    datamodel: ''
+  },
   develop: {
     fhir: 'https://fhir-r4-develop-ext-k8s.eds.aphp.fr/fhir/',
     back: 'https://django-develop-ext-k8s.eds.aphp.fr/',

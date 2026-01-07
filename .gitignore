@@ -33,11 +33,12 @@ yarn-error.log*
 .env*
 !.env.example
 .mp4
+public/config.json
 public/config.*.json
+public/assets/config*.json
 *storybook.log
 
-# AI Tooling
-CLAUDE.md
+# AI Tooling (prefer .gitignorelocal or global gitignore)
 specs/*
 
 
