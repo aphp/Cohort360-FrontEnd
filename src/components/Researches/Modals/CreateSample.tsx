@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useContext, useEffect, useMemo, useState } from 'react'
 
 import {
   Alert,
@@ -16,6 +16,18 @@ import { Cohort } from 'types'
 import { AppConfig } from 'config'
 import { CreateSampleProps } from 'services/aphp/serviceCohortCreation'
 
+type FieldErrors = {
+  nameTooLong: boolean
+  noName: boolean
+  percentageOutOfRange: boolean
+  zeroPatient: boolean
+}
+
+type ErrorLabels = {
+  name: string
+  percentage: string
+}
+
 const CreateSample: React.FC<{
   open: boolean
   parentCohort: Cohort
@@ -31,20 +43,48 @@ const CreateSample: React.FC<{
   const [hasInteractedName, setHasInteractedName] = useState(false)
   const [hasInteractedPercentage, setHasInteractedPercentage] = useState(false)
 
-  const nameTooLong = !!(name && name.length > 255)
-  const noName = !name?.trim()
   const parsedPercentage = parseFloat(percentage)
-  const percentageError = isNaN(parsedPercentage) || parsedPercentage < 0.01 || parsedPercentage > 99.99
-
-  // Calculate expected patient count and check if it would result in 0 patients
   const parentPatientCount = parentCohort?.result_size ?? 0
-  const expectedPatientCount = Math.floor((parsedPercentage / 100) * parentPatientCount)
-  const zeroPatientError = !isNaN(parsedPercentage) && !percentageError && expectedPatientCount === 0
 
-  const error = nameTooLong || noName || percentageError || zeroPatientError
+  // Compute all field errors in one place
+  const errors = useMemo<FieldErrors>(() => {
+    const nameTooLong = !!(name && name.length > 255)
+    const noName = !name?.trim()
+    const percentageOutOfRange = isNaN(parsedPercentage) || parsedPercentage < 0.01 || parsedPercentage > 99.99
+    const expectedPatientCount = Math.floor((parsedPercentage / 100) * parentPatientCount)
+    const zeroPatient = !isNaN(parsedPercentage) && !percentageOutOfRange && expectedPatientCount === 0
+
+    return { nameTooLong, noName, percentageOutOfRange, zeroPatient }
+  }, [name, parsedPercentage, parentPatientCount])
+
+  // Compute error labels for display
+  const errorLabels = useMemo<ErrorLabels>(() => {
+    let nameLabel = ''
+    if (hasInteractedName && errors.noName) {
+      nameLabel = 'Le nom doit comporter au moins un caractère.'
+    } else if (errors.nameTooLong) {
+      nameLabel = 'Le nom est trop long (255 caractères max.)'
+    }
+
+    let percentageLabel = ''
+    if (hasInteractedPercentage) {
+      if (errors.percentageOutOfRange) {
+        percentageLabel = 'Le pourcentage doit être compris entre 0.01 et 99.99.'
+      } else if (errors.zeroPatient) {
+        percentageLabel = `Ce pourcentage donnerait 0 patient. La cohorte parente contient ${parentPatientCount} patient(s), veuillez augmenter le pourcentage.`
+      }
+    }
+
+    return { name: nameLabel, percentage: percentageLabel }
+  }, [errors, hasInteractedName, hasInteractedPercentage, parentPatientCount])
+
+  const hasError = useMemo(
+    () => errors.nameTooLong || errors.noName || errors.percentageOutOfRange || errors.zeroPatient,
+    [errors]
+  )
 
   const handleSubmit = () => {
-    if (!name || error) {
+    if (!name || hasError) {
       return
     }
 
@@ -95,14 +135,8 @@ const CreateSample: React.FC<{
               id="title"
               margin="normal"
               fullWidth
-              error={nameTooLong || (noName && hasInteractedName)}
-              helperText={
-                nameTooLong || (noName && hasInteractedName)
-                  ? noName && hasInteractedName
-                    ? 'Le nom doit comporter au moins un caractère.'
-                    : 'Le nom est trop long (255 caractères max.)'
-                  : ''
-              }
+              error={errors.nameTooLong || (errors.noName && hasInteractedName)}
+              helperText={errorLabels.name}
             />
           </Grid>
 
@@ -114,14 +148,8 @@ const CreateSample: React.FC<{
               value={percentage}
               onChange={handlePercentageChange}
               placeholder="Entrez une valeur entre 0.01 et 99.99%"
-              error={hasInteractedPercentage && (percentageError || zeroPatientError)}
-              helperText={
-                hasInteractedPercentage && percentageError
-                  ? 'Le pourcentage doit être compris entre 0.01 et 99.99.'
-                  : hasInteractedPercentage && zeroPatientError
-                    ? `Ce pourcentage donnerait 0 patient. La cohorte parente contient ${parentPatientCount} patient(s), veuillez augmenter le pourcentage.`
-                    : ''
-              }
+              error={hasInteractedPercentage && (errors.percentageOutOfRange || errors.zeroPatient)}
+              helperText={errorLabels.percentage}
             />
           </Grid>
 
@@ -141,7 +169,7 @@ const CreateSample: React.FC<{
           </Grid>
         </Grid>
       </DialogContent>
-      {parsedPercentage / 100 > cohortLimit && !percentageError && (
+      {parsedPercentage / 100 > cohortLimit && !errors.percentageOutOfRange && (
         <Alert severity="warning" style={{ alignItems: 'center' }}>
           Cette cohorte contenant plus de {cohortLimit} patients, sa création est plus complexe et nécessite d'être
           placée dans une file d'attente. Un mail vous sera envoyé quand celle-ci sera disponible.
@@ -153,7 +181,7 @@ const CreateSample: React.FC<{
           Annuler
         </Button>
 
-        <Button onClick={handleSubmit} disabled={error}>
+        <Button onClick={handleSubmit} disabled={hasError}>
           Créer
         </Button>
       </DialogActions>
