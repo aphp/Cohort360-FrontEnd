@@ -1,5 +1,5 @@
 /* eslint-disable max-statements */
-import React, { useState, useEffect, useContext, useMemo, useCallback } from 'react'
+import React, { useState, useEffect, useContext, useMemo } from 'react'
 import moment from 'moment'
 
 import {
@@ -22,6 +22,7 @@ import {
 
 import DescriptionIcon from '@mui/icons-material/Description'
 import HighlightOffIcon from '@mui/icons-material/HighlightOff'
+import PlayArrowIcon from '@mui/icons-material/PlayArrow'
 import InfoIcon from '@mui/icons-material/Info'
 import ShareIcon from '@mui/icons-material/Share'
 
@@ -38,7 +39,8 @@ import {
   unbuildCohortCreation,
   addActionToNavHistory,
   updateCount,
-  editSnapshotHistory
+  editSnapshotHistory,
+  saveJson
 } from 'state/cohortCreation'
 
 import {
@@ -67,8 +69,9 @@ import { isRequestFinished } from './utils'
 import { CriteriaType } from 'types/requestCriterias'
 
 const ControlPanel: React.FC<{
+  canExecuteJson: boolean
   onExecute?: (cohortName: string, cohortDescription: string, globalCount: boolean) => void
-}> = ({ onExecute }) => {
+}> = ({ canExecuteJson, onExecute }) => {
   const { classes, cx } = useStyle()
   const dispatch = useAppDispatch()
   const appConfig = useContext(AppConfig)
@@ -82,6 +85,7 @@ const ControlPanel: React.FC<{
   const [openVersionsDialog, setOpenVersionsDialog] = useState<boolean>(false)
 
   const {
+    viewMode,
     loading = false,
     saveLoading = false,
     count = {},
@@ -156,6 +160,16 @@ const ControlPanel: React.FC<{
     dispatch(buildCohortCreation({ selectedPopulation: null }))
   }
 
+  const executeJson = async () => {
+    try {
+      const saveJsonResponse = await dispatch(saveJson({ newJson: JSON.stringify(JSON.parse(json)) })).unwrap()
+
+      await dispatch(unbuildCohortCreation({ newCurrentSnapshot: saveJsonResponse.currentSnapshot })).unwrap()
+    } catch (e) {
+      console.error('Failed executing serialized query : ', e)
+    }
+  }
+
   const _relaunchCount = (keepCount: boolean) => {
     if (keepCount) setOldCount(count ?? null)
     dispatch(
@@ -175,6 +189,7 @@ const ControlPanel: React.FC<{
     setRequestShare({ currentSnapshot, requestId, requestName, name: '', uuid: '' })
     setOpenShareRequestModal(true)
   }
+
   const handleCloseSharedModal = () => {
     setRequestShare(null)
     setOpenShareRequestModal(false)
@@ -200,7 +215,6 @@ const ControlPanel: React.FC<{
       const snapshot: Snapshot = await services.cohortCreation.fetchSnapshot(snapshotId)
       const newNavHistoryIndex = getNewNavHistoryIndex(navHistory, currentSnapshot)
       const newCurrentSnapshot: CurrentSnapshot = { ...snapshot, navHistoryIndex: newNavHistoryIndex }
-
       dispatch(addActionToNavHistory(newCurrentSnapshot))
       dispatch(unbuildCohortCreation({ newCurrentSnapshot }))
     }
@@ -366,6 +380,23 @@ const ControlPanel: React.FC<{
               >
                 <Tooltip title="Supprimer les groupes ne contenant aucun élément">
                   <Typography className={classes.boldText}>Nettoyer le diagramme</Typography>
+                </Tooltip>
+              </Button>
+            </>
+          )}
+
+          {/* Execute the query in json view */}
+          {viewMode === 'json' && (
+            <>
+              <Divider />
+              <Button
+                onClick={executeJson}
+                className={classes.actionButton}
+                disabled={!!canExecuteJson}
+                startIcon={<PlayArrowIcon color="action" className={classes.iconBorder} />}
+              >
+                <Tooltip title="Exécuter la requête construite dans l'interface Json">
+                  <Typography className={classes.boldText}>Exécuter la requête</Typography>
                 </Tooltip>
               </Button>
             </>

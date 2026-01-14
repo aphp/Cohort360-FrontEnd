@@ -101,7 +101,7 @@ type RequeteurGroupType =
  * Complete search request structure in Requeteur format.
  * This is the top-level object that gets serialized and sent to the backend.
  */
-type RequeteurSearchType = {
+export type RequeteurSearchType = {
   /** Version of the Requeteur format */
   version: string
   /** Type identifier for the request */
