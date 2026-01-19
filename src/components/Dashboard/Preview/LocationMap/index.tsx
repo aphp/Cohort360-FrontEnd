@@ -1,5 +1,6 @@
-import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react'
+import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import L, { LatLngBounds, LatLngTuple } from 'leaflet'
+import { Location } from 'fhir/r4'
 // https://github.com/PaulLeCam/react-leaflet/issues/1077
 //@ts-ignore
 import { Polygon, Rectangle, Tooltip, useMapEvents } from 'react-leaflet'
@@ -36,6 +37,12 @@ const MIN_ZOOM = 8
 const DEFAULT_MAP_CENTER: LatLngTuple = [48.8575, 2.3514]
 const TILE_URL = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
 const MAP_COPYRIGHTS = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+// Debounce delay for map pan/zoom events to reduce API call frequency
+const MAP_DEBOUNCE_DELAY_MS = 300
+// Maximum number of concurrent tile fetch requests to avoid overwhelming the backend
+const MAX_CONCURRENT_TILE_REQUESTS = 3
+// Minimum zoom level at which IRIS zones are fetched (zoomed out = more zones = heavier load)
+const MIN_ZOOM_FOR_IRIS_FETCH = 10
 const COLOR_PALETTE = [
   '#fad370',
   '#fac55c',
@@ -67,33 +74,57 @@ const IrisZones = (props: IrisZonesProps) => {
   const [zones, setZones] = useState<{ [id: string]: ZoneInfo }>({})
   const [visibleZones, setVisibleZones] = useState<Array<ZoneInfo>>([])
   const [bounds, setBounds] = useState<LatLngBounds | null>(null)
+  const [debouncedBounds, setDebouncedBounds] = useState<LatLngBounds | null>(null)
+  const [currentZoom, setCurrentZoom] = useState<number>(10)
   const [loadedBounds, setLoadedBounds] = useState<LatLngBounds[]>([])
   const [loadingBounds, setLoadingBounds] = useState<LatLngBounds[]>([])
   const [maxCount, setMaxCount] = useState(MAX_COUNT_DEFAULT)
   const [zoneOpacity, setZoneOpacity] = useState(ZONE_COLOR_OPACITY * 100)
   const colorPalette = getColorPalette(COLOR_PALETTE, maxCount)
+  // Refs for debouncing and request management
+  const debounceTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+  const abortControllerRef = useRef<AbortController | null>(null)
 
-  const updateBounds = useCallback((newBounds: LatLngBounds) => {
+  const updateBounds = useCallback((newBounds: LatLngBounds, zoom: number) => {
     setBounds((prevBounds) => {
       if (prevBounds !== null && newBounds.equals(prevBounds)) {
         return prevBounds
       }
       return newBounds
     })
+    setCurrentZoom(zoom)
   }, [])
 
-  // Update bounds on map move
+  // Debounce bounds changes to avoid flooding the API during rapid pan/zoom
+  useEffect(() => {
+    if (!bounds) return
+    // Clear any pending debounce timer
+    if (debounceTimeoutRef.current) {
+      clearTimeout(debounceTimeoutRef.current)
+    }
+    // Set a new debounce timer
+    debounceTimeoutRef.current = setTimeout(() => {
+      setDebouncedBounds(bounds)
+    }, MAP_DEBOUNCE_DELAY_MS)
+    return () => {
+      if (debounceTimeoutRef.current) {
+        clearTimeout(debounceTimeoutRef.current)
+      }
+    }
+  }, [bounds])
+
+  // Update bounds on map move (with zoom tracking)
   const map = useMapEvents({
     moveend: () => {
-      updateBounds(map.getBounds())
+      updateBounds(map.getBounds(), map.getZoom())
     },
     zoomend: () => {
-      updateBounds(map.getBounds())
+      updateBounds(map.getBounds(), map.getZoom())
     }
   })
   // Update bounds on first render
   useEffect(() => {
-    updateBounds(map.getBounds())
+    updateBounds(map.getBounds(), map.getZoom())
   }, [map, updateBounds])
 
   // Reset zones when cohortId changes
@@ -101,15 +132,30 @@ const IrisZones = (props: IrisZonesProps) => {
     setVisibleZones([])
     setZones({})
     setLoadedBounds([])
+    setDebouncedBounds(null)
     setMaxCount(MAX_COUNT_DEFAULT)
   }, [cohortId])
 
-  // Fetch zones when bounds or nearFilter change
+  // Fetch zones when debounced bounds change (uses debounced bounds to avoid API flooding)
   useEffect(() => {
+    // Cancel any previous in-flight request
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort()
+    }
     const abortController = new AbortController()
-    if (bounds) {
+    abortControllerRef.current = abortController
+
+    if (debouncedBounds) {
+      // Skip fetching if zoomed out too far (prevents heavy queries when viewing large areas)
+      // Use minZoom from config, which also controls the map's minimum zoom level
+      const minZoomThreshold = appConfig.features.locationMap.minZoom || MIN_ZOOM_FOR_IRIS_FETCH
+      if (currentZoom < minZoomThreshold) {
+        setDataLoading(false)
+        return
+      }
+
       // If the current viewbox is already covered by the loaded bounds, do not fetch new locations
-      if (isBoundCovered(map, bounds, loadedBounds)) {
+      if (isBoundCovered(map, debouncedBounds, loadedBounds)) {
         setDataLoading(false)
         return
       }
@@ -118,29 +164,40 @@ const IrisZones = (props: IrisZonesProps) => {
         try {
           setDataLoading(true)
           // Fetch fhir locations for the current viewbox using the near filter
-          const smallBounds = uncoveredBoundMeshUnits(map, bounds, loadedBounds)
+          const smallBounds = uncoveredBoundMeshUnits(map, debouncedBounds, loadedBounds)
           if (DEBUG_SHOW_LOADED_BOUNDS) {
             setLoadingBounds(smallBounds)
           }
-          const locationParts = await Promise.all(
-            smallBounds.map(async (boundPart, i) => {
-              const loadingPartProgress = (stage: number, total: number) => {
-                updateLoadingProgress(i, stage, total, smallBounds.length)
-              }
-              const nearFilter = computeNearFilter(map, boundPart)
-              return await getAllResults(
-                fetchLocation,
-                {
-                  _list: [cohortId],
-                  size: LOCATION_FETCH_BATCH_SIZE,
-                  near: nearFilter,
-                  signal: abortController.signal
-                },
-                loadingPartProgress
-              )
-            })
-          )
-          const locations = locationParts.flat()
+
+          // Fetch tiles with limited concurrency to avoid overwhelming the backend
+          const locations: Location[] = []
+          for (let i = 0; i < smallBounds.length; i += MAX_CONCURRENT_TILE_REQUESTS) {
+            // Check if request was aborted
+            if (abortController.signal.aborted) {
+              return
+            }
+            const batchBounds = smallBounds.slice(i, i + MAX_CONCURRENT_TILE_REQUESTS)
+            const batchResults = await Promise.all(
+              batchBounds.map(async (boundPart, j) => {
+                const batchIndex = i + j
+                const loadingPartProgress = (stage: number, total: number) => {
+                  updateLoadingProgress(batchIndex, stage, total, smallBounds.length)
+                }
+                const nearFilter = computeNearFilter(map, boundPart)
+                return await getAllResults(
+                  fetchLocation,
+                  {
+                    _list: [cohortId],
+                    size: LOCATION_FETCH_BATCH_SIZE,
+                    near: nearFilter,
+                    signal: abortController.signal
+                  },
+                  loadingPartProgress
+                )
+              })
+            )
+            locations.push(...batchResults.flat())
+          }
 
           if (locations) {
             // updates loaded zones
@@ -167,10 +224,10 @@ const IrisZones = (props: IrisZonesProps) => {
               )
               // update the loaded bounds
               setLoadedBounds((prevLoadedBounds) => {
-                if (prevLoadedBounds.some((b) => b.equals(bounds))) {
+                if (prevLoadedBounds.some((b) => b.equals(debouncedBounds))) {
                   return prevLoadedBounds
                 }
-                return prevLoadedBounds.concat(bounds)
+                return prevLoadedBounds.concat(debouncedBounds)
               })
 
               return newZones
@@ -178,8 +235,11 @@ const IrisZones = (props: IrisZonesProps) => {
           }
           setDataLoading(false)
         } catch (error) {
+          // Ignore abort errors (normal when the user moves the map too fast)
+          if (error instanceof Error && error.name === 'AbortError') {
+            return
+          }
           // TODO use snackbar setMessage to display error instead
-          // except if the error if of type AbortError (which is normal when the user moves the map too fast)
           console.error(error)
         }
       })()
@@ -189,13 +249,15 @@ const IrisZones = (props: IrisZonesProps) => {
     }
   }, [
     cohortId,
-    bounds,
+    debouncedBounds,
+    currentZoom,
     updateLoadingProgress,
     setDataLoading,
     map,
     loadedBounds,
     appConfig.features.locationMap.extensions.locationShapeUrl,
-    appConfig.features.locationMap.extensions.locationCount
+    appConfig.features.locationMap.extensions.locationCount,
+    appConfig.features.locationMap.minZoom
   ])
 
   // Update visible zones (and max visible count) when zones or bounds change
