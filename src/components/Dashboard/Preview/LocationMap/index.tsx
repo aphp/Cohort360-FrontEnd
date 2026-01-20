@@ -1,4 +1,5 @@
 import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
+import axios from 'axios'
 import L, { LatLngBounds, LatLngTuple } from 'leaflet'
 import { Location } from 'fhir/r4'
 // https://github.com/PaulLeCam/react-leaflet/issues/1077
@@ -33,7 +34,6 @@ const LOCATION_FETCH_BATCH_SIZE = 2000
 const MAX_COUNT_QUANTILE = 0.96
 const ZONE_COLOR_OPACITY = 0.37
 const BORDER_RELATIVE_OPACITY = 1.33
-const MIN_ZOOM = 8
 const DEFAULT_MAP_CENTER: LatLngTuple = [48.8575, 2.3514]
 const TILE_URL = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
 const MAP_COPYRIGHTS = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -127,14 +127,18 @@ const IrisZones = (props: IrisZonesProps) => {
     updateBounds(map.getBounds(), map.getZoom())
   }, [map, updateBounds])
 
-  // Reset zones when cohortId changes
+  // Reset zones when cohortId changes and trigger new fetch
   useEffect(() => {
     setVisibleZones([])
     setZones({})
     setLoadedBounds([])
-    setDebouncedBounds(null)
     setMaxCount(MAX_COUNT_DEFAULT)
-  }, [cohortId])
+    // Trigger fetch for new cohort by setting debouncedBounds to current bounds
+    // (setting to null would prevent fetch until user pans/zooms)
+    if (bounds) {
+      setDebouncedBounds(bounds)
+    }
+  }, [cohortId]) // eslint-disable-line react-hooks/exhaustive-deps -- bounds intentionally excluded to avoid re-triggering on pan/zoom
 
   // Fetch zones when debounced bounds change (uses debounced bounds to avoid API flooding)
   useEffect(() => {
@@ -174,6 +178,7 @@ const IrisZones = (props: IrisZonesProps) => {
           for (let i = 0; i < smallBounds.length; i += MAX_CONCURRENT_TILE_REQUESTS) {
             // Check if request was aborted
             if (abortController.signal.aborted) {
+              // Don't clear loading - another fetch is likely starting
               return
             }
             const batchBounds = smallBounds.slice(i, i + MAX_CONCURRENT_TILE_REQUESTS)
@@ -235,12 +240,14 @@ const IrisZones = (props: IrisZonesProps) => {
           }
           setDataLoading(false)
         } catch (error) {
-          // Ignore abort errors (normal when the user moves the map too fast)
-          if (error instanceof Error && error.name === 'AbortError') {
+          // Ignore abort/cancel errors (normal when user pans/zooms rapidly)
+          if (axios.isCancel(error) || (error instanceof Error && error.name === 'AbortError')) {
+            // Don't clear loading - another fetch is likely starting
             return
           }
           // TODO use snackbar setMessage to display error instead
           console.error(error)
+          setDataLoading(false) // Clear loading on real errors
         }
       })()
     }
@@ -438,7 +445,7 @@ const LocationMap = (props: LocationMapProps) => {
         renderer={L.canvas()}
         center={center}
         zoom={10}
-        minZoom={appConfig.features.locationMap.minZoom || MIN_ZOOM}
+        minZoom={appConfig.features.locationMap.minZoom || MIN_ZOOM_FOR_IRIS_FETCH}
         scrollWheelZoom={true}
         style={{ height: '500px', width: '100%' }}
       >
