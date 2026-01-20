@@ -1,6 +1,43 @@
 import L, { LatLngBounds, LatLngTuple } from 'leaflet'
 
 /**
+ * Compute the centroid (center of mass) of a polygon defined by an array of LatLngTuple.
+ * Uses the standard polygon centroid formula for simple polygons.
+ */
+export const computeCentroid = (shape: LatLngTuple[]): LatLngTuple | null => {
+  if (!shape || shape.length === 0) return null
+  if (shape.length === 1) return shape[0]
+  if (shape.length === 2) {
+    return [(shape[0][0] + shape[1][0]) / 2, (shape[0][1] + shape[1][1]) / 2]
+  }
+
+  let signedArea = 0
+  let cx = 0
+  let cy = 0
+
+  for (let i = 0; i < shape.length; i++) {
+    const [lat0, lng0] = shape[i]
+    const [lat1, lng1] = shape[(i + 1) % shape.length]
+    const a = lat0 * lng1 - lat1 * lng0
+    signedArea += a
+    cx += (lat0 + lat1) * a
+    cy += (lng0 + lng1) * a
+  }
+
+  signedArea *= 0.5
+  if (Math.abs(signedArea) < 1e-10) {
+    // Degenerate polygon, fall back to simple average
+    const avgLat = shape.reduce((sum, p) => sum + p[0], 0) / shape.length
+    const avgLng = shape.reduce((sum, p) => sum + p[1], 0) / shape.length
+    return [avgLat, avgLng]
+  }
+
+  cx /= 6 * signedArea
+  cy /= 6 * signedArea
+  return [cx, cy]
+}
+
+/**
  * Transform the string polygon description retrieved by FHIR (POLYGON((lat lng, lat lng, ...))) into an array of LatLngTuple
  */
 export const parseShape = (polygons?: string): LatLngTuple[] | null => {

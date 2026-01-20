@@ -1,16 +1,18 @@
-import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react'
+import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import L, { LatLngBounds, LatLngTuple } from 'leaflet'
 // https://github.com/PaulLeCam/react-leaflet/issues/1077
 //@ts-ignore
-import { Polygon, Rectangle, Tooltip, useMapEvents } from 'react-leaflet'
+import { Polygon, Rectangle, Tooltip, useMap, useMapEvents } from 'react-leaflet'
 //@ts-ignore
 import { MapContainer } from 'react-leaflet/MapContainer'
 //@ts-ignore
 import { TileLayer } from 'react-leaflet/TileLayer'
+import axios from 'axios'
 import { fetchLocation } from 'services/aphp/callApi'
 import { getAllResults } from 'utils/apiHelpers'
 import {
   colorize,
+  computeCentroid,
   computeNearFilter,
   getColorPalette,
   isBoundCovered,
@@ -24,6 +26,7 @@ import CircularProgressWithLabel from 'components/ui/CircularProgressWithLabel'
 import useMultipartDataLoading from './useMultipartDataLoading'
 import { getExtension } from 'utils/fhir'
 import { AppConfig } from 'config'
+import { Location } from 'fhir/r4'
 
 const DEBUG_SHOW_LOADED_BOUNDS = false
 const SHOW_OPACITY_CONTROL = false
@@ -58,6 +61,94 @@ type ZoneInfo = { shape: LatLngTuple[]; meta: { count: number; name: string; id:
 
 type IrisZonesProps = {
   cohortId: string
+}
+
+// Number of locations to fetch to find the best center (fetched without geo-filter, sorted by count desc)
+const AUTO_CENTER_FETCH_SIZE = 100
+
+/**
+ * Component that auto-centers the map on the zone with the highest patient density.
+ * Fetches a sample of locations without geo-filter on initial load and cohort change,
+ * finds the one with the highest count, and pans the map to its centroid.
+ */
+const AutoCenterMap = (props: { cohortId: string }) => {
+  const { cohortId } = props
+  const appConfig = useContext(AppConfig)
+  const map = useMap()
+  const [hasCentered, setHasCentered] = useState(false)
+  const abortControllerRef = useRef<AbortController | null>(null)
+
+  useEffect(() => {
+    // Reset centered flag when cohort changes
+    setHasCentered(false)
+  }, [cohortId])
+
+  useEffect(() => {
+    if (hasCentered) return
+
+    // Cancel any previous in-flight request
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort()
+    }
+    const abortController = new AbortController()
+    abortControllerRef.current = abortController
+
+    ;(async () => {
+      try {
+        // Fetch locations without geo-filter to find the zone with highest patient count
+        const response = await fetchLocation({
+          _list: [cohortId],
+          size: AUTO_CENTER_FETCH_SIZE,
+          signal: abortController.signal
+        })
+
+        if (abortController.signal.aborted) return
+
+        const locations = response.data?.entry?.map((e) => e.resource).filter(Boolean) || []
+        if (locations.length === 0) return
+
+        // Find the location with the highest count
+        let maxCount = 0
+        let bestLocation: Location | null = null
+        for (const loc of locations) {
+          const count = getExtension(loc, appConfig.features.locationMap.extensions.locationCount)?.valueInteger || 0
+          if (count > maxCount) {
+            maxCount = count
+            bestLocation = loc
+          }
+        }
+
+        if (!bestLocation) return
+
+        // Parse the shape and compute the centroid
+        const shapeString = getExtension(
+          bestLocation,
+          appConfig.features.locationMap.extensions.locationShapeUrl
+        )?.valueString
+        const shape = parseShape(shapeString)
+        if (!shape || shape.length === 0) return
+
+        const centroid = computeCentroid(shape)
+        if (!centroid) return
+
+        // Pan the map to the centroid with animation
+        map.flyTo(centroid, map.getZoom(), { animate: true, duration: 0.5 })
+        setHasCentered(true)
+      } catch (error) {
+        // Ignore abort/cancel errors
+        if (axios.isCancel(error) || (error instanceof Error && error.name === 'AbortError')) {
+          return
+        }
+        console.error('Failed to auto-center map:', error)
+      }
+    })()
+
+    return () => {
+      cancelPendingRequest(abortController)
+    }
+  }, [cohortId, hasCentered, map, appConfig.features.locationMap.extensions.locationCount, appConfig.features.locationMap.extensions.locationShapeUrl])
+
+  return null // This component only produces side effects
 }
 
 const IrisZones = (props: IrisZonesProps) => {
@@ -380,6 +471,7 @@ const LocationMap = (props: LocationMapProps) => {
         scrollWheelZoom={true}
         style={{ height: '500px', width: '100%' }}
       >
+        <AutoCenterMap cohortId={cohortId} />
         <IrisZones cohortId={cohortId} />
         <TileLayer attribution={MAP_COPYRIGHTS} url={TILE_URL} />
       </MapContainer>
