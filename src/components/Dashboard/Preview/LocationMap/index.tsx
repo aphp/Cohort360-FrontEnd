@@ -129,6 +129,11 @@ const IrisZones = (props: IrisZonesProps) => {
 
   // Reset zones when cohortId changes and trigger new fetch
   useEffect(() => {
+    // Clear any pending debounce timer to prevent stale bounds from the old cohort
+    if (debounceTimeoutRef.current) {
+      clearTimeout(debounceTimeoutRef.current)
+      debounceTimeoutRef.current = null
+    }
     setVisibleZones([])
     setZones({})
     setLoadedBounds([])
@@ -151,8 +156,11 @@ const IrisZones = (props: IrisZonesProps) => {
 
     if (debouncedBounds) {
       // Skip fetching if zoomed out too far (prevents heavy queries when viewing large areas)
-      // Use minZoom from config, which also controls the map's minimum zoom level
-      const minZoomThreshold = appConfig.features.locationMap.minZoom || MIN_ZOOM_FOR_IRIS_FETCH
+      // Use the higher of: config minZoom or MIN_ZOOM_FOR_IRIS_FETCH to ensure consistent behavior
+      const minZoomThreshold = Math.max(
+        appConfig.features.locationMap.minZoom || MIN_ZOOM_FOR_IRIS_FETCH,
+        MIN_ZOOM_FOR_IRIS_FETCH
+      )
       if (currentZoom < minZoomThreshold) {
         setDataLoading(false)
         return
@@ -241,7 +249,12 @@ const IrisZones = (props: IrisZonesProps) => {
           setDataLoading(false)
         } catch (error) {
           // Ignore abort/cancel errors (normal when user pans/zooms rapidly)
-          if (axios.isCancel(error) || (error instanceof Error && error.name === 'AbortError')) {
+          // Check for axios cancel, DOMException AbortError (browser), and Error AbortError (node)
+          const isAbortError =
+            axios.isCancel(error) ||
+            (typeof DOMException !== 'undefined' && error instanceof DOMException && error.name === 'AbortError') ||
+            (error instanceof Error && error.name === 'AbortError')
+          if (isAbortError) {
             // Don't clear loading - another fetch is likely starting
             return
           }
