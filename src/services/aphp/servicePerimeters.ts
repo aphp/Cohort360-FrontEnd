@@ -127,7 +127,7 @@ const servicesPerimeters: IServicePerimeters = {
 
   fetchPerimetersInfos: async (perimetersId) => {
     const [djangoResponse, patientsResp, encountersResp] = await Promise.all([
-      servicesPerimeters.getPerimeters({ cohortIds: perimetersId }),
+      servicesPerimeters.getPerimeters({ cohortIds: perimetersId, limit: -1 }),
       fetchPatient({
         pivotFacet: ['age-month_gender', 'deceased_gender'],
         _list: perimetersId.split(','),
