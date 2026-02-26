@@ -34,13 +34,13 @@ jobs:
           echo "VERSION=$VERSION" >> $GITHUB_ENV
       - name: Debug Sonar Token
         run: |
-          if [ -z "${{ secrets.SONAR_TOKEN }}" ]; then
+          if [ -z "${{ secrets.SONAR_TOKEN_NEW }}" ]; then
             echo "SONAR_TOKEN est vide ou non défini"
           else
             echo "SONAR_TOKEN est défini (longueur: ${#SONAR_TOKEN})"
           fi
         env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN_NEW }}
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@v3
         env:
