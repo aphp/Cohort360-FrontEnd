@@ -44,19 +44,24 @@ export const fetchExportTablesRelationsInfo = async (tableList: string[]) => {
   }
 }
 
-export const downloadExport = async (id: string, name: string, signal?: AbortSignal) => {
+export const downloadExport = async (id: string, name: string, output_format: string, signal?: AbortSignal) => {
   try {
     const blob = (await _downloadExport({ id, signal })) as unknown as Blob
+
+    if (!blob) return
+
+    const extension = output_format === 'xlsx' ? 'xlsx' : 'csv'
+    const filename = `${name}.${extension}`
+
     const url = window.URL.createObjectURL(blob)
     const link = document.createElement('a')
 
     link.href = url
-    link.download = `${name}.zip`
+    link.download = filename
 
     document.body.appendChild(link)
     link.click()
     document.body.removeChild(link)
-
     window.URL.revokeObjectURL(url)
   } catch (error) {
     console.error('Download error:', error)

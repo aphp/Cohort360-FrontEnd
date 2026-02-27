@@ -17,7 +17,7 @@ const mapExportsToRows = (list: ExportList[], callbacks: ExportCallbacks) => {
       {
         title: 'Télécharger l’export',
         icon: Download,
-        onClick: () => onDownload(elem.uuid, elem.target_name ?? elem.uuid),
+        onClick: () => onDownload(elem.uuid, elem.target_name ?? elem.uuid, elem.output_format ?? ''),
         disabled:
           elem.request_job_status !== JobStatus.FINISHED || (elem.created_at && isDateBefore(elem.created_at, 7))
       },
