@@ -1,4 +1,10 @@
-import { fetchExportTableInfo, fetchExportTableRelationInfo, fetchExportList } from 'services/aphp/callApi'
+import {
+  fetchExportTableInfo,
+  fetchExportTableRelationInfo,
+  fetchExportList,
+  downloadExport as _downloadExport,
+  retryExport as _retryExport
+} from 'services/aphp/callApi'
 import { getConfig } from 'config'
 import { AxiosResponse } from 'axios'
 import { Export, Cohort } from 'types'
@@ -35,6 +41,42 @@ export const fetchExportTablesRelationsInfo = async (tableList: string[]) => {
   } catch (error) {
     console.error(error)
     return []
+  }
+}
+
+export const downloadExport = async (id: string, name: string, output_format: string, signal?: AbortSignal) => {
+  try {
+    const blob = (await _downloadExport({ id, signal })) as unknown as Blob
+
+    if (!blob) return
+
+    const extension = output_format === 'xlsx' ? 'xlsx' : 'csv'
+    const filename = `${name}.${extension}`
+
+    const url = window.URL.createObjectURL(blob)
+    const link = document.createElement('a')
+
+    link.href = url
+    link.download = filename
+
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    window.URL.revokeObjectURL(url)
+  } catch (error) {
+    console.error('Download error:', error)
+  }
+}
+
+export const retryExport = async (id: string, signal?: AbortSignal) => {
+  try {
+    const response = await _retryExport({ id, signal })
+    return response
+  } catch (error) {
+    return {
+      count: 0,
+      results: []
+    }
   }
 }
 

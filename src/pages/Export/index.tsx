@@ -9,7 +9,7 @@ import { Grid, CircularProgress, Tooltip, Box } from '@mui/material'
 import SearchInput from 'components/ui/Searchbar/SearchInput'
 import DataTable from 'components/ui/Table'
 import { useNavigate, useSearchParams } from 'react-router-dom'
-import { fetchExportsList } from 'services/aphp/serviceExportCohort'
+import { downloadExport, fetchExportsList, retryExport } from 'services/aphp/serviceExportCohort'
 import { cleanSearchParams } from 'utils/paginationUtils'
 import { Back_API_Response, LoadingStatus } from 'types'
 import { cancelPendingRequest } from 'utils/abortController'
@@ -91,6 +91,14 @@ const Export = () => {
     _fetchExportList({ page, input: args.input ?? searchInput ?? '', orderBy: args.orderBy ?? orderBy })
   }
 
+  const onDownload = (id: string, name: string, output_format: string) =>
+    downloadExport(id, name, output_format, controllerRef.current?.signal)
+
+  const onRetry = async (id: string) => {
+    await retryExport(id, controllerRef.current?.signal)
+    handleSearch({ page: 1 })
+  }
+
   useEffect(() => {
     handleSearch({ page: Math.max(1, parseInt(searchParams.get('page') ?? '1', 10)) })
   }, [])
@@ -99,7 +107,18 @@ const Export = () => {
     if (deidentified) navigate('/home')
   }, [deidentified, navigate])
 
-  const table = useMemo(() => mapExportListToTable(exportList?.results ?? []), [exportList])
+  const table = useMemo(
+    () =>
+      mapExportListToTable(exportList?.results ?? [], {
+        onDownload: (id, name, output_format) => {
+          void onDownload(id, name, output_format)
+        },
+        onRetry: (id) => {
+          void onRetry(id)
+        }
+      }),
+    [exportList]
+  )
 
   return (
     <PageContainer>
