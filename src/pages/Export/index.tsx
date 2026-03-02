@@ -91,7 +91,8 @@ const Export = () => {
     _fetchExportList({ page, input: args.input ?? searchInput ?? '', orderBy: args.orderBy ?? orderBy })
   }
 
-  const onDownload = (id: string, name: string, output_format: string) => downloadExport(id, name, output_format, controllerRef.current?.signal)
+  const onDownload = (id: string, name: string, output_format: string) =>
+    downloadExport(id, name, output_format, controllerRef.current?.signal)
 
   const onRetry = async (id: string) => {
     await retryExport(id, controllerRef.current?.signal)
