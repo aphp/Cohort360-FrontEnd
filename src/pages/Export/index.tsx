@@ -107,7 +107,18 @@ const Export = () => {
     if (deidentified) navigate('/home')
   }, [deidentified, navigate])
 
-  const table = useMemo(() => mapExportListToTable(exportList?.results ?? [], { onDownload, onRetry }), [exportList])
+  const table = useMemo(
+    () =>
+      mapExportListToTable(exportList?.results ?? [], {
+        onDownload: (id, name, output_format) => {
+          void onDownload(id, name, output_format)
+        },
+        onRetry: (id) => {
+          void onRetry(id)
+        }
+      }),
+    [exportList]
+  )
 
   return (
     <PageContainer>
