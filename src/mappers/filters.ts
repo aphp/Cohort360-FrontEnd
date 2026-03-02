@@ -114,7 +114,7 @@ const mapGenericFromRequestParams = async (parameters: URLSearchParams, type: Re
   const executiveUnitsParams = parameters.get(getGenericKeyFromResourceType(type, 'EXECUTIVE_UNITS'))
   let executiveUnits: Hierarchy<ScopeElement>[] = []
   if (executiveUnitsParams) {
-    const fetchedData = await servicesPerimeters.getPerimeters({ ids: executiveUnitsParams })
+    const fetchedData = await servicesPerimeters.getPerimeters({ ids: executiveUnitsParams, limit: -1 })
     executiveUnits = fetchedData.results
   }
   const encounterStatusParams = decodeURIComponent(
