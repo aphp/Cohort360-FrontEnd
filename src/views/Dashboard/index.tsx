@@ -87,7 +87,7 @@ const Dashboard = ({ context }: DashboardProps) => {
     ],
     [appConfig, dashboard]
   )
-  const { availableTabs, subTabs, selectedTab, selectedSubTab, handleChangeTab, handleChangeSubTab } =
+  const { tabs, subTabs, currentTab, currentSubTab, effectiveValue, handleChangeTab, handleChangeSubTab } =
     useTabs(tabConfig)
 
   const config = useMemo(
@@ -95,22 +95,16 @@ const Dashboard = ({ context }: DashboardProps) => {
     [dashboard.deidentifiedBoolean, groupId]
   )
 
-  const selectedConfig = useMemo(
-    () =>
-      config.get(
-        (selectedSubTab ?? selectedTab) as ExplorationResourceType,
-        selectedSubTab === ResourceType.PATIENT || selectedTab === ResourceType.PATIENT
-          ? { ...DISPLAY_OPTIONS, diagrams: true }
-          : undefined
-      ),
-    [config, selectedSubTab, selectedTab]
-  )
+  const selectedConfig = useMemo(() => {
+    const options = effectiveValue === ResourceType.PATIENT ? { ...DISPLAY_OPTIONS, diagrams: true } : undefined
+    return config.get(effectiveValue as ExplorationResourceType, options)
+  }, [config, effectiveValue])
 
   useEffect(() => {
     dispatch(fetchExploredCohort({ context, id: groupId }))
   }, [context, groupId, dispatch])
 
-  if ((dashboard.loading === false && dashboard.rightToExplore === false) || selectedTab === ResourceType.CLAIM)
+  if ((dashboard.loading === false && dashboard.rightToExplore === false) || currentTab === ResourceType.CLAIM)
     return <CohortRightOrNotExist />
   else if (dashboard.loading === false && dashboard.totalPatients === 0) return <CohortNoPatient />
   return (
@@ -127,23 +121,18 @@ const Dashboard = ({ context }: DashboardProps) => {
                 id="mainTabs"
                 scrollButtons={'auto'}
                 variant="scrollable"
-                value={selectedTab}
+                value={currentTab}
                 onChange={(_, tab) => handleChangeTab(tab)}
               >
-                {availableTabs.map((tab) => {
-                  const groupIdParam = groupId ? `groupId=${groupId}` : ''
-                  const defaultSubTab = tab.subs?.[0]?.value
-                  const subtabParam = defaultSubTab ? `&subtab=${defaultSubTab}` : ''
-                  return (
-                    <Tab
-                      key={tab.value}
-                      label={tab.label}
-                      value={tab.value}
-                      component={Link}
-                      to={`/${context}/${tab.value}?${groupIdParam}${subtabParam}`}
-                    />
-                  )
-                })}
+                {tabs.map((tab) => (
+                  <Tab
+                    key={tab.value}
+                    label={tab.label}
+                    value={tab.value}
+                    component={Link}
+                    to={`/${context}/${tab.value}${groupId ? `?groupId=${groupId}` : ''}`}
+                  />
+                ))}
               </TabsWrapper>
             </Grid>
           </Grid>
@@ -151,30 +140,26 @@ const Dashboard = ({ context }: DashboardProps) => {
             <Grid size={11} sx={{ borderBottom: '1px solid #848484' }}>
               <TabsWrapper
                 id="subTabs"
-                value={selectedSubTab}
+                value={currentSubTab}
                 onChange={(_, newSubTab) => handleChangeSubTab(newSubTab)}
                 customVariant="secondary"
               >
-                {subTabs.map((subTab) => {
-                  const groupIdParam = groupId ? `groupId=${groupId}` : ''
-                  return (
-                    <Tab
-                      sx={{ fontSize: 12 }}
-                      key={subTab.value}
-                      label={subTab.label}
-                      value={subTab.value}
-                      component={Link}
-                      to={`/${context}/${selectedTab}?${groupIdParam}&subtab=${subTab.value}`}
-                    />
-                  )
-                })}
+                {subTabs.map((subTab) => (
+                  <Tab
+                    key={subTab.value}
+                    label={subTab.label}
+                    value={subTab.value}
+                    component={Link}
+                    to={`/${context}/${currentTab}?${groupId ? `groupId=${groupId}&` : ''}subtab=${subTab.value}`}
+                  />
+                ))}
               </TabsWrapper>
             </Grid>
           )}
         </Grid>
       </Grid>
       <Grid container size={11} sx={{ alignItems: 'center', flexDirection: 'column' }}>
-        {selectedTab === ResourceType.PREVIEW ? (
+        {currentTab === ResourceType.PREVIEW ? (
           <CohortPreview
             cohortId={
               context === URLS.COHORT || context === URLS.PERIMETERS

@@ -12,23 +12,29 @@ type TabConfig = {
 
 export const useTabs = (config: TabConfig[]) => {
   const { tabName } = useParams<{ tabName?: ResourceType }>()
+  const [currentTab, setCurrentTab] = useState<ResourceType>(tabName ?? ResourceType.PREVIEW)
 
-  const [selectedTab, setSelectedTab] = useState<ResourceType>(tabName ?? ResourceType.PREVIEW)
+  const tabs = useMemo(() => config.filter((t) => t.show), [config])
 
-  const availableTabs = useMemo(() => config.filter((tab) => tab.show), [config])
-  const subTabs = availableTabs.find((t) => t.value === selectedTab)?.subs ?? null
+  const subTabs = useMemo(() => tabs.find((t) => t.value === currentTab)?.subs ?? null, [tabs, currentTab])
 
+  // gère selectedSubTab uniquement si des sous-tabs existent
   const { selectedSubTab, handleChangeSubTab } = useValidatedSubTab(subTabs)
 
+  // règle clé : si pas de subTabs → subTab = null pour éviter un double render
+  const currentSubTab = subTabs ? selectedSubTab : null
+
   const handleChangeTab = (newTab: ResourceType) => {
-    setSelectedTab(newTab)
+    setCurrentTab(newTab)
   }
+  const effectiveValue = currentSubTab ?? currentTab
 
   return {
-    availableTabs,
-    selectedTab,
-    selectedSubTab,
+    tabs,
     subTabs,
+    currentTab,
+    currentSubTab,
+    effectiveValue,
     handleChangeTab,
     handleChangeSubTab
   }

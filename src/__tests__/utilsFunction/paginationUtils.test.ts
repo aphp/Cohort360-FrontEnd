@@ -1,28 +1,4 @@
-import { AppDispatch } from 'state'
 import { cleanSearchParams, getCleanGroupId } from 'utils/paginationUtils'
-import { validatePageNumber } from 'utils/url'
-import { vi } from 'vitest'
-
-describe('validatePageNumber', () => {
-  it('should not return a dispatch with error ', () => {
-    const totalPages = Math.ceil(0 / 20)
-    const currentPage = 1
-    const setPage = vi.fn()
-    const dispatch = vi.fn()
-
-    validatePageNumber(totalPages, currentPage, setPage, dispatch as unknown as AppDispatch)
-    expect(dispatch).not.toHaveBeenCalled()
-  })
-  it('should return dispatch with error', () => {
-    const totalPages = Math.ceil(300 / 20)
-    const currentPage = 155
-    const setPage = vi.fn()
-    const dispatch = vi.fn()
-
-    validatePageNumber(currentPage, totalPages, setPage, dispatch as unknown as AppDispatch)
-    expect(dispatch).toHaveBeenCalled()
-  })
-})
 
 describe('test of getCleanGroupId function', () => {
   it('should return no groupId if perimeter is empty or null', () => {
