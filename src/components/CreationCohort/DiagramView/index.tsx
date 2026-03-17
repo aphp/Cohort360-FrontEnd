@@ -75,7 +75,7 @@ const DiagramView: React.FC<DiagramViewWithAjvProps> = ({ isValidJson }) => {
       marginRight="300px"
       position="relative"
     >
-      <div style={{ minWidth: 500, paddingRight: 24 }}>
+      <div style={{ minWidth: 500, paddingRight: 24, display: 'flex', flexDirection: 'column', minHeight: '100%' }}>
         {maintenanceIsActive && (
           <CustomAlert severity="warning" style={{ marginTop: '-12px', marginBottom: '10px' }}>
             Une maintenance est en cours. Seules les consultations de cohortes, requêtes et données patients sont
@@ -90,35 +90,6 @@ const DiagramView: React.FC<DiagramViewWithAjvProps> = ({ isValidJson }) => {
           </CustomAlert>
         )}
         <CohortCreationBreadcrumbs />
-        {/* Switch between view modes */}
-        <Box
-          sx={{
-            position: 'absolute',
-            bottom: 8,
-            left: 8,
-            borderRadius: 1,
-            px: 1,
-            py: 0.5
-          }}
-        >
-          <Stack direction="row" alignItems="center" spacing={1}>
-            <Typography variant="caption" fontWeight={'bold'}>
-              Interface graphique
-            </Typography>
-            <PinkSwitch
-              size="medium"
-              checked={requestState.viewMode === 'json'}
-              onChange={(e) => {
-                dispatch(
-                  editDiagramViewMode(e.target.checked ? ViewMode.JSON_INTERFACE : ViewMode.LOGICAL_OPERATOR_INTERFACE)
-                )
-              }}
-            />
-            <Typography variant="caption" fontWeight={'bold'}>
-              Interface json
-            </Typography>
-          </Stack>
-        </Box>
 
         <Grid container justifyContent="center" alignItems="center">
           {selectedPopulation && selectedPopulation.length > 0 && (
@@ -149,6 +120,34 @@ const DiagramView: React.FC<DiagramViewWithAjvProps> = ({ isValidJson }) => {
         ) : (
           <JsonView onJsonIssuesChange={isValidJson} />
         )}
+
+        {/* Switch between view modes */}
+        <Box
+          sx={{
+            borderRadius: 1,
+            px: 1,
+            py: 0.5,
+            mt: 'auto'
+          }}
+        >
+          <Stack direction="row" alignItems="center" spacing={1}>
+            <Typography variant="caption" fontWeight={'bold'}>
+              Interface graphique
+            </Typography>
+            <PinkSwitch
+              size="medium"
+              checked={requestState.viewMode === 'json'}
+              onChange={(e) => {
+                dispatch(
+                  editDiagramViewMode(e.target.checked ? ViewMode.JSON_INTERFACE : ViewMode.LOGICAL_OPERATOR_INTERFACE)
+                )
+              }}
+            />
+            <Typography variant="caption" fontWeight={'bold'}>
+              Interface json
+            </Typography>
+          </Stack>
+        </Box>
       </div>
       <Panel
         title="Structure hospitalière"
