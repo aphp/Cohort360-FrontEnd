@@ -421,7 +421,7 @@ export const getExportTableLabel = (tableName: string) => {
     care_site: 'Structure hospitalière',
     iris: 'Zone géographique',
     visit_detail: 'Détail de prise en charge',
-    person: 'Patient',
+    patient: 'Patient',
     note: 'Fait - Documents cliniques',
     note_legacy: 'Fait - Documents cliniques',
     fact_relationship: 'Référentiel',
@@ -435,15 +435,15 @@ export const getExportTableLabel = (tableName: string) => {
 }
 
 /**
- * Sorts an array of table information, placing the 'person' table first.
+ * Sorts an array of table information, placing the 'patient' table first.
  *
  * @param {TableInfo[]} tables - Array of table information objects
- * @returns {TableInfo[]} Sorted array with 'person' table first
+ * @returns {TableInfo[]} Sorted array with 'patient' table first
  */
 export const sortTables = (tables: TableInfo[]): TableInfo[] => {
   return tables.sort((a, b) => {
-    if (a.name === 'person') return -1
-    if (b.name === 'person') return 1
+    if (a.name === 'Patient') return -1
+    if (b.name === 'Patient') return 1
     return a.name.localeCompare(b.name)
   })
 }

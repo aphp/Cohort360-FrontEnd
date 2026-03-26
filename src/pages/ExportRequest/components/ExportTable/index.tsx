@@ -136,7 +136,7 @@ const ExportTable: React.FC<ExportTableProps> = ({
   }
 
   const onDisableSelectedTable = () => {
-    if (exportTable.name === 'person') return true
+    if (exportTable.name === 'Patient') return true
     if (count === 0) return true
     if (oneFile && !isCompatibleTable(exportTable.name)) return true
     return false
