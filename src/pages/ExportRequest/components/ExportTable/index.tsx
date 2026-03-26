@@ -139,6 +139,7 @@ const ExportTable: React.FC<ExportTableProps> = ({
     if (exportTable.name === 'person') return true
     if (count === 0) return true
     if (oneFile && !isCompatibleTable(exportTable.name)) return true
+    if (oneFile && exportTable.name === 'note') return true
     return false
   }
 
