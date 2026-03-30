@@ -7,9 +7,6 @@
 /coverage
 /reports
 
-# documentation
-/docs
-
 # production
 /build
 
