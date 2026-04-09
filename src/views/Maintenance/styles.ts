@@ -1,5 +1,5 @@
+import type { Theme } from '@mui/material/styles'
 import { makeStyles } from 'tss-react/mui'
-import { Theme } from '@mui/material/styles'
 
 const pageBackground = '#ECF3FF'
 const primaryBlue = '#2456AA'
@@ -51,38 +51,20 @@ const useStyles = makeStyles()((theme: Theme) => ({
     fontSize: 'clamp(1.15rem, 1.8vw, 1.55rem)',
     lineHeight: 1.3,
     fontWeight: 700,
-    marginBottom: theme.spacing(1)
+    marginBottom: theme.spacing(3)
   },
-  bodyText: {
+  message: {
     color: bodyColor,
     fontSize: 'clamp(1rem, 1.2vw, 1.1rem)',
     lineHeight: 1.55,
-    marginBottom: theme.spacing(0.5)
-  },
-  list: {
-    margin: theme.spacing(1, 0, 2.5),
-    paddingLeft: theme.spacing(2.8),
-    color: bodyColor,
-    fontSize: 'clamp(1rem, 1.2vw, 1.1rem)',
-    lineHeight: 1.55,
-    '& li': {
-      marginBottom: theme.spacing(0.5)
-    }
-  },
-  supportLink: {
-    color: primaryBlue,
-    fontWeight: 700,
-    fontSize: 'clamp(1rem, 1.2vw, 1.1rem)',
-    textDecorationColor: primaryBlue,
-    '&:hover': {
-      color: deepBlue
-    }
+    whiteSpace: 'pre-line',
+    marginBottom: theme.spacing(4)
   },
   infoBanner: {
     display: 'flex',
     alignItems: 'center',
     gap: theme.spacing(1),
-    marginTop: theme.spacing(5),
+    marginTop: theme.spacing(2),
     width: 'fit-content',
     maxWidth: '100%',
     border: `1px solid ${cardBorder}`,

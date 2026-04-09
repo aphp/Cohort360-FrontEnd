@@ -13,29 +13,6 @@ const Maintenance = () => {
   const dispatch = useAppDispatch()
   const maintenance = useAppSelector((state) => state.me?.maintenance)
 
-  const formatMaintenanceDate = (value?: string) => {
-    if (!value) {
-      return null
-    }
-
-    const date = new Date(value)
-    if (Number.isNaN(date.getTime())) {
-      return null
-    }
-
-    return date.toLocaleString('fr-FR', {
-      weekday: 'long',
-      day: 'numeric',
-      month: 'long',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    })
-  }
-
-  const startLabel = formatMaintenanceDate(maintenance?.maintenance_start)
-  const endLabel = formatMaintenanceDate(maintenance?.maintenance_end)
-
   React.useEffect(() => {
     ;(async () => {
       const maintenanceResponse = await services.practitioner.maintenance()
@@ -61,24 +38,12 @@ const Maintenance = () => {
 
         <Typography className={classes.subtitle}>Nous rencontrons actuellement un incident technique</Typography>
 
-        <Typography className={classes.bodyText}>
-          Nous publierons ici chaque nouvelle information importante :
-        </Typography>
-
-        <Box component="ul" className={classes.list}>
-          {startLabel && <li>Début de l&apos;interruption : {startLabel}</li>}
-          {endLabel && <li>Prochaine mise à jour : {endLabel}</li>}
-        </Box>
-
-        <Typography className={classes.bodyText}>En cas de besoins, contactez le support :</Typography>
-        <Link className={classes.supportLink} href="mailto:id.recherche.support.dsn@aphp.fr">
-          id.recherche.support.dsn@aphp.fr
-        </Link>
+        {maintenance?.message && <Typography className={classes.message}>{maintenance.message}</Typography>}
 
         <Box className={classes.infoBanner}>
           <SaveIcon sx={{ fontSize: 14 }} />
           <Typography component="p" className={classes.infoBannerText}>
-            Les requêtes, cohortes et échantillons déjà enregistrées seront conservées.
+            Les requêtes, cohortes et échantillons déjà enregistrés seront conservées.
           </Typography>
         </Box>
       </Box>
