@@ -1,8 +1,9 @@
-import { createSlice, PayloadAction, createAsyncThunk, createAction } from '@reduxjs/toolkit'
-import { RootState } from 'state'
+import { createSlice, createAsyncThunk, createAction } from '@reduxjs/toolkit'
+import type { PayloadAction } from '@reduxjs/toolkit'
+import type { RootState } from 'state'
 
 import services from 'services/aphp'
-import { AccessExpiration, User } from '../types'
+import type { AccessExpiration, User } from '../types'
 import { IMPERSONATED_USER } from 'constants.js'
 
 /**
@@ -40,6 +41,8 @@ export type MeState = null | {
     maintenance_start: string
     /** Maintenance type */
     type: string
+    /** Maintenance subject */
+    subject?: string
     /** Maintenance message */
     message: string
   }
@@ -96,7 +99,7 @@ const meSlice = createSlice({
      * @param state - Current state
      * @param action - Action containing the user data
      */
-    login: (state: MeState, action: PayloadAction<MeState>) => {
+    login: (_state: MeState, action: PayloadAction<MeState>) => {
       return action.payload
     },
     /**
@@ -133,6 +136,7 @@ const meSlice = createSlice({
         maintenance_end: string
         maintenance_start: string
         type: string
+        subject?: string
         message: string
       }>
     ) => {

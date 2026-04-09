@@ -66,16 +66,8 @@ const Maintenance = () => {
         </Typography>
 
         <Box component="ul" className={classes.list}>
-          {startLabel && (
-            <li>
-              Début de l&apos;interruption : {startLabel}
-            </li>
-          )}
-          {endLabel && (
-            <li>
-              Prochaine mise à jour : {endLabel}
-            </li>
-          )}
+          {startLabel && <li>Début de l&apos;interruption : {startLabel}</li>}
+          {endLabel && <li>Prochaine mise à jour : {endLabel}</li>}
         </Box>
 
         <Typography className={classes.bodyText}>En cas de besoins, contactez le support :</Typography>
