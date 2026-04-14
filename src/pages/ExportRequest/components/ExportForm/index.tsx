@@ -41,6 +41,7 @@ import { Cohort } from 'types'
 import { TableSetting, TableInfo } from 'types/export'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { sortTables } from 'pages/ExportRequest/components/exportUtils'
+import { useDebounceAction } from 'hooks/useDebounceAction'
 
 import { getConfig } from 'config'
 
@@ -118,6 +119,7 @@ const ExportForm: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams()
   const cohortID = searchParams.get('groupId')
   const [loading, setLoading] = useState<boolean>(false)
+  const [exporting, setExporting] = useState<boolean>(false)
   const [cohortListLoading, setCohortListLoading] = useState<boolean>(false)
   const navigate = useNavigate()
   const dispatch = useAppDispatch()
@@ -339,6 +341,7 @@ const ExportForm: React.FC = () => {
     })
 
     const error = response.status !== 201
+    setExporting(false)
 
     dispatch(
       showDialog({
@@ -353,6 +356,8 @@ const ExportForm: React.FC = () => {
       })
     )
   }
+
+  const debouncedSubmitPayload = useDebounceAction(handleSubmitPayload, 500)
 
   const handleChangeMotivation = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     if (e.target.value.length < 10) {
@@ -629,8 +634,13 @@ const ExportForm: React.FC = () => {
                 }
               />
               <Button
-                disabled={conditions === false || motivation === null || error === Error.ERROR_MOTIF || limitError}
-                onClick={handleSubmitPayload}
+                disabled={
+                  conditions === false || motivation === null || error === Error.ERROR_MOTIF || limitError || exporting
+                }
+                onClick={() => {
+                  setExporting(true)
+                  debouncedSubmitPayload()
+                }}
               >
                 Confirmer
               </Button>
