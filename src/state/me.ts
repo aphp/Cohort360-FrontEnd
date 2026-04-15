@@ -46,7 +46,7 @@ export type MeState = null | {
     /** Maintenance message */
     message: string
     /** Is "data is saved" message hidden */
-    isDataSavedMessageHidden?: boolean
+    is_data_saved_message_hidden: boolean
   }
   /** Impersonated user information */
   impersonation?: User

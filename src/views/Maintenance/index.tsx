@@ -51,7 +51,7 @@ const Maintenance = () => {
           </Markdown>
         )}
 
-        {!maintenance?.isDataSavedMessageHidden && (
+        {!maintenance?.is_data_saved_message_hidden && (
           <Box className={classes.infoBanner}>
             <SaveIcon sx={{ fontSize: 14 }} />
             <Typography component="p" className={classes.infoBannerText}>
