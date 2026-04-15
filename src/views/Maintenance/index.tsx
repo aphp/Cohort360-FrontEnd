@@ -52,8 +52,8 @@ const Maintenance = () => {
         )}
 
         {!maintenance?.isDataSavedMessageHidden && (
-        <Box className={classes.infoBanner}>
-          <SaveIcon sx={{ fontSize: 14 }} />
+          <Box className={classes.infoBanner}>
+            <SaveIcon sx={{ fontSize: 14 }} />
             <Typography component="p" className={classes.infoBannerText}>
               Les requêtes, cohortes et échantillons déjà enregistrés seront conservées.
             </Typography>
