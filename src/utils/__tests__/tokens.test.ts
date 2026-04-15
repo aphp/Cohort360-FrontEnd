@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest'
 import { isTokenExpired, isAccessTokenValid } from 'utils/tokens'
-import { ACCESS_TOKEN } from 'constants'
+import { ACCESS_TOKEN } from 'constants.js'
 
 const makeJwt = (payload: Record<string, unknown>) => {
   const header = btoa(JSON.stringify({ alg: 'HS256' }))

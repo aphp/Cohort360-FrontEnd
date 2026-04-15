@@ -15,10 +15,10 @@ vi.mock('lodash', () => ({
   throttle: (callback: () => void) => callback
 }))
 
-import { AppConfig } from 'config'
+import { AppConfig, type AppConfig as AppConfigType } from 'config'
 import { useAppSelector } from 'state'
 import PrivateRoute from '../PrivateRoute'
-import { ACCESS_TOKEN } from 'constants'
+import { ACCESS_TOKEN } from 'constants.js'
 
 const mockedUseAppSelector = vi.mocked(useAppSelector)
 
@@ -30,7 +30,7 @@ const makeJwt = (exp: number) => {
 
 const renderPrivateRoute = () =>
   render(
-    <AppConfig.Provider value={{ system: { userTrackingBlacklist: [] } }}>
+    <AppConfig.Provider value={{ system: { userTrackingBlacklist: [] } } as unknown as AppConfigType}>
       <MemoryRouter initialEntries={['/private']}>
         <Routes>
           <Route element={<PrivateRoute />}>
