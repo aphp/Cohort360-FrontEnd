@@ -36,9 +36,6 @@ const Maintenance = () => {
       </Box>
       <Box className={classes.contentWrapper}>
         <Typography className={classes.title}>Cohort360 est temporairement indisponible</Typography>
-
-        <Typography className={classes.subtitle}>{maintenance?.subject}</Typography>
-
         {maintenance?.message && (
           <Markdown
             components={{
