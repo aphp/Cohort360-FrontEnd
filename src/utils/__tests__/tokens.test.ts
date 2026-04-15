@@ -27,9 +27,9 @@ describe('isTokenExpired', () => {
     expect(isTokenExpired(token)).toBe(false)
   })
 
-  it('retourne false si pas de champ exp (token sans expiry)', () => {
+  it('retourne true si pas de champ exp (token sans expiry)', () => {
     const token = makeJwt({ sub: 'user' })
-    expect(isTokenExpired(token)).toBe(false)
+    expect(isTokenExpired(token)).toBe(true)
   })
 })
 
