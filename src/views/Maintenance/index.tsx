@@ -3,6 +3,7 @@ import { Box, Link, Typography } from '@mui/material'
 import cohortLogo from 'assets/images/logo-login.png'
 import { isAxiosError } from 'axios'
 import React from 'react'
+import Markdown from 'react-markdown'
 import services from 'services/aphp'
 import { useAppDispatch, useAppSelector } from 'state'
 import { updateMaintenance } from 'state/me'
@@ -38,7 +39,20 @@ const Maintenance = () => {
 
         <Typography className={classes.subtitle}>{maintenance?.subject}</Typography>
 
-        {maintenance?.message && <Typography className={classes.message}>{maintenance.message}</Typography>}
+        {maintenance?.message && (
+          <Markdown
+            components={{
+              p: ({ children }) => <Typography className={classes.message}>{children}</Typography>,
+              a: ({ href, children }) => (
+                <Link href={href} target="_blank" rel="noopener noreferrer">
+                  {children}
+                </Link>
+              )
+            }}
+          >
+            {maintenance.message}
+          </Markdown>
+        )}
 
         {!maintenance?.isDataSavedMessageHidden && (
         <Box className={classes.infoBanner}>
