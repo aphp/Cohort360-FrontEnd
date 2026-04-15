@@ -36,16 +36,18 @@ const Maintenance = () => {
       <Box className={classes.contentWrapper}>
         <Typography className={classes.title}>Cohort360 est temporairement indisponible</Typography>
 
-        <Typography className={classes.subtitle}>Nous rencontrons actuellement un incident technique</Typography>
+        <Typography className={classes.subtitle}>{maintenance?.subject}</Typography>
 
         {maintenance?.message && <Typography className={classes.message}>{maintenance.message}</Typography>}
 
+        {!maintenance?.isDataSavedMessageHidden && (
         <Box className={classes.infoBanner}>
           <SaveIcon sx={{ fontSize: 14 }} />
-          <Typography component="p" className={classes.infoBannerText}>
-            Les requêtes, cohortes et échantillons déjà enregistrés seront conservées.
-          </Typography>
-        </Box>
+            <Typography component="p" className={classes.infoBannerText}>
+              Les requêtes, cohortes et échantillons déjà enregistrés seront conservées.
+            </Typography>
+          </Box>
+        )}
       </Box>
     </Box>
   )
