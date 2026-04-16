@@ -140,6 +140,7 @@ const meSlice = createSlice({
         type: string
         subject?: string
         message: string
+        is_data_saved_message_hidden: boolean
       }>
     ) => {
       if (state) {
