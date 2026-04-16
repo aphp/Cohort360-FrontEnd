@@ -1,5 +1,4 @@
 import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
-import axios from 'axios'
 import L, { LatLngBounds, LatLngTuple } from 'leaflet'
 import { Location } from 'fhir/r4'
 // https://github.com/PaulLeCam/react-leaflet/issues/1077
@@ -75,8 +74,8 @@ const IrisZones = (props: IrisZonesProps) => {
   const [visibleZones, setVisibleZones] = useState<Array<ZoneInfo>>([])
   const [bounds, setBounds] = useState<LatLngBounds | null>(null)
   const [debouncedBounds, setDebouncedBounds] = useState<LatLngBounds | null>(null)
-  const [currentZoom, setCurrentZoom] = useState<number>(10)
-  const [loadedBounds, setLoadedBounds] = useState<LatLngBounds[]>([])
+  const currentZoomRef = useRef<number>(10)
+  const loadedBoundsRef = useRef<LatLngBounds[]>([])
   const [loadingBounds, setLoadingBounds] = useState<LatLngBounds[]>([])
   const [maxCount, setMaxCount] = useState(MAX_COUNT_DEFAULT)
   const [zoneOpacity, setZoneOpacity] = useState(ZONE_COLOR_OPACITY * 100)
@@ -92,7 +91,7 @@ const IrisZones = (props: IrisZonesProps) => {
       }
       return newBounds
     })
-    setCurrentZoom(zoom)
+    currentZoomRef.current = zoom
   }, [])
 
   // Debounce bounds changes to avoid flooding the API during rapid pan/zoom
@@ -136,7 +135,7 @@ const IrisZones = (props: IrisZonesProps) => {
     }
     setVisibleZones([])
     setZones({})
-    setLoadedBounds([])
+    loadedBoundsRef.current = []
     setMaxCount(MAX_COUNT_DEFAULT)
     // Trigger fetch for new cohort by setting debouncedBounds to current bounds
     // (setting to null would prevent fetch until user pans/zooms)
@@ -161,13 +160,13 @@ const IrisZones = (props: IrisZonesProps) => {
         appConfig.features.locationMap.minZoom || MIN_ZOOM_FOR_IRIS_FETCH,
         MIN_ZOOM_FOR_IRIS_FETCH
       )
-      if (currentZoom < minZoomThreshold) {
+      if (currentZoomRef.current < minZoomThreshold) {
         setDataLoading(false)
         return
       }
 
       // If the current viewbox is already covered by the loaded bounds, do not fetch new locations
-      if (isBoundCovered(map, debouncedBounds, loadedBounds)) {
+      if (isBoundCovered(map, debouncedBounds, loadedBoundsRef.current)) {
         setDataLoading(false)
         return
       }
@@ -176,7 +175,7 @@ const IrisZones = (props: IrisZonesProps) => {
         try {
           setDataLoading(true)
           // Fetch fhir locations for the current viewbox using the near filter
-          const smallBounds = uncoveredBoundMeshUnits(map, debouncedBounds, loadedBounds)
+          const smallBounds = uncoveredBoundMeshUnits(map, debouncedBounds, loadedBoundsRef.current)
           if (DEBUG_SHOW_LOADED_BOUNDS) {
             setLoadingBounds(smallBounds)
           }
@@ -186,7 +185,7 @@ const IrisZones = (props: IrisZonesProps) => {
           for (let i = 0; i < smallBounds.length; i += MAX_CONCURRENT_TILE_REQUESTS) {
             // Check if request was aborted
             if (abortController.signal.aborted) {
-              // Don't clear loading - another fetch is likely starting
+              setDataLoading(false)
               return
             }
             const batchBounds = smallBounds.slice(i, i + MAX_CONCURRENT_TILE_REQUESTS)
@@ -236,31 +235,22 @@ const IrisZones = (props: IrisZonesProps) => {
                 { ...existingZones }
               )
               // update the loaded bounds
-              setLoadedBounds((prevLoadedBounds) => {
-                if (prevLoadedBounds.some((b) => b.equals(debouncedBounds))) {
-                  return prevLoadedBounds
-                }
-                return prevLoadedBounds.concat(debouncedBounds)
-              })
+              if (!loadedBoundsRef.current.some((b) => b.equals(debouncedBounds))) {
+                loadedBoundsRef.current = loadedBoundsRef.current.concat(debouncedBounds)
+              }
 
               return newZones
             })
           }
           setDataLoading(false)
         } catch (error) {
-          // Ignore abort/cancel errors (normal when user pans/zooms rapidly)
-          // Check for axios cancel, DOMException AbortError (browser), and Error AbortError (node)
-          const isAbortError =
-            axios.isCancel(error) ||
-            (typeof DOMException !== 'undefined' && error instanceof DOMException && error.name === 'AbortError') ||
-            (error instanceof Error && error.name === 'AbortError')
-          if (isAbortError) {
-            // Don't clear loading - another fetch is likely starting
+          if (abortController.signal.aborted) {
+            setDataLoading(false)
             return
           }
           // TODO use snackbar setMessage to display error instead
           console.error(error)
-          setDataLoading(false) // Clear loading on real errors
+          setDataLoading(false)
         }
       })()
     }
@@ -270,11 +260,9 @@ const IrisZones = (props: IrisZonesProps) => {
   }, [
     cohortId,
     debouncedBounds,
-    currentZoom,
     updateLoadingProgress,
     setDataLoading,
     map,
-    loadedBounds,
     appConfig.features.locationMap.extensions.locationShapeUrl,
     appConfig.features.locationMap.extensions.locationCount,
     appConfig.features.locationMap.minZoom
@@ -357,8 +345,8 @@ const IrisZones = (props: IrisZonesProps) => {
       {SHOW_OPACITY_CONTROL && renderControls()}
       {DEBUG_SHOW_LOADED_BOUNDS && (
         <div>
-          {loadedBounds &&
-            loadedBounds.map((b, i) => (
+          {loadedBoundsRef.current &&
+            loadedBoundsRef.current.map((b, i) => (
               <Rectangle
                 key={`mesh_${i}`}
                 pathOptions={{
