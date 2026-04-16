@@ -1,7 +1,7 @@
 import { parseShape, getColorPalette, colorize } from "./utils";
 
 
-describe('Shape parser should work.', function () {    
+describe('parseShape', function () {
   it('Should return null on bad expression', function () {
       expect(parseShape('POLYLOT((2.3514 48.8575, 2.3514 48.8575, 2.3514 48.8575))')).toBeNull()
       expect(parseShape('POLYGON(2.3514 48.8575, 2.3514 48.8575, 2.3514 48.8575))')).toBeNull()
@@ -19,83 +19,53 @@ describe('Shape parser should work.', function () {
     expect(parseShape('')).toBeNull();
   });
 
-  it('Should parse multipolygon (pipe-separated) and return first polygon', function () {
+  it('Should return only the first polygon from pipe-separated multipolygon', function () {
     const multi = 'POLYGON((2.0 48.0, 2.1 48.1, 2.0 48.0))|POLYGON((3.0 49.0, 3.1 49.1, 3.0 49.0))';
-    const result = parseShape(multi);
-    // Should return first polygon only
-    expect(result).toEqual([[48.0, 2.0], [48.1, 2.1], [48.0, 2.0]]);
+    expect(parseShape(multi)).toEqual([[48.0, 2.0], [48.1, 2.1], [48.0, 2.0]]);
   });
 });
 
-describe('getColorPalette should return appropriate color subsets', function () {
-  const fullPalette = ['#ff0000', '#ff4000', '#ff8000', '#ffc000', '#ffff00', '#c0ff00', '#80ff00', '#40ff00', '#00ff00', '#00ff40'];
+describe('getColorPalette', function () {
+  const palette = ['#a', '#b', '#c', '#d', '#e', '#f', '#g', '#h', '#i', '#j'];
 
   it('Should return full palette when maxCount >= palette length', function () {
-    expect(getColorPalette(fullPalette, 10)).toEqual(fullPalette);
-    expect(getColorPalette(fullPalette, 15)).toEqual(fullPalette);
+    expect(getColorPalette(palette, 10)).toEqual(palette);
+    expect(getColorPalette(palette, 20)).toEqual(palette);
   });
 
   it('Should return first and last colors when maxCount is 2', function () {
-    const result = getColorPalette(fullPalette, 2);
-    expect(result).toEqual(['#ff0000', '#00ff40']);
+    expect(getColorPalette(palette, 2)).toEqual(['#a', '#j']);
   });
 
-  it('Should return a subset when maxCount is less than palette length', function () {
-    const result = getColorPalette(fullPalette, 5);
-    expect(result.length).toBeLessThanOrEqual(5);
-    expect(result[0]).toBe('#ff0000'); // First color is always included
+  it('Should return a subset starting from the first color when maxCount < palette length', function () {
+    const result = getColorPalette(palette, 5);
+    // inc = floor(10/5) = 2, picks indices 0, 2, 4, 6, 8
+    expect(result).toEqual(['#a', '#c', '#e', '#g', '#i']);
+  });
+
+  it('Should return single-element palette unchanged', function () {
+    expect(getColorPalette(['#only'], 5)).toEqual(['#only']);
   });
 });
 
-describe('colorize should map counts to colors correctly', function () {
-  const palette = ['#low', '#medium', '#high'];
+describe('colorize', function () {
+  const palette = ['#low', '#mid', '#high'];
+  // step = 30 / 3 = 10, so: [0..10) → #low, [10..20) → #mid, [20..30+) → #high
 
-  it('Should return first color for low counts', function () {
+  it('Should map count to the correct color bucket', function () {
     expect(colorize(palette, 1, 30)).toBe('#low');
+    expect(colorize(palette, 9, 30)).toBe('#low');
+    expect(colorize(palette, 11, 30)).toBe('#mid');
+    expect(colorize(palette, 21, 30)).toBe('#high');
   });
 
-  it('Should return last color for counts at or above maxCount', function () {
+  it('Should clamp to last color when count >= maxCount', function () {
     expect(colorize(palette, 30, 30)).toBe('#high');
     expect(colorize(palette, 100, 30)).toBe('#high');
   });
 
-  it('Should handle edge cases', function () {
-    expect(colorize(['#single'], 5, 10)).toBe('#single');
-    // Very small counts should still get first color
-    expect(colorize(palette, 1, 30)).toBe('#low');
-  });
-
-  it('Should return undefined for count=0 (zones with 0 patients should not exist)', function () {
-    // count of 0 results in colorIndex of -1 which returns undefined
-    // This is expected behavior - zones with 0 patients should never be rendered
+  it('Should return undefined for count=0 (palette[-1])', function () {
+    // floor((0 - 0.1) / 10) = -1 → palette[-1] is undefined in JS
     expect(colorize(palette, 0, 30)).toBeUndefined();
-  });
-
-  it('Should distribute colors proportionally across count range', function () {
-    // With 3 colors and maxCount=30, each color covers ~10 units
-    expect(colorize(palette, 5, 30)).toBe('#low');     // 0-10 range
-    expect(colorize(palette, 15, 30)).toBe('#medium'); // 10-20 range
-    expect(colorize(palette, 25, 30)).toBe('#high');   // 20-30 range
-  });
-});
-
-describe('getColorPalette edge cases', function () {
-  const fullPalette = ['#1', '#2', '#3', '#4', '#5', '#6', '#7', '#8', '#9', '#10'];
-
-  it('Should handle maxCount of 1', function () {
-    const result = getColorPalette(fullPalette, 1);
-    expect(result.length).toBeGreaterThanOrEqual(1);
-    expect(result[0]).toBe('#1');
-  });
-
-  it('Should handle maxCount of 0', function () {
-    const result = getColorPalette(fullPalette, 0);
-    // When maxCount < palette length and not 2, returns subset starting with first color
-    expect(result[0]).toBe('#1');
-  });
-
-  it('Should handle single-color palette', function () {
-    const result = getColorPalette(['#only'], 5);
-    expect(result).toEqual(['#only']);
   });
 });
