@@ -1302,15 +1302,6 @@ type ExportProps = {
   signal?: AbortSignal
 }
 
-export const downloadExport = async (args: ExportProps) => {
-  const { id, signal } = args
-  const response = await apiBackend.get<Back_API_Response<ExportList>>(`/exports/${id}/download/`, {
-    responseType: 'blob',
-    signal
-  })
-  return response.data
-}
-
 export const retryExport = async (args: ExportProps) => {
   const { id, signal } = args
   const response = await apiBackend.post(`/exports/${id}/retry/`, { signal })

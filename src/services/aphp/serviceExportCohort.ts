@@ -2,7 +2,6 @@ import {
   fetchExportTableInfo,
   fetchExportTableRelationInfo,
   fetchExportList,
-  downloadExport as _downloadExport,
   retryExport as _retryExport
 } from 'services/aphp/callApi'
 import { getConfig } from 'config'
@@ -44,14 +43,35 @@ export const fetchExportTablesRelationsInfo = async (tableList: string[]) => {
   }
 }
 
-export const downloadExport = async (id: string, name: string, output_format: string, signal?: AbortSignal) => {
+/**
+ * Extracts the filename from the Content-Disposition header.
+ * @param contentDisposition  The Content-Disposition header value from which to extract the filename.
+ * @returns {string}  The extracted filename, or a default name if extraction fails.
+ */
+const extractFilename = (contentDisposition: string): string => {
+  const filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/
+  const matches = filenameRegex.exec(contentDisposition)
+  let default_filename = 'Download.zip'
+  if (matches != null && matches[1]) {
+    default_filename = matches[1].replace(/['"]/g, '')
+  }
+  return default_filename
+}
+
+/**
+ *  Downloads the exported file for the given export ID.
+ * @param id The ID of the export to download.
+ * @param signal An optional AbortSignal to cancel the download request if needed.
+ */
+export const downloadExport = async (id: string, signal?: AbortSignal) => {
   try {
-    const blob = (await _downloadExport({ id, signal })) as unknown as Blob
+    const downloadResponse = await apiBackend.get(`/exports/${id}/download/`, {
+      responseType: 'blob',
+      signal
+    })
 
-    if (!blob) return
-
-    const extension = output_format === 'xlsx' ? 'xlsx' : 'csv'
-    const filename = `${name}.${extension}`
+    const filename = extractFilename(downloadResponse.headers['content-disposition'])
+    const blob = new Blob([downloadResponse.data], { type: 'application/zip' })
 
     const url = window.URL.createObjectURL(blob)
     const link = document.createElement('a')
