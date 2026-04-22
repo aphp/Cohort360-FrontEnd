@@ -4,7 +4,7 @@
  */
 
 import { removeFilter } from 'utils/filters'
-import { useReducer, useEffect } from 'react'
+import { useReducer, useEffect, useRef } from 'react'
 import {
   ActionTypes,
   SearchCriterias,
@@ -130,7 +130,15 @@ const useSearchCriterias = <F>(
     () => initState
   )
 
+  // Evite un double fetch au montage initial : sans ce guard, le useEffect dispatche
+  // REMOVE_SEARCH_CRITERIAS dès le premier render, ce qui appelle initState() et crée
+  // un nouvel objet (nouvelle référence), forçant un re-render et retriggant les effets dépendants.
+  const isFirstRun = useRef(true)
   useEffect(() => {
+    if (isFirstRun.current) {
+      isFirstRun.current = false
+      return
+    }
     dispatch({ type: ActionTypes.REMOVE_SEARCH_CRITERIAS, payload: null })
   }, [resetKey])
 
