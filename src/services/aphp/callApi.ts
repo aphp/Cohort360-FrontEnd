@@ -299,8 +299,7 @@ export const fetchDocumentReference = async (
 
   // By default, all the calls to `/DocumentReference` will have`'type:not=https://terminology.eds.aphp.fr/fhir/CodeSystem/aphp-document-class|doc-impor'`, contenttype=text/plain, and patient.active=true in parameter
   let options: string[] = [
-    `type:not=${encodeURIComponent('https://terminology.eds.aphp.fr/fhir/CodeSystem/aphp-document-class|doc-impor')}`,
-    `contenttype=${encodeURIComponent('text/plain')}`
+    `type:not=${encodeURIComponent('https://terminology.eds.aphp.fr/fhir/CodeSystem/aphp-document-class|doc-impor')}`
   ]
 
   if (appConfig.core.fhir.totalCount) options = [...options, '_total=accurate']

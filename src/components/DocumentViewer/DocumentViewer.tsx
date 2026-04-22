@@ -112,6 +112,16 @@ const DocumentViewer: React.FC<DocumentViewerProps> = ({ deidentified, open, han
       ? Buffer.from(findContent.attachment.data, 'base64').toString('utf-8')
       : ''
 
+  const hasPdfContent = documentContent?.content?.some(
+    (content) => content.attachment?.contentType === 'application/pdf'
+  )
+
+  useEffect(() => {
+    if (selectedTab === 'pdf' && !hasPdfContent) {
+      setSelectedTab('raw')
+    }
+  }, [hasPdfContent, selectedTab])
+
   return (
     <Dialog open={open} fullWidth maxWidth="xl" onClose={handleClose}>
       <DialogContent id="document-viewer-dialog-content">
@@ -122,7 +132,7 @@ const DocumentViewer: React.FC<DocumentViewerProps> = ({ deidentified, open, han
         ) : (
           <>
             <TabsWrapper value={selectedTab} onChange={handleTabChange} customVariant={'secondary'}>
-              {!deidentified && <Tab label="PDF" value="pdf" />}
+              {!deidentified && hasPdfContent && <Tab label="PDF" value="pdf" />}
               <Tab label="Texte brut pseudonymisé" value="raw" />
             </TabsWrapper>
             <>
@@ -137,7 +147,7 @@ const DocumentViewer: React.FC<DocumentViewerProps> = ({ deidentified, open, han
               )}
             </>
             <>
-              {selectedTab === 'pdf' && (
+              {hasPdfContent && selectedTab === 'pdf' && (
                 <Grid id="salut" ref={gridRef} style={pdfViewerContainerStyle}>
                   <div id="document">
                     <Document

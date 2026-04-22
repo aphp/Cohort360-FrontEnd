@@ -188,7 +188,7 @@ export const mapToTable = (
       },
       {
         id: `${elem.id}-viewDoc`,
-        value: { id: elem.id, deidentified },
+        value: { id: elem.content ? elem.id : false, deidentified },
         type: CellType.DOCUMENT_VIEWER,
         align: 'center'
       },
