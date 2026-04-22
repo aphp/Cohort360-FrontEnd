@@ -75,7 +75,7 @@ const PopulationCard = ({ label, onEditDisabled, population, loading, onEdit }: 
       </Grid>
       <Grid container size={1} sx={{ alignSelf: 'center' }}>
         <IconButton color="primary" size="small" onClick={onEdit} disabled={onEditDisabled}>
-          <EditIcon />
+          <EditIcon data-testid="EditIcon" />
         </IconButton>
       </Grid>
     </Grid>
