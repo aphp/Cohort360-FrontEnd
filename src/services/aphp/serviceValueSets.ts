@@ -277,7 +277,7 @@ export const searchInValueSets = async (
   const filter = searchValue === HIERARCHY_ROOT ? '' : `&filter=${encodeURIComponent(searchValue)}`
   try {
     const res = await apiFhir.get<FHIR_API_Response<ValueSet>>(
-      `/ValueSet/$expand?activeOnly=true&url=${codeSystems.join(',')}${filter}&excludeNested=false&_tag=text-search-rank&_tag=${LOW_TOLERANCE_TAG}${options}`,
+      `/ValueSet/$expand?url=${codeSystems.join(',')}${filter}&excludeNested=false&_tag=text-search-rank&_tag=${LOW_TOLERANCE_TAG}${options}`,
       { signal }
     )
     const response = formatValuesetExpansion(getApiResponseResourceOrThrow(res).expansion)
