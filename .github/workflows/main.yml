@@ -97,6 +97,7 @@ jobs:
     if: >
       github.ref == 'refs/heads/main'
       || github.ref == 'refs/heads/develop'
+      || github.ref == 'refs/tags/run-sonar'
       || startsWith(github.ref, 'refs/tags/')
       || github.event_name == 'pull_request'
     needs:
@@ -143,7 +144,7 @@ jobs:
             -Dsonar.javascript.lcov.reportPaths=./coverage/lcov.info
 
   publish:
-    if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/')
+    if: github.ref == 'refs/heads/main' || (startsWith(github.ref, 'refs/tags/') && github.ref != 'refs/tags/run-sonar')
     needs:
       - lint
       - typecheck
