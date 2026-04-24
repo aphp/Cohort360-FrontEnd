@@ -93,6 +93,13 @@ jobs:
       - name: Run tests with coverage
         run: npm run coverage
 
+      - name: Upload coverage artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage
+          if-no-files-found: error
+
   sonar:
     if: >
       github.ref == 'refs/heads/main'
@@ -125,7 +132,20 @@ jobs:
 
       - name: Retrieve version
         id: package_version
-        run: echo "version=$(node -p 'require(\"./package.json\").version')" >> "$GITHUB_OUTPUT"
+        run: |
+          VERSION=$(python3 - <<'PY'
+          import json
+          with open("package.json", encoding="utf-8") as package_file:
+              print(json.load(package_file)["version"])
+          PY
+          )
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Download coverage artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage
 
       - name: Set Sonar branch name for run-sonar tag
         id: sonar_branch
@@ -167,7 +187,14 @@ jobs:
 
       - name: Read version
         id: package_version
-        run: echo "version=$(python3 -c 'import json; print(json.load(open(\"package.json\", encoding=\"utf-8\"))[\"version\"])')" >> "$GITHUB_OUTPUT"
+        run: |
+          VERSION=$(python3 - <<'PY'
+          import json
+          with open("package.json", encoding="utf-8") as package_file:
+              print(json.load(package_file)["version"])
+          PY
+          )
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
 
       - name: Check correct tag and version
         env:
