@@ -106,7 +106,7 @@ jobs:
     if: >
       github.ref == 'refs/heads/main'
       || github.ref == 'refs/heads/develop'
-      || github.ref == format('refs/tags/{0}', env.SONAR_TEST_TAG)
+      || github.ref == 'refs/tags/run-sonar'
       || startsWith(github.ref, 'refs/tags/')
       || github.event_name == 'pull_request'
     needs:
@@ -151,7 +151,7 @@ jobs:
 
       - name: Set Sonar branch name for test tag
         id: sonar_branch
-        if: github.ref == format('refs/tags/{0}', env.SONAR_TEST_TAG)
+        if: github.ref == 'refs/tags/run-sonar'
         run: echo "args=-Dsonar.branch.name=$SONAR_TEST_BRANCH" >> "$GITHUB_OUTPUT"
 
       - name: SonarCloud scan
@@ -172,7 +172,7 @@ jobs:
             ${{ steps.sonar_branch.outputs.args }}
 
   publish:
-    if: github.ref == 'refs/heads/main' || (startsWith(github.ref, 'refs/tags/') && github.ref != format('refs/tags/{0}', env.SONAR_TEST_TAG))
+    if: github.ref == 'refs/heads/main' || (startsWith(github.ref, 'refs/tags/') && github.ref != 'refs/tags/run-sonar')
     needs:
       - lint
       - typecheck
