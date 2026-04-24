@@ -150,7 +150,7 @@ jobs:
       - name: Set Sonar branch name for run-sonar tag
         id: sonar_branch
         if: github.ref == 'refs/tags/run-sonar'
-        run: echo "args=-Dsonar.branch.name=run-sonar" >> "$GITHUB_OUTPUT"
+        run: echo "args=-Dsonar.branch.name=branch-run-sonar" >> "$GITHUB_OUTPUT"
 
       - name: SonarCloud scan
         uses: SonarSource/sonarqube-scan-action@v7
