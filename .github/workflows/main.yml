@@ -21,6 +21,8 @@ concurrency:
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
   NODE_VERSION: 22.x
+  SONAR_TEST_BRANCH: branch-run-sonar
+  SONAR_TEST_TAG: run-sonar
   TZ: Europe/Paris
 
 jobs:
@@ -104,7 +106,7 @@ jobs:
     if: >
       github.ref == 'refs/heads/main'
       || github.ref == 'refs/heads/develop'
-      || github.ref == 'refs/tags/run-sonar'
+      || github.ref == format('refs/tags/{0}', env.SONAR_TEST_TAG)
       || startsWith(github.ref, 'refs/tags/')
       || github.event_name == 'pull_request'
     needs:
@@ -147,10 +149,10 @@ jobs:
           name: coverage-report
           path: coverage
 
-      - name: Set Sonar branch name for run-sonar tag
+      - name: Set Sonar branch name for test tag
         id: sonar_branch
-        if: github.ref == 'refs/tags/run-sonar'
-        run: echo "args=-Dsonar.branch.name=branch-run-sonar" >> "$GITHUB_OUTPUT"
+        if: github.ref == format('refs/tags/{0}', env.SONAR_TEST_TAG)
+        run: echo "args=-Dsonar.branch.name=$SONAR_TEST_BRANCH" >> "$GITHUB_OUTPUT"
 
       - name: SonarCloud scan
         uses: SonarSource/sonarqube-scan-action@v7
@@ -170,7 +172,7 @@ jobs:
             ${{ steps.sonar_branch.outputs.args }}
 
   publish:
-    if: github.ref == 'refs/heads/main' || (startsWith(github.ref, 'refs/tags/') && github.ref != 'refs/tags/run-sonar')
+    if: github.ref == 'refs/heads/main' || (startsWith(github.ref, 'refs/tags/') && github.ref != format('refs/tags/{0}', env.SONAR_TEST_TAG))
     needs:
       - lint
       - typecheck
