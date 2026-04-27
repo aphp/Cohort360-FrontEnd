@@ -20,6 +20,7 @@ env:
   SONAR_TEST_BRANCH: branch-run-sonar
   SONAR_TEST_TAG: run-sonar
   TZ: Europe/Paris
+  HAS_SONAR_TOKEN: ${{ secrets.SONAR_TOKEN != '' }}
 
 jobs:
   lint:
@@ -107,7 +108,7 @@ jobs:
         || github.event_name == 'pull_request'
       )
       && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
-      && secrets.SONAR_TOKEN != ''
+      && env.HAS_SONAR_TOKEN == 'true'
     needs:
       - lint
       - typecheck
