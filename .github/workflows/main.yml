@@ -150,12 +150,7 @@ jobs:
       - name: Retrieve version
         id: package_version
         run: |
-          VERSION=$(python3 - <<'PY'
-          import json
-          with open("package.json", encoding="utf-8") as package_file:
-              print(json.load(package_file)["version"])
-          PY
-          )
+          VERSION=$(node -p "require('./package.json').version")
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
 
       - name: Download coverage artifacts
@@ -201,12 +196,7 @@ jobs:
       - name: Read version
         id: package_version
         run: |
-          VERSION=$(python3 - <<'PY'
-          import json
-          with open("package.json", encoding="utf-8") as package_file:
-              print(json.load(package_file)["version"])
-          PY
-          )
+          VERSION=$(node -p "require('./package.json').version")
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
 
       - name: Check correct tag and version
