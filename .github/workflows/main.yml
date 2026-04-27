@@ -2,13 +2,9 @@ name: cohort360-main-pipeline
 
 on:
   push:
-    branches:
-      - "**"
-    tags:
-      - "**"
+    branches: [main, develop]
+    tags: ["*"]
   pull_request:
-    branches:
-      - "**"
   workflow_dispatch:
 
 permissions:
