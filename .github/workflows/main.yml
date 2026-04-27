@@ -69,7 +69,7 @@ jobs:
         run: npm ci --no-audit
 
       - name: Type-check
-        run: npx tsc --noEmit -b
+        run: npx tsc --noEmit
 
   tests:
     runs-on: ubuntu-24.04
