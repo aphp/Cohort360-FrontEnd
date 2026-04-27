@@ -20,7 +20,6 @@ env:
   SONAR_TEST_BRANCH: branch-run-sonar
   SONAR_TEST_TAG: run-sonar
   TZ: Europe/Paris
-  HAS_SONAR_TOKEN: ${{ secrets.SONAR_TOKEN != '' }}
 
 jobs:
   lint:
@@ -99,6 +98,24 @@ jobs:
           path: coverage
           if-no-files-found: error
 
+  sonar_precheck:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    outputs:
+      has_sonar_token: ${{ steps.check.outputs.has_sonar_token }}
+
+    steps:
+      - name: Check Sonar token availability
+        id: check
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: |
+          if [ -n "$SONAR_TOKEN" ]; then
+            echo "has_sonar_token=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_sonar_token=false" >> "$GITHUB_OUTPUT"
+          fi
+
   sonar:
     if: >
       (
@@ -108,11 +125,12 @@ jobs:
         || github.event_name == 'pull_request'
       )
       && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
-      && env.HAS_SONAR_TOKEN == 'true'
+      && needs.sonar_precheck.outputs.has_sonar_token == 'true'
     needs:
       - lint
       - typecheck
       - tests
+      - sonar_precheck
     runs-on: ubuntu-24.04
     timeout-minutes: 20
 
