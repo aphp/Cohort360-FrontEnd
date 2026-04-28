@@ -67,11 +67,14 @@ const getPatientInfos = (patient: Patient, deidentified: boolean, groupId: strin
   }
   const lastEncounter =
     getExtension(patient, appConfig.core.extensions.patientLastEnconterUrl)?.valueReference?.display ?? 'N/A'
-  const surname = deidentified
-    ? 'Prénom'
-    : patient.name?.[0].given?.[0]
-      ? capitalizeFirstLetter(patient.name?.[0].given?.[0])
-      : 'Non renseigné'
+  let surname: string
+  if (deidentified) {
+    surname = 'Prénom'
+  } else if (patient.name?.[0].given?.[0]) {
+    surname = capitalizeFirstLetter(patient.name?.[0].given?.[0])
+  } else {
+    surname = 'Non renseigné'
+  }
   const lastname = deidentified
     ? 'Nom'
     : (patient.name
@@ -94,7 +97,10 @@ const getPatientInfos = (patient: Patient, deidentified: boolean, groupId: strin
         )?.value ??
         patient.identifier?.[0].value ??
         'inconnu'),
-    url: `/patients/${patient.id}/preview/${groupId ? `?groupId=${groupId}` : ''}`,
+    url: (() => {
+      const groupParam = groupId ? `?groupId=${groupId}` : ''
+      return `/patients/${patient.id}/preview/${groupParam}`
+    })(),
     getUrl: () => {
       const url = new URL(window.location.href)
       const pathParts = url.pathname.split('/').map((part) => part || '')
@@ -104,7 +110,8 @@ const getPatientInfos = (patient: Patient, deidentified: boolean, groupId: strin
       searchParams.delete('groupId')
       if (groupId && groupId.length > 0) groupId.forEach((id) => searchParams.append('groupId', id))
       const queryString = searchParams.toString()
-      return `${newPath}${queryString ? `?${queryString}` : ''}`
+      const querySuffix = queryString ? `?${queryString}` : ''
+      return `${newPath}${querySuffix}`
     }
   }
   const age = {
@@ -119,15 +126,15 @@ const mapToTable = (data: Data, deidentified: boolean, groupId: string[]): Table
   const rows: Row[] = []
   const columns: Column[] = [
     {
-      label: `${PatientTableLabels.IPP}${!deidentified ? '' : ' chiffré'}`,
-      code: !deidentified ? Order.IPP : undefined
+      label: `${PatientTableLabels.IPP}${deidentified ? ' chiffré' : ''}`,
+      code: deidentified ? undefined : Order.IPP
     },
     { label: PatientTableLabels.GENDER, code: `${Order.GENDER},${Order.ID}` },
-    { label: PatientTableLabels.NAME, code: !deidentified ? Order.NAME : undefined },
-    { label: PatientTableLabels.LASTNAME, code: !deidentified ? Order.FAMILY : undefined },
+    { label: PatientTableLabels.NAME, code: deidentified ? undefined : Order.NAME },
+    { label: PatientTableLabels.LASTNAME, code: deidentified ? undefined : Order.FAMILY },
     {
-      label: !deidentified ? PatientTableLabels.BIRTHDATE : PatientTableLabels.AGE,
-      code: `${!deidentified ? Order.BIRTHDATE : Order.AGE_MONTH},${Order.ID}`
+      label: deidentified ? PatientTableLabels.AGE : PatientTableLabels.BIRTHDATE,
+      code: `${deidentified ? Order.AGE_MONTH : Order.BIRTHDATE},${Order.ID}`
     },
     { label: PatientTableLabels.LAST_ENCOUNTER },
     { label: PatientTableLabels.VITAL_STATUS }
@@ -248,6 +255,12 @@ const fetchList = (
   ]
   const minBirthdate = birthdates && Math.abs(moment(birthdates[0]).diff(moment(), deidentified ? 'months' : 'days'))
   const maxBirthdate = birthdates && Math.abs(moment(birthdates[1]).diff(moment(), deidentified ? 'months' : 'days'))
+  let deceased: boolean | undefined
+  if (vitalStatuses.length === 1) {
+    deceased = vitalStatuses.includes(VitalStatus.DECEASED)
+  } else {
+    deceased = undefined
+  }
   const params = {
     pivotFacet: includeFacets
       ? (['age-month_gender', 'deceased_gender'] as ('age-month_gender' | 'deceased_gender')[])
@@ -256,7 +269,7 @@ const fetchList = (
     searchBy,
     minBirthdate: minBirthdate,
     maxBirthdate: maxBirthdate,
-    deceased: vitalStatuses.length === 1 ? (vitalStatuses.includes(VitalStatus.DECEASED) ? true : false) : undefined,
+    deceased,
     deidentified,
     _elements: ['gender', 'name', 'birthDate', 'deceased', 'identifier', 'extension'] as (
       | 'id'

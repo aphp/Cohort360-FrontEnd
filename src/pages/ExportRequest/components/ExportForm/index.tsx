@@ -533,14 +533,14 @@ const ExportForm: React.FC = () => {
                     <Checkbox
                       color="secondary"
                       indeterminate={
-                        (exportTableList &&
+                        (exportTableList?.length !== undefined &&
                           tablesSettings.filter((tableSetting) => tableSetting.isChecked).length !==
                             exportTableList.length &&
                           tablesSettings.some((tableSetting) => tableSetting.isChecked)) ??
                         false
                       }
                       checked={
-                        (exportTableList &&
+                        (exportTableList?.length !== undefined &&
                           tablesSettings.filter((tableSetting) => tableSetting.isChecked).length ===
                             exportTableList.length) ??
                         false

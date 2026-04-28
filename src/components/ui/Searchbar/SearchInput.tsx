@@ -94,19 +94,24 @@ const SearchInput = ({
         <Grid container>
           <ErrorWrapper>
             <Typography style={{ fontWeight: 'bold' }}>Des erreurs ont été détectées dans votre recherche.</Typography>
-            {error?.errorsDetails?.map((detail: ErrorDetails, count: number) => (
-              <Typography key={count}>
-                {`- ${
-                  detail.errorPositions && detail.errorPositions.length > 0
-                    ? detail.errorPositions.length === 1
-                      ? `Au caractère ${detail.errorPositions[0]} : `
-                      : `Aux caractères ${detail.errorPositions.join(', ')} : `
-                    : ''
-                }
-              ${detail.errorName ? `${detail.errorName}.` : ''}
-              ${detail.errorSolution ? `${detail.errorSolution}.` : ''}`}
-              </Typography>
-            ))}
+            {error?.errorsDetails?.map((detail: ErrorDetails, count: number) => {
+              let positionPrefix = ''
+              if (detail.errorPositions && detail.errorPositions.length > 0) {
+                positionPrefix =
+                  detail.errorPositions.length === 1
+                    ? `Au caractère ${detail.errorPositions[0]} : `
+                    : `Aux caractères ${detail.errorPositions.join(', ')} : `
+              }
+              const namePart = detail.errorName ? `${detail.errorName}.` : ''
+              const solutionPart = detail.errorSolution ? `${detail.errorSolution}.` : ''
+              return (
+                <Typography key={count}>
+                  {`- ${positionPrefix}
+              ${namePart}
+              ${solutionPart}`}
+                </Typography>
+              )
+            })}
           </ErrorWrapper>
         </Grid>
       )}

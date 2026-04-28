@@ -93,10 +93,8 @@ const Contact: React.FC = () => {
 
       contactSubmitForm.append('label', contactRequest.requestType)
       contactSubmitForm.append('title', contactRequest.object)
-      contactSubmitForm.append(
-        'description',
-        `${contactRequest.url !== '' ? `**URL concernée :** ${contactRequest.url}\n\n` : ''} ${contactRequest.message}`
-      )
+      const urlPrefix = contactRequest.url === '' ? '' : `**URL concernée :** ${contactRequest.url}\n\n`
+      contactSubmitForm.append('description', `${urlPrefix} ${contactRequest.message}`)
       if (contactRequest.files && contactRequest.files.length > 0) {
         contactSubmitForm.append('attachment', contactRequest.files[0])
       }

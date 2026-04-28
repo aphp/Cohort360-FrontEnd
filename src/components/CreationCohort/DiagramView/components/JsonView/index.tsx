@@ -87,7 +87,7 @@ const JsonView: React.FC<JsonEditorWithAjvProps> = ({ onJsonIssuesChange, minHei
 
   useEffect(() => {
     const hasIssues = !!syntaxError || schemaErrors.length > 0
-    onJsonIssuesChange(!didJsonValueChanged.current ? true : hasIssues)
+    onJsonIssuesChange(didJsonValueChanged.current ? hasIssues : true)
   }, [syntaxError, schemaErrors, onJsonIssuesChange])
 
   const handleMount: OnMount = (editor, monaco) => {

@@ -16,7 +16,7 @@ type ExplorationBoardProps<T> = {
 
 const ExplorationBoard = <T,>({ config }: ExplorationBoardProps<T>) => {
   const [searchParams] = useSearchParams()
-  const pageFromUrl = parseInt(searchParams.get('page') ?? '1', 10)
+  const pageFromUrl = Number.parseInt(searchParams.get('page') ?? '1', 10)
   const {
     fetchStatus,
     additionalInfo,

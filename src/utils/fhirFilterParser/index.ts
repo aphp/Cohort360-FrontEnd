@@ -33,14 +33,14 @@ class ParamExtractionVisitor extends FilterLanguageVisitor<void> {
     const compareOp = ctx.CompareOp().getText()
     // remove double quotes when it matches the String rule
     const value =
-      ctx.compValue().String() != null
-        ? ctx
+      ctx.compValue().String() == null
+        ? ctx.compValue().getText()
+        : ctx
             .compValue()
             .String()
             .getText()
             .substring(1, ctx.compValue().String().getText().length - 1)
             .trim()
-        : ctx.compValue().getText()
     const newParamValue = {
       operator: compareOp === 'eq' && this.options.omitOperatorEq ? undefined : compareOp,
       value

@@ -39,7 +39,7 @@ type FetchCohortsListProps = {
 }
 
 const optionsReducer = (accumulator: string, currentValue: string) =>
-  accumulator ? `${accumulator}&${currentValue}` : currentValue ? currentValue : accumulator
+  accumulator ? `${accumulator}&${currentValue}` : currentValue || accumulator
 
 export interface IServiceProjects {
   fetchProject: (projectId: string, signal?: AbortSignal) => Promise<ProjectType>
@@ -273,7 +273,7 @@ const servicesProjects: IServiceProjects = {
         next: string | null
         previous: string | null
         results: ProjectType[]
-      }>(`/cohort/folders/?${options.reduce(optionsReducer)}`, { signal })
+      }>(`/cohort/folders/?${options.reduce((acc, val) => optionsReducer(acc, val), '')}`, { signal })
 
       return fetchProjectsResponse.data
     } catch (error) {
@@ -346,7 +346,7 @@ const servicesProjects: IServiceProjects = {
         next: string | null
         previous: string | null
         results: RequestType[]
-      }>(`/cohort/requests/?${options.reduce(optionsReducer)}`, { signal })
+      }>(`/cohort/requests/?${options.reduce((acc, val) => optionsReducer(acc, val), '')}`, { signal })
 
       return fetchRequestsListResponse.data
     } catch (error) {
@@ -485,7 +485,7 @@ const servicesProjects: IServiceProjects = {
         next: string | null
         previous: string | null
         results: Cohort[]
-      }>(`/cohort/cohorts/?${options.reduce(optionsReducer)}`, { signal })
+      }>(`/cohort/cohorts/?${options.reduce((acc, val) => optionsReducer(acc, val), '')}`, { signal })
 
       // Récupère les droits
       const cohortList = await servicesCohorts.fetchCohortsRights(cohortListResponse.data.results)
@@ -517,7 +517,7 @@ const servicesProjects: IServiceProjects = {
       const editCohortResponse = await apiBack.patch(`/cohort/cohorts/${editedCohort.uuid}/`, {
         name: editedCohort.name,
         description: editedCohort.description,
-        favorite: editedCohort.favorite !== undefined ? !!editedCohort.favorite : undefined
+        favorite: editedCohort.favorite === undefined ? undefined : !!editedCohort.favorite
       })
 
       if (editCohortResponse.status !== 200) {

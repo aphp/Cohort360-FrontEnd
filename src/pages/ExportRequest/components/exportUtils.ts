@@ -60,12 +60,7 @@ const fetchPatientCount = async (cohortId: string, patientsFilters?: SearchCrite
         _text: patientsFilters.searchInput,
         minBirthdate: minBirthdate,
         maxBirthdate: maxBirthdate,
-        deceased:
-          vitalStatuses && vitalStatuses.length === 1
-            ? vitalStatuses.includes(VitalStatus.DECEASED)
-              ? true
-              : false
-            : undefined
+        deceased: vitalStatuses?.length === 1 ? vitalStatuses.includes(VitalStatus.DECEASED) : undefined
       })
     } else {
       patientsResp = await fetchPatient({ size: 0, _list: [cohortId] })

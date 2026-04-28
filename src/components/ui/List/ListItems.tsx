@@ -18,7 +18,15 @@ const ListItems = ({ values, multiple = false, count, onchange, fetchPaginateDat
 
   const handleSelectListItem = (selectedItem: Item) => {
     const newItems = items.map((item) => {
-      return { ...item, checked: item.id === selectedItem.id ? !item.checked : multiple ? item.checked : false }
+      let checked: boolean
+      if (item.id === selectedItem.id) {
+        checked = !item.checked
+      } else if (multiple) {
+        checked = item.checked
+      } else {
+        checked = false
+      }
+      return { ...item, checked }
     })
     setItems(newItems)
     onchange(newItems)

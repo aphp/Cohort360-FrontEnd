@@ -60,10 +60,10 @@ const EpisodeConstraints: React.FC<EpisodeConstraintsProps> = ({ constraints, on
   const onChangeValue = (value: TemporalConstraintsKind) => {
     setRadioValues(value)
 
-    if (value !== TemporalConstraintsKind.PARTIAL_EPISODE_CONSTRAINT) {
-      onChangeConstraints([{ idList: ['All'], constraintType: value }])
-    } else {
+    if (value === TemporalConstraintsKind.PARTIAL_EPISODE_CONSTRAINT) {
       onChangeConstraints([])
+    } else {
+      onChangeConstraints([{ idList: ['All'], constraintType: value }])
     }
   }
 

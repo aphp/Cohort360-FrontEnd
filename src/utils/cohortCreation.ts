@@ -447,7 +447,7 @@ export function buildRequest(
     selectedPopulation === null
       ? false
       : selectedPopulation
-          .map((population) => population && population.access)
+          .map((population) => population?.access)
           .filter((elem) => elem && elem === 'Pseudonymisé').length > 0
 
   const exploreCriteriaGroup = (itemIds: number[]): (RequeteurCriteriaType | RequeteurGroupType)[] => {
@@ -456,7 +456,30 @@ export function buildRequest(
     for (const itemId of itemIds) {
       let child: RequeteurCriteriaType | RequeteurGroupType | null = null
       const isGroup = itemId < 0
-      if (!isGroup) {
+      if (isGroup) {
+        const group: CriteriaGroup = criteriaGroup.find(({ id }) => id === itemId) ?? DEFAULT_GROUP_ERROR
+
+        // DO SPECIAL THING FOR `NamongM`
+        if (group.type === CriteriaGroupType.N_AMONG_M) {
+          child = {
+            _type: CriteriaGroupType.N_AMONG_M,
+            _id: group.id,
+            isInclusive: group.isInclusive ?? true,
+            criteria: exploreCriteriaGroup(group.criteriaIds),
+            nAmongMOptions: {
+              n: group.options.number,
+              operator: group.options.operator
+            }
+          }
+        } else {
+          child = {
+            _type: group.type,
+            _id: group.id,
+            isInclusive: group.isInclusive ?? true,
+            criteria: exploreCriteriaGroup(group.criteriaIds)
+          }
+        }
+      } else {
         const item: SelectedCriteriaType | undefined = selectedCriteria.find(({ id }) => id === itemId)
         if (!item) {
           console.error('Unknown criteria id', itemId)
@@ -480,35 +503,13 @@ export function buildRequest(
                     : undefined
                 }
               : undefined,
-          occurrence: !(item.type === CriteriaType.PATIENT || item.type === CriteriaType.IPP_LIST)
-            ? {
-                n: item.occurrence.value,
-                operator: item.occurrence.comparator
-              }
-            : undefined
-        }
-      } else {
-        const group: CriteriaGroup = criteriaGroup.find(({ id }) => id === itemId) ?? DEFAULT_GROUP_ERROR
-
-        // DO SPECIAL THING FOR `NamongM`
-        if (group.type === CriteriaGroupType.N_AMONG_M) {
-          child = {
-            _type: CriteriaGroupType.N_AMONG_M,
-            _id: group.id,
-            isInclusive: group.isInclusive ?? true,
-            criteria: exploreCriteriaGroup(group.criteriaIds),
-            nAmongMOptions: {
-              n: group.options.number,
-              operator: group.options.operator
-            }
-          }
-        } else {
-          child = {
-            _type: group.type,
-            _id: group.id,
-            isInclusive: group.isInclusive ?? true,
-            criteria: exploreCriteriaGroup(group.criteriaIds)
-          }
+          occurrence:
+            item.type === CriteriaType.PATIENT || item.type === CriteriaType.IPP_LIST
+              ? undefined
+              : {
+                  n: item.occurrence.value,
+                  operator: item.occurrence.comparator
+                }
         }
       }
       if (child) {
@@ -642,11 +643,11 @@ export async function unbuildRequest(_json: string): Promise<UnbuildRequestRetur
     }
   }
 
-  if (request !== undefined) {
+  if (request === undefined) {
+    return { population, criteria: [], criteriaGroup: [], idRemap: {} }
+  } else {
     criteriaGroup = [...criteriaGroup, { ...request }]
     exploreRequest(request)
-  } else {
-    return { population, criteria: [], criteriaGroup: [], idRemap: {} }
   }
 
   const convertJsonObjectsToCriteria = async (

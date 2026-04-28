@@ -159,19 +159,19 @@ const servicesPerimeters: IServicePerimeters = {
 
     const agePyramidData =
       patientsResp?.data?.resourceType === 'Bundle'
-        ? getAgeRepartitionMapAphp(ageFacet && ageFacet.extension)
+        ? getAgeRepartitionMapAphp(ageFacet?.extension)
         : undefined
     const genderRepartitionMap =
       patientsResp?.data?.resourceType === 'Bundle'
-        ? getGenderRepartitionMapAphp(deceasedFacet && deceasedFacet.extension)
+        ? getGenderRepartitionMapAphp(deceasedFacet?.extension)
         : undefined
     const monthlyVisitData =
       encountersResp?.data?.resourceType === 'Bundle'
-        ? getVisitRepartitionMapAphp(visitFacet && visitFacet.extension)
+        ? getVisitRepartitionMapAphp(visitFacet?.extension)
         : undefined
     const visitTypeRepartitionData =
       encountersResp?.data?.resourceType === 'Bundle'
-        ? getEncounterRepartitionMapAphp(classFacet && classFacet.extension)
+        ? getEncounterRepartitionMapAphp(classFacet?.extension)
         : undefined
 
     return {
@@ -191,7 +191,8 @@ const servicesPerimeters: IServicePerimeters = {
     if (ids) {
       const response = (await servicesPerimeters.getRights({ limit: -1, cohortIds: ids, sourceType: SourceType.ALL }))
         .results
-      if (!response.length)
+      if (response.length) population = response
+      else
         population = [
           {
             id: Rights.EXPIRED,
@@ -208,7 +209,6 @@ const servicesPerimeters: IServicePerimeters = {
             system: System.ScopeTree
           }
         ]
-      else population = response
     }
     return population
   },

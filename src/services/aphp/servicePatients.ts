@@ -256,9 +256,7 @@ const servicesPatients: IServicePatients = {
     } else {
       const cohortRights = await servicesCohorts.fetchCohortsRights([{ group_id: groupId }])
       return cohortRights?.[0]?.rights?.read_patient_pseudo
-        ? cohortRights?.[0]?.rights?.read_patient_nomi
-          ? false
-          : true
+        ? !cohortRights?.[0]?.rights?.read_patient_nomi
         : false
     }
   }
@@ -300,7 +298,7 @@ export const getEncounterDocuments = async (
     encounter.documents = currentDocuments
     encounter.details = currentDetails
 
-    if (!currentDocuments || (currentDocuments && currentDocuments.length === 0)) continue
+    if (!currentDocuments?.length) continue
 
     for (const currentDocument of currentDocuments) {
       currentDocument.serviceProvider = encounter?.serviceProvider?.display ?? 'Non renseigné'

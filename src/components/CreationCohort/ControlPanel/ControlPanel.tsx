@@ -130,8 +130,15 @@ const ControlPanel: React.FC<{
     selectedPopulation === null
       ? null
       : selectedPopulation
-          .map((population) => population && population.access)
+          .map((population) => population?.access)
           .filter((elem) => elem && elem === 'Pseudonymisé').length > 0
+
+  let accessLabel: string
+  if (accessIsPseudonymize === null) {
+    accessLabel = '-'
+  } else {
+    accessLabel = accessIsPseudonymize ? 'Pseudonymisé' : 'Nominatif'
+  }
 
   const checkIfLogicalOperatorIsEmpty = () => {
     let _criteriaGroup = criteriaGroup || []
@@ -406,7 +413,7 @@ const ControlPanel: React.FC<{
           <Grid container size={12} justifyContent="space-between">
             <Typography className={cx(classes.boldText, classes.patientTypo)}>ACCÈS :</Typography>
             <Typography className={cx(classes.blueText, classes.boldText, classes.patientTypo)}>
-              {accessIsPseudonymize === null ? '-' : accessIsPseudonymize ? 'Pseudonymisé' : 'Nominatif'}
+              {accessLabel}
             </Typography>
           </Grid>
         </Grid>
@@ -430,11 +437,11 @@ const ControlPanel: React.FC<{
               <Grid container alignItems="center" style={{ width: 'fit-content' }}>
                 <Typography className={cx(classes.boldText, classes.patientTypo, classes.blueText)}>
                   {format(includePatient ?? prevCountDisplay)}
-                  {oldCount !== null && !!oldCount.includePatient
-                    ? (includePatient ?? 0) - oldCount.includePatient > 0
-                      ? ` (+${(includePatient ?? 0) - oldCount.includePatient})`
-                      : ` (${(includePatient ?? 0) - oldCount.includePatient})`
-                    : ''}
+                  {(() => {
+                    if (oldCount === null || !oldCount.includePatient) return ''
+                    const delta = (includePatient ?? 0) - oldCount.includePatient
+                    return delta > 0 ? ` (+${delta})` : ` (${delta})`
+                  })()}
                 </Typography>
                 {oldCount !== null && !!oldCount.includePatient && (
                   <Tooltip

@@ -19,11 +19,11 @@ jobs:
         with:
           node-version: 22.x
           cache: 'npm'
-      - uses: szenius/set-timezone@v2.0
+      - uses: szenius/set-timezone@1f9716b0f7120e344f0c62bb7b1ee98819aefd42 # v2.0
         with:
           timezoneLinux: "Europe/Paris"
       - name: Install Dependencies
-        run: npm install
+        run: npm install --ignore-scripts
       - name: Lint
         run: npm run lint && npx tsc --noEmit
       - name: Test
@@ -33,7 +33,7 @@ jobs:
           VERSION=$(cat package.json | grep version | head -1 | awk -F= "{ print $2 }" | sed 's/"version"://g' | sed 's/[",]//g' | tr -d '[[:space:]]')
           echo "VERSION=$VERSION" >> $GITHUB_ENV
       - name: SonarCloud Scan
-        uses: SonarSource/sonarqube-scan-action@v7
+        uses: SonarSource/sonarqube-scan-action@299e4b793aaa83bf2aba7c9c14bedbb485688ec4 # v7
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
@@ -66,16 +66,16 @@ jobs:
           if [ "$CI_COMMIT_TAG" != "" ] && [ "$CI_COMMIT_TAG" != "$VERSION" ] && case "$VERSION" in *SNAPSHOT) false;; *) true;; esac; then echo "The version is not the same as the tag name"; exit 1; else echo "Publishing version $VERSION"; fi
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+        uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3
 
       - name: Login to DockerHub
-        uses: docker/login-action@v3
+        uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Build and push Docker image
-        uses: docker/build-push-action@v4
+        uses: docker/build-push-action@0a97817b6ade9f46837855d676c4cca3a2471fc9 # v4
         with:
           context: .
           file: ./Dockerfile

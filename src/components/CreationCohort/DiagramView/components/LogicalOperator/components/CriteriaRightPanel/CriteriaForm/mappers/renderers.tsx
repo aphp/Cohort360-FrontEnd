@@ -127,7 +127,12 @@ const FORM_ITEM_RENDERER: { [key in CriteriaFormItemType]: CriteriaFormItemView<
     )
   },
   autocomplete: (props) => {
-    const arrayPropValue = isArray(props.value) ? props.value : !!props.value ? [props.value] : []
+    const getArrayPropValue = () => {
+      if (isArray(props.value)) return props.value
+      if (props.value) return [props.value]
+      return []
+    }
+    const arrayPropValue = getArrayPropValue()
     const codeSystem = props.getValueSetOptions(props.definition.valueSetId)
     const groupBy = props.definition.groupBy
     const valueWithLabels = (arrayPropValue ?? []).map(
@@ -145,7 +150,13 @@ const FORM_ITEM_RENDERER: { [key in CriteriaFormItemType]: CriteriaFormItemView<
         getOptionLabel={(option) => `${props.definition.prependCode ? option.id + ' - ' : ''}${option.label}`}
         isOptionEqualToValue={(option, value) => option.id === value.id}
         value={value}
-        onChange={(e, value) => props.updateData(value ? (isArray(value) ? value.map((v) => v.id) : [value.id]) : null)}
+        onChange={(e, value) => {
+          if (!value) {
+            props.updateData(null)
+            return
+          }
+          props.updateData(isArray(value) ? value.map((v) => v.id) : [value.id])
+        }}
         renderInput={(params) => <TextField {...params} label={props.definition.label} />}
         groupBy={groupBy ? (option) => option[groupBy] ?? '' : undefined}
         renderGroup={
@@ -222,7 +233,7 @@ const FORM_ITEM_RENDERER: { [key in CriteriaFormItemType]: CriteriaFormItemView<
         type="number"
         variant="outlined"
         value={props.value}
-        onChange={(e) => props.updateData(e.target.value ? parseFloat(e.target.value) : null)}
+        onChange={(e) => props.updateData(e.target.value ? Number.parseFloat(e.target.value) : null)}
         placeholder={props.definition.label}
         disabled={props.disabled}
         fullWidth

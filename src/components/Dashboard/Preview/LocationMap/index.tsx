@@ -275,30 +275,28 @@ const IrisZones = (props: IrisZonesProps) => {
       {SHOW_OPACITY_CONTROL && renderControls()}
       {DEBUG_SHOW_LOADED_BOUNDS && (
         <div>
-          {loadedBounds &&
-            loadedBounds.map((b, i) => (
-              <Rectangle
-                key={`mesh_${i}`}
-                pathOptions={{
-                  color: '#0000ff',
-                  opacity: 1,
-                  fillOpacity: 0.5
-                }}
-                bounds={b}
-              />
-            ))}
-          {loadingBounds &&
-            loadingBounds.map((b, i) => (
-              <Rectangle
-                key={`mesh_${i}`}
-                pathOptions={{
-                  color: '#ff00ff',
-                  opacity: 1,
-                  fillOpacity: 0.5
-                }}
-                bounds={b}
-              />
-            ))}
+          {loadedBounds?.map((b, i) => (
+            <Rectangle
+              key={`mesh_${i}`}
+              pathOptions={{
+                color: '#0000ff',
+                opacity: 1,
+                fillOpacity: 0.5
+              }}
+              bounds={b}
+            />
+          ))}
+          {loadingBounds?.map((b, i) => (
+            <Rectangle
+              key={`mesh_${i}`}
+              pathOptions={{
+                color: '#ff00ff',
+                opacity: 1,
+                fillOpacity: 0.5
+              }}
+              bounds={b}
+            />
+          ))}
         </div>
       )}
       {visibleZones.map((zone) => {

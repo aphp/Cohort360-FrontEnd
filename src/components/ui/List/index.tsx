@@ -48,7 +48,7 @@ const List = ({ values, count, onSelect, fetchPaginateData }: PropsWithChildren<
                   onChange={() => {
                     setAllElements(
                       allElements.map((e) => {
-                        return { ...e, checked: toggleSelectAll ? false : true }
+                        return { ...e, checked: !toggleSelectAll }
                       })
                     )
                     setToggleSelectAll(!toggleSelectAll)

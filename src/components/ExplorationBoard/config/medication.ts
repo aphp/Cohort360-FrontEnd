@@ -36,17 +36,17 @@ const fetchAdditionalInfos = async (additionalInfo: AdditionalInfo): Promise<Add
   const config = getConfig().features
   const fetchersMap: Record<string, () => Promise<FhirItem[] | undefined>> = {
     encounterStatusList: () =>
-      !additionalInfo.encounterStatusList
-        ? fetchValueSet(getConfig().core.valueSets.encounterStatus.url)
-        : Promise.resolve(undefined),
+      additionalInfo.encounterStatusList
+        ? Promise.resolve(undefined)
+        : fetchValueSet(getConfig().core.valueSets.encounterStatus.url),
     prescriptionList: () =>
-      !additionalInfo.prescriptionList
-        ? getCodeList(config.medication.valueSets.medicationPrescriptionTypes.url).then((res) => res.results)
-        : Promise.resolve(undefined),
+      additionalInfo.prescriptionList
+        ? Promise.resolve(undefined)
+        : getCodeList(config.medication.valueSets.medicationPrescriptionTypes.url).then((res) => res.results),
     administrationList: () =>
-      !additionalInfo.administrationList
-        ? getCodeList(config.medication.valueSets.medicationAdministrations.url).then((res) => res.results)
-        : Promise.resolve(undefined)
+      additionalInfo.administrationList
+        ? Promise.resolve(undefined)
+        : getCodeList(config.medication.valueSets.medicationAdministrations.url).then((res) => res.results)
   }
   const resolved = await resolveAdditionalInfos(fetchersMap)
   const references: Reference[] = getValueSetsFromSystems([
@@ -127,13 +127,14 @@ const mapToTable = (
         (elem as MedicationAdministration).dosage?.dose?.unit ?? '-'
       }`
       const comment = (elem as MedicationAdministration).dosage?.text ?? 'Non renseigné'
+      const ippGroupQuery = groupId ? `?groupId=${groupId}` : ''
       const row: Row = [
         !isPatient && {
           id: `${elem}-ipp`,
           value: elem.IPP
             ? {
                 label: elem.IPP,
-                url: `/patients/${elem.idPatient}${groupId ? `?groupId=${groupId}` : ''}`
+                url: `/patients/${elem.idPatient}${ippGroupQuery}`
               }
             : 'Non renseigné',
           type: elem.IPP ? CellType.LINK : CellType.TEXT
