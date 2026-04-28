@@ -446,8 +446,7 @@ export function buildRequest(
   const deidentified: boolean =
     selectedPopulation === null
       ? false
-      : selectedPopulation.map((population) => population?.access).filter((elem) => elem && elem === 'Pseudonymisé')
-          .length > 0
+      : selectedPopulation.map((population) => population?.access).some((elem) => elem && elem === 'Pseudonymisé')
 
   const exploreCriteriaGroup = (itemIds: number[]): (RequeteurCriteriaType | RequeteurGroupType)[] => {
     let children: (RequeteurCriteriaType | RequeteurGroupType)[] = []

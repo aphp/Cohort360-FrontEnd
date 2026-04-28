@@ -129,8 +129,7 @@ const ControlPanel: React.FC<{
   const accessIsPseudonymize: boolean | null =
     selectedPopulation === null
       ? null
-      : selectedPopulation.map((population) => population?.access).filter((elem) => elem && elem === 'Pseudonymisé')
-          .length > 0
+      : selectedPopulation.map((population) => population?.access).some((elem) => elem && elem === 'Pseudonymisé')
 
   let accessLabel: string
   if (accessIsPseudonymize === null) {
@@ -437,7 +436,7 @@ const ControlPanel: React.FC<{
                 <Typography className={cx(classes.boldText, classes.patientTypo, classes.blueText)}>
                   {format(includePatient ?? prevCountDisplay)}
                   {(() => {
-                    if (oldCount === null || !oldCount.includePatient) return ''
+                    if (!oldCount?.includePatient) return ''
                     const delta = (includePatient ?? 0) - oldCount.includePatient
                     return delta > 0 ? ` (+${delta})` : ` (${delta})`
                   })()}
