@@ -130,15 +130,12 @@ const useSearchCriterias = <F>(
     () => initState
   )
 
-  // Evite un double fetch au montage initial : sans ce guard, le useEffect dispatche
-  // REMOVE_SEARCH_CRITERIAS dès le premier render, ce qui appelle initState() et crée
-  // un nouvel objet (nouvelle référence), forçant un re-render et retriggant les effets dépendants.
-  const isFirstRun = useRef(true)
+  // Ne dispatch que quand resetKey change réellement : évite qu'un REMOVE au mount                                                                                                                                 
+  // ne renvoie une nouvelle ref de initState et cascade en double fetch via useData.
+  const prevResetKey = useRef(resetKey)
   useEffect(() => {
-    if (isFirstRun.current) {
-      isFirstRun.current = false
-      return
-    }
+    if (prevResetKey.current === resetKey) return
+    prevResetKey.current = resetKey
     dispatch({ type: ActionTypes.REMOVE_SEARCH_CRITERIAS, payload: null })
   }, [resetKey])
 
