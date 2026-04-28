@@ -25,7 +25,9 @@ const AddOrEditItem: React.FC<{
   let nameHelperText = ''
   if (nameTooLong || (noName && hasInteracted)) {
     nameHelperText =
-      noName && hasInteracted ? 'Le nom doit comporter au moins un caractère.' : 'Le nom est trop long (255 caractères max.)'
+      noName && hasInteracted
+        ? 'Le nom doit comporter au moins un caractère.'
+        : 'Le nom est trop long (255 caractères max.)'
   }
 
   const handleSubmit = () => {

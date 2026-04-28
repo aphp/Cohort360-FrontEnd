@@ -367,10 +367,8 @@ const mapGenericToRequestParams = (filters: GenericFilter, type: ResourceType) =
   const { nda, durationRange, executiveUnits, encounterStatus } = filters
   const requestParams: string[] = []
   if (nda) requestParams.push(`${getGenericKeyFromResourceType(type, 'NDA')}=${encodeURIComponent(nda)}`)
-  if (durationRange?.[0])
-    requestParams.push(`${getGenericKeyFromResourceType(type, 'DATE')}=ge${durationRange[0]}`)
-  if (durationRange?.[1])
-    requestParams.push(`${getGenericKeyFromResourceType(type, 'DATE')}=le${durationRange[1]}`)
+  if (durationRange?.[0]) requestParams.push(`${getGenericKeyFromResourceType(type, 'DATE')}=ge${durationRange[0]}`)
+  if (durationRange?.[1]) requestParams.push(`${getGenericKeyFromResourceType(type, 'DATE')}=le${durationRange[1]}`)
   if (executiveUnits && executiveUnits.length > 0)
     requestParams.push(
       `${getGenericKeyFromResourceType(type, 'EXECUTIVE_UNITS')}=${executiveUnits.map((unit) => unit.id)}`

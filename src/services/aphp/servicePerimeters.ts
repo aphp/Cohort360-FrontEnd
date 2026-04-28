@@ -158,17 +158,11 @@ const servicesPerimeters: IServicePerimeters = {
     const classFacet = getExtension(encountersResp.data.meta, ChartCode.VISIT_TYPE_REPARTITION)
 
     const agePyramidData =
-      patientsResp?.data?.resourceType === 'Bundle'
-        ? getAgeRepartitionMapAphp(ageFacet?.extension)
-        : undefined
+      patientsResp?.data?.resourceType === 'Bundle' ? getAgeRepartitionMapAphp(ageFacet?.extension) : undefined
     const genderRepartitionMap =
-      patientsResp?.data?.resourceType === 'Bundle'
-        ? getGenderRepartitionMapAphp(deceasedFacet?.extension)
-        : undefined
+      patientsResp?.data?.resourceType === 'Bundle' ? getGenderRepartitionMapAphp(deceasedFacet?.extension) : undefined
     const monthlyVisitData =
-      encountersResp?.data?.resourceType === 'Bundle'
-        ? getVisitRepartitionMapAphp(visitFacet?.extension)
-        : undefined
+      encountersResp?.data?.resourceType === 'Bundle' ? getVisitRepartitionMapAphp(visitFacet?.extension) : undefined
     const visitTypeRepartitionData =
       encountersResp?.data?.resourceType === 'Bundle'
         ? getEncounterRepartitionMapAphp(classFacet?.extension)

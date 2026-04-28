@@ -129,9 +129,8 @@ const ControlPanel: React.FC<{
   const accessIsPseudonymize: boolean | null =
     selectedPopulation === null
       ? null
-      : selectedPopulation
-          .map((population) => population?.access)
-          .filter((elem) => elem && elem === 'Pseudonymisé').length > 0
+      : selectedPopulation.map((population) => population?.access).filter((elem) => elem && elem === 'Pseudonymisé')
+          .length > 0
 
   let accessLabel: string
   if (accessIsPseudonymize === null) {
