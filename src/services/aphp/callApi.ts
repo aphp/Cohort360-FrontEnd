@@ -297,7 +297,7 @@ export const fetchDocumentReference = async (
   uniqueFacet = uniqueFacet ? uniqueFacet.filter(uniq) : []
   _elements = _elements ? _elements.filter(uniq) : []
 
-  // By default, all the calls to `/DocumentReference` will have`'type:not=https://terminology.eds.aphp.fr/fhir/CodeSystem/aphp-document-class|doc-impor'`, contenttype=text/plain, and patient.active=true in parameter
+  // By default, all the calls to `/DocumentReference` will have `'type:not=https://terminology.eds.aphp.fr/fhir/CodeSystem/aphp-document-class|doc-impor'` and patient.active=true in parameter
   let options: string[] = [
     `type:not=${encodeURIComponent('https://terminology.eds.aphp.fr/fhir/CodeSystem/aphp-document-class|doc-impor')}`
   ]
