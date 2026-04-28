@@ -130,7 +130,7 @@ const useSearchCriterias = <F>(
     () => initState
   )
 
-  // Ne dispatch que quand resetKey change réellement : évite qu'un REMOVE au mount                                                                                                                                 
+  // Ne dispatch que quand resetKey change réellement : évite qu'un REMOVE au mount
   // ne renvoie une nouvelle ref de initState et cascade en double fetch via useData.
   const prevResetKey = useRef(resetKey)
   useEffect(() => {
