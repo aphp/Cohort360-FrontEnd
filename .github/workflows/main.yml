@@ -6,8 +6,6 @@ on:
       - main
       - develop
       - release/**
-    tags:
-      - run-sonar
   pull_request:
   workflow_dispatch:
 
@@ -16,12 +14,10 @@ permissions:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/tags/run-sonar' }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 env:
   NODE_VERSION: 22.x
-  SONAR_TEST_BRANCH: branch-run-sonar
-  SONAR_TEST_TAG: run-sonar
   TZ: Europe/Paris
 
 jobs:
@@ -131,7 +127,7 @@ jobs:
         github.ref == 'refs/heads/main'
         || github.ref == 'refs/heads/develop'
         || startsWith(github.ref, 'refs/heads/release/')
-        || github.ref == 'refs/tags/run-sonar'
+        || github.event_name == 'workflow_dispatch'
         || github.event_name == 'pull_request'
       )
       && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
@@ -175,11 +171,6 @@ jobs:
           name: coverage-report
           path: coverage
 
-      - name: Set Sonar branch name for test tag
-        id: sonar_branch
-        if: github.ref == 'refs/tags/run-sonar'
-        run: echo "args=-Dsonar.branch.name=$SONAR_TEST_BRANCH" >> "$GITHUB_OUTPUT"
-
       - name: SonarCloud scan
         uses: SonarSource/sonarqube-scan-action@v7
         env:
@@ -191,7 +182,6 @@ jobs:
             -Dsonar.organization=aphp
             -Dsonar.projectKey=aphp_Cohort360
             -Dsonar.javascript.lcov.reportPaths=./coverage/lcov.info
-            ${{ steps.sonar_branch.outputs.args }}
 
   publish:
     if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/heads/release/')
@@ -219,19 +209,19 @@ jobs:
         env:
           VERSION: ${{ steps.package_version.outputs.version }}
         run: |
-          if [ "$GITHUB_REF" = "refs/heads/main" ]; then
+          if [[ "$GITHUB_REF" = "refs/heads/main" ]]; then
             echo "Publishing main version $VERSION"
             exit 0
           fi
 
           RELEASE_VERSION="${GITHUB_REF#refs/heads/release/}"
 
-          if [ "$RELEASE_VERSION" = "$GITHUB_REF" ]; then
+          if [[ "$RELEASE_VERSION" = "$GITHUB_REF" ]]; then
             echo "Publish is only allowed from main or release/* branches"
             exit 1
           fi
 
-          if [ "$VERSION" != "$RELEASE_VERSION" ]; then
+          if [[ "$VERSION" != "$RELEASE_VERSION" ]]; then
             echo "The package.json version must match the release branch name"
             echo "Branch version: $RELEASE_VERSION"
             echo "Package version: $VERSION"
