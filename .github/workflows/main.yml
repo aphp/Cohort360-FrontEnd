@@ -2,8 +2,12 @@ name: cohort360-main-pipeline
 
 on:
   push:
-    branches: [main, develop]
-    tags: ["*"]
+    branches:
+      - main
+      - develop
+      - release/**
+    tags:
+      - run-sonar
   pull_request:
   workflow_dispatch:
 
@@ -12,7 +16,7 @@ permissions:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: ${{ github.ref != 'refs/heads/main' && !startsWith(github.ref, 'refs/tags/') }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/tags/run-sonar' }}
 
 env:
   NODE_VERSION: 22.x
@@ -126,7 +130,8 @@ jobs:
       (
         github.ref == 'refs/heads/main'
         || github.ref == 'refs/heads/develop'
-        || startsWith(github.ref, 'refs/tags/')
+        || startsWith(github.ref, 'refs/heads/release/')
+        || github.ref == 'refs/tags/run-sonar'
         || github.event_name == 'pull_request'
       )
       && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
@@ -189,7 +194,7 @@ jobs:
             ${{ steps.sonar_branch.outputs.args }}
 
   publish:
-    if: github.ref == 'refs/heads/main' || (startsWith(github.ref, 'refs/tags/') && github.ref != 'refs/tags/run-sonar')
+    if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/heads/release/')
     needs:
       - lint
       - typecheck
@@ -210,15 +215,36 @@ jobs:
           VERSION=$(node -p "require('./package.json').version")
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
 
-      - name: Check correct tag and version
+      - name: Check correct release ref and version
         env:
           VERSION: ${{ steps.package_version.outputs.version }}
         run: |
-          CI_COMMIT_TAG=$(git tag --points-at HEAD | head -n 1)
-          if [ -n "$CI_COMMIT_TAG" ] && [ "$CI_COMMIT_TAG" != "$VERSION" ] && case "$VERSION" in *SNAPSHOT) false;; *) true;; esac; then
-            echo "The version is not the same as the tag name"
+          if [ "$GITHUB_REF" = "refs/heads/main" ]; then
+            echo "Publishing main version $VERSION"
+            exit 0
+          fi
+
+          RELEASE_VERSION="${GITHUB_REF#refs/heads/release/}"
+
+          if [ "$RELEASE_VERSION" = "$GITHUB_REF" ]; then
+            echo "Publish is only allowed from main or release/* branches"
             exit 1
           fi
+
+          if [ "$VERSION" != "$RELEASE_VERSION" ]; then
+            echo "The package.json version must match the release branch name"
+            echo "Branch version: $RELEASE_VERSION"
+            echo "Package version: $VERSION"
+            exit 1
+          fi
+
+          case "$VERSION" in
+            *SNAPSHOT)
+              echo "Release branches must not publish SNAPSHOT versions"
+              exit 1
+              ;;
+          esac
+
           echo "Publishing version $VERSION"
 
       - name: Set up Docker Buildx
