@@ -14,7 +14,7 @@
  * - Request joining for complex query composition
  *
  * @module cohortCreation
- * @version 1.6.1
+ * @version 1.6.2
  * @since 1.0.0
  */
 
@@ -46,7 +46,7 @@ import { ScopeElement } from 'types/scope'
 import { formatAge } from './age'
 
 /** Current version of the Requeteur format used for cohort requests */
-const REQUETEUR_VERSION = 'v1.6.1'
+const REQUETEUR_VERSION = 'v1.6.2'
 
 /** Default criteria group used as fallback when group lookup fails */
 const DEFAULT_GROUP_ERROR: CriteriaGroup = {
