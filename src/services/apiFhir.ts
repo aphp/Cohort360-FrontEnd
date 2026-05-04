@@ -1,4 +1,4 @@
-import axios, { InternalAxiosRequestConfig } from 'axios'
+import axios, { AxiosRequestConfig, AxiosResponse, InternalAxiosRequestConfig } from 'axios'
 import { ACCESS_TOKEN } from '../constants'
 import { getConfig, onUpdateConfig } from 'config'
 
@@ -35,5 +35,20 @@ apiFhir.interceptors.request.use((config) => {
   requestsConfigHooks.forEach((hook) => hook(config))
   return config
 })
+
+export const fhirSearch = <T>(
+  resource: string,
+  params: string[],
+  config: AxiosRequestConfig = {}
+): Promise<AxiosResponse<T>> => {
+  const body = params.filter(Boolean).join('&')
+  return apiFhir.post<T>(`/${resource}/_search`, body, {
+    ...config,
+    headers: {
+      ...(config.headers ?? {}),
+      'Content-Type': 'application/x-www-form-urlencoded'
+    }
+  })
+}
 
 export default apiFhir
