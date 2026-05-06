@@ -4,7 +4,7 @@
  */
 
 import { removeFilter } from 'utils/filters'
-import { useReducer, useEffect } from 'react'
+import { useReducer, useEffect, useRef } from 'react'
 import {
   ActionTypes,
   SearchCriterias,
@@ -130,7 +130,12 @@ const useSearchCriterias = <F>(
     () => initState
   )
 
+  // Ne dispatch que quand resetKey change réellement : évite qu'un REMOVE au mount
+  // ne renvoie une nouvelle ref de initState et cascade en double fetch via useData.
+  const prevResetKey = useRef(resetKey)
   useEffect(() => {
+    if (prevResetKey.current === resetKey) return
+    prevResetKey.current = resetKey
     dispatch({ type: ActionTypes.REMOVE_SEARCH_CRITERIAS, payload: null })
   }, [resetKey])
 
