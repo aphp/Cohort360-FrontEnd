@@ -60,8 +60,7 @@ export type MeState = null | {
  * @returns Promise resolving to null (cleared state)
  */
 const logout = createAsyncThunk<MeState, void, { state: RootState }>('scope/logout', async () => {
-  services.practitioner.logout()
-  // Clear impersonation data from localStorage on logout
+  await services.practitioner.logout()
   localStorage.removeItem(IMPERSONATED_USER)
   return null
 })
