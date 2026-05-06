@@ -291,8 +291,7 @@ export const unbuildCriteriaDataFromDefinition = async <T extends SelectedCriter
           for (const item of matchingItems) {
             if (item?.buildInfo?.fhirKey && item?.valueKey) {
               if (
-                item.buildInfo.unbuildIgnoreValues &&
-                item.buildInfo.unbuildIgnoreValues.find(
+                item.buildInfo.unbuildIgnoreValues?.find(
                   (ignoreValue) => JSON.stringify(ignoreValue) === JSON.stringify(value)
                 )
               ) {
@@ -338,7 +337,7 @@ export const criteriasAsArray = (
     .map((item) => {
       if (!item.valueKey) return null
       let val = selectedCriteria[item.valueKey as keyof typeof selectedCriteria]
-      if (item.buildInfo && item.buildInfo.ignoreIf) {
+      if (item.buildInfo?.ignoreIf) {
         const ignore = isFunction(item.buildInfo.ignoreIf)
           ? item.buildInfo.ignoreIf(selectedCriteria)
           : eval(item.buildInfo.ignoreIf)(selectedCriteria)

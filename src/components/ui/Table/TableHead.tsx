@@ -64,6 +64,12 @@ export const renderTableHeadCellContent = (col: Column, orderBy?: OrderBy, onSor
   return col.label
 }
 
+const getCellPadding = (index: number, total: number): string => {
+  if (index === 0) return '4px 8px 4px 12px'
+  if (index === total - 1) return '4px 12px 4px 8px'
+  return '4px 8px'
+}
+
 const TableHead = ({ columns, orderBy, sx, onSort }: RowProps) => {
   return (
     <TableHeadMui>
@@ -73,7 +79,7 @@ const TableHead = ({ columns, orderBy, sx, onSort }: RowProps) => {
             sx={{
               fontSize: 12,
               fontWeight: 600,
-              padding: index === 0 ? '4px 8px 4px 12px' : index === columns.length - 1 ? '4px 12px 4px 8px' : '4px 8px',
+              padding: getCellPadding(index, columns.length),
               ...sx
             }}
             size="small"

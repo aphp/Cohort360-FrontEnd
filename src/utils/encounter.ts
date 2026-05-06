@@ -116,13 +116,13 @@ function fillElementInformation<
 
   const encounterIsDetailed = encounter?.id !== encounterId
 
-  if (!encounterIsDetailed) {
-    newElement.serviceProvider = encounter?.serviceProvider?.display ?? 'Non renseigné'
-  } else {
+  if (encounterIsDetailed) {
     const foundEncounterDetail =
       // @ts-ignore
       encounter?.details?.find(({ id }) => id === encounterId) ?? encounter
     newElement.serviceProvider = foundEncounterDetail?.serviceProvider?.display ?? 'Non renseigné'
+  } else {
+    newElement.serviceProvider = encounter?.serviceProvider?.display ?? 'Non renseigné'
   }
 
   newElement.NDA = encounter?.id ?? 'Inconnu'

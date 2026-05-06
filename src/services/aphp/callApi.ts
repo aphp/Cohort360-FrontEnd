@@ -297,10 +297,9 @@ export const fetchDocumentReference = async (
   uniqueFacet = uniqueFacet ? uniqueFacet.filter(uniq) : []
   _elements = _elements ? _elements.filter(uniq) : []
 
-  // By default, all the calls to `/DocumentReference` will have`'type:not=https://terminology.eds.aphp.fr/fhir/CodeSystem/aphp-document-class|doc-impor'`, contenttype=text/plain, and patient.active=true in parameter
+  // By default, all the calls to `/DocumentReference` will have `'type:not=https://terminology.eds.aphp.fr/fhir/CodeSystem/aphp-document-class|doc-impor'` and patient.active=true in parameter
   let options: string[] = [
-    `type:not=${encodeURIComponent('https://terminology.eds.aphp.fr/fhir/CodeSystem/aphp-document-class|doc-impor')}`,
-    `contenttype=${encodeURIComponent('text/plain')}`
+    `type:not=${encodeURIComponent('https://terminology.eds.aphp.fr/fhir/CodeSystem/aphp-document-class|doc-impor')}`
   ]
 
   if (appConfig.core.fhir.totalCount) options = [...options, '_total=accurate']
@@ -1300,15 +1299,6 @@ export const fetchExportList = async (args: fetchExportListProps) => {
 type ExportProps = {
   id: string
   signal?: AbortSignal
-}
-
-export const downloadExport = async (args: ExportProps) => {
-  const { id, signal } = args
-  const response = await apiBackend.get<Back_API_Response<ExportList>>(`/exports/${id}/download/`, {
-    responseType: 'blob',
-    signal
-  })
-  return response.data
 }
 
 export const retryExport = async (args: ExportProps) => {

@@ -93,7 +93,7 @@ export const form: () => CriteriaForm<DemographicDataType> = () => ({
           extraLabel: (data) => {
             const typedData = data as DemographicDataType
             const vitalStatus = typedData.vitalStatus
-            return vitalStatus && vitalStatus.length === 1 && vitalStatus.find((status) => status === 'true')
+            return vitalStatus?.length === 1 && vitalStatus.find((status) => status === 'true')
               ? VitalStatusOptionsLabel.deceasedAge
               : VitalStatusOptionsLabel.age
           },

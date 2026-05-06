@@ -133,6 +133,7 @@ const PatientBoard = ({ patient }: PatientBoardProps) => {
                 onChange={(_, newSubTab) => handleChangeSubTab(newSubTab)}
               >
                 {subTabs.map((subTab) => {
+                  const groupIdParam = patient.groupId ? `${patient.groupId}&` : ''
                   return (
                     <Tab
                       sx={{ fontSize: 12 }}
@@ -140,7 +141,7 @@ const PatientBoard = ({ patient }: PatientBoardProps) => {
                       label={subTab.label}
                       value={subTab.value}
                       component={Link}
-                      to={`/patients/${patient.id}/${selectedTab}?${patient.groupId ? `${patient.groupId}&` : ''}subtab=${subTab.value}`}
+                      to={`/patients/${patient.id}/${selectedTab}?${groupIdParam}subtab=${subTab.value}`}
                     />
                   )
                 })}

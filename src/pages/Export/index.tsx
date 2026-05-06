@@ -23,6 +23,7 @@ import { GAP } from 'types/exploration'
 import Button from 'components/ui/Button'
 import AddIcon from '@mui/icons-material/Add'
 import PageContainer from 'components/ui/PageContainer'
+import WaitingPopup from 'views/WaitingPopup/WaitingPopup'
 
 const RESULTS_PER_PAGE = 20
 
@@ -40,12 +41,14 @@ const RESULTS_PER_PAGE = 20
  */
 const Export = () => {
   const controllerRef = useRef<AbortController>(new AbortController())
+  const downloadControllerRef = useRef<AbortController | null>(null)
   const navigate = useNavigate()
   const user = useAppSelector((state) => state.me?.impersonation?.username ?? state.me?.userName) ?? ''
   const deidentified = useAppSelector((state) => state.me?.deidentified)
   const [exportList, setExportList] = useState<Back_API_Response<ExportList> | null>(null)
   const maintenanceIsActive = useAppSelector((state) => state.me?.maintenance?.active) ?? false
   const [loadingStatus, setLoadingStatus] = useState(LoadingStatus.FETCHING)
+  const [downloading, setDownloading] = useState<boolean | null>(false)
   const [searchParams, setSearchParams] = useSearchParams()
   const [pagination, setPagination] = useState({ current: 0, total: 0 })
   const [{ orderBy, searchInput }, { changeOrderBy, changeSearchInput }] = useSearchCriterias(
@@ -91,8 +94,37 @@ const Export = () => {
     _fetchExportList({ page, input: args.input ?? searchInput ?? '', orderBy: args.orderBy ?? orderBy })
   }
 
-  const onDownload = (id: string, name: string, output_format: string) =>
-    downloadExport(id, name, output_format, controllerRef.current?.signal)
+  /**
+   * Cancels the ongoing download request if it exists.
+   * This function is called when the user clicks the cancel button in the waiting popup.
+   */
+  const cancelDownload = () => {
+    downloadControllerRef.current?.abort()
+  }
+
+  /**
+   * Initiates the download of an export file.
+   * @param id The ID of the export to download
+   */
+  const onDownload = async (id: string) => {
+    const controller = new AbortController()
+    downloadControllerRef.current = controller
+
+    setDownloading(true)
+
+    try {
+      await downloadExport(id, controller.signal)
+    } catch (e: Error | unknown) {
+      if (e instanceof Error && e.name === 'AbortError') {
+        console.log('Download annulé')
+      } else {
+        console.error(e)
+      }
+    } finally {
+      setDownloading(false)
+      downloadControllerRef.current = null
+    }
+  }
 
   const onRetry = async (id: string) => {
     await retryExport(id, controllerRef.current?.signal)
@@ -100,7 +132,7 @@ const Export = () => {
   }
 
   useEffect(() => {
-    handleSearch({ page: Math.max(1, parseInt(searchParams.get('page') ?? '1', 10)) })
+    handleSearch({ page: Math.max(1, Number.parseInt(searchParams.get('page') ?? '1', 10)) })
   }, [])
 
   useEffect(() => {
@@ -110,8 +142,8 @@ const Export = () => {
   const table = useMemo(
     () =>
       mapExportListToTable(exportList?.results ?? [], {
-        onDownload: (id, name, output_format) => {
-          void onDownload(id, name, output_format)
+        onDownload: (id) => {
+          void onDownload(id)
         },
         onRetry: (id) => {
           void onRetry(id)
@@ -169,6 +201,7 @@ const Export = () => {
           onPageChange={(page) => handleSearch({ page })}
         />
       )}
+      {downloading && <WaitingPopup open={downloading} onCancel={cancelDownload} />}
     </PageContainer>
   )
 }

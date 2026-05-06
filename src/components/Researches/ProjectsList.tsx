@@ -109,6 +109,36 @@ const ProjectsList = () => {
     setOpenEditionModal(false)
   }
 
+  let projectsListContent: React.ReactNode
+  if (loading) {
+    projectsListContent = <CenteredCircularProgress />
+  } else if (projectsList.length === 0) {
+    projectsListContent = (
+      <Grid container sx={{ justifyContent: 'center' }} marginTop={'12px'}>
+        <Typography>Aucun projet à afficher</Typography>
+      </Grid>
+    )
+  } else {
+    projectsListContent = projectsList.map((project: ProjectType) => (
+      <ProjectCard
+        key={project.uuid}
+        title={project.name}
+        creationDate={project.created_at}
+        requestNumber={project.requests_count ?? 0}
+        onclick={() => navigate(`/researches/projects/${project.uuid}${location.search}`)}
+        onedit={() => {
+          setSelectedProject(project)
+          setOpenEditionModal(true)
+        }}
+        ondelete={() => {
+          setSelectedProject(project)
+          setOpenDeletionModal(true)
+        }}
+        disabled={maintenanceIsActive}
+      />
+    ))
+  }
+
   return (
     <Grid container size={12} style={{ padding: '20px 0' }} sx={{ gap: '20px' }}>
       <Grid container size={12} sx={{ justifyContent: 'space-between', alignItems: 'center' }}>
@@ -136,32 +166,7 @@ const ProjectsList = () => {
         </Grid>
       </Grid>
       <Grid container size={12} sx={{ gap: '50px' }} id="projects-list-div">
-        {loading ? (
-          <CenteredCircularProgress />
-        ) : projectsList.length === 0 ? (
-          <Grid container sx={{ justifyContent: 'center' }} marginTop={'12px'}>
-            <Typography>Aucun projet à afficher</Typography>
-          </Grid>
-        ) : (
-          projectsList.map((project: ProjectType) => (
-            <ProjectCard
-              key={project.uuid}
-              title={project.name}
-              creationDate={project.created_at}
-              requestNumber={project.requests_count ?? 0}
-              onclick={() => navigate(`/researches/projects/${project.uuid}${location.search}`)}
-              onedit={() => {
-                setSelectedProject(project)
-                setOpenEditionModal(true)
-              }}
-              ondelete={() => {
-                setSelectedProject(project)
-                setOpenDeletionModal(true)
-              }}
-              disabled={maintenanceIsActive}
-            />
-          ))
-        )}
+        {projectsListContent}
       </Grid>
 
       <AddOrEditItem

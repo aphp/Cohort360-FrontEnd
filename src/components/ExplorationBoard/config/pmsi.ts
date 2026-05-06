@@ -25,13 +25,13 @@ import { getValueSetsFromSystems } from 'utils/valueSets'
 const fetchAdditionalInfos = async (additionalInfo: AdditionalInfo): Promise<AdditionalInfo> => {
   const fetchersMap: Record<string, () => Promise<FhirItem[] | undefined>> = {
     diagnosticTypesList: () =>
-      !additionalInfo.diagnosticTypesList
-        ? fetchValueSet(getConfig().features.condition.valueSets.conditionStatus.url)
-        : Promise.resolve(undefined),
+      additionalInfo.diagnosticTypesList
+        ? Promise.resolve(undefined)
+        : fetchValueSet(getConfig().features.condition.valueSets.conditionStatus.url),
     encounterStatusList: () =>
-      !additionalInfo.encounterStatusList
-        ? fetchValueSet(getConfig().core.valueSets.encounterStatus.url)
-        : Promise.resolve(undefined)
+      additionalInfo.encounterStatusList
+        ? Promise.resolve(undefined)
+        : fetchValueSet(getConfig().core.valueSets.encounterStatus.url)
   }
   const sourceType = SourceType.CCAM
   const resolved = await resolveAdditionalInfos(fetchersMap)
@@ -80,13 +80,14 @@ const mapToTable = (
     const codes = getPmsiCodes(type, elem)
     const source = elem.meta?.source?.split('/').filter(Boolean).pop()?.toUpperCase()
 
+    const ippGroupQuery = groupId ? `?groupId=${groupId}` : ''
     const row: Row = [
       !isPatient && {
         id: `${elem.id}-ipp`,
         value: elem.IPP
           ? {
               label: elem.IPP,
-              url: `/patients/${elem.idPatient}${groupId ? `?groupId=${groupId}` : ''}`
+              url: `/patients/${elem.idPatient}${ippGroupQuery}`
             }
           : 'Non renseigné',
         type: elem.IPP ? CellType.LINK : CellType.TEXT

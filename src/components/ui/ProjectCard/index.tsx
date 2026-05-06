@@ -57,7 +57,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
       <Box position={'absolute'} right={8} top={12}>
         <ActionMenu actions={actions} disabled={disabled} />
       </Box>
-      <Box>{!hover ? <FolderIcon /> : <OpenedFolderIcon />}</Box>
+      <Box>{hover ? <OpenedFolderIcon /> : <FolderIcon />}</Box>
       <Box display={'flex'} flexDirection={'column'} alignItems={'center'}>
         <ProjectTitle>{title}</ProjectTitle>
         <Typography fontSize={'12px'} fontFamily={"'Montserrat', sans-serif"} color={'#6d6d6d'}>

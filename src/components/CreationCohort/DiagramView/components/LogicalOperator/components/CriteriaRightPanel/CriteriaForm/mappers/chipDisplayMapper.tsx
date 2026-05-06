@@ -112,7 +112,7 @@ const getDocumentTypesLabel = (values: string[]) => {
 
 const chipForNumberAndComparator = (value: NumberAndComparatorDataType, name: string) => {
   if (value.comparator === Comparators.BETWEEN) {
-    return `${name} comprise entre ${value.value} et ${!value.maxValue ? '?' : value.maxValue}`
+    return `${name} comprise entre ${value.value} et ${value.maxValue ? value.maxValue : '?'}`
   }
   return `${name} ${value.comparator} ${+value.value}`
 }
@@ -148,7 +148,7 @@ const getLabelsForCodeSearchItem = (
         (value.system
           ? valueSets.cache[value.system]
           : item.valueSetsInfo.flatMap((valueset) => valueSets.cache[valueset.url])) || []
-      ).find((code) => code && code.id === value.id) as LabelObject
+      ).find((code) => code?.id === value.id) as LabelObject
     })
     .filter((code) => code !== undefined)
 }
