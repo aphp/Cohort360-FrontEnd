@@ -19,11 +19,7 @@ const CohortCreationBreadcrumbs: React.FC = () => {
   const [requestName, setRequestName] = useState('Requête')
 
   useEffect(() => {
-    if (!projects || (projects && projects.length === 0)) {
-      dispatch(fetchProjectsList())
-    } else if (!requests || (requests && requests.length === 0)) {
-      dispatch(fetchRequestsList())
-    } else {
+    if (projects?.length && requests?.length) {
       const foundItem = requests.find(({ uuid }) => uuid === requestId)
       if (foundItem) {
         setRequestName(foundItem.name)
@@ -32,6 +28,10 @@ const CohortCreationBreadcrumbs: React.FC = () => {
           setProjectName(foundProject.name)
         }
       }
+    } else if (!projects?.length) {
+      dispatch(fetchProjectsList())
+    } else {
+      dispatch(fetchRequestsList())
     }
   }, [projects, requests, requestId, dispatch])
 

@@ -146,7 +146,7 @@ const Requeteur = () => {
         globalCount
       )
 
-      if (createCohortResult && createCohortResult.status === 201) {
+      if (createCohortResult?.status === 201) {
         dispatch(resetCohortCreation())
         navigate(`/home`)
       }

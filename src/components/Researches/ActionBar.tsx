@@ -106,7 +106,7 @@ const ActionBar: React.FC<ActionBarProps> = ({
             {totalSelected > 0 && (
               <DisplayDigits
                 nb={totalSelected}
-                label={`${label}${plural(totalSelected)} sélectionné${label !== 'échantillon' ? 'e' : ''}${plural(
+                label={`${label}${plural(totalSelected)} sélectionné${label === 'échantillon' ? '' : 'e'}${plural(
                   totalSelected
                 )} /`}
               />

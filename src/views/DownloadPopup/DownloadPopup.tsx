@@ -26,8 +26,8 @@ const DownloadPopup: React.FC = () => {
     const filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/
     const matches = filenameRegex.exec(contentDisposition)
     let default_filename = 'Download.zip'
-    if (matches != null && matches[1]) {
-      default_filename = matches[1].replace(/['"]/g, '')
+    if (matches?.[1]) {
+      default_filename = matches[1].replaceAll(/['"]/g, '')
     }
     return default_filename
   }
@@ -85,6 +85,27 @@ const DownloadPopup: React.FC = () => {
     navigate('/home', { replace: true })
   }
 
+  let downloadStatusContent: React.ReactNode
+  if (downloading === null) {
+    downloadStatusContent = (
+      <Typography variant="h2" color="primary">
+        Téléchargement terminé!
+      </Typography>
+    )
+  } else if (downloading) {
+    downloadStatusContent = (
+      <Typography variant="h2" color="primary">
+        Téléchargement en cours...
+      </Typography>
+    )
+  } else {
+    downloadStatusContent = (
+      <Typography variant="h2" color="secondary">
+        Erreur lors du téléchargement
+      </Typography>
+    )
+  }
+
   return (
     <Dialog
       open={open}
@@ -96,21 +117,7 @@ const DownloadPopup: React.FC = () => {
       <DialogContent>
         <DialogContentText id="alert-dialog-description">
           <Grid className={classes.exportDownloadProgress}>
-            {downloading !== null ? (
-              downloading ? (
-                <Typography variant="h2" color="primary">
-                  Téléchargement en cours...
-                </Typography>
-              ) : (
-                <Typography variant="h2" color="secondary">
-                  Erreur lors du téléchargement
-                </Typography>
-              )
-            ) : (
-              <Typography variant="h2" color="primary">
-                Téléchargement terminé!
-              </Typography>
-            )}
+            {downloadStatusContent}
             {downloading ? <CircularProgress /> : null}
           </Grid>
         </DialogContentText>

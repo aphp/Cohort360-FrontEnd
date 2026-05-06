@@ -33,13 +33,13 @@ import { SourceType } from 'types/scope'
 const fetchAdditionalInfos = async (additionalInfo: AdditionalInfo): Promise<AdditionalInfo> => {
   const fetchersMap: Record<string, () => Promise<FhirItem[] | undefined>> = {
     encounterStatusList: () =>
-      !additionalInfo.encounterStatusList
-        ? fetchValueSet(getConfig().core.valueSets.encounterStatus.url)
-        : Promise.resolve(undefined),
+      additionalInfo.encounterStatusList
+        ? Promise.resolve(undefined)
+        : fetchValueSet(getConfig().core.valueSets.encounterStatus.url),
     modalities: () =>
-      !additionalInfo.modalities
-        ? getCodeList(getConfig().features.imaging.valueSets.imagingModalities.url, true).then((res) => res.results)
-        : Promise.resolve(undefined)
+      additionalInfo.modalities
+        ? Promise.resolve(undefined)
+        : getCodeList(getConfig().features.imaging.valueSets.imagingModalities.url, true).then((res) => res.results)
   }
   const sourceType = SourceType.IMAGING
   const resolved = await resolveAdditionalInfos(fetchersMap)
@@ -158,6 +158,7 @@ const mapToTable = (data: Data, deidentified: boolean, isPatient: boolean, group
           ?.url?.split('/')
           .pop()
       : getExtension(elem, 'docId')?.valueString
+    const ippGroupQuery = groupId ? `?groupId=${groupId}` : ''
     const row: Row = [
       {
         id: `${elem.id}-subArray`,
@@ -169,7 +170,7 @@ const mapToTable = (data: Data, deidentified: boolean, isPatient: boolean, group
         value: elem.IPP
           ? {
               label: elem.IPP,
-              url: `/patients/${elem.idPatient}${groupId ? `?groupId=${groupId}` : ''}`
+              url: `/patients/${elem.idPatient}${ippGroupQuery}`
             }
           : 'Non renseigné',
         type: elem.IPP ? CellType.LINK : CellType.TEXT

@@ -307,7 +307,13 @@ const ExportTable: React.FC<ExportTableProps> = ({
                   fontSize={12}
                   color={tableSetting?.isChecked ? '#153D8A' : '#888'}
                 >
-                  {`${count} ${exportTableResourceType === ResourceType.QUESTIONNAIRE_RESPONSE ? `dossier${plural(count ?? 0)} de spécialité` : `ligne${plural(count ?? 0)}`}`}
+                  {(() => {
+                    const label =
+                      exportTableResourceType === ResourceType.QUESTIONNAIRE_RESPONSE
+                        ? `dossier${plural(count ?? 0)} de spécialité`
+                        : `ligne${plural(count ?? 0)}`
+                    return `${count} ${label}`
+                  })()}
                 </Typography>
               )}
             </>

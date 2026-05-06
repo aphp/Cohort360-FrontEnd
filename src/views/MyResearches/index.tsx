@@ -115,10 +115,10 @@ const MyResearches = () => {
       hasMounted.current = true
       return
     }
-    if (!newSearchInput) {
-      searchParams.delete(ExplorationsSearchParams.SEARCH_INPUT)
-    } else {
+    if (newSearchInput) {
       searchParams.set(ExplorationsSearchParams.SEARCH_INPUT, newSearchInput)
+    } else {
+      searchParams.delete(ExplorationsSearchParams.SEARCH_INPUT)
     }
     setSearchParams(searchParams)
     navigate({
@@ -128,10 +128,10 @@ const MyResearches = () => {
   }
 
   const handleDateChange = (date: string | null, key: ExplorationsSearchParams) => {
-    if (!date) {
-      searchParams.delete(key)
-    } else {
+    if (date) {
       searchParams.set(key, moment(date).isValid() ? moment(date).format('YYYY-MM-DD') : '')
+    } else {
+      searchParams.delete(key)
     }
     setSearchParams(searchParams)
     navigate({

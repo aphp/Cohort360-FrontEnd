@@ -49,10 +49,9 @@ const AppNavigation = () => {
                   </WebSocketProvider>
                 }
               >
-                {route.children &&
-                  route.children.map((child, index) => (
-                    <Route key={index + (child.path ?? '')} path={child.path} element={child.element} />
-                  ))}
+                {route.children?.map((child, index) => (
+                  <Route key={index + (child.path ?? '')} path={child.path} element={child.element} />
+                ))}
               </Route>
             </Route>
           ) : (

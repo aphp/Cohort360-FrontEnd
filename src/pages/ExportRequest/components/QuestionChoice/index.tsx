@@ -105,7 +105,7 @@ const normalize = (str: string) =>
   str
     .toLocaleLowerCase('fr-FR')
     .normalize('NFD')
-    .replace(/\p{Diacritic}/gu, '')
+    .replaceAll(/\p{Diacritic}/gu, '')
 
 /**
  * Checks if a linkId starts with the F_MATER_ prefix.

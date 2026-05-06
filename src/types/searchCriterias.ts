@@ -216,20 +216,22 @@ export enum DocumentStatuses {
   PRELIMINARY = 'preliminary'
 }
 
+const DOCUMENT_STATUS_TO_REQUEST_PARAM: Record<string, string> = {
+  [FilterByDocumentStatus.VALIDATED]: DocumentStatuses.FINAL,
+  [FilterByDocumentStatus.NOT_VALIDATED]: DocumentStatuses.PRELIMINARY
+}
+
 export function mapDocumentStatusesToRequestParam(docStatus: string): string {
-  return docStatus === FilterByDocumentStatus.VALIDATED
-    ? DocumentStatuses.FINAL
-    : docStatus === FilterByDocumentStatus.NOT_VALIDATED
-      ? DocumentStatuses.PRELIMINARY
-      : ''
+  return DOCUMENT_STATUS_TO_REQUEST_PARAM[docStatus] ?? ''
+}
+
+const DOCUMENT_STATUS_FROM_REQUEST_PARAM: Record<string, string> = {
+  [DocumentStatuses.FINAL]: FilterByDocumentStatus.VALIDATED,
+  [DocumentStatuses.PRELIMINARY]: FilterByDocumentStatus.NOT_VALIDATED
 }
 
 export function mapDocumentStatusesFromRequestParam(docStatus: string): string {
-  return docStatus === DocumentStatuses.FINAL
-    ? FilterByDocumentStatus.VALIDATED
-    : docStatus === DocumentStatuses.PRELIMINARY
-      ? FilterByDocumentStatus.NOT_VALIDATED
-      : ''
+  return DOCUMENT_STATUS_FROM_REQUEST_PARAM[docStatus] ?? ''
 }
 
 export enum FilterKeys {

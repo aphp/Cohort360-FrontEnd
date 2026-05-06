@@ -147,6 +147,7 @@ export const mapToTable = (
     const documentContent = findContent?.attachment?.data
       ? Buffer.from(findContent?.attachment.data, 'base64').toString('utf-8')
       : ''
+    const ippGroupQuery = groupId ? `?groupId=${groupId}` : ''
     const row: Row = [
       {
         id: `${elem.id}-status`,
@@ -166,7 +167,7 @@ export const mapToTable = (
         value: elem.IPP
           ? {
               label: elem.IPP,
-              url: `/patients/${elem.idPatient}${groupId ? `?groupId=${groupId}` : ''}`
+              url: `/patients/${elem.idPatient}${ippGroupQuery}`
             }
           : 'Non renseigné',
         type: elem.IPP ? CellType.LINK : CellType.TEXT
@@ -207,9 +208,9 @@ export const mapToTable = (
 const fetchAdditionalInfos = async (additionalInfo: AdditionalInfo): Promise<AdditionalInfo> => {
   const fetchersMap: Record<string, () => Promise<FhirItem[] | SearchBy[] | undefined>> = {
     encounterStatusList: () =>
-      !additionalInfo.encounterStatusList
-        ? fetchValueSet(getConfig().core.valueSets.encounterStatus.url)
-        : Promise.resolve(undefined),
+      additionalInfo.encounterStatusList
+        ? Promise.resolve(undefined)
+        : fetchValueSet(getConfig().core.valueSets.encounterStatus.url),
     searchByList: () => Promise.resolve(searchByListDocuments)
   }
   const sourceType = SourceType.DOCUMENT

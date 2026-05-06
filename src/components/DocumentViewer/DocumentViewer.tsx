@@ -35,7 +35,14 @@ const DocumentViewer: React.FC<DocumentViewerProps> = ({ deidentified, open, han
   const [documentContent, setDocumentContent] = useState<DocumentReference | null>(null)
   const [numPages, setNumPages] = useState(1)
   const [loading, setLoading] = useState(false)
-  const [selectedTab, setSelectedTab] = useState<'pdf' | 'raw'>(!deidentified ? (documentId ? 'pdf' : 'raw') : 'raw')
+  let initialTab: 'pdf' | 'raw'
+  if (deidentified) {
+    initialTab = 'raw'
+  } else {
+    initialTab = documentId ? 'pdf' : 'raw'
+  }
+
+  const [selectedTab, setSelectedTab] = useState<'pdf' | 'raw'>(initialTab)
   const gridRef: React.RefObject<HTMLDivElement | null> = useRef(null)
   const [gridWidth, setGridWidth] = useState(0)
 
@@ -108,9 +115,9 @@ const DocumentViewer: React.FC<DocumentViewerProps> = ({ deidentified, open, han
   const findContent = documentContent?.content?.find((content) => content.attachment?.contentType === 'text/plain')
 
   const documentContentDecode =
-    findContent?.attachment.data != undefined
-      ? Buffer.from(findContent.attachment.data, 'base64').toString('utf-8')
-      : ''
+    findContent?.attachment.data == undefined
+      ? ''
+      : Buffer.from(findContent.attachment.data, 'base64').toString('utf-8')
 
   return (
     <Dialog open={open} fullWidth maxWidth="xl" onClose={handleClose}>

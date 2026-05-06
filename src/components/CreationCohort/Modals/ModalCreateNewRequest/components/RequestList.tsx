@@ -28,13 +28,13 @@ const ProjectRow: React.FC<ProjectRowProps> = ({ project, requestsList, selected
       <ListItem
         className={classes.requestItem}
         secondaryAction={
-          !open ? (
+          open ? (
             <IconButton onClick={() => setOpen(!open)}>
-              <ExpandMoreIcon />
+              <ExpandLessIcon />
             </IconButton>
           ) : (
             <IconButton onClick={() => setOpen(!open)}>
-              <ExpandLessIcon />
+              <ExpandMoreIcon />
             </IconButton>
           )
         }

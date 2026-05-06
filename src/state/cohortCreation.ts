@@ -302,7 +302,7 @@ const saveJson = createAsyncThunk<SaveJsonReturn, SaveJsonParams, { state: RootS
       const { navHistory } = state.cohortCreation.request
       const _navHistory: CurrentSnapshot[] = navHistory.slice()
 
-      if (!snapshotsHistory || (snapshotsHistory && snapshotsHistory.length === 0)) {
+      if (!snapshotsHistory?.length) {
         if (requestId) {
           const newSnapshot = await services.cohortCreation.createSnapshot(requestId, newJson, true)
           if (newSnapshot) {
@@ -717,7 +717,7 @@ const getTemporalConstraints = (
 const getNextCriteriaId = (selectedCriteria: { id: number }[], criteriaGroup: { criteriaIds: number[] }[]): number => {
   const criteriaIdsFromGroups = criteriaGroup.flatMap((group) => group.criteriaIds)
   const allIds = [...selectedCriteria.map((c) => c.id), ...criteriaIdsFromGroups]
-  const maxId = Math.max(0, ...allIds.filter((id): id is number => typeof id === 'number' && isFinite(id)))
+  const maxId = Math.max(0, ...allIds.filter((id): id is number => typeof id === 'number' && Number.isFinite(id)))
   return maxId + 1
 }
 
@@ -737,14 +737,14 @@ const moveCriterionInGroups = (snapshot: CriteriaGroup[], { active, over }: Move
     if (isTargetGroup) {
       let insertionIndex: number
 
-      if (over.id !== null) {
+      if (over.id === null) {
+        insertionIndex = active.groupId > over.groupId ? 0 : criteriaIds.length
+      } else {
         const overIndex = originalIds.indexOf(over.id)
         const activeIndex = originalIds.indexOf(active.id)
         const shouldInsertAfter =
           active.groupId > over.groupId || (active.groupId === over.groupId && activeIndex < overIndex)
         insertionIndex = shouldInsertAfter ? overIndex + 1 : overIndex
-      } else {
-        insertionIndex = active.groupId > over.groupId ? 0 : criteriaIds.length
       }
 
       criteriaIds.splice(insertionIndex, 0, active.id)

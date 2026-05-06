@@ -21,7 +21,7 @@ import { plural } from './string'
  */
 export const format = (nb: number | null | undefined) => {
   if (nb === null || nb === undefined) return '-'
-  return nb.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ')
+  return nb.toString().replaceAll(/\B(?=(\d{3})+(?!\d))/g, ' ')
 }
 
 /**
@@ -42,7 +42,7 @@ export const format = (nb: number | null | undefined) => {
  * ```
  */
 export const displayCount = (criteriaCount: number, bigIntAllowed = false) => {
-  if (criteriaCount < (!bigIntAllowed ? 1000 : 100000)) {
+  if (criteriaCount < (bigIntAllowed ? 100000 : 1000)) {
     return criteriaCount.toString() // Normal values (less than 1,000)
   } else if (criteriaCount < 1000000) {
     return `~${Math.round(criteriaCount / 1000)}k` // Thousands

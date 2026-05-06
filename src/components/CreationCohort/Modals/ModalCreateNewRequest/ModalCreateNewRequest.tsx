@@ -146,6 +146,37 @@ const ModalCreateNewRequest: React.FC<{
     }
   }
 
+  let dialogBodyContent: React.ReactNode
+  if (loading || currentRequest === null) {
+    dialogBodyContent = (
+      <Grid container direction="column" justifyContent="center" alignItems="center" marginBottom={3}>
+        <CircularProgress />
+      </Grid>
+    )
+  } else if (tab === 'form') {
+    dialogBodyContent = (
+      <RequestForm
+        currentRequest={currentRequest}
+        onChangeValue={_onChangeValue}
+        error={error}
+        projectName={projectName}
+        onChangeProjectName={setProjectName}
+        projectList={projectsList}
+      />
+    )
+  } else {
+    dialogBodyContent = (
+      <RequestList
+        projectList={projectsList}
+        requestsList={requestsList}
+        selectedItem={openRequest}
+        onSelectedItem={(newOpenRequest: string) =>
+          setOpenRequest(newOpenRequest === openRequest ? null : newOpenRequest)
+        }
+      />
+    )
+  }
+
   return (
     <Dialog
       fullWidth
@@ -159,31 +190,7 @@ const ModalCreateNewRequest: React.FC<{
       ) : (
         <DialogTitle>Ouvrir une requête</DialogTitle>
       )}
-      <DialogContent>
-        {loading || currentRequest === null ? (
-          <Grid container direction="column" justifyContent="center" alignItems="center" marginBottom={3}>
-            <CircularProgress />
-          </Grid>
-        ) : tab === 'form' ? (
-          <RequestForm
-            currentRequest={currentRequest}
-            onChangeValue={_onChangeValue}
-            error={error}
-            projectName={projectName}
-            onChangeProjectName={setProjectName}
-            projectList={projectsList}
-          />
-        ) : (
-          <RequestList
-            projectList={projectsList}
-            requestsList={requestsList}
-            selectedItem={openRequest}
-            onSelectedItem={(newOpenRequest: string) =>
-              setOpenRequest(newOpenRequest === openRequest ? null : newOpenRequest)
-            }
-          />
-        )}
-      </DialogContent>
+      <DialogContent>{dialogBodyContent}</DialogContent>
 
       <DialogActions>
         {url ? (

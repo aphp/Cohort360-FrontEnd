@@ -53,7 +53,9 @@ const buildSelect = (criterion: string[] | string | null, hierarchyUrl?: string)
     return ''
   }
   const values = Array.isArray(criterion) ? criterion : [criterion]
-  return values.map((item) => (hierarchyUrl ? `${hierarchyUrl}|${item}` : item)).reduce(searchReducer, '')
+  return values
+    .map((item) => (hierarchyUrl ? `${hierarchyUrl}|${item}` : item))
+    .reduce((acc, val) => searchReducer(acc, val), '')
 }
 
 const buildLabelObjectFilter = (
@@ -66,7 +68,7 @@ const buildLabelObjectFilter = (
       ? `${hierarchyUrl}|*`
       : `${criterion
           .map((item) => (item.system || hierarchyUrl ? `${item.system ?? hierarchyUrl}|${item.id}` : item.id))
-          .reduce(searchReducer, '')}`
+          .reduce((acc, val) => searchReducer(acc, val), '')}`
     return filter
   }
   return ''
@@ -88,7 +90,9 @@ const unbuildLabelObjectFilterValue = (values: string | null, prevValues: LabelO
 }
 
 const buildEncounterServiceFilter = (criterion?: Hierarchy<ScopeElement, string>[] | null) => {
-  return criterion && criterion.length > 0 ? `${criterion.map((item) => item.id).reduce(searchReducer, '')}` : ''
+  return criterion && criterion.length > 0
+    ? `${criterion.map((item) => item.id).reduce((acc, val) => searchReducer(acc, val), '')}`
+    : ''
 }
 
 const unbuildEncounterServiceFilter = async (
@@ -110,7 +114,14 @@ const buildDateFilter = (
   removeTimeZone = false,
   whithSpace = false
 ): string[] | undefined | { filterValue: string; filterKey: string } => {
-  const fhirKeyString = typeof fhirKey === 'string' ? fhirKey : 'id' in fhirKey ? fhirKey.id : fhirKey.main
+  let fhirKeyString: string
+  if (typeof fhirKey === 'string') {
+    fhirKeyString = fhirKey
+  } else if ('id' in fhirKey) {
+    fhirKeyString = fhirKey.id
+  } else {
+    fhirKeyString = fhirKey.main
+  }
   if (dateRange?.includeNull && (dateRange?.start || dateRange?.end)) {
     let dateFilter = ''
     if (dateRange.start && dateRange.end) {
@@ -162,7 +173,7 @@ const unbuildDateFilter = (value: string, existingValue?: NewDurationRangeType) 
     return res
   }
 
-  const date = replaceTime(value.replace(COMPARATORS_REGEX, ''))
+  const date = replaceTime(value.replaceAll(COMPARATORS_REGEX, ''))
   const updatedValue = existingValue || { start: null, end: null, includeNull: false }
   if (value.includes('ge')) {
     updatedValue.start = date
@@ -190,7 +201,7 @@ const buildDurationFilters = (duration: NewDurationRangeType | null, deidentifie
 }
 
 const unbuildDurationFilter = (value: string, deid: boolean, existingValue?: NewDurationRangeType) => {
-  const cleanValue = value?.replace(COMPARATORS_REGEX, '')
+  const cleanValue = value?.replaceAll(COMPARATORS_REGEX, '')
   const duration = convertDurationToString(convertTimestampToDuration(+cleanValue, deid))
   const updatedValue = existingValue || { start: null, end: null, includeNull: false }
   if (value.includes('ge')) {
@@ -233,11 +244,11 @@ const buildNumberComparatorFilter = (
 
 const buildWithDocumentFilter = (withDocument: string | null, daysOfDelay: number | null) => {
   if (withDocument !== DocumentAttachmentMethod.NONE) {
-    return `${
-      withDocument === DocumentAttachmentMethod.ACCESS_NUMBER
-        ? DocumentAttachmentMethod.ACCESS_NUMBER
-        : `INFERENCE_TEMPOREL${daysOfDelay ? `_${daysOfDelay}_J` : ''}`
-    }`
+    if (withDocument === DocumentAttachmentMethod.ACCESS_NUMBER) {
+      return DocumentAttachmentMethod.ACCESS_NUMBER
+    }
+    const daysSuffix = daysOfDelay ? `_${daysOfDelay}_J` : ''
+    return `INFERENCE_TEMPOREL${daysSuffix}`
   }
   return ''
 }
