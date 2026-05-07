@@ -3,8 +3,10 @@ name: cohort360-frontend-test
 on: 
   push:
     branches:
-      - 'develop'
-      - 'main'
+      - develop
+      - main
+      - release/**
+      - hotfix/**
   pull_request:
 
 jobs:
