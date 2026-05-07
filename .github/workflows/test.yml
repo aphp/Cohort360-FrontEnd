@@ -1,0 +1,74 @@
+name: cohort360-frontend-test
+
+on:
+  pull_request:
+    branches:
+      - develop
+      - main
+    types: [opened, synchronize, reopened, ready_for_review]
+  push:
+    branches:
+      - develop
+      - main
+      - 'release/**'
+      - 'hotfix/**'
+
+jobs:
+  pr-target-guard:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Vers main — uniquement hotfix/** ou release/**
+        if: github.event_name == 'pull_request' && github.event.pull_request.base.ref == 'main'
+        run: |
+          case "${{ github.head_ref }}" in
+            hotfix/*|release/*) ;;
+            *)
+              echo "::error title=PR invalide vers main::Seules les branches hotfix/** ou release/** peuvent cibler main (reçu: ${{ github.head_ref }})."
+              exit 1
+              ;;
+          esac
+      - name: Garde OK
+        run: echo "PR target OK"
+
+  test:
+    needs: [pr-target-guard]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v4
+        with:
+          node-version: 22.x
+          cache: npm
+
+      - uses: szenius/set-timezone@1f9716b0f7120e344f0c62bb7b1ee98819aefd42 # v2.0
+        with:
+          timezoneLinux: Europe/Paris
+
+      - name: Install Dependencies
+        run: npm install --ignore-scripts
+
+      - name: Lint
+        run: npm run lint && npx tsc --noEmit
+
+      - name: Test
+        run: npm run coverage
+
+      - name: Retrieve version
+        run: echo "VERSION=$(jq -r .version package.json)" >> "$GITHUB_ENV"
+
+      - name: SonarCloud Scan
+        if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+        uses: SonarSource/sonarqube-scan-action@299e4b793aaa83bf2aba7c9c14bedbb485688ec4 # v7
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        with:
+          args: >
+            -Dsonar.projectVersion=${{ env.VERSION }}
+            -Dsonar.organization=aphp
+            -Dsonar.projectKey=aphp_Cohort360
+            -Dsonar.javascript.lcov.reportPaths=./coverage/lcov.info
+            -Dsonar.verbose=true
