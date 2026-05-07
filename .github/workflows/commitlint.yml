@@ -24,7 +24,8 @@ jobs:
           npm install --ignore-scripts --force conventional-changelog-conventionalcommits @commitlint/config-conventional commitlint@latest
 
       - name: Fix commitlint error
-        run: sed -i 's/"type": "module",//g' package.json
+        run: |
+          sed -i 's/"type": "module",//g' package.json
 
       - name: Validate PR commits with commitlint
         env:
