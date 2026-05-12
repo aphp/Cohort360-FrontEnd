@@ -142,20 +142,7 @@ const OperatorItem: React.FC<OperatorItemProps> = ({
 
       <div className={classes.operatorChild} style={{ height: 12, marginBottom: -14 }}></div>
 
-      {!isExpanded ? (
-        <IconButton
-          size="small"
-          className={classes.addButton}
-          disabled={disabled}
-          onMouseEnter={() => {
-            if (!disabled) setIsExpanded(true)
-            if (timeout) clearInterval(timeout)
-          }}
-          onMouseLeave={() => (timeout = setTimeout(() => setIsExpanded(false), 1500))}
-        >
-          <AddIcon />
-        </IconButton>
-      ) : (
+      {isExpanded ? (
         <ButtonGroup disableElevation className={classes.buttonContainer} variant="contained" color="primary">
           {loading && (
             <Button disabled>
@@ -199,6 +186,19 @@ const OperatorItem: React.FC<OperatorItemProps> = ({
             </Button>
           )}
         </ButtonGroup>
+      ) : (
+        <IconButton
+          size="small"
+          className={classes.addButton}
+          disabled={disabled}
+          onMouseEnter={() => {
+            if (!disabled) setIsExpanded(true)
+            if (timeout) clearInterval(timeout)
+          }}
+          onMouseLeave={() => (timeout = setTimeout(() => setIsExpanded(false), 1500))}
+        >
+          <AddIcon />
+        </IconButton>
       )}
     </>
   )
@@ -253,10 +253,7 @@ const LogicalOperator: React.FC = () => {
   const _onConfirmAddOrEditCriteria = async (item: SelectedCriteriaType) => {
     // Add criteria
     const nextCriteriaId = request.nextCriteriaId
-    if (item.id !== undefined) {
-      // Edition
-      dispatch(editSelectedCriteria(item))
-    } else {
+    if (item.id === undefined) {
       // Creation
       item.id = nextCriteriaId
       dispatch(addNewSelectedCriteria(item))
@@ -269,6 +266,9 @@ const LogicalOperator: React.FC = () => {
           criteriaIds: [...currentParent.criteriaIds, nextCriteriaId]
         })
       )
+    } else {
+      // Edition
+      dispatch(editSelectedCriteria(item))
     }
     _buildCohortCreation()
   }

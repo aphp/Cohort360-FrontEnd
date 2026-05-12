@@ -43,16 +43,16 @@ const CreateSample: React.FC<{
   const [hasInteractedName, setHasInteractedName] = useState(false)
   const [hasInteractedPercentage, setHasInteractedPercentage] = useState(false)
 
-  const parsedPercentage = parseFloat(percentage)
+  const parsedPercentage = Number.parseFloat(percentage)
   const parentPatientCount = parentCohort?.result_size ?? 0
 
   // Compute all field errors in one place
   const errors = useMemo<FieldErrors>(() => {
     const nameTooLong = !!(name && name.length > 255)
     const noName = !name?.trim()
-    const percentageOutOfRange = isNaN(parsedPercentage) || parsedPercentage < 0.01 || parsedPercentage > 99.99
+    const percentageOutOfRange = Number.isNaN(parsedPercentage) || parsedPercentage < 0.01 || parsedPercentage > 99.99
     const expectedPatientCount = Math.floor((parsedPercentage / 100) * parentPatientCount)
-    const zeroPatient = !isNaN(parsedPercentage) && !percentageOutOfRange && expectedPatientCount === 0
+    const zeroPatient = !Number.isNaN(parsedPercentage) && !percentageOutOfRange && expectedPatientCount === 0
 
     return { nameTooLong, noName, percentageOutOfRange, zeroPatient }
   }, [name, parsedPercentage, parentPatientCount])

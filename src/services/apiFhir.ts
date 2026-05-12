@@ -1,4 +1,4 @@
-import axios, { InternalAxiosRequestConfig } from 'axios'
+import axios, { AxiosRequestConfig, AxiosResponse, InternalAxiosRequestConfig } from 'axios'
 import { ACCESS_TOKEN } from '../constants'
 import { getConfig, onUpdateConfig } from 'config'
 
@@ -29,11 +29,30 @@ export const getAuthorizationMethod = () => {
 apiFhir.interceptors.request.use((config) => {
   const token = localStorage.getItem(ACCESS_TOKEN)
 
-  config.headers.Authorization = `Bearer ${token}`
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`
+  } else {
+    delete config.headers.Authorization
+  }
   config.headers.authorizationMethod = getAuthorizationMethod()
 
   requestsConfigHooks.forEach((hook) => hook(config))
   return config
 })
+
+export const fhirSearch = <T>(
+  resource: string,
+  params: string[],
+  config: AxiosRequestConfig = {}
+): Promise<AxiosResponse<T>> => {
+  const body = params.filter(Boolean).join('&')
+  return apiFhir.post<T>(`/${resource}/_search`, body, {
+    ...config,
+    headers: {
+      ...(config.headers ?? {}),
+      'Content-Type': 'application/x-www-form-urlencoded'
+    }
+  })
+}
 
 export default apiFhir

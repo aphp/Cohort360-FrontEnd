@@ -77,7 +77,7 @@ const ValueSetRow = ({
         </Typography>
       )
     }
-    return stat !== undefined ? stat.toLocaleString() : '-'
+    return stat === undefined ? '-' : stat.toLocaleString()
   }
 
   return (

@@ -1,8 +1,7 @@
-import React, { ReactNode } from 'react'
+import React, { PropsWithChildren, ReactNode } from 'react'
 import useStyles from './styles'
 import { Alert, Button, Divider, FormLabel, Grid, IconButton, Switch, TextField, Typography } from '@mui/material'
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace'
-import { PropsWithChildren } from 'react'
 
 type CriteriaLayoutProps = {
   isEdition: boolean
@@ -41,7 +40,9 @@ const CriteriaLayout: React.FC<PropsWithChildren<CriteriaLayoutProps>> = ({
   return (
     <Grid className={classes.root}>
       <Grid className={classes.actionContainer}>
-        {!isEdition ? (
+        {isEdition ? (
+          <Typography className={classes.titleLabel}>Modifier un critère {criteriaLabel}</Typography>
+        ) : (
           <>
             <IconButton className={classes.backButton} onClick={goBack}>
               <KeyboardBackspaceIcon />
@@ -49,8 +50,6 @@ const CriteriaLayout: React.FC<PropsWithChildren<CriteriaLayoutProps>> = ({
             <Divider className={classes.divider} orientation="vertical" flexItem />
             <Typography className={classes.titleLabel}>Ajouter un critère {criteriaLabel}</Typography>
           </>
-        ) : (
-          <Typography className={classes.titleLabel}>Modifier un critère {criteriaLabel}</Typography>
         )}
       </Grid>
 

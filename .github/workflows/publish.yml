@@ -1,0 +1,73 @@
+name: cohort360-frontend-publish
+
+on:
+  workflow_run:
+    workflows: [cohort360-frontend-test]
+    types: [completed]
+    branches:
+      - main
+      - develop
+      - 'release/**'
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    if: github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+
+      - name: Définir VERSION et les tags Docker
+        env:
+          HEAD_BRANCH: ${{ github.event.workflow_run.head_branch }}
+          GIT_SHA: ${{ github.event.workflow_run.head_sha }}
+          DOCKER_REPO: aphpid/cohort360-frontend
+        run: |
+          set -euo pipefail
+          VERSION=$(jq -r .version package.json)
+          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+          SHORT_SHA="${GIT_SHA:0:7}"
+
+          if [[ "$HEAD_BRANCH" == release/* ]]; then
+            BRANCH_VER="${HEAD_BRANCH#release/}"
+            if [ "${BRANCH_VER}" != "${VERSION}" ]; then
+              echo "::error title=Version mismatch::Le suffixe release '${BRANCH_VER}' doit égaler la version dans package.json '${VERSION}'."
+              exit 1
+            fi
+          fi
+
+          case "$HEAD_BRANCH" in
+            main)
+              echo "IMAGE_TAGS=${DOCKER_REPO}:${VERSION},${DOCKER_REPO}:latest" >> "$GITHUB_ENV"
+              ;;
+            develop)
+              echo "IMAGE_TAGS=${DOCKER_REPO}:develop" >> "$GITHUB_ENV"
+              ;;
+            release/*)
+              echo "IMAGE_TAGS=${DOCKER_REPO}:${VERSION}-rc,${DOCKER_REPO}:${VERSION}-rc.${SHORT_SHA}" >> "$GITHUB_ENV"
+              ;;
+            *)
+              echo "::error::Branche inattendue pour le publish: ${HEAD_BRANCH}"
+              exit 1
+              ;;
+          esac
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3
+
+      - name: Login to DockerHub
+        uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@0a97817b6ade9f46837855d676c4cca3a2471fc9 # v4
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: ${{ env.IMAGE_TAGS }}

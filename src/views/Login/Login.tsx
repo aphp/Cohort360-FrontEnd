@@ -7,7 +7,6 @@ import React, {
   useState
 } from 'react'
 import { useNavigate } from 'react-router-dom'
-import localforage from 'localforage'
 import {
   Alert,
   Box,
@@ -31,9 +30,10 @@ import logo from 'assets/images/logo-login.png'
 import logoAPHP from 'assets/images/logo-aphp.png'
 import Keycloak from 'assets/icones/keycloak.svg?react'
 
-import { useAppDispatch } from 'state'
+import { useAppDispatch, useAppSelector } from 'state'
 import { MeState, login as loginAction } from 'state/me'
 import { ACCESS_TOKEN, REFRESH_TOKEN } from 'constants.js'
+import { isAccessTokenValid } from 'utils/tokens'
 
 import services from 'services/aphp'
 
@@ -126,6 +126,7 @@ const Login = () => {
   const { classes, cx } = useStyles()
   const appConfig = useContext(AppConfig)
   const dispatch = useAppDispatch()
+  const me = useAppSelector((state) => state.me)
   const [loading, setLoading] = useState(false)
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
@@ -138,9 +139,16 @@ const Login = () => {
   const oidcCode = urlParams.get('code')
 
   useEffect(() => {
-    localforage.setItem('persist:root', '')
     if (oidcCode) login()
   }, [])
+
+  useEffect(() => {
+    if (!oidcCode && me && isAccessTokenValid()) {
+      const oldPath = localStorage.getItem('old-path')
+      localStorage.removeItem('old-path')
+      navigate(oldPath ?? '/home', { replace: true })
+    }
+  }, [me, navigate, oidcCode])
 
   const loadBootstrapData = async (practitionerData: User, lastConnection: string) => {
     const maintenanceResponse = await services.practitioner.maintenance()

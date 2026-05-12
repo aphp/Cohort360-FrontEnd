@@ -24,7 +24,8 @@ export default defineConfig(({ mode }) => {
   if (mode === 'development') {
     if (proxyKeys.length > 0) {
       const back = env.VITE_DEV_PROXY_BACK?.trim()
-      console.info(`[cohort360] dev proxy (${proxyKeys.length} règles)${back ? ` → back ${back}` : ''}`)
+      const backInfo = back ? ` → back ${back}` : ''
+      console.info(`[cohort360] dev proxy (${proxyKeys.length} règles)${backInfo}`)
     } else if ((env.VITE_BACK_API_URL ?? '').startsWith('/')) {
       console.warn(
         '[cohort360] Aucun VITE_DEV_PROXY_* : sans Nginx, les URLs relatives type VITE_BACK_API_URL ne seront pas routées. Voir .env.dev-proxy.example'

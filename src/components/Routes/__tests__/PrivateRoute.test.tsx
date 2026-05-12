@@ -1,0 +1,78 @@
+import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { render, screen } from '@testing-library/react'
+import { MemoryRouter, Route, Routes } from 'react-router-dom'
+
+vi.mock('state', () => ({
+  useAppSelector: vi.fn(),
+  useAppDispatch: vi.fn(() => vi.fn())
+}))
+
+vi.mock('services/aphp/serviceFhirConfig', () => ({
+  updateConfigFromFhirMetadata: vi.fn()
+}))
+
+vi.mock('lodash', () => ({
+  throttle: (callback: () => void) => callback
+}))
+
+import { AppConfig, type AppConfig as AppConfigType } from 'config'
+import { useAppSelector } from 'state'
+import PrivateRoute from '../PrivateRoute'
+import { ACCESS_TOKEN } from 'constants.js'
+
+const mockedUseAppSelector = vi.mocked(useAppSelector)
+
+const makeJwt = (exp: number) => {
+  const header = btoa(JSON.stringify({ alg: 'HS256' }))
+  const payload = btoa(JSON.stringify({ exp }))
+  return `${header}.${payload}.signature`
+}
+
+const renderPrivateRoute = () =>
+  render(
+    <AppConfig.Provider value={{ system: { userTrackingBlacklist: [] } } as unknown as AppConfigType}>
+      <MemoryRouter initialEntries={['/private']}>
+        <Routes>
+          <Route element={<PrivateRoute />}>
+            <Route path="/private" element={<div>private content</div>} />
+          </Route>
+        </Routes>
+      </MemoryRouter>
+    </AppConfig.Provider>
+  )
+
+const meState = { me: { id: 'user-1' } }
+
+describe('PrivateRoute', () => {
+  beforeEach(() => {
+    localStorage.clear()
+    mockedUseAppSelector.mockImplementation((selector) => selector({ me: null } as never))
+  })
+
+  it("bloque l'accès quand me est null", () => {
+    renderPrivateRoute()
+    expect(screen.getByText(/vous allez être redirigé vers la page de connexion/i)).toBeInTheDocument()
+  })
+
+  it("bloque l'accès quand access_token est absent même avec me", () => {
+    mockedUseAppSelector.mockImplementation((selector) => selector(meState as never))
+    renderPrivateRoute()
+    expect(screen.getByText(/vous allez être redirigé vers la page de connexion/i)).toBeInTheDocument()
+  })
+
+  it("bloque l'accès quand le token est expiré", () => {
+    const expiredToken = makeJwt(Math.floor(Date.now() / 1000) - 3600)
+    localStorage.setItem(ACCESS_TOKEN, expiredToken)
+    mockedUseAppSelector.mockImplementation((selector) => selector(meState as never))
+    renderPrivateRoute()
+    expect(screen.getByText(/vous allez être redirigé vers la page de connexion/i)).toBeInTheDocument()
+  })
+
+  it('laisse passer quand me et token valide existent', () => {
+    const validToken = makeJwt(Math.floor(Date.now() / 1000) + 3600)
+    localStorage.setItem(ACCESS_TOKEN, validToken)
+    mockedUseAppSelector.mockImplementation((selector) => selector(meState as never))
+    renderPrivateRoute()
+    expect(screen.getByText('private content')).toBeInTheDocument()
+  })
+})

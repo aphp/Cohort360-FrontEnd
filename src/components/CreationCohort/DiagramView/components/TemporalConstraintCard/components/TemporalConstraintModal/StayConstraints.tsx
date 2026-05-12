@@ -59,10 +59,10 @@ const StayConstraints: React.FC<StayConstraintsProps> = ({ constraints, onChange
   const onChangeValue = (value: TemporalConstraintsKind) => {
     setRadioValues(value)
 
-    if (value !== TemporalConstraintsKind.PARTIAL_CONSTRAINT) {
-      onChangeConstraints([{ idList: ['All'], constraintType: value }])
-    } else {
+    if (value === TemporalConstraintsKind.PARTIAL_CONSTRAINT) {
       onChangeConstraints([])
+    } else {
+      onChangeConstraints([{ idList: ['All'], constraintType: value }])
     }
   }
 

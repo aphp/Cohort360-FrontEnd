@@ -42,9 +42,7 @@ export default function CriteriaForm<T extends CommonCriteriaData>(props: Criter
 
   const deidentified: boolean =
     selectedPopulation !== null &&
-    selectedPopulation
-      .map((population) => population && population.access)
-      .filter((elem) => elem && elem === 'Pseudonymisé').length > 0
+    selectedPopulation.map((population) => population?.access).some((elem) => elem && elem === 'Pseudonymisé')
 
   if (globalErrorCheck) {
     const context = { deidentified }

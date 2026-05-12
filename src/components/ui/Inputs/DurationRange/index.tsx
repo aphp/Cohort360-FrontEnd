@@ -47,11 +47,13 @@ const DurationRange = ({
   useEffect(() => {
     setError({ isError: false, errorMessage: '' })
     onError(false)
-    if (!checkMinMaxValue(minDuration, maxDuration)) {
+    if (checkMinMaxValue(minDuration, maxDuration))
+      onChange?.([convertDurationToString(minDuration), convertDurationToString(maxDuration)])
+    else {
       setError({ isError: true, errorMessage: 'La date maximale doit être supérieure à la date minimale.' })
       onChange?.([convertDurationToString(minDuration), convertDurationToString(maxDuration)])
       onError(true)
-    } else onChange?.([convertDurationToString(minDuration), convertDurationToString(maxDuration)])
+    }
   }, [minDuration, maxDuration])
 
   return (

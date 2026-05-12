@@ -38,13 +38,20 @@ const OccurenceInput = ({
   const [error, setError] = useState<string | undefined>()
 
   useEffect(() => {
-    const typedOccurenceValue =
-      defaultValue === undefined && occurrenceValue === ''
-        ? null
-        : parseFloat(occurrenceValue === '' ? `${defaultValue}` : occurrenceValue)
-    const typedUpperRangeValue = upperRangeValue
-      ? parseFloat(upperRangeValue === '' ? '0' : upperRangeValue)
-      : undefined
+    let typedOccurenceValue: number | null
+    if (defaultValue === undefined && occurrenceValue === '') {
+      typedOccurenceValue = null
+    } else {
+      const occurenceSource = occurrenceValue === '' ? `${defaultValue}` : occurrenceValue
+      typedOccurenceValue = Number.parseFloat(occurenceSource)
+    }
+    let typedUpperRangeValue: number | undefined
+    if (upperRangeValue) {
+      const upperRangeSource = upperRangeValue === '' ? '0' : upperRangeValue
+      typedUpperRangeValue = Number.parseFloat(upperRangeSource)
+    } else {
+      typedUpperRangeValue = undefined
+    }
     if (
       typedUpperRangeValue !== undefined &&
       typedOccurenceValue !== null &&
@@ -87,7 +94,7 @@ const OccurenceInput = ({
   const handleComparatorChange = (event: SelectChangeEvent<Comparators>) => {
     const newComparator = event.target.value as Comparators
     setComparatorValue(newComparator)
-    const typedOccurenceValue = parseFloat(occurrenceValue)
+    const typedOccurenceValue = Number.parseFloat(occurrenceValue)
     if (!enableNegativeValues && newComparator === Comparators.LESS && typedOccurenceValue === 0) {
       setOccurrenceValue('1')
     }

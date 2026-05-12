@@ -13,7 +13,7 @@ export default () => {
     dispatch(impersonate(undefined))
   }
 
-  if (me && me.impersonation) {
+  if (me?.impersonation) {
     return (
       <>
         <div
