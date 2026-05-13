@@ -176,7 +176,7 @@ const MyResearches = () => {
       <Grid container size={11}>
         <TabsWrapper value={selectedTab} onChange={(_, tab) => handleTabChange(tab)}>
           {explorationTabs.map((tab) => (
-            <Tab key={tab.id} label={tab.label} value={tab} component="div" disableRipple />
+            <Tab id={tab.id} key={tab.id} label={tab.label} value={tab} component="div" disableRipple />
           ))}
         </TabsWrapper>
       </Grid>
