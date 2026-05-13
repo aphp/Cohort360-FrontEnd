@@ -22,7 +22,7 @@ export const completeProcedureCriteria: CcamDataType = {
     {
       id: '000126',
       label: "000126 - Explorations Électrophysiologiques De L'oeil",
-      system: 'https://www.atih.sante.fr/plateformes-de-transmiss…ls/logiciels-espace-de-telechargement/id_lot/3550',
+      system: 'https://aphp.fr/ig/fhir/core/CodeSystem/CCAMDescriptiveVerAPHP',
       above_levels_ids: '*',
       inferior_levels_ids: ''
     },
@@ -30,7 +30,7 @@ export const completeProcedureCriteria: CcamDataType = {
     {
       id: '000127',
       label: "000127 - Échographie De L'oeil",
-      system: 'https://www.atih.sante.fr/plateformes-de-transmiss…ls/logiciels-espace-de-telechargement/id_lot/3550',
+      system: 'https://aphp.fr/ig/fhir/core/CodeSystem/CCAMDescriptiveVerAPHP',
       above_levels_ids: '*',
       inferior_levels_ids: ''
     }

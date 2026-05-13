@@ -49,16 +49,14 @@ export const procedurePeudonimizedCriteria: SelectedCriteriaType[] = [
         label: "000212 - Actes Diagnostiques Sur L'oreille",
         above_levels_ids: '*',
         inferior_levels_ids: '',
-        system:
-          'https://www.atih.sante.fr/plateformes-de-transmission-et-logiciels/logiciels-espace-de-telechargement/id_lot/3550'
+        system: 'https://aphp.fr/ig/fhir/core/CodeSystem/CCAMDescriptiveVerAPHP'
       },
       {
         id: '000489',
         label: '000489 - Actes Thérapeutiques Sur Les Vaisseaux Intracrâniens',
         above_levels_ids: '*',
         inferior_levels_ids: '',
-        system:
-          'https://www.atih.sante.fr/plateformes-de-transmission-et-logiciels/logiciels-espace-de-telechargement/id_lot/3550'
+        system: 'https://aphp.fr/ig/fhir/core/CodeSystem/CCAMDescriptiveVerAPHP'
       }
     ]
   }
