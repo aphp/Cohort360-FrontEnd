@@ -1,4 +1,8 @@
-name: cohort360-frontend-publish
+name: Publish Docker frontend
+
+run-name: >-
+  Publish Docker frontend - ${{ github.event.workflow_run.head_branch }}
+  - ${{ github.event.workflow_run.display_title }}
 
 on:
   workflow_run:
@@ -11,6 +15,7 @@ on:
 
 jobs:
   publish:
+    name: Build and push frontend Docker image - ${{ github.event.workflow_run.head_branch }}
     runs-on: ubuntu-latest
     if: github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push'
 
