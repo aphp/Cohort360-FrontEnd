@@ -293,8 +293,8 @@ const ExportForm: React.FC = () => {
   }, [])
 
   const resetSelectedTables = () => {
-    const newSelectedTables = tableSettingsInitialState
-    setTablesSettings(newSelectedTables)
+    setTablesSettings(tableSettingsInitialState)
+    setErrorTables(errorTablesInitialState)
   }
 
   const handleSelectAllTables = useCallback(
