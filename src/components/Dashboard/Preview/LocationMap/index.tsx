@@ -9,7 +9,7 @@ import { MapContainer } from 'react-leaflet/MapContainer'
 //@ts-ignore
 import { TileLayer } from 'react-leaflet/TileLayer'
 import { fetchLocation } from 'services/aphp/callApi'
-import { getAllResults } from 'utils/apiHelpers'
+import { getAllResults, getApiResponseResources } from 'utils/apiHelpers'
 import {
   colorize,
   computeCentroid,
@@ -26,7 +26,6 @@ import CircularProgressWithLabel from 'components/ui/CircularProgressWithLabel'
 import useMultipartDataLoading from './useMultipartDataLoading'
 import { getExtension } from 'utils/fhir'
 import { AppConfig } from 'config'
-import { getApiResponseResources } from 'utils/apiHelpers'
 
 const DEBUG_SHOW_LOADED_BOUNDS = false
 const SHOW_OPACITY_CONTROL = false

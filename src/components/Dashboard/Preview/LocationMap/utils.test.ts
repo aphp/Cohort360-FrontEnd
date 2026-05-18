@@ -14,8 +14,8 @@ describe('computeCentroid should calculate polygon center correctly', function (
   });
 
   it('Should return the midpoint for a two-point polygon', function () {
-    const p1: LatLngTuple = [48.0, 2.0];
-    const p2: LatLngTuple = [49.0, 3.0];
+    const p1: LatLngTuple = [48, 2];
+    const p2: LatLngTuple = [49, 3];
     const result = computeCentroid([p1, p2]);
     expect(result![0]).toBeCloseTo(48.5, 5);
     expect(result![1]).toBeCloseTo(2.5, 5);
@@ -31,7 +31,7 @@ describe('computeCentroid should calculate polygon center correctly', function (
     const result = computeCentroid(triangle);
     // Centroid of a triangle is the average of its vertices
     expect(result![0]).toBeCloseTo(1.5, 1);
-    expect(result![1]).toBeCloseTo(1.0, 1);
+    expect(result![1]).toBeCloseTo(1, 1);
   });
 
   it('Should calculate centroid of a square', function () {
