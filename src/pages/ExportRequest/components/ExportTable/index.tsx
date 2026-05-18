@@ -451,7 +451,7 @@ const ExportTable: React.FC<ExportTableProps> = ({
                     return `${option.name}`
                   }}
                   renderInput={(params) => <TextField {...params} label="Sélectionnez un filtre" />}
-                  value={tableSetting?.fhirFilter}
+                  value={tableSetting?.fhirFilter ?? null}
                   onChange={(_, value) => {
                     onChangeTableSettings([{ tableName: exportTable.name, key: 'fhirFilter', value }])
                   }}
