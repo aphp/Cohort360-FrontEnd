@@ -3,15 +3,16 @@ import L, { LatLngBounds, LatLngTuple } from 'leaflet'
 import { Location } from 'fhir/r4'
 // https://github.com/PaulLeCam/react-leaflet/issues/1077
 //@ts-ignore
-import { Polygon, Rectangle, Tooltip, useMapEvents } from 'react-leaflet'
+import { Polygon, Rectangle, Tooltip, useMap, useMapEvents } from 'react-leaflet'
 //@ts-ignore
 import { MapContainer } from 'react-leaflet/MapContainer'
 //@ts-ignore
 import { TileLayer } from 'react-leaflet/TileLayer'
 import { fetchLocation } from 'services/aphp/callApi'
-import { getAllResults } from 'utils/apiHelpers'
+import { getAllResults, getApiResponseResources } from 'utils/apiHelpers'
 import {
   colorize,
+  computeCentroid,
   computeNearFilter,
   getColorPalette,
   isBoundCovered,
@@ -64,6 +65,90 @@ type ZoneInfo = { shape: LatLngTuple[]; meta: { count: number; name: string; id:
 
 type IrisZonesProps = {
   cohortId: string
+}
+
+// Number of locations to fetch to find the best center (fetched without geo-filter, sorted by count desc)
+const AUTO_CENTER_FETCH_SIZE = 100
+
+/**
+ * Component that auto-centers the map on the zone with the highest patient density.
+ * Fetches a sample of locations without geo-filter on initial load and cohort change,
+ * finds the one with the highest count, and pans the map to its centroid.
+ */
+const AutoCenterMap = (props: { cohortId: string }) => {
+  const { cohortId } = props
+  const appConfig = useContext(AppConfig)
+  const map = useMap()
+  const hasCenteredRef = useRef(false)
+  const abortControllerRef = useRef<AbortController | null>(null)
+  const { locationCount: countExtUrl, locationShapeUrl: shapeExtUrl } = appConfig.features.locationMap.extensions
+
+  useEffect(() => {
+    hasCenteredRef.current = false
+  }, [cohortId])
+
+  useEffect(() => {
+    if (hasCenteredRef.current) return
+
+    // Cancel any previous in-flight request
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort()
+    }
+    const abortController = new AbortController()
+    abortControllerRef.current = abortController
+
+    const centerOnDensestZone = async () => {
+      try {
+        // Fetch locations without geo-filter to find the zone with highest patient count
+        const response = await fetchLocation({
+          _list: [cohortId],
+          size: AUTO_CENTER_FETCH_SIZE,
+          signal: abortController.signal
+        })
+
+        if (abortController.signal.aborted) return
+
+        const locations = getApiResponseResources(response) || []
+        if (locations.length === 0) return
+
+        // Find the location with the highest count
+        let maxCount = 0
+        let bestLocation: Location | null = null
+        for (const loc of locations) {
+          const count = getExtension(loc, countExtUrl)?.valueInteger || 0
+          if (count > maxCount) {
+            maxCount = count
+            bestLocation = loc
+          }
+        }
+
+        if (!bestLocation) return
+
+        // Parse the shape and compute the centroid
+        const shapeString = getExtension(bestLocation, shapeExtUrl)?.valueString
+        const shape = parseShape(shapeString)
+        if (!shape || shape.length === 0) return
+
+        const centroid = computeCentroid(shape)
+        if (!centroid) return
+
+        // Pan the map to the centroid with animation
+        map.flyTo(centroid, map.getZoom(), { animate: true, duration: 0.5 })
+        hasCenteredRef.current = true
+      } catch (error) {
+        if (error instanceof Error && error.name === 'AbortError') return
+        console.error('Failed to auto-center map:', error)
+      }
+    }
+
+    centerOnDensestZone()
+
+    return () => {
+      cancelPendingRequest(abortController)
+    }
+  }, [cohortId, map, countExtUrl, shapeExtUrl])
+
+  return null // This component only produces side effects
 }
 
 const IrisZones = (props: IrisZonesProps) => {
@@ -450,6 +535,7 @@ const LocationMap = (props: LocationMapProps) => {
         scrollWheelZoom={true}
         style={{ height: '500px', width: '100%' }}
       >
+        <AutoCenterMap cohortId={cohortId} />
         <IrisZones cohortId={cohortId} />
         <TileLayer attribution={MAP_COPYRIGHTS} url={TILE_URL} />
       </MapContainer>
