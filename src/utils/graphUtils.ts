@@ -184,7 +184,7 @@ export const getAgeRepartitionMapAphp = (facet?: Extension[]): AgeRepartitionTyp
     const genderValuesObj = getExtension(extension, 'gender.display')
 
     if (ageObj) {
-      const age: number = parseInt(ageObj, 10) / 12
+      const age: number = Number.parseInt(ageObj, 10) / 12
       if (genderValuesObj) {
         const genderValues = genderValuesObj.extension
         for (let i = 0; i < 130; i++) {
@@ -234,19 +234,19 @@ export const getVisitRepartitionMapAphp = (facet?: Extension[]): VisiteRepartiti
       const values = data[0].url?.split('-')
 
       if (values) {
-        const month = getStringMonthAphp(parseInt(values[1] ?? 'Inconnu', 10))
+        const month = getStringMonthAphp(Number.parseInt(values[1] ?? 'Inconnu', 10))
         if (month && values[2]) {
           switch (values[2]) {
             case 'female':
-              repartitionMap[month].female += parseInt(`${data[0].valueDecimal ?? 0}`)
+              repartitionMap[month].female += Number.parseInt(`${data[0].valueDecimal ?? 0}`)
               repartitionMap[month].femaleCount += 1
               break
             case 'male':
-              repartitionMap[month].male += parseInt(`${data[0].valueDecimal ?? 0}`)
+              repartitionMap[month].male += Number.parseInt(`${data[0].valueDecimal ?? 0}`)
               repartitionMap[month].maleCount += 1
               break
             default:
-              repartitionMap[month].other += parseInt(`${data[0].valueDecimal ?? 0}`)
+              repartitionMap[month].other += Number.parseInt(`${data[0].valueDecimal ?? 0}`)
               repartitionMap[month].otherCount += 1
               break
           }
@@ -297,7 +297,7 @@ export const getVisitRepartitionMap = (patients: Patient[], encounters: Encounte
   }
 
   encounters.forEach((encounter) => {
-    if (encounter.subject?.reference && encounter.period && encounter.period.start) {
+    if (encounter.subject?.reference && encounter.period?.start) {
       const patient = patients.find((p) => encounter.subject?.reference === `Patient/${p.id}`)
       const month = new Date(encounter.period.start).getMonth()
       const monthStr = getStringMonth(month)

@@ -39,6 +39,10 @@ This will generate files in the `build` directory that can be exposed via a web 
 
 An example configuration with Nginx can be found [here](.templates/nginx.conf)
 
+#### Dev server (`npm run start`) — API proxy without Nginx
+
+See [`.env.dev-proxy.example`](.env.dev-proxy.example) and [`vite-dev-proxy.ts`](vite-dev-proxy.ts). Use **`http://localhost:3000`** in the browser so relative API paths (`/api/back`, etc.) hit the Vite proxy.
+
 ## CI
 
 A [gitlab-ci.yml](.templates/.gitlab-ci.yml) is available in the `.templates` folder, alongside

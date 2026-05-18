@@ -54,7 +54,7 @@ const PartialConstraintLayout: React.FC<PartialConstraintLayoutProps> = ({ isEpi
 
   const _onConfirm = () => {
     const newConstraint: TemporalConstraintsType = {
-      idList: encounterConstraint.criteriaIds.sort(),
+      idList: encounterConstraint.criteriaIds.sort((a, b) => a - b),
       constraintType: isEpisode ? TemporalConstraintsKind.SAME_EPISODE_OF_CARE : TemporalConstraintsKind.SAME_ENCOUNTER
     }
     setEncounterConstraint(defaultEncounterConstraint)

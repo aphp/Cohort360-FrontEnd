@@ -81,8 +81,7 @@ export const useData = <T>(
 
   useEffect(() => {
     if (data) {
-      const hasSearch =
-        config.hasSearchDisplay && config.hasSearchDisplay(searchCriterias.searchInput, searchCriterias.searchBy)
+      const hasSearch = config.hasSearchDisplay?.(searchCriterias.searchInput, searchCriterias.searchBy)
       if (config.mapToTimeline) config.mapToTimeline(data).then(setTimeline)
       else setTimeline(null)
       if (config.mapToDiagram && data.meta) setDiagrams(config.mapToDiagram(data.meta))

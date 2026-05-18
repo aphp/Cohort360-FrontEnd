@@ -30,11 +30,11 @@ export const getStageDetails = (
   const countDetail = stageDetails?.[`criteria_count_${id}`]
   const ratioDetail = stageDetails?.[`criteria_ratio_${id}`]
   if (countDetail !== undefined) {
-    const criteriaCountValue = parseFloat(countDetail)
+    const criteriaCountValue = Number.parseFloat(countDetail)
     return { display: displayCount(criteriaCountValue), value: criteriaCountValue }
   }
   if (ratioDetail !== undefined) {
-    const criteriaCountValue = parseFloat(ratioDetail)
+    const criteriaCountValue = Number.parseFloat(ratioDetail)
     return { display: `${(criteriaCountValue * 100).toFixed(0)}%` }
   }
   return undefined

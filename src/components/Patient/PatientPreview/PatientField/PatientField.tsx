@@ -11,6 +11,15 @@ type PatientFieldProps = {
 const PatientField: React.FC<PatientFieldProps> = ({ fieldName, fieldValue }) => {
   const { classes, cx } = useStyles()
 
+  let fieldContent: React.ReactNode
+  if (fieldValue === 'loading') {
+    fieldContent = <Skeleton height={20} width={200} />
+  } else if (typeof fieldValue === 'string' || typeof fieldValue === 'number') {
+    fieldContent = <Typography>{fieldValue}</Typography>
+  } else {
+    fieldContent = fieldValue?.map((value: string, index: number) => <Typography key={index}>{value}</Typography>)
+  }
+
   return (
     <Grid container size={12}>
       <Grid
@@ -22,15 +31,7 @@ const PatientField: React.FC<PatientFieldProps> = ({ fieldName, fieldValue }) =>
         <Typography variant="h6">{fieldName}</Typography>
       </Grid>
       <Grid container size={{ xs: 9, lg: 10 }} sx={{ alignItems: 'center' }} className={classes.gridItem}>
-        {typeof fieldValue === 'string' || typeof fieldValue === 'number' ? (
-          fieldValue === 'loading' ? (
-            <Skeleton height={20} width={200} />
-          ) : (
-            <Typography>{fieldValue}</Typography>
-          )
-        ) : (
-          fieldValue?.map((value: string, index: number) => <Typography key={index}>{value}</Typography>)
-        )}
+        {fieldContent}
       </Grid>
     </Grid>
   )

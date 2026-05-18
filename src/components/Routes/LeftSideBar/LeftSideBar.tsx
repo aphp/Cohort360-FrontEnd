@@ -239,7 +239,7 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
             )}
           </ListItem>
           {!!cohortCreation?.request?.requestId && (
-            <ListItem style={{ padding: !open ? '0 16px' : undefined }}>
+            <ListItem style={{ padding: open ? undefined : '0 16px' }}>
               {!open && (
                 <Tooltip title="Modifier la requête en cours">
                   <IconButton
@@ -269,7 +269,7 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
           )}
 
           <ListItemButton id="accueil" className={classes.listItem} onClick={() => navigate('/home')}>
-            <Tooltip title={!open ? 'Accueil' : ''}>
+            <Tooltip title={open ? '' : 'Accueil'}>
               <ListItemIcon className={classes.listIcon}>
                 <HomeIcon width="20px" fill="#FFF" />
               </ListItemIcon>
@@ -279,7 +279,7 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
           </ListItemButton>
 
           <ListItemButton id="patients" className={classes.listItem} onClick={handleDisplayPatientList}>
-            <Tooltip title={!open ? 'Mes patients' : ''}>
+            <Tooltip title={open ? '' : 'Mes patients'}>
               <ListItemIcon className={classes.listIcon}>
                 <PatientIcon width="20px" fill="#FFF" />
               </ListItemIcon>
@@ -334,7 +334,7 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
           </Collapse>
 
           <ListItemButton id="research" className={classes.listItem} onClick={handleDisplaySearchList}>
-            <Tooltip title={!open ? 'Mes recherches' : ''}>
+            <Tooltip title={open ? '' : 'Mes recherches'}>
               <ListItemIcon className={classes.listIcon}>
                 <ResearchIcon width="20px" fill="#FFF" />
               </ListItemIcon>
@@ -426,7 +426,7 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
               rel="noopener noreferrer"
               component="a"
             >
-              <Tooltip title={!open ? 'Documentation' : ''}>
+              <Tooltip title={open ? '' : 'Documentation'}>
                 <ListItemIcon className={classes.listIcon}>
                   <MenuBookIcon width="20px" htmlColor="#FFF" />
                 </ListItemIcon>

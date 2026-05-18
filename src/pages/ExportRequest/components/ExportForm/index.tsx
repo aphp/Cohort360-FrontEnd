@@ -41,6 +41,7 @@ import { Cohort } from 'types'
 import { TableSetting, TableInfo } from 'types/export'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { sortTables } from 'pages/ExportRequest/components/exportUtils'
+import { useDebounceAction } from 'hooks/useDebounceAction'
 
 import { getConfig } from 'config'
 
@@ -68,10 +69,10 @@ type ErrorTables = Array<{
   error?: Error
 }>
 
-/** Initial state for table settings with person table pre-selected */
+/** Initial state for table settings with patient table pre-selected */
 const tableSettingsInitialState: TableSetting[] = [
   {
-    tableName: 'person',
+    tableName: 'Patient',
     isChecked: true,
     columns: null,
     fhirFilter: null,
@@ -79,10 +80,10 @@ const tableSettingsInitialState: TableSetting[] = [
   }
 ]
 
-/** Initial state for error tracking with person table having no errors */
+/** Initial state for error tracking with patient table having no errors */
 const errorTablesInitialState: ErrorTables = [
   {
-    tableName: 'person',
+    tableName: 'Patient',
     error: Error.NO_ERROR
   }
 ]
@@ -118,6 +119,7 @@ const ExportForm: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams()
   const cohortID = searchParams.get('groupId')
   const [loading, setLoading] = useState<boolean>(false)
+  const [exporting, setExporting] = useState<boolean>(false)
   const [cohortListLoading, setCohortListLoading] = useState<boolean>(false)
   const navigate = useNavigate()
   const dispatch = useAppDispatch()
@@ -316,7 +318,7 @@ const ExportForm: React.FC = () => {
       } else {
         setTablesSettings([
           {
-            tableName: 'person',
+            tableName: 'Patient',
             isChecked: true,
             columns: null,
             fhirFilter: null,
@@ -339,6 +341,7 @@ const ExportForm: React.FC = () => {
     })
 
     const error = response.status !== 201
+    setExporting(false)
 
     dispatch(
       showDialog({
@@ -353,6 +356,8 @@ const ExportForm: React.FC = () => {
       })
     )
   }
+
+  const debouncedSubmitPayload = useDebounceAction(handleSubmitPayload, 500)
 
   const handleChangeMotivation = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     if (e.target.value.length < 10) {
@@ -528,14 +533,14 @@ const ExportForm: React.FC = () => {
                     <Checkbox
                       color="secondary"
                       indeterminate={
-                        (exportTableList &&
+                        (exportTableList?.length !== undefined &&
                           tablesSettings.filter((tableSetting) => tableSetting.isChecked).length !==
                             exportTableList.length &&
                           tablesSettings.some((tableSetting) => tableSetting.isChecked)) ??
                         false
                       }
                       checked={
-                        (exportTableList &&
+                        (exportTableList?.length !== undefined &&
                           tablesSettings.filter((tableSetting) => tableSetting.isChecked).length ===
                             exportTableList.length) ??
                         false
@@ -629,8 +634,13 @@ const ExportForm: React.FC = () => {
                 }
               />
               <Button
-                disabled={conditions === false || motivation === null || error === Error.ERROR_MOTIF || limitError}
-                onClick={handleSubmitPayload}
+                disabled={
+                  conditions === false || motivation === null || error === Error.ERROR_MOTIF || limitError || exporting
+                }
+                onClick={() => {
+                  setExporting(true)
+                  debouncedSubmitPayload()
+                }}
               >
                 Confirmer
               </Button>

@@ -49,7 +49,7 @@ export const parseShape = (polygons?: string): LatLngTuple[] | null => {
       if (m) {
         return m[1].split(',').map((latlng) => {
           const [lng, lat] = latlng.trim().split(' ')
-          return [parseFloat(lat), parseFloat(lng)]
+          return [Number.parseFloat(lat), Number.parseFloat(lng)]
         })
       }
       return null

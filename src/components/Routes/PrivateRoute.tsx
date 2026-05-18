@@ -23,7 +23,7 @@ import { Outlet, Navigate, useLocation } from 'react-router-dom'
 
 import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button } from '@mui/material'
 
-import { ACCESS_TOKEN } from '../../constants'
+import { isAccessTokenValid } from 'utils/tokens'
 
 import { useAppSelector, useAppDispatch } from '../../state'
 import { AppConfig } from 'config'
@@ -76,7 +76,7 @@ const PrivateRoute: React.FC = () => {
   const dispatch = useAppDispatch()
   const appConfig = useContext(AppConfig)
   const location = useLocation()
-  const authToken = localStorage.getItem(ACCESS_TOKEN)
+  const hasValidToken = isAccessTokenValid()
   const [fetchedFhirMetadata, setFetchedFhirMetadata] = useState(false)
 
   /** State to control when redirection to login page is allowed */
@@ -117,15 +117,15 @@ const PrivateRoute: React.FC = () => {
         console.error(error)
       }
     }, 1000)
-    if (me && authToken) {
+    if (me && hasValidToken) {
       if (!fetchedFhirMetadata) {
         callFetchFhirMetadata()
       }
     }
-  }, [me, authToken, fetchedFhirMetadata])
+  }, [me, hasValidToken, fetchedFhirMetadata])
 
   // Authentication check: user must be authenticated and have a valid token
-  if (!me || (!me && !authToken)) {
+  if (!me || !hasValidToken) {
     // If user has confirmed the dialog, redirect to login page
     if (allowRedirect === true) return <Navigate to="/" replace />
 

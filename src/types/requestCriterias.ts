@@ -259,12 +259,16 @@ export enum VitalStatusLabel {
   ALL = 'Tous les patients'
 }
 
+export enum ViewMode {
+  LOGICAL_OPERATOR_INTERFACE = 'logicalOperator',
+  JSON_INTERFACE = 'json'
+}
+
 // Update the config dynamically
 onUpdateConfig((config) => {
   const encounterCareSite = hasSearchParam(ResourceType.ENCOUNTER, 'encounter-care-site', config)
     ? 'encounter-care-site'
     : 'service-provider'
-
   EncounterParamsKeys.SERVICE_PROVIDER = encounterCareSite
   ConditionParamsKeys.EXECUTIVE_UNITS = `encounter.${encounterCareSite}`
   ProcedureParamsKeys.EXECUTIVE_UNITS = `encounter.${encounterCareSite}`

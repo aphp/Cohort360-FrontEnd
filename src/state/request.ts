@@ -85,7 +85,7 @@ const addRequest = createAsyncThunk<AddRequestReturn, AddRequestParams, { state:
       return {
         count: state.count + 1,
         selectedRequest: null,
-        requestsList: createdRequest !== null ? [...requestsList, createdRequest] : requestsList
+        requestsList: createdRequest === null ? requestsList : [...requestsList, createdRequest]
       }
     } catch (error) {
       console.error(error)

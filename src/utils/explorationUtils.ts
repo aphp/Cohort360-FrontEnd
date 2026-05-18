@@ -159,7 +159,7 @@ export const getRequestsSearchParams = (searchParams: URLSearchParams) => {
     searchInput: searchParams.get(ExplorationsSearchParams.SEARCH_INPUT) ?? '',
     startDate: searchParams.get(ExplorationsSearchParams.START_DATE) ?? undefined,
     endDate: searchParams.get(ExplorationsSearchParams.END_DATE) ?? undefined,
-    page: parseInt(searchParams.get('page') ?? '1', 10),
+    page: Number.parseInt(searchParams.get('page') ?? '1', 10),
     orderBy: (searchParams.get(ExplorationsSearchParams.ORDER_BY) as Order) ?? Order.UPDATED,
     orderDirection: (searchParams.get(ExplorationsSearchParams.DIRECTION) as Direction) ?? Direction.DESC
   }
@@ -228,7 +228,7 @@ export const getCohortsSearchParams = (
 ): SearchCriterias<CohortsFilters> & { page: number } => {
   return {
     searchInput: searchParams.get(ExplorationsSearchParams.SEARCH_INPUT) ?? '',
-    page: parseInt(searchParams.get('page') ?? '1', 10),
+    page: Number.parseInt(searchParams.get('page') ?? '1', 10),
     orderBy: {
       orderBy: (searchParams.get(ExplorationsSearchParams.ORDER_BY) as Order) ?? Order.CREATED_AT,
       orderDirection: (searchParams.get(ExplorationsSearchParams.DIRECTION) as Direction) ?? Direction.DESC
@@ -264,10 +264,10 @@ export const getExportTooltip = (isExportable: boolean, cohort?: Cohort) => {
   } else if (cohort.request_job_status === JobStatus.PENDING || cohort.request_job_status === JobStatus.LONG_PENDING) {
     return 'Cette cohorte ne peut pas être exportée car elle est en cours de création'
   } else if (cohort.request_job_status === JobStatus.FINISHED) {
-    if (!isExportable) {
-      return "Vous n'avez pas les droits suffisants pour exporter cette cohorte"
-    } else {
+    if (isExportable) {
       return 'Exporter la cohorte'
+    } else {
+      return "Vous n'avez pas les droits suffisants pour exporter cette cohorte"
     }
   } else if (!cohort.exportable) {
     return 'Cette cohorte ne peut pas être exportée car elle dépasse le seuil de nombre de patients maximum autorisé'

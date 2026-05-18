@@ -22,7 +22,7 @@ import { logout, login, impersonate } from './me'
 import { addRequest } from './request'
 
 import services from 'services/aphp'
-import { CriteriaType, SelectedCriteriaType } from 'types/requestCriterias'
+import { CriteriaType, SelectedCriteriaType, ViewMode } from 'types/requestCriterias'
 import { Hierarchy } from 'types/hierarchy'
 import { getConfig } from 'config'
 import { ScopeElement } from 'types/scope'
@@ -32,6 +32,8 @@ import { ScopeElement } from 'types/scope'
  * Contains all data needed for building and managing cohort requests.
  */
 export type CohortCreationState = {
+  /** General loading state for cohort operations */
+  viewMode: string
   /** General loading state for cohort operations */
   loading: boolean
   /** Loading state specifically for save operations */
@@ -89,6 +91,7 @@ export type CohortCreationState = {
  * @returns {CohortCreationState} Fresh initial state
  */
 const defaultInitialState: () => CohortCreationState = () => ({
+  viewMode: ViewMode.LOGICAL_OPERATOR_INTERFACE,
   loading: false,
   saveLoading: false,
   countLoading: false,
@@ -299,7 +302,7 @@ const saveJson = createAsyncThunk<SaveJsonReturn, SaveJsonParams, { state: RootS
       const { navHistory } = state.cohortCreation.request
       const _navHistory: CurrentSnapshot[] = navHistory.slice()
 
-      if (!snapshotsHistory || (snapshotsHistory && snapshotsHistory.length === 0)) {
+      if (!snapshotsHistory?.length) {
         if (requestId) {
           const newSnapshot = await services.cohortCreation.createSnapshot(requestId, newJson, true)
           if (newSnapshot) {
@@ -714,7 +717,7 @@ const getTemporalConstraints = (
 const getNextCriteriaId = (selectedCriteria: { id: number }[], criteriaGroup: { criteriaIds: number[] }[]): number => {
   const criteriaIdsFromGroups = criteriaGroup.flatMap((group) => group.criteriaIds)
   const allIds = [...selectedCriteria.map((c) => c.id), ...criteriaIdsFromGroups]
-  const maxId = Math.max(0, ...allIds.filter((id): id is number => typeof id === 'number' && isFinite(id)))
+  const maxId = Math.max(0, ...allIds.filter((id): id is number => typeof id === 'number' && Number.isFinite(id)))
   return maxId + 1
 }
 
@@ -734,14 +737,14 @@ const moveCriterionInGroups = (snapshot: CriteriaGroup[], { active, over }: Move
     if (isTargetGroup) {
       let insertionIndex: number
 
-      if (over.id !== null) {
+      if (over.id === null) {
+        insertionIndex = active.groupId > over.groupId ? 0 : criteriaIds.length
+      } else {
         const overIndex = originalIds.indexOf(over.id)
         const activeIndex = originalIds.indexOf(active.id)
         const shouldInsertAfter =
           active.groupId > over.groupId || (active.groupId === over.groupId && activeIndex < overIndex)
         insertionIndex = shouldInsertAfter ? overIndex + 1 : overIndex
-      } else {
-        insertionIndex = active.groupId > over.groupId ? 0 : criteriaIds.length
       }
 
       criteriaIds.splice(insertionIndex, 0, active.id)
@@ -1152,6 +1155,24 @@ const cohortCreationSlice = createSlice({
       }
       navHistory.push(newSnapshot)
       state.navHistory = navHistory
+    },
+    /**
+     * Switch between view modes (LogicalOperator/json)
+     *
+     * @param state - Current cohort creation state
+     * @param action - Action containing the view Mode
+     */
+    editDiagramViewMode: (state: CohortCreationState, action: PayloadAction<string>) => {
+      state.viewMode = action.payload
+    },
+    /**
+     * Edit global json query
+     *
+     * @param state - Current cohort creation state
+     * @param action - Action containing the view Mode
+     */
+    editJson: (state: CohortCreationState, action: PayloadAction<string>) => {
+      state.json = action.payload
     }
   },
   extraReducers: (builder) => {
@@ -1234,6 +1255,8 @@ export const {
   editAllCriteria,
   pseudonimizeCriteria,
   editSelectedCriteria,
+  editDiagramViewMode,
+  editJson,
   editCriteriaGroup,
   duplicateSelectedCriteria,
   updateTemporalConstraints,
