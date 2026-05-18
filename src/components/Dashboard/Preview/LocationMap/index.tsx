@@ -8,7 +8,6 @@ import { Polygon, Rectangle, Tooltip, useMap, useMapEvents } from 'react-leaflet
 import { MapContainer } from 'react-leaflet/MapContainer'
 //@ts-ignore
 import { TileLayer } from 'react-leaflet/TileLayer'
-import axios from 'axios'
 import { fetchLocation } from 'services/aphp/callApi'
 import { getAllResults } from 'utils/apiHelpers'
 import {
@@ -81,16 +80,16 @@ const AutoCenterMap = (props: { cohortId: string }) => {
   const { cohortId } = props
   const appConfig = useContext(AppConfig)
   const map = useMap()
-  const [hasCentered, setHasCentered] = useState(false)
+  const hasCenteredRef = useRef(false)
   const abortControllerRef = useRef<AbortController | null>(null)
+  const { locationCount: countExtUrl, locationShapeUrl: shapeExtUrl } = appConfig.features.locationMap.extensions
 
   useEffect(() => {
-    // Reset centered flag when cohort changes
-    setHasCentered(false)
+    hasCenteredRef.current = false
   }, [cohortId])
 
   useEffect(() => {
-    if (hasCentered) return
+    if (hasCenteredRef.current) return
 
     // Cancel any previous in-flight request
     if (abortControllerRef.current) {
@@ -98,7 +97,8 @@ const AutoCenterMap = (props: { cohortId: string }) => {
     }
     const abortController = new AbortController()
     abortControllerRef.current = abortController
-    ;(async () => {
+
+    const centerOnDensestZone = async () => {
       try {
         // Fetch locations without geo-filter to find the zone with highest patient count
         const response = await fetchLocation({
@@ -116,7 +116,7 @@ const AutoCenterMap = (props: { cohortId: string }) => {
         let maxCount = 0
         let bestLocation: Location | null = null
         for (const loc of locations) {
-          const count = getExtension(loc, appConfig.features.locationMap.extensions.locationCount)?.valueInteger || 0
+          const count = getExtension(loc, countExtUrl)?.valueInteger || 0
           if (count > maxCount) {
             maxCount = count
             bestLocation = loc
@@ -126,10 +126,7 @@ const AutoCenterMap = (props: { cohortId: string }) => {
         if (!bestLocation) return
 
         // Parse the shape and compute the centroid
-        const shapeString = getExtension(
-          bestLocation,
-          appConfig.features.locationMap.extensions.locationShapeUrl
-        )?.valueString
+        const shapeString = getExtension(bestLocation, shapeExtUrl)?.valueString
         const shape = parseShape(shapeString)
         if (!shape || shape.length === 0) return
 
@@ -138,26 +135,19 @@ const AutoCenterMap = (props: { cohortId: string }) => {
 
         // Pan the map to the centroid with animation
         map.flyTo(centroid, map.getZoom(), { animate: true, duration: 0.5 })
-        setHasCentered(true)
+        hasCenteredRef.current = true
       } catch (error) {
-        // Ignore abort/cancel errors
-        if (axios.isCancel(error) || (error instanceof Error && error.name === 'AbortError')) {
-          return
-        }
+        if (error instanceof Error && error.name === 'AbortError') return
         console.error('Failed to auto-center map:', error)
       }
-    })()
+    }
+
+    centerOnDensestZone()
 
     return () => {
       cancelPendingRequest(abortController)
     }
-  }, [
-    cohortId,
-    hasCentered,
-    map,
-    appConfig.features.locationMap.extensions.locationCount,
-    appConfig.features.locationMap.extensions.locationShapeUrl
-  ])
+  }, [cohortId, map, countExtUrl, shapeExtUrl])
 
   return null // This component only produces side effects
 }

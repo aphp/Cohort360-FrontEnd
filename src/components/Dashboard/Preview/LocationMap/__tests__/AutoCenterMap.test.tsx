@@ -274,4 +274,58 @@ describe('AutoCenterMap', () => {
 
     consoleSpy.mockRestore()
   })
+
+  it('should not center when FHIR returns an OperationOutcome', async () => {
+    mockFetchLocation.mockResolvedValueOnce({
+      data: {
+        resourceType: 'OperationOutcome',
+        issue: [{ code: 'processing', details: { text: 'Backend failure' } }]
+      }
+    })
+
+    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
+
+    await act(async () => {
+      renderLocationMap('oo-cohort')
+    })
+
+    await new Promise((r) => setTimeout(r, 100))
+
+    expect(mockFlyTo).not.toHaveBeenCalled()
+    consoleSpy.mockRestore()
+  })
+
+  it('should abort the in-flight request when cohort changes mid-flight', async () => {
+    const signals: AbortSignal[] = []
+    // First call: capture the signal and never resolve until aborted
+    mockFetchLocation.mockImplementationOnce(
+      (args: { signal: AbortSignal }) =>
+        new Promise((_resolve, reject) => {
+          signals.push(args.signal)
+          args.signal.addEventListener('abort', () => reject(Object.assign(new Error('aborted'), { name: 'AbortError' })))
+        })
+    )
+    // Second call: resolves immediately
+    mockFetchLocation.mockResolvedValueOnce({
+      data: { entry: [{ resource: createMockLocation('paris-center', 'Paris') }] }
+    })
+
+    const { rerender } = await act(async () => renderLocationMap('cohort-1'))
+
+    // Swap cohort while first request is still pending
+    await act(async () => {
+      rerender(
+        <AppConfig.Provider value={getConfig()}>
+          <LocationMap cohortId="cohort-2" />
+        </AppConfig.Provider>
+      )
+    })
+
+    await waitFor(() => {
+      expect(signals[0].aborted).toBe(true)
+    })
+
+    // Only the second (non-aborted) request should drive a flyTo
+    await waitFor(() => expect(mockFlyTo).toHaveBeenCalledTimes(1))
+  })
 })

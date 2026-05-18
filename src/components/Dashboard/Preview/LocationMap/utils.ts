@@ -11,17 +11,18 @@ export const computeCentroid = (shape: LatLngTuple[]): LatLngTuple | null => {
     return [(shape[0][0] + shape[1][0]) / 2, (shape[0][1] + shape[1][1]) / 2]
   }
 
+  // Standard signed-area centroid formula operates on (x, y); map (lat, lng) → (y, x)
   let signedArea = 0
   let cx = 0
   let cy = 0
 
   for (let i = 0; i < shape.length; i++) {
-    const [lat0, lng0] = shape[i]
-    const [lat1, lng1] = shape[(i + 1) % shape.length]
-    const a = lat0 * lng1 - lat1 * lng0
+    const [y0, x0] = shape[i]
+    const [y1, x1] = shape[(i + 1) % shape.length]
+    const a = x0 * y1 - x1 * y0
     signedArea += a
-    cx += (lat0 + lat1) * a
-    cy += (lng0 + lng1) * a
+    cx += (x0 + x1) * a
+    cy += (y0 + y1) * a
   }
 
   signedArea *= 0.5
@@ -34,7 +35,7 @@ export const computeCentroid = (shape: LatLngTuple[]): LatLngTuple | null => {
 
   cx /= 6 * signedArea
   cy /= 6 * signedArea
-  return [cx, cy]
+  return [cy, cx]
 }
 
 /**
