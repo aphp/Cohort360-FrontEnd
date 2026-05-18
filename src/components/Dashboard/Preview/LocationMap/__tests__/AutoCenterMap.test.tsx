@@ -45,7 +45,7 @@ vi.mock('services/aphp/callApi', () => ({
 
 // Mock getExtension utility
 vi.mock('utils/fhir', () => ({
-  getExtension: (resource: { id?: string }, url: string) => {
+  getExtension: vi.fn((resource: { id?: string }, url: string) => {
     // Return mock extension data based on URL and resource
     if (url.includes('count')) {
       // Return higher count for Paris location
@@ -70,7 +70,7 @@ vi.mock('utils/fhir', () => ({
       return null
     }
     return null
-  }
+  })
 }))
 
 // Import component after mocks are set up
@@ -175,24 +175,25 @@ describe('AutoCenterMap', () => {
     })
 
     // Temporarily override getExtension mock for this test
-    const originalMock = vi.mocked(await import('utils/fhir')).getExtension
-    vi.mocked(await import('utils/fhir')).getExtension = vi.fn((resource: { id?: string }, url: string) => {
-      if (url.includes('count')) {
+    const { getExtension } = await import('utils/fhir')
+    vi.mocked(getExtension).mockImplementation((resource, url) => {
+      const id = (resource as { id?: string } | undefined)?.id
+      if (url?.includes('count')) {
         // Hendaye has more patients than Paris for this test
-        if (resource?.id === 'hendaye') return { valueInteger: 1000 }
-        if (resource?.id === 'paris-center') return { valueInteger: 100 }
-        return { valueInteger: 0 }
+        if (id === 'hendaye') return { url, valueInteger: 1000 }
+        if (id === 'paris-center') return { url, valueInteger: 100 }
+        return { url, valueInteger: 0 }
       }
-      if (url.includes('shape')) {
-        if (resource?.id === 'hendaye') {
-          return { valueString: 'POLYGON((-1.77 43.36, -1.76 43.36, -1.76 43.37, -1.77 43.37, -1.77 43.36))' }
+      if (url?.includes('shape')) {
+        if (id === 'hendaye') {
+          return { url, valueString: 'POLYGON((-1.77 43.36, -1.76 43.36, -1.76 43.37, -1.77 43.37, -1.77 43.36))' }
         }
-        if (resource?.id === 'paris-center') {
-          return { valueString: 'POLYGON((2.35 48.85, 2.36 48.85, 2.36 48.86, 2.35 48.86, 2.35 48.85))' }
+        if (id === 'paris-center') {
+          return { url, valueString: 'POLYGON((2.35 48.85, 2.36 48.85, 2.36 48.86, 2.35 48.86, 2.35 48.85))' }
         }
-        return null
+        return undefined
       }
-      return null
+      return undefined
     })
 
     await act(async () => {

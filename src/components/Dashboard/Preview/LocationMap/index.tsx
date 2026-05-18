@@ -27,7 +27,7 @@ import CircularProgressWithLabel from 'components/ui/CircularProgressWithLabel'
 import useMultipartDataLoading from './useMultipartDataLoading'
 import { getExtension } from 'utils/fhir'
 import { AppConfig } from 'config'
-import { Location } from 'fhir/r4'
+import { getApiResponseResources } from 'utils/apiHelpers'
 
 const DEBUG_SHOW_LOADED_BOUNDS = false
 const SHOW_OPACITY_CONTROL = false
@@ -109,7 +109,7 @@ const AutoCenterMap = (props: { cohortId: string }) => {
 
         if (abortController.signal.aborted) return
 
-        const locations = response.data?.entry?.map((e) => e.resource).filter(Boolean) || []
+        const locations = getApiResponseResources(response) || []
         if (locations.length === 0) return
 
         // Find the location with the highest count
