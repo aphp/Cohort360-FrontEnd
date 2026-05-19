@@ -197,7 +197,7 @@ const OperatorItem: React.FC<OperatorItemProps> = ({
           }}
           onMouseLeave={() => (timeout = setTimeout(() => setIsExpanded(false), 1500))}
         >
-          <AddIcon />
+          <AddIcon data-testid="AddIcon" />
         </IconButton>
       )}
     </>
