@@ -385,7 +385,7 @@ export const getResourceType = (tableName: string): ResourceType => {
     condition: ResourceType.CONDITION,
     iris: ResourceType.UNKNOWN,
     visit_detail: ResourceType.UNKNOWN,
-    person: ResourceType.PATIENT,
+    Patient: ResourceType.PATIENT,
     note: ResourceType.DOCUMENTS,
     note_legacy: ResourceType.DOCUMENTS,
     fact_relationship: ResourceType.UNKNOWN,
