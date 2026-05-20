@@ -38,6 +38,7 @@ export const getVersionsTable = (
           {
             title: 'Annuler',
             icon: CancelIcon,
+            testId: 'CancelIcon',
             color: '#ED6D91',
             onClick: handleCancelEdit,
             disabled: isLoading
@@ -45,6 +46,7 @@ export const getVersionsTable = (
           {
             title: 'Valider',
             icon: CheckCircleIcon,
+            testId: 'CheckCircleIcon',
             color: '#1ca717',
             onClick: () => handleSaveEdit(version.uuid),
             disabled: isLoading
@@ -54,6 +56,7 @@ export const getVersionsTable = (
           {
             title: 'Éditer cette version',
             icon: EditIcon,
+            testId: 'EditIcon',
             onClick: () => handleStartEdit(version)
           }
         ]
@@ -67,6 +70,7 @@ export const getVersionsTable = (
             ? {
                 icon: SupervisedUserCircleIcon,
                 style: { color: '#f7a600b3', fontSize: '1.25rem' },
+                testId: 'SupervisedUserCircleIcon',
                 tooltip: `${version.cohorts_count} cohorte${plural(version.cohorts_count)} créée${plural(
                   version.cohorts_count
                 )} à partir de cette version.`

@@ -12,6 +12,7 @@ type VersionItemProps = {
   versionId: string
   icon?: React.ElementType
   iconTooltip?: string
+  iconTestId?: string
   onSnapshotChange: (snapshotId: string) => void
 }
 
@@ -23,6 +24,7 @@ const VersionItem: React.FC<VersionItemProps> = ({
   versionId,
   icon: IconComponent,
   iconTooltip,
+  iconTestId,
   onSnapshotChange
 }) => {
   const { classes, cx } = useStyles()
@@ -60,7 +62,7 @@ const VersionItem: React.FC<VersionItemProps> = ({
 
       {IconComponent && iconTooltip && (
         <Tooltip title={iconTooltip}>
-          <IconComponent className={classes.cohortIcon} />
+          <IconComponent className={classes.cohortIcon} data-testid={iconTestId} />
         </Tooltip>
       )}
     </Box>

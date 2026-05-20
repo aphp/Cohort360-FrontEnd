@@ -55,7 +55,7 @@ export const renderTableHeadCellContent = (col: Column, orderBy?: OrderBy, onSor
       <Box display="flex" alignItems="center" gap={0.2}>
         {col.label}
         <Tooltip title={col.tooltip}>
-          <InfoIcon fontSize="small" htmlColor="#5bc5f4" />
+          <InfoIcon data-testid="InfoIcon" fontSize="small" htmlColor="#5bc5f4" />
         </Tooltip>
       </Box>
     )

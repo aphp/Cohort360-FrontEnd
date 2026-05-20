@@ -72,7 +72,7 @@ const TutorialsCard = () => {
         {currentIndex < youtubeIds.length - 1 && (
           <Grid className={cx(classes.indicator, classes.rightIndicator)}>
             <IconButton size="small" onClick={() => _onChangeCurrentIndex(currentIndex + 1)}>
-              <KeyboardArrowRightIcon fontSize="medium" />
+              <KeyboardArrowRightIcon data-testid="KeyboardArrowRightIcon" fontSize="medium" />
             </IconButton>
           </Grid>
         )}

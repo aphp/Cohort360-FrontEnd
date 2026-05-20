@@ -87,7 +87,7 @@ const ActionBar: React.FC<ActionBarProps> = ({
               <Button
                 width="fit-content"
                 onClick={onDelete}
-                endIcon={<DeleteIcon />}
+                endIcon={<DeleteIcon data-testid="DeleteIcon" />}
                 customVariant="pink"
                 disabled={disabled}
               >

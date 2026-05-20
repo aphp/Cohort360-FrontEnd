@@ -77,6 +77,7 @@ const VersionsSection: React.FC<VersionsSectionProps> = ({
                   name: getVersionName(version),
                   versionId: version.uuid,
                   icon: hasCohorts ? SupervisedUserCircleIcon : undefined,
+                  iconTestId: hasCohorts ? 'SupervisedUserCircleIcon' : undefined,
                   iconTooltip: hasCohorts
                     ? `${version.cohorts_count} cohorte${plural(version.cohorts_count)} créée${plural(
                         version.cohorts_count

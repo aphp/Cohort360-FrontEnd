@@ -59,7 +59,7 @@ const ExecutiveUnits = ({ value, sourceType, disabled = false, onChange, label }
             </>
           }
         >
-          <InfoIcon fontSize="small" color="primary" style={{ marginLeft: 4 }} />
+          <InfoIcon data-testid="InfoIcon" fontSize="small" color="primary" style={{ marginLeft: 4 }} />
         </Tooltip>
       </Grid>
       <Grid
