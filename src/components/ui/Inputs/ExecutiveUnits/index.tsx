@@ -96,7 +96,7 @@ const ExecutiveUnits = ({ value, sourceType, disabled = false, onChange, label }
             disabled={disabled}
           >
             {loading === LoadingStatus.FETCHING && <CircularProgress size={24} />}
-            {loading === LoadingStatus.SUCCESS && <SearchOutlined />}
+            {loading === LoadingStatus.SUCCESS && <SearchOutlined data-testid="SearchOutlinedIcon" />}
           </IconButton>
         </Grid>
       </Grid>

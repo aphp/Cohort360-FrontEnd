@@ -525,7 +525,7 @@ const ExportTable: React.FC<ExportTableProps> = ({
                 </IconButton>
               )}
               <IconButton sx={{ color: '#5BC5F2' }} size="small" onClick={handleOpen}>
-                <SearchOutlined />
+                <SearchOutlined data-testid="SearchOutlinedIcon" />
               </IconButton>
             </Grid>
           </Grid>

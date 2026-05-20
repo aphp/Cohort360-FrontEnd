@@ -224,7 +224,11 @@ const TableRow = ({ row, sx }: RowProps) => {
                   size="small"
                   onClick={() => setSubitemIndex(index === subitemIndex ? null : index)}
                 >
-                  {subitemIndex === index ? <KeyboardArrowUp /> : <KeyboardArrowDown />}
+                  {subitemIndex === index ? (
+                    <KeyboardArrowUp data-testid="KeyboardArrowUpIcon" />
+                  ) : (
+                    <KeyboardArrowDown data-testid="KeyboardArrowDownIcon" />
+                  )}
                 </IconButton>
               )}
             </TableCellWrapper>
