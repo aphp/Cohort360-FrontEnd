@@ -144,7 +144,7 @@ const CohortsList: React.FC<CohortsListProps> = ({ rowsPerPage = 20, favorites =
       <IconButtonWithTooltip
         disabled={maintenanceIsActive}
         title="Supprimer la requête"
-        icon={<DeleteIcon />}
+        icon={<DeleteIcon data-testid="DeleteIcon" />}
         onClick={() => setOpenDeletionModal(true)}
         color={'#ed6d91'}
       />

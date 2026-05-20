@@ -160,7 +160,7 @@ const SamplesList = () => {
                   <IconButtonWithTooltip
                     disabled={maintenanceIsActive}
                     title="Supprimer la cohorte"
-                    icon={<DeleteIcon />}
+                    icon={<DeleteIcon data-testid="DeleteIcon" />}
                     onClick={() => setOpenDeletionModal(true)}
                     color={'#ed6d91'}
                   />

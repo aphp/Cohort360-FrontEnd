@@ -124,7 +124,7 @@ const StayConstraints: React.FC<StayConstraintsProps> = ({ constraints, onChange
         cancelText="Annuler"
         maxWidth="md"
       >
-        <WarningIcon color="warning" style={{ verticalAlign: 'middle', marginRight: 8 }} />
+        <WarningIcon data-testid="WarningIcon" color="warning" style={{ verticalAlign: 'middle', marginRight: 8 }} />
         Attention, en passant sur un type de contrainte temporelle globale, vous perdrez toutes les contraintes
         partielles déjà ajoutées.
       </Modal>

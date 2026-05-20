@@ -243,7 +243,7 @@ const LogicalOperatorItem: React.FC<LogicalOperatorItemProps> = ({ itemId, crite
             </Typography>
             {!isMainOperator && (
               <IconButton className={classes.deleteButton} size="small" onClick={deleteLogicalOperator}>
-                <DeleteIcon />
+                <DeleteIcon data-testid="DeleteIcon" />
               </IconButton>
             )}
           </>
@@ -263,7 +263,7 @@ const LogicalOperatorItem: React.FC<LogicalOperatorItemProps> = ({ itemId, crite
         cancelText="Annuler"
         maxWidth="md"
       >
-        <WarningIcon color="warning" style={{ verticalAlign: 'middle', marginRight: 8 }} />
+        <WarningIcon data-testid="WarningIcon" color="warning" style={{ verticalAlign: 'middle', marginRight: 8 }} />
         L'ajout de contraintes temporelles n'étant possible que sur un groupe de critères ET, passer sur un groupe de
         critères OU vous fera perdre toutes les contraintes temporelles de ce groupe.
       </Modal>

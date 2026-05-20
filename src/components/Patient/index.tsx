@@ -94,7 +94,7 @@ const PatientBoard = ({ patient }: PatientBoardProps) => {
   return (
     <>
       <SidebarButton role="button" onClick={() => setIsSidebarOpened(true)}>
-        <ChevronLeftIcon color="action" width="20px" />
+        <ChevronLeftIcon data-testid="ChevronLeftIcon" color="action" width="20px" />
       </SidebarButton>
       <PatientHeader patient={patient} groupId={patient.groupId} />
       <Grid container sx={{ flexDirection: 'column', alignItems: 'center', backgroundColor: '#E6F1FD' }}>

@@ -63,10 +63,10 @@ const SearchInput = ({
           }}
           endAdornment={
             <InputAdornment position="end" style={{ padding: '0px 25px' }}>
-              {error?.isError && <WarningIcon style={{ fill: '#F44336', height: 20 }} />}
+              {error?.isError && <WarningIcon data-testid="WarningIcon" style={{ fill: '#F44336', height: 20 }} />}
               {displayHelpIcon && (
                 <IconButton style={{ padding: 2 }} onClick={() => setHelpOpen(true)}>
-                  <InfoIcon style={{ height: 22 }} />
+                  <InfoIcon data-testid="InfoIcon" style={{ height: 22 }} />
                 </IconButton>
               )}
               {searchOnClick && (

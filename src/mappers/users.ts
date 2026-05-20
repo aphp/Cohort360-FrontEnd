@@ -28,6 +28,7 @@ const mapUsersToRows = (list: User[], deleteItem: (user: User) => void) => {
           {
             title: "Supprimer l'utilisateur",
             icon: DeleteIcon,
+            testId: 'DeleteIcon',
             onClick: () => deleteItem(user)
           }
         ] as Action[],

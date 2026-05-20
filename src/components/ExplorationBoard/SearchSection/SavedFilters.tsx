@@ -85,7 +85,7 @@ const SavedFilters = ({
                 onClick={() => setToggleDeleteModal(true)}
                 disabled={!selectedItems.length || maintenanceIsActive}
               >
-                <DeleteOutline />
+                <DeleteOutline data-testid="DeleteOutlineIcon" />
               </Button>
             </Grid>
           </Tooltip>

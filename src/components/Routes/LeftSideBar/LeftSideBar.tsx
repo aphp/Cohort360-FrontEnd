@@ -141,7 +141,11 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
               [classes.menuButton]: !open
             })}
           >
-            {open ? <ChevronLeftIcon color="action" width="20px" /> : <MenuIcon width="20px" fill="#FFF" />}
+            {open ? (
+              <ChevronLeftIcon data-testid="ChevronLeftIcon" color="action" width="20px" />
+            ) : (
+              <MenuIcon width="20px" fill="#FFF" />
+            )}
           </IconButton>
         </div>
 

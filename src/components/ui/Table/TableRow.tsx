@@ -86,7 +86,7 @@ const TableRow = ({ row, sx }: RowProps) => {
                     <IconButtonWithTooltip
                       key={action.title}
                       disabled={action.disabled}
-                      icon={<IconComponent />}
+                      icon={<IconComponent data-testid={action.testId} />}
                       onClick={action.onClick}
                       title={action.title}
                       color={action.color ?? 'inherit'}
@@ -165,8 +165,8 @@ const TableRow = ({ row, sx }: RowProps) => {
                 })()}
               {cell.type === CellType.ICON &&
                 (() => {
-                  const { icon: IconComponent, style, tooltip } = cell.value as Icon
-                  const iconElement = <IconComponent sx={style} />
+                  const { icon: IconComponent, style, tooltip, testId } = cell.value as Icon
+                  const iconElement = <IconComponent sx={style} data-testid={testId} />
                   return tooltip ? <Tooltip title={tooltip}>{iconElement}</Tooltip> : iconElement
                 })()}
               {cell.type === CellType.LINK && (

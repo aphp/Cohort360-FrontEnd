@@ -488,7 +488,7 @@ const ExportForm: React.FC = () => {
                 </span>
               }
             >
-              <InfoIcon fontSize="small" color="primary" />
+              <InfoIcon data-testid="InfoIcon" fontSize="small" color="primary" />
             </Tooltip>
           </Grid>
 
@@ -507,7 +507,7 @@ const ExportForm: React.FC = () => {
                   )
                 }
               >
-                <InfoIcon />
+                <InfoIcon data-testid="InfoIcon" />
               </IconButton>
             </Grid>
 

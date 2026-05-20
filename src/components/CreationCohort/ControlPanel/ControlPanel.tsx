@@ -451,7 +451,7 @@ const ControlPanel: React.FC<{
                       'DD/MM/YYYY'
                     )} et la date du jour.`}
                   >
-                    <InfoIcon />
+                    <InfoIcon data-testid="InfoIcon" />
                   </Tooltip>
                 )}
               </Grid>

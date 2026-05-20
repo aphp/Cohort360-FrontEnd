@@ -195,7 +195,7 @@ const RequestsList = ({ simplified = false, rowsPerPage = 20 }: RequestsListProp
                   <IconButtonWithTooltip
                     disabled={maintenanceIsActive}
                     title="Supprimer le projet"
-                    icon={<DeleteIcon />}
+                    icon={<DeleteIcon data-testid="DeleteIcon" />}
                     onClick={() => setOpenDeletionModal(true)}
                     color="#ed6d91"
                   />

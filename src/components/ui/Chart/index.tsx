@@ -47,7 +47,7 @@ const Chart = ({
               {tooltip && (
                 <Tooltip title="Les localisations des patients sont affichées uniquement si leur adresse est disponible (certains patients n'ayant pas d'adresse associée).">
                   <IconButton style={{ padding: '0 0 0 4px', marginTop: '-2.5px', position: 'absolute' }}>
-                    <InfoIcon style={{ height: 22 }} />
+                    <InfoIcon data-testid="InfoIcon" style={{ height: 22 }} />
                   </IconButton>
                 </Tooltip>
               )}
@@ -56,7 +56,7 @@ const Chart = ({
                   <IconButton
                     style={{ padding: '0 0 0 4px', marginTop: '-2.5px', marginLeft: '25px', position: 'absolute' }}
                   >
-                    <WarningIcon color="warning" style={{ height: 22 }} />
+                    <WarningIcon data-testid="WarningIcon" color="warning" style={{ height: 22 }} />
                   </IconButton>
                 </Tooltip>
               )}
