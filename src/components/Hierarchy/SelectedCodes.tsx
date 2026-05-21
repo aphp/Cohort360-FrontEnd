@@ -48,12 +48,12 @@ const SelectedCodes = <T,>({ values, onDelete, sx = { backgroundColor: '#D1E2F4'
               {openSelectedCodesDrawer ? (
                 <KeyboardArrowDown
                   data-testid="KeyboardArrowDownIcon"
-                  onClick={() => setOpenSelectedCodesDrawer((prev) => !prev)} 
+                  onClick={() => setOpenSelectedCodesDrawer((prev) => !prev)}
                 />
               ) : (
                 <KeyboardArrowRight
                   data-testid="KeyboardArrowRightIcon"
-                  onClick={() => setOpenSelectedCodesDrawer((prev) => !prev)} 
+                  onClick={() => setOpenSelectedCodesDrawer((prev) => !prev)}
                 />
               )}
             </>
