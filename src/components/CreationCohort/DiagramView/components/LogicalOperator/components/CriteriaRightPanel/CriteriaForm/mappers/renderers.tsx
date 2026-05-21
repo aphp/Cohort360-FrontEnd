@@ -5,6 +5,7 @@ import CalendarRange from 'components/ui/Inputs/CalendarRange'
 import {
   Autocomplete,
   Checkbox,
+  Chip,
   FormControlLabel,
   Grid,
   Radio,
@@ -31,6 +32,7 @@ import { selectValueSetCodes } from 'state/valueSets'
 import SearchbarWithCheck from 'components/ui/Searchbar/SearchbarWithChecks'
 import { SearchbarWithCheckWrapper } from 'components/ui/Searchbar/styles'
 import CustomAlert from 'components/ui/Alert'
+import CancelIcon from '@mui/icons-material/Cancel'
 
 /************************************************************************************/
 /*                        Criteria Form Item Renderer                               */
@@ -159,6 +161,19 @@ const FORM_ITEM_RENDERER: { [key in CriteriaFormItemType]: CriteriaFormItemView<
         }}
         renderInput={(params) => <TextField {...params} label={props.definition.label} />}
         groupBy={groupBy ? (option) => option[groupBy] ?? '' : undefined}
+        renderTags={(tagValue, getTagProps) =>
+          tagValue.map((option, index) => {
+            const { onDelete } = getTagProps({ index })
+            return (
+              <Chip
+                key={option.id}
+                label={option.label}
+                onDelete={onDelete}
+                deleteIcon={<CancelIcon data-testid="CancelIcon" />}
+              />
+            )
+          })
+        }
         renderGroup={
           groupBy
             ? (params) => {
