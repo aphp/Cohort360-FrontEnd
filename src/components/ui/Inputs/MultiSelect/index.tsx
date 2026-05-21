@@ -1,5 +1,6 @@
 import React from 'react'
-import { Autocomplete, TextField, Typography } from '@mui/material'
+import { Autocomplete, Chip, TextField, Typography } from '@mui/material'
+import CancelIcon from '@mui/icons-material/Cancel'
 import { InputWrapper } from 'components/ui/Inputs/styles'
 import { LabelObject } from 'types/searchCriterias'
 import { capitalizeFirstLetter } from 'utils/string'
@@ -29,6 +30,19 @@ const MultiSelect = ({ value, placeholder, label, options, disabled = false, onC
         disableCloseOnSelect
         getOptionLabel={(elem) => capitalizeFirstLetter(elem.label)}
         renderOption={(props, elem) => <li {...props}>{capitalizeFirstLetter(elem.label)}</li>}
+        renderTags={(tagValue, getTagProps) =>
+          tagValue.map((option, index) => {
+            const { onDelete } = getTagProps({ index })
+            return (
+              <Chip
+                key={option.id}
+                label={capitalizeFirstLetter(option.label)}
+                onDelete={onDelete}
+                deleteIcon={<CancelIcon data-testid="CancelIcon" />}
+              />
+            )
+          })
+        }
         renderInput={(params) => <TextField {...params} placeholder={placeholder} />}
       />
     </InputWrapper>

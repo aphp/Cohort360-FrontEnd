@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react'
-import { Autocomplete, AutocompleteRenderGroupParams, Checkbox, Grid, TextField, Typography } from '@mui/material'
+import { Autocomplete, AutocompleteRenderGroupParams, Checkbox, Chip, Grid, TextField, Typography } from '@mui/material'
 import { InputWrapper } from 'components/ui/Inputs/styles'
 import { SimpleCodeType } from 'types'
+import CancelIcon from '@mui/icons-material/Cancel'
 
 type DocTypesProps = {
   options: SimpleCodeType[]
@@ -73,7 +74,20 @@ const DocTypes = ({ value, options, label, disabled = false, onChange }: DocType
         renderOption={(props, docType: SimpleCodeType) => {
           return <li {...props}>{docType.label}</li>
         }}
-        renderInput={(params) => <TextField {...params} placeholder="Types de documents" />}
+        renderTags={(tagValue, getTagProps) =>
+          tagValue.map((option, index) => {
+            const { onDelete } = getTagProps({ index })
+            return (
+              <Chip
+                key={option.label}
+                label={option.label}
+                onDelete={onDelete}
+                deleteIcon={<CancelIcon data-testid="CancelIcon" />}
+              />
+            )
+          })
+        }
+        renderInput={(params) => <TextField {...params} placeholder="Types des documents" />}
       />
     </InputWrapper>
   )

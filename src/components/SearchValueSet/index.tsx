@@ -99,7 +99,7 @@ const SearchValueSet = ({ references, selectedNodes, onSelect }: SearchValueSetP
                       onChange={(event) => onChangeSearchInput(event.target.value)}
                       endAdornment={
                         <IconButton onClick={() => onChangeSearchInput('')}>
-                          <ClearIcon style={{ fill: '#6f6f6f', height: 18 }} />
+                          <ClearIcon style={{ fill: '#6f6f6f', height: 18 }} data-testid="ClearIcon" />
                         </IconButton>
                       }
                     />

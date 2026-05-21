@@ -124,7 +124,7 @@ const CriteriaCard = ({
           style={disabled ? { color: '#CBCFCF' } : { color: 'currentcolor' }}
           disabled={disabled}
         >
-          <EditIcon />
+          <EditIcon data-testid="EditIcon" />
         </IconButton>
         <IconButton
           size="small"

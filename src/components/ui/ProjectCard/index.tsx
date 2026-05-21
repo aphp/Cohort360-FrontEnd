@@ -36,7 +36,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
   const actions = [
     {
       key: 'edit',
-      icon: <EditIcon />,
+      icon: <EditIcon data-testid="EditIcon" />,
       label: 'Éditer',
       onclick: () => onedit(),
       tooltip: '',
