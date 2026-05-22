@@ -12,13 +12,14 @@ import {
   Typography,
   TextField,
   Checkbox,
+  Chip as ChipMui,
   Autocomplete,
   CircularProgress,
   ListItemText,
   IconButton,
   Switch
 } from '@mui/material'
-
+import CancelIcon from '@mui/icons-material/Cancel'
 import CloseIcon from '@mui/icons-material/Close'
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz'
 import SearchOutlined from '@mui/icons-material/SearchOutlined'
@@ -427,6 +428,19 @@ const ExportTable: React.FC<ExportTableProps> = ({
                   </li>
                 )
               }}
+              renderTags={(tagValue, getTagProps) =>
+                tagValue.map((option, index) => {
+                  const { onDelete } = getTagProps({ index })
+                  return (
+                    <ChipMui
+                      key={option}
+                      label={option}
+                      onDelete={onDelete}
+                      deleteIcon={<CancelIcon data-testid="CancelIcon" />}
+                    />
+                  )
+                })
+              }
               renderInput={(params) => {
                 return <TextField {...params} label="Sélectionnez une colonne" />
               }}
@@ -525,7 +539,7 @@ const ExportTable: React.FC<ExportTableProps> = ({
                 </IconButton>
               )}
               <IconButton sx={{ color: '#5BC5F2' }} size="small" onClick={handleOpen}>
-                <SearchOutlined />
+                <SearchOutlined data-testid="SearchOutlinedIcon" />
               </IconButton>
             </Grid>
           </Grid>

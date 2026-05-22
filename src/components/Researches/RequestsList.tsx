@@ -188,7 +188,7 @@ const RequestsList = ({ simplified = false, rowsPerPage = 20 }: RequestsListProp
                   <IconButtonWithTooltip
                     disabled={maintenanceIsActive}
                     title="Éditer le projet"
-                    icon={<EditIcon />}
+                    icon={<EditIcon data-testid="EditIcon" />}
                     onClick={() => setOpenParentEditionModal(true)}
                     color="#5bc5f2"
                   />

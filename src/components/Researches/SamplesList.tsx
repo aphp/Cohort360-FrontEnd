@@ -153,7 +153,7 @@ const SamplesList = () => {
                   <IconButtonWithTooltip
                     disabled={maintenanceIsActive}
                     title="Éditer la cohorte parent"
-                    icon={<EditIcon />}
+                    icon={<EditIcon data-testid="EditIcon" />}
                     onClick={() => setOpenParentEditionModal(true)}
                     color={'#5bc5f2'}
                   />

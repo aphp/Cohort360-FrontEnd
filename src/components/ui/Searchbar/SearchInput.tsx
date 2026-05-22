@@ -81,7 +81,7 @@ const SearchInput = ({
                   }}
                   style={{ padding: 2 }}
                 >
-                  <ClearIcon style={{ fill: '#6f6f6f', height: 18 }} />
+                  <ClearIcon style={{ fill: '#6f6f6f', height: 18 }} data-testid="ClearIcon" />
                 </IconButton>
               )}
             </InputAdornment>

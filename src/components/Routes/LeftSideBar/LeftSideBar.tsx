@@ -251,7 +251,7 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
                     className={cx(classes.button, classes.miniButton)}
                     disabled={maintenanceIsActive}
                   >
-                    <EditIcon />
+                    <EditIcon data-testid="EditIcon" />
                   </IconButton>
                 </Tooltip>
               )}

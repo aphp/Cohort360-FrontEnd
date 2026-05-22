@@ -58,7 +58,7 @@ const CalendarInput = ({ value, label, disabled = false, onChange }: CalendarInp
           {date !== null && (
             <Grid size={1}>
               <IconButton color="primary" size="small" onClick={() => setDate(null)} disabled={disabled}>
-                <ClearIcon style={{ fontSize: 17 }} />
+                <ClearIcon style={{ fontSize: 17 }} data-testid="ClearIcon" />
               </IconButton>
             </Grid>
           )}
