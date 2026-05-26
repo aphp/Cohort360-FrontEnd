@@ -167,7 +167,7 @@ const FORM_ITEM_RENDERER: { [key in CriteriaFormItemType]: CriteriaFormItemView<
             return (
               <Chip
                 key={option.id}
-                label={option.label}
+                label={`${props.definition.prependCode ? option.id + ' - ' : ''}${option.label}`}
                 onDelete={onDelete}
                 deleteIcon={<CancelIcon data-testid="CancelIcon" />}
               />
