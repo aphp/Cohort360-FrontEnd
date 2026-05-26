@@ -38,6 +38,7 @@ const mapRequestsToRows = (
       },
       {
         title: 'Éditer la requête',
+        testId: 'EditIcon',
         icon: EditIcon,
         onClick: () => onClickEdit(request),
         disabled: disabled

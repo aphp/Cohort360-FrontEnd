@@ -60,6 +60,7 @@ const mapSamplesToRows = (
       },
       {
         title: 'Éditer la cohorte',
+        testId: 'EditIcon',
         icon: EditIcon,
         onClick: () => onClickEdit(cohort),
         disabled: disabled
