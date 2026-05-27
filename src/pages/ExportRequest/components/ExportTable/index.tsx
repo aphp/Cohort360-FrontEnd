@@ -535,7 +535,7 @@ const ExportTable: React.FC<ExportTableProps> = ({
               )}
               {!isExtended && selectedQuestions.length > 0 && (
                 <IconButton size="small" sx={{ color: '#5BC5F2' }} onClick={() => setIsExtended(true)}>
-                  <MoreHorizIcon />
+                  <MoreHorizIcon data-testid="MoreHorizIcon" />
                 </IconButton>
               )}
               <IconButton sx={{ color: '#5BC5F2' }} size="small" onClick={handleOpen}>
