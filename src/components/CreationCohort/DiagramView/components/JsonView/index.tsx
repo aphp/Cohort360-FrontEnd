@@ -24,8 +24,14 @@ const JsonView: React.FC<JsonEditorWithAjvProps> = ({ onJsonIssuesChange, minHei
   const [syntaxError, setSyntaxError] = useState<string | null>(null)
   const [schemaErrors, setSchemaErrors] = useState<string[]>([])
 
-  const [editorValue, setEditorValue] = useState<string>('')
-  const didInitPrettyRef = useRef(false)
+  const [editorValue, setEditorValue] = useState<string>(() => {
+    if (!request.json) return ''
+    try {
+      return JSON.stringify(JSON.parse(request.json), null, 2)
+    } catch {
+      return request.json
+    }
+  })
 
   const editorRef = useRef<any>(null)
   const monacoRef = useRef<any>(null)
@@ -44,19 +50,6 @@ const JsonView: React.FC<JsonEditorWithAjvProps> = ({ onJsonIssuesChange, minHei
   }, [])
 
   const hasError = Boolean(syntaxError) || schemaErrors.length > 0
-
-  useEffect(() => {
-    if (didInitPrettyRef.current) return
-    if (!request.json) return
-
-    try {
-      setEditorValue(JSON.stringify(JSON.parse(request.json), null, 2))
-    } catch {
-      setEditorValue(request.json)
-    }
-
-    didInitPrettyRef.current = true
-  }, [request.json])
 
   useEffect(() => {
     if (!debouncedValue) {
@@ -111,7 +104,7 @@ const JsonView: React.FC<JsonEditorWithAjvProps> = ({ onJsonIssuesChange, minHei
           height={minHeight}
           language="json"
           theme="vs-dark"
-          value={editorValue}
+          defaultValue={editorValue}
           onChange={(v) => {
             const next = v ?? ''
             didJsonValueChanged.current = true
