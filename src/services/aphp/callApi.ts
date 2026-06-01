@@ -1117,9 +1117,16 @@ export const fetchLocation = async (args: fetchLocationProps) => {
   if (offset) options = [...options, `_offset=${offset}`]
   if (near) options = [...options, `near=${encodeURIComponent(near)}`]
   if (_elements && _elements.length > 0)
-    options = [...options, `_elements=${_elements.filter((item, index, array) => uniq(item, index, array)).reduce(paramValuesReducer, '')}`]
+    options = [
+      ...options,
+      `_elements=${_elements.filter((item, index, array) => uniq(item, index, array)).reduce(paramValuesReducer, '')}`
+    ]
 
-  if (_list && _list.length > 0) options = [...options, `_list=${_list.filter((item, index, array) => uniq(item, index, array)).reduce(paramValuesReducer, '')}`]
+  if (_list && _list.length > 0)
+    options = [
+      ...options,
+      `_list=${_list.filter((item, index, array) => uniq(item, index, array)).reduce(paramValuesReducer, '')}`
+    ]
 
   const response = await fhirSearch<FHIR_Bundle_Response<Location>>('Location', options, {
     signal
@@ -1154,9 +1161,16 @@ export const fetchDiagnosticReport = async (args: fetchDiagnosticReportProps) =>
   if (date) options = [...options, `date=${date}`]
   if (code) options = [...options, `code=${code}`]
   if (_elements && _elements.length > 0)
-    options = [...options, `_elements=${_elements.filter((item, index, array) => uniq(item, index, array)).reduce(paramValuesReducer, '')}`]
+    options = [
+      ...options,
+      `_elements=${_elements.filter((item, index, array) => uniq(item, index, array)).reduce(paramValuesReducer, '')}`
+    ]
 
-  if (_list && _list.length > 0) options = [...options, `_list=${_list.filter((item, index, array) => uniq(item, index, array)).reduce(paramValuesReducer, '')}`]
+  if (_list && _list.length > 0)
+    options = [
+      ...options,
+      `_list=${_list.filter((item, index, array) => uniq(item, index, array)).reduce(paramValuesReducer, '')}`
+    ]
 
   const response = await fhirSearch<FHIR_Bundle_Response<DiagnosticReport>>('DiagnosticReport', options, {
     signal
