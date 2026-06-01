@@ -89,6 +89,15 @@ const paramsReducer = (accumulator: string, currentValue: string): string => {
 
 const uniq = (item: string, index: number, array: string[]) => array.indexOf(item) === index && item
 
+const uniqueValues = <T extends string>(values?: T[]): T[] =>
+  values ? values.filter((item, index, array) => uniq(item, index, array)) : []
+
+const reduceParamValues = (values: string[]): string =>
+  values.reduce((accumulator, currentValue) => paramValuesReducer(accumulator, currentValue), '')
+
+const reduceParams = (values: string[]): string =>
+  values.reduce((accumulator, currentValue) => paramsReducer(accumulator, currentValue), '')
+
 export const LOW_TOLERANCE_TAG = encodeURIComponent('https://terminology.eds.aphp.fr/text-fault-tolerant|LOW')
 
 /**
@@ -134,9 +143,9 @@ export const fetchPatient = async (args: fetchPatientProps): FHIR_Bundle_Promise
   let { _list, pivotFacet, _elements } = args
   const appConfig = getConfig()
 
-  _list = _list ? _list.filter((item, index, array) => uniq(item, index, array)) : []
-  pivotFacet = pivotFacet ? pivotFacet.filter((item, index, array) => uniq(item, index, array)) : []
-  _elements = _elements ? _elements.filter((item, index, array) => uniq(item, index, array)) : []
+  _list = uniqueValues(_list)
+  pivotFacet = uniqueValues(pivotFacet)
+  _elements = uniqueValues(_elements)
 
   // By default, all the calls to `/Patient` will have 'active=true' in parameter
   let options: string[] = appConfig.core.fhir.filterActive ? ['active=true'] : []
@@ -159,21 +168,10 @@ export const fetchPatient = async (args: fetchPatientProps): FHIR_Bundle_Promise
       `${deidentified ? PatientsParamsKeys.DATE_DEIDENTIFIED : PatientsParamsKeys.DATE_IDENTIFIED}=le${maxBirthdate}`
     ]
 
-  if (!_id && _list && _list.length > 0)
-    options = [
-      ...options,
-      `_list=${_list.reduce((accumulator, currentValue) => paramValuesReducer(accumulator, currentValue), '')}`
-    ]
+  if (!_id && _list && _list.length > 0) options = [...options, `_list=${reduceParamValues(_list)}`]
   if (appConfig.core.fhir.facetsExtensions && pivotFacet && pivotFacet.length > 0)
-    options = [
-      ...options,
-      `pivot-facet=${pivotFacet.reduce((accumulator, currentValue) => paramValuesReducer(accumulator, currentValue), '')}`
-    ]
-  if (_elements && _elements.length > 0)
-    options = [
-      ...options,
-      `_elements=${_elements.reduce((accumulator, currentValue) => paramValuesReducer(accumulator, currentValue), '')}`
-    ]
+    options = [...options, `pivot-facet=${reduceParamValues(pivotFacet)}`]
+  if (_elements && _elements.length > 0) options = [...options, `_elements=${reduceParamValues(_elements)}`]
 
   const response = await fhirSearch<FHIR_Bundle_Response<Patient>>('Patient', options, {
     signal: signal
@@ -207,10 +205,10 @@ export const fetchEncounter = async (args: fetchEncounterProps): FHIR_Bundle_Pro
   let { _list, _elements, status, facet } = args
   const appConfig = getConfig()
 
-  _list = _list ? _list.filter((item, index, array) => uniq(item, index, array)) : []
-  status = status ? status.filter((item, index, array) => uniq(item, index, array)) : []
-  _elements = _elements ? _elements.filter((item, index, array) => uniq(item, index, array)) : []
-  facet = facet ? facet.filter((item, index, array) => uniq(item, index, array)) : []
+  _list = uniqueValues(_list)
+  status = uniqueValues(status)
+  _elements = uniqueValues(_elements)
+  facet = uniqueValues(facet)
 
   // By default, all the calls to `/Encounter` will have 'subject.active=true' in parameter
   let options: string[] = appConfig.core.fhir.filterActive ? ['subject.active=true'] : []
@@ -221,26 +219,11 @@ export const fetchEncounter = async (args: fetchEncounterProps): FHIR_Bundle_Pro
   if (_sort) options = [...options, `_sort=${_sortDirection}${_sort}`]
   if (patient) options = [...options, `subject=${patient}`]
 
-  if (!patient && _list && _list.length > 0)
-    options = [
-      ...options,
-      `_list=${_list.reduce((accumulator, currentValue) => paramValuesReducer(accumulator, currentValue), '')}`
-    ]
-  if (status && status.length > 0)
-    options = [
-      ...options,
-      `status=${status.reduce((accumulator, currentValue) => paramValuesReducer(accumulator, currentValue), '')}`
-    ]
-  if (_elements && _elements.length > 0)
-    options = [
-      ...options,
-      `_elements=${_elements.reduce((accumulator, currentValue) => paramValuesReducer(accumulator, currentValue), '')}`
-    ]
+  if (!patient && _list && _list.length > 0) options = [...options, `_list=${reduceParamValues(_list)}`]
+  if (status && status.length > 0) options = [...options, `status=${reduceParamValues(status)}`]
+  if (_elements && _elements.length > 0) options = [...options, `_elements=${reduceParamValues(_elements)}`]
   if (appConfig.core.fhir.facetsExtensions && facet && facet.length > 0)
-    options = [
-      ...options,
-      `facet=${facet.reduce((accumulator, currentValue) => paramValuesReducer(accumulator, currentValue), '')}`
-    ]
+    options = [...options, `facet=${reduceParamValues(facet)}`]
   if (visit !== undefined) options = [...options, `part-of:missing=${visit}`]
 
   const response = await fhirSearch<FHIR_Bundle_Response<Encounter>>('Encounter', options, {
@@ -331,12 +314,12 @@ export const fetchDocumentReference = async (
   const encounterIdentifier = args['encounter-identifier']
   const patientIdentifier = args['patient-identifier']
   const appConfig = getConfig()
-  const includes = _include ? _include.filter((item, index, array) => uniq(item, index, array)) : []
+  const includes = uniqueValues(_include)
 
-  _list = _list ? _list.filter((item, index, array) => uniq(item, index, array)) : []
-  facet = facet ? facet.filter((item, index, array) => uniq(item, index, array)) : []
-  uniqueFacet = uniqueFacet ? uniqueFacet.filter((item, index, array) => uniq(item, index, array)) : []
-  _elements = _elements ? _elements.filter((item, index, array) => uniq(item, index, array)) : []
+  _list = uniqueValues(_list)
+  facet = uniqueValues(facet)
+  uniqueFacet = uniqueValues(uniqueFacet)
+  _elements = uniqueValues(_elements)
 
   // By default, all the calls to `/DocumentReference` will have `'type:not=https://terminology.eds.aphp.fr/fhir/CodeSystem/aphp-document-class|doc-impor'` and patient.active=true in parameter
   let options: string[] = [
@@ -383,26 +366,12 @@ export const fetchDocumentReference = async (
   if (encounterStatus && encounterStatus.length > 0)
     options = [...options, `${DocumentsParamsKeys.ENCOUNTER_STATUS}=${encounterStatus}`]
 
-  if (!patient && _list && _list.length > 0)
-    options = [
-      ...options,
-      `_list=${_list.reduce((accumulator, currentValue) => paramValuesReducer(accumulator, currentValue), '')}`
-    ]
+  if (!patient && _list && _list.length > 0) options = [...options, `_list=${reduceParamValues(_list)}`]
   if (appConfig.core.fhir.facetsExtensions && facet && facet.length > 0)
-    options = [
-      ...options,
-      `facet=${facet.reduce((accumulator, currentValue) => paramValuesReducer(accumulator, currentValue), '')}`
-    ]
+    options = [...options, `facet=${reduceParamValues(facet)}`]
   if (appConfig.core.fhir.facetsExtensions && uniqueFacet && uniqueFacet.length > 0)
-    options = [
-      ...options,
-      `unique-facet=${uniqueFacet.reduce((accumulator, currentValue) => paramValuesReducer(accumulator, currentValue), '')}`
-    ]
-  if (_elements && _elements.length > 0)
-    options = [
-      ...options,
-      `_elements=${_elements.reduce((accumulator, currentValue) => paramValuesReducer(accumulator, currentValue), '')}`
-    ]
+    options = [...options, `unique-facet=${reduceParamValues(uniqueFacet)}`]
+  if (_elements && _elements.length > 0) options = [...options, `_elements=${reduceParamValues(_elements)}`]
   if (includes.length > 0)
     options = [...options, ...includes.map((include) => `_include=${encodeURIComponent(include)}`)]
 
@@ -466,9 +435,7 @@ export const getFilters = async (
   options = [...options, `ordering=${urlParams?.get('ordering') || '-' + Order.CREATED_AT}`]
   options = [...options, `limit=${urlParams?.get('limit') || limit}`]
   options = [...options, `offset=${urlParams?.get('offset') || offset}`]
-  const res = await apiBackend.get(
-    `/cohort/fhir-filters/?${options.reduce((accumulator, currentValue) => paramsReducer(accumulator, currentValue), '')}`
-  )
+  const res = await apiBackend.get(`/cohort/fhir-filters/?${reduceParams(options)}`)
   return res
 }
 
@@ -563,8 +530,8 @@ export const fetchProcedure = async (args: fetchProcedureProps): FHIR_Bundle_Pro
   const patientIdentifier = args['patient-identifier']
   const appConfig = getConfig()
 
-  _list = _list ? _list.filter((item, index, array) => uniq(item, index, array)) : []
-  uniqueFacet = uniqueFacet ? uniqueFacet.filter((item, index, array) => uniq(item, index, array)) : []
+  _list = uniqueValues(_list)
+  uniqueFacet = uniqueValues(uniqueFacet)
 
   // By default, all the calls to `/Procedure` will have 'patient.active=true' in parameter
   let options: string[] = appConfig.core.fhir.filterActive ? ['subject.active=true'] : []
@@ -585,20 +552,13 @@ export const fetchProcedure = async (args: fetchProcedureProps): FHIR_Bundle_Pro
   if (patientIdentifier) options = [...options, `${ProcedureParamsKeys.IPP}=${patientIdentifier}`]
   if (minDate) options = [...options, `${ProcedureParamsKeys.DATE}=ge${minDate}`]
   if (maxDate) options = [...options, `${ProcedureParamsKeys.DATE}=le${maxDate}`]
-  if (_list && _list.length > 0)
-    options = [
-      ...options,
-      `_list=${_list.reduce((accumulator, currentValue) => paramValuesReducer(accumulator, currentValue), '')}`
-    ]
+  if (_list && _list.length > 0) options = [...options, `_list=${reduceParamValues(_list)}`]
   if (executiveUnits && executiveUnits.length > 0)
     options = [...options, `${ProcedureParamsKeys.EXECUTIVE_UNITS}=${executiveUnits}`]
   if (encounterStatus && encounterStatus.length > 0)
     options = [...options, `${ProcedureParamsKeys.ENCOUNTER_STATUS}=${encounterStatus}`]
   if (appConfig.core.fhir.facetsExtensions && uniqueFacet && uniqueFacet.length > 0)
-    options = [
-      ...options,
-      `unique-facet=${uniqueFacet.reduce((accumulator, currentValue) => paramValuesReducer(accumulator, currentValue), '')}`
-    ]
+    options = [...options, `unique-facet=${reduceParamValues(uniqueFacet)}`]
 
   const response = await fhirSearch<FHIR_Bundle_Response<Procedure>>('Procedure', options, {
     signal: args.signal
@@ -649,8 +609,8 @@ export const fetchClaim = async (args: fetchClaimProps): FHIR_Bundle_Promise_Res
   const patientIdentifier = args['patient-identifier']
   const appConfig = getConfig()
 
-  _list = _list ? _list.filter((item, index, array) => uniq(item, index, array)) : []
-  uniqueFacet = uniqueFacet ? uniqueFacet.filter((item, index, array) => uniq(item, index, array)) : []
+  _list = uniqueValues(_list)
+  uniqueFacet = uniqueValues(uniqueFacet)
 
   // By default, all the calls to `/Claim` will have 'patient.active=true' in parameter
   let options: string[] = appConfig.core.fhir.filterActive ? ['patient.active=true'] : []
@@ -670,16 +630,9 @@ export const fetchClaim = async (args: fetchClaimProps): FHIR_Bundle_Promise_Res
   if (encounterStatus && encounterStatus.length > 0)
     options = [...options, `${ClaimParamsKeys.ENCOUNTER_STATUS}=${encounterStatus}`]
   if (appConfig.core.fhir.facetsExtensions && uniqueFacet && uniqueFacet.length > 0)
-    options = [
-      ...options,
-      `unique-facet=${uniqueFacet.reduce((accumulator, currentValue) => paramValuesReducer(accumulator, currentValue), '')}`
-    ]
+    options = [...options, `unique-facet=${reduceParamValues(uniqueFacet)}`]
 
-  if (!patient && _list && _list.length > 0)
-    options = [
-      ...options,
-      `_list=${_list.reduce((accumulator, currentValue) => paramValuesReducer(accumulator, currentValue), '')}`
-    ]
+  if (!patient && _list && _list.length > 0) options = [...options, `_list=${reduceParamValues(_list)}`]
 
   const response = await fhirSearch<FHIR_Bundle_Response<Claim>>('Claim', options, {
     signal: args.signal
@@ -723,9 +676,9 @@ export const fetchCondition = async (args: fetchConditionProps): FHIR_Bundle_Pro
   const minRecordedDate = args['min-recorded-date']
   const maxRecordedDate = args['max-recorded-date']
   const appConfig = getConfig()
-  _list = _list ? _list.filter((item, index, array) => uniq(item, index, array)) : []
-  uniqueFacet = uniqueFacet ? uniqueFacet.filter((item, index, array) => uniq(item, index, array)) : []
-  type = type ? type.filter((item, index, array) => uniq(item, index, array)) : []
+  _list = uniqueValues(_list)
+  uniqueFacet = uniqueValues(uniqueFacet)
+  type = uniqueValues(type)
 
   // By default, all the calls to `/Condition` will have 'patient.active=true' in parameter
   let options: string[] = appConfig.core.fhir.filterActive ? ['subject.active=true'] : []
@@ -746,16 +699,9 @@ export const fetchCondition = async (args: fetchConditionProps): FHIR_Bundle_Pro
   if (encounterStatus && encounterStatus.length > 0)
     options = [...options, `${ConditionParamsKeys.ENCOUNTER_STATUS}=${encounterStatus}`]
   if (appConfig.core.fhir.facetsExtensions && uniqueFacet && uniqueFacet.length > 0)
-    options = [
-      ...options,
-      `unique-facet=${uniqueFacet.reduce((accumulator, currentValue) => paramValuesReducer(accumulator, currentValue), '')}`
-    ]
+    options = [...options, `unique-facet=${reduceParamValues(uniqueFacet)}`]
 
-  if (!subject && _list && _list.length > 0)
-    options = [
-      ...options,
-      `_list=${_list.reduce((accumulator, currentValue) => paramValuesReducer(accumulator, currentValue), '')}`
-    ]
+  if (!subject && _list && _list.length > 0) options = [...options, `_list=${reduceParamValues(_list)}`]
   if (hasSearchParam(ResourceType.CONDITION, ConditionParamsKeys.DIAGNOSTIC_TYPES) && type && type.length > 0) {
     const urlString = type.map((id) => id).join(',')
     options = [...options, `${ConditionParamsKeys.DIAGNOSTIC_TYPES}=${encodeURIComponent(urlString)}`]
@@ -811,8 +757,8 @@ export const fetchObservation = async (args: fetchObservationProps): FHIR_Bundle
   const patientIdentifier = args['patient-identifier']
   const appConfig = getConfig()
 
-  _list = _list ? _list.filter((item, index, array) => uniq(item, index, array)) : []
-  uniqueFacet = uniqueFacet ? uniqueFacet.filter((item, index, array) => uniq(item, index, array)) : []
+  _list = uniqueValues(_list)
+  uniqueFacet = uniqueValues(uniqueFacet)
 
   // By default, all the calls to `/Observation` will have 'value-quantity-value=ge0,le0' and 'patient.active=true' in the parameters
   let options: string[] = []
@@ -838,16 +784,9 @@ export const fetchObservation = async (args: fetchObservationProps): FHIR_Bundle
     options = [...options, `${ObservationParamsKeys.ENCOUNTER_STATUS}=${encounterStatus}`]
   if (patientIdentifier) options = [...options, `${ObservationParamsKeys.IPP}=${patientIdentifier}`]
   if (appConfig.core.fhir.facetsExtensions && uniqueFacet && uniqueFacet.length > 0)
-    options = [
-      ...options,
-      `unique-facet=${uniqueFacet.reduce((accumulator, currentValue) => paramValuesReducer(accumulator, currentValue), '')}`
-    ]
+    options = [...options, `unique-facet=${reduceParamValues(uniqueFacet)}`]
 
-  if (!subject && _list && _list.length > 0)
-    options = [
-      ...options,
-      `_list=${_list.reduce((accumulator, currentValue) => paramValuesReducer(accumulator, currentValue), '')}`
-    ]
+  if (!subject && _list && _list.length > 0) options = [...options, `_list=${reduceParamValues(_list)}`]
 
   const response = await fhirSearch<FHIR_Bundle_Response<Observation>>('Observation', options, {
     signal: signal
@@ -902,8 +841,8 @@ export const fetchMedicationRequest = async (
   let { _list, uniqueFacet } = args
   const appConfig = getConfig()
 
-  _list = _list ? _list.filter((item, index, array) => uniq(item, index, array)) : []
-  uniqueFacet = uniqueFacet ? uniqueFacet.filter((item, index, array) => uniq(item, index, array)) : []
+  _list = uniqueValues(_list)
+  uniqueFacet = uniqueValues(uniqueFacet)
 
   // By default, all the calls to `/MedicationRequest` will have 'patient.active=true' in parameter
   let options: string[] = appConfig.core.fhir.filterActive ? ['subject.active=true'] : []
@@ -929,16 +868,9 @@ export const fetchMedicationRequest = async (
   if (encounterStatus && encounterStatus.length > 0)
     options = [...options, `${PrescriptionParamsKeys.ENCOUNTER_STATUS}=${encounterStatus}`]
   if (appConfig.core.fhir.facetsExtensions && uniqueFacet && uniqueFacet.length > 0)
-    options = [
-      ...options,
-      `unique-facet=${uniqueFacet.reduce((accumulator, currentValue) => paramValuesReducer(accumulator, currentValue), '')}`
-    ]
+    options = [...options, `unique-facet=${reduceParamValues(uniqueFacet)}`]
 
-  if (!subject && _list && _list.length > 0)
-    options = [
-      ...options,
-      `_list=${_list.reduce((accumulator, currentValue) => paramValuesReducer(accumulator, currentValue), '')}`
-    ]
+  if (!subject && _list && _list.length > 0) options = [...options, `_list=${reduceParamValues(_list)}`]
 
   const response = await fhirSearch<FHIR_Bundle_Response<MedicationRequest>>('MedicationRequest', options, {
     signal: signal
@@ -992,8 +924,8 @@ export const fetchMedicationAdministration = async (
   let { _list, uniqueFacet } = args
   const appConfig = getConfig()
 
-  _list = _list ? _list.filter((item, index, array) => uniq(item, index, array)) : []
-  uniqueFacet = uniqueFacet ? uniqueFacet.filter((item, index, array) => uniq(item, index, array)) : []
+  _list = uniqueValues(_list)
+  uniqueFacet = uniqueValues(uniqueFacet)
 
   // By default, all the calls to `/MedicationAdministration` will have 'patient.active=true' in parameter
   let options: string[] = appConfig.core.fhir.filterActive ? ['subject.active=true'] : []
@@ -1019,16 +951,9 @@ export const fetchMedicationAdministration = async (
   if (encounterStatus && encounterStatus.length > 0)
     options = [...options, `${AdministrationParamsKeys.ENCOUNTER_STATUS}=${encounterStatus}`]
   if (appConfig.core.fhir.facetsExtensions && uniqueFacet && uniqueFacet.length > 0)
-    options = [
-      ...options,
-      `unique-facet=${uniqueFacet.reduce((accumulator, currentValue) => paramValuesReducer(accumulator, currentValue), '')}`
-    ]
+    options = [...options, `unique-facet=${reduceParamValues(uniqueFacet)}`]
 
-  if (!subject && _list && _list.length > 0)
-    options = [
-      ...options,
-      `_list=${_list.reduce((accumulator, currentValue) => paramValuesReducer(accumulator, currentValue), '')}`
-    ]
+  if (!subject && _list && _list.length > 0) options = [...options, `_list=${reduceParamValues(_list)}`]
 
   const response = await fhirSearch<FHIR_Bundle_Response<MedicationAdministration>>(
     'MedicationAdministration',
@@ -1082,8 +1007,8 @@ export const fetchImaging = async (args: fetchImagingProps): FHIR_Bundle_Promise
   let { _list, uniqueFacet } = args
   const appConfig = getConfig()
 
-  _list = _list ? _list.filter((item, index, array) => uniq(item, index, array)) : []
-  uniqueFacet = uniqueFacet ? uniqueFacet.filter((item, index, array) => uniq(item, index, array)) : []
+  _list = uniqueValues(_list)
+  uniqueFacet = uniqueValues(uniqueFacet)
 
   // By default, all the calls to `/ImagingStudy` will have 'patient.active=true' in parameter
   let options: string[] = appConfig.core.fhir.filterActive ? ['patient.active=true'] : []
@@ -1107,16 +1032,9 @@ export const fetchImaging = async (args: fetchImagingProps): FHIR_Bundle_Promise
     options = [...options, `${ImagingParamsKeys.EXECUTIVE_UNITS}=${executiveUnits}`]
   if (encounterStatus && encounterStatus.length > 0)
     options = [...options, `${ImagingParamsKeys.ENCOUNTER_STATUS}=${encounterStatus}`]
-  if (_list && _list.length > 0)
-    options = [
-      ...options,
-      `_list=${_list.reduce((accumulator, currentValue) => paramValuesReducer(accumulator, currentValue), '')}`
-    ]
+  if (_list && _list.length > 0) options = [...options, `_list=${reduceParamValues(_list)}`]
   if (appConfig.core.fhir.facetsExtensions && uniqueFacet && uniqueFacet.length > 0)
-    options = [
-      ...options,
-      `unique-facet=${uniqueFacet.reduce((accumulator, currentValue) => paramValuesReducer(accumulator, currentValue), '')}`
-    ]
+    options = [...options, `unique-facet=${reduceParamValues(uniqueFacet)}`]
 
   const response = await fhirSearch<FHIR_Bundle_Response<ImagingStudy>>('ImagingStudy', options, {
     signal: signal
@@ -1159,7 +1077,7 @@ export const fetchForms = async (args: fetchFormsProps) => {
   } = args
   let { uniqueFacet } = args
   const appConfig = getConfig()
-  uniqueFacet = uniqueFacet ? uniqueFacet.filter((item, index, array) => uniq(item, index, array)) : []
+  uniqueFacet = uniqueValues(uniqueFacet)
   const _sortDirection = sortDirection === Direction.DESC ? '-' : ''
   const config = getConfig()
   const formNames = formName || config.features.questionnaires.defaultFilterFormNames?.join(',')
@@ -1168,11 +1086,7 @@ export const fetchForms = async (args: fetchFormsProps) => {
   if (appConfig.core.fhir.totalCount) options = [...options, '_total=accurate']
   if (patient) options = [...options, `subject=${patient}`]
   if (formNames) options = [...options, `${QuestionnaireResponseParamsKeys.NAME}=${formNames}`]
-  if (!patient && _list && _list.length > 0)
-    options = [
-      ...options,
-      `_list=${_list.reduce((accumulator, currentValue) => paramValuesReducer(accumulator, currentValue), '')}`
-    ]
+  if (!patient && _list && _list.length > 0) options = [...options, `_list=${reduceParamValues(_list)}`]
   if (startDate) options = [...options, `${QuestionnaireResponseParamsKeys.DATE}=ge${startDate}`]
   if (endDate) options = [...options, `${QuestionnaireResponseParamsKeys.DATE}=le${endDate}`]
   if (executiveUnits && executiveUnits.length > 0)
@@ -1185,10 +1099,7 @@ export const fetchForms = async (args: fetchFormsProps) => {
   if (ipp) options = [...options, `${QuestionnaireResponseParamsKeys.IPP}=${ipp}`]
 
   if (appConfig.core.fhir.facetsExtensions && uniqueFacet && uniqueFacet.length > 0)
-    options = [
-      ...options,
-      `unique-facet=${uniqueFacet.reduce((accumulator, currentValue) => paramValuesReducer(accumulator, currentValue), '')}`
-    ]
+    options = [...options, `unique-facet=${reduceParamValues(uniqueFacet)}`]
 
   const response = await fhirSearch<FHIR_Bundle_Response<QuestionnaireResponse>>('QuestionnaireResponse', options, {
     signal: signal
@@ -1204,15 +1115,11 @@ type fetchQuestionnairesProps = {
 export const fetchQuestionnaires = async (args: fetchQuestionnairesProps) => {
   const { name } = args
   let { _elements } = args
-  _elements = _elements ? _elements.filter((item, index, array) => uniq(item, index, array)) : []
+  _elements = uniqueValues(_elements)
 
   let options: string[] = []
   if (name) options = [...options, `name=${name}`]
-  if (_elements && _elements.length > 0)
-    options = [
-      ...options,
-      `_elements=${_elements.reduce((accumulator, currentValue) => paramValuesReducer(accumulator, currentValue), '')}`
-    ]
+  if (_elements && _elements.length > 0) options = [...options, `_elements=${reduceParamValues(_elements)}`]
 
   const response = await fhirSearch<FHIR_Bundle_Response<Questionnaire>>('Questionnaire', options)
 
@@ -1236,16 +1143,9 @@ export const fetchLocation = async (args: fetchLocationProps) => {
   if (offset) options = [...options, `_offset=${offset}`]
   if (near) options = [...options, `near=${encodeURIComponent(near)}`]
   if (_elements && _elements.length > 0)
-    options = [
-      ...options,
-      `_elements=${_elements.filter((item, index, array) => uniq(item, index, array)).reduce((accumulator, currentValue) => paramValuesReducer(accumulator, currentValue), '')}`
-    ]
+    options = [...options, `_elements=${reduceParamValues(uniqueValues(_elements))}`]
 
-  if (_list && _list.length > 0)
-    options = [
-      ...options,
-      `_list=${_list.filter((item, index, array) => uniq(item, index, array)).reduce((accumulator, currentValue) => paramValuesReducer(accumulator, currentValue), '')}`
-    ]
+  if (_list && _list.length > 0) options = [...options, `_list=${reduceParamValues(uniqueValues(_list))}`]
 
   const response = await fhirSearch<FHIR_Bundle_Response<Location>>('Location', options, {
     signal
@@ -1274,33 +1174,15 @@ export const fetchDiagnosticReport = async (args: fetchDiagnosticReportProps) =>
   if (size !== undefined) options = [...options, `_count=${size}`]
   if (offset) options = [...options, `_offset=${offset}`]
   if (config.features.diagnosticReport.useStudyParam && study)
-    options = [
-      ...options,
-      `study=${study.reduce((accumulator, currentValue) => paramValuesReducer(accumulator, currentValue), '')}`
-    ]
-  if (encounter)
-    options = [
-      ...options,
-      `encounter=${encounter.reduce((accumulator, currentValue) => paramValuesReducer(accumulator, currentValue), '')}`
-    ]
-  if (patient)
-    options = [
-      ...options,
-      `patient=${patient.reduce((accumulator, currentValue) => paramValuesReducer(accumulator, currentValue), '')}`
-    ]
+    options = [...options, `study=${reduceParamValues(study)}`]
+  if (encounter) options = [...options, `encounter=${reduceParamValues(encounter)}`]
+  if (patient) options = [...options, `patient=${reduceParamValues(patient)}`]
   if (date) options = [...options, `date=${date}`]
   if (code) options = [...options, `code=${code}`]
   if (_elements && _elements.length > 0)
-    options = [
-      ...options,
-      `_elements=${_elements.filter((item, index, array) => uniq(item, index, array)).reduce((accumulator, currentValue) => paramValuesReducer(accumulator, currentValue), '')}`
-    ]
+    options = [...options, `_elements=${reduceParamValues(uniqueValues(_elements))}`]
 
-  if (_list && _list.length > 0)
-    options = [
-      ...options,
-      `_list=${_list.filter((item, index, array) => uniq(item, index, array)).reduce((accumulator, currentValue) => paramValuesReducer(accumulator, currentValue), '')}`
-    ]
+  if (_list && _list.length > 0) options = [...options, `_list=${reduceParamValues(uniqueValues(_list))}`]
 
   const response = await fhirSearch<FHIR_Bundle_Response<DiagnosticReport>>('DiagnosticReport', options, {
     signal
@@ -1324,7 +1206,7 @@ export const fetchAccessExpirations: (
 
   let queryParams = ''
   if (options.length != 0) {
-    queryParams = `?${options.reduce((accumulator, currentValue) => paramsReducer(accumulator, currentValue), '')}`
+    queryParams = `?${reduceParams(options)}`
   }
 
   const response: AxiosResponse<Array<AccessExpiration | UserAccesses>> = await apiBackend.get(
@@ -1374,7 +1256,7 @@ export const fetchExportTableInfo = async (args: fetchExportTableInfoProps) => {
 
   let queryParams = ''
   if (options.length != 0) {
-    queryParams = `${options.reduce((accumulator, currentValue) => paramsReducer(accumulator, currentValue), '')}`
+    queryParams = `${reduceParams(options)}`
   }
 
   const response = await apiDatamodel.get(`/models?${queryParams}`)
@@ -1391,7 +1273,7 @@ export const fetchExportTableRelationInfo = async (args: fetchExportTableInfoPro
 
   let queryParams = ''
   if (options.length != 0) {
-    queryParams = `${options.reduce((accumulator, currentValue) => paramsReducer(accumulator, currentValue), '')}`
+    queryParams = `${reduceParams(options)}`
   }
 
   const response = await apiDatamodel.get(`/models/relations?${queryParams}`)
@@ -1416,7 +1298,7 @@ export const fetchExportList = async (args: fetchExportListProps) => {
   if (ordering !== undefined) options = [...options, `ordering=${ordering}`]
   let queryParams = ''
   if (options.length != 0) {
-    queryParams = `?${options.reduce((accumulator, currentValue) => paramsReducer(accumulator, currentValue), '')}`
+    queryParams = `?${reduceParams(options)}`
   }
   const response = await apiBackend.get<Back_API_Response<ExportList>>(`/exports/${queryParams}`, { signal })
   return response.data
