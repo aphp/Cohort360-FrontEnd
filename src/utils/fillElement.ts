@@ -144,6 +144,88 @@ export const fillServiceProviderWithOrganization = async (entries: DocumentRefer
   })
 }
 
+const fillEntriesWithLinkedResources = <
+  T extends ResourceToFill,
+  U extends
+    | CohortComposition
+    | CohortImaging
+    | CohortPMSI
+    | CohortMedication<MedicationRequest | MedicationAdministration>
+    | CohortObservation
+    | CohortQuestionnaireResponse
+>(
+  elementEntries: T[],
+  deidentifiedBoolean: boolean,
+  patients: Patient[],
+  encounters: Encounter[]
+): U[] => {
+  const appConfig = getConfig()
+
+  return elementEntries.map((entry) => {
+    const idPatient = retrievePatientIds([entry])
+    const IPP = deidentifiedBoolean
+      ? idPatient
+      : getLinkedPatient(patients, entry)?.identifier?.find(
+          (object: Identifier) =>
+            object?.type?.coding?.[0].code === appConfig.features.patient.patientIdentifierExtensionCode?.code &&
+            object?.type?.coding?.[0].system === appConfig.features.patient.patientIdentifierExtensionCode?.system
+        )?.value
+
+    const linkedEncounter = getLinkedEncounter(encounters, entry)
+    const NDA = deidentifiedBoolean
+      ? retrieveEncounterIds([entry])
+      : linkedEncounter?.identifier?.find((object: Identifier) => object?.type?.coding?.[0].code === 'NDA')?.value
+
+    const serviceProvider = linkedEncounter?.serviceProvider?.display ?? 'Non renseigné'
+
+    return {
+      ...entry,
+      idPatient,
+      IPP: IPP ?? 'Inconnu',
+      NDA: NDA ?? 'Inconnu',
+      serviceProvider
+    } as unknown as U
+  })
+}
+
+const withDocumentOrganizations = async <
+  U extends
+    | CohortComposition
+    | CohortImaging
+    | CohortPMSI
+    | CohortMedication<MedicationRequest | MedicationAdministration>
+    | CohortObservation
+    | CohortQuestionnaireResponse
+>(
+  filledEntries: U[]
+): Promise<U[]> => {
+  if (filledEntries.length > 0 && filledEntries[0].resourceType === ResourceType.DOCUMENTS) {
+    return (await fillServiceProviderWithOrganization(filledEntries as DocumentReference[])) as U[]
+  }
+
+  return filledEntries
+}
+
+export const getResourceInfosFromBundle = async <
+  T extends ResourceToFill,
+  U extends
+    | CohortComposition
+    | CohortImaging
+    | CohortPMSI
+    | CohortMedication<MedicationRequest | MedicationAdministration>
+    | CohortObservation
+    | CohortQuestionnaireResponse
+>(
+  elementEntries: T[],
+  deidentifiedBoolean: boolean,
+  patients: Patient[],
+  encounters: Encounter[]
+): Promise<U[]> => {
+  const filledEntries = fillEntriesWithLinkedResources<T, U>(elementEntries, deidentifiedBoolean, patients, encounters)
+
+  return await withDocumentOrganizations(filledEntries)
+}
+
 export const getResourceInfos = async <
   T extends ResourceToFill,
   U extends
@@ -159,7 +241,6 @@ export const getResourceInfos = async <
   groupId?: string,
   signal?: AbortSignal
 ): Promise<U[]> => {
-  const appConfig = getConfig()
   const listePatientsIds = retrievePatientIds(elementEntries)
   const listeEncounterIds = retrieveEncounterIds(elementEntries)
 
@@ -182,36 +263,12 @@ export const getResourceInfos = async <
   })
   const _patients = getApiResponseResources(patients) ?? []
   const _encounters = getApiResponseResources(encounters) ?? []
+  const filledEntries = fillEntriesWithLinkedResources<T, U>(
+    elementEntries,
+    deidentifiedBoolean,
+    _patients,
+    _encounters
+  )
 
-  let filledEntries: U[] = elementEntries.map((entry) => {
-    const idPatient = retrievePatientIds([entry])
-    const IPP = deidentifiedBoolean
-      ? idPatient
-      : getLinkedPatient(_patients, entry)?.identifier?.find(
-          (object: Identifier) =>
-            object?.type?.coding?.[0].code === appConfig.features.patient.patientIdentifierExtensionCode?.code &&
-            object?.type?.coding?.[0].system === appConfig.features.patient.patientIdentifierExtensionCode?.system
-        )?.value
-
-    const linkedEncounter = getLinkedEncounter(_encounters, entry)
-    const NDA = deidentifiedBoolean
-      ? retrieveEncounterIds([entry])
-      : linkedEncounter?.identifier?.find((object: Identifier) => object?.type?.coding?.[0].code === 'NDA')?.value
-
-    const serviceProvider = linkedEncounter?.serviceProvider?.display ?? 'Non renseigné'
-
-    return {
-      ...entry,
-      idPatient,
-      IPP: IPP ?? 'Inconnu',
-      NDA: NDA ?? 'Inconnu',
-      serviceProvider
-    } as unknown as U
-  })
-
-  if (filledEntries.length > 0 && filledEntries[0].resourceType === ResourceType.DOCUMENTS) {
-    filledEntries = (await fillServiceProviderWithOrganization(filledEntries as DocumentReference[])) as U[]
-  }
-
-  return filledEntries
+  return await withDocumentOrganizations(filledEntries)
 }

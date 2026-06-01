@@ -24,15 +24,13 @@ import {
 } from 'types/searchCriterias'
 import { Table, Row, CellType, Column } from 'types/table'
 import { getDocumentStatus } from 'utils/documentsFormatter'
-import docTypes from 'assets/docTypes.json'
 import CheckIcon from 'assets/icones/check.svg?react'
 import CancelIcon from 'assets/icones/times.svg?react'
-import { DocumentReference } from 'fhir/r4'
+import { DocumentReference, Encounter, Patient as FhirPatient, Resource } from 'fhir/r4'
 import { fetchDocumentReference } from 'services/aphp/callApi'
 import { ResourceType } from 'types/requestCriterias'
 import { getConfig } from 'config'
 import {
-  fetcherWithParams,
   fetchValueSet,
   getCommonParamsAll,
   getCommonParamsList,
@@ -42,6 +40,10 @@ import {
 import { FhirItem } from 'types/valueSet'
 import { Buffer } from 'buffer'
 import { SourceType } from 'types/scope'
+import { FHIR_Bundle_Response } from 'types'
+import { getResourceInfos, getResourceInfosFromBundle } from 'utils/fillElement'
+import { getExtension } from 'utils/fhir'
+import { linkElementWithEncounter } from 'utils/encounter'
 import { getDocTypeLabel } from '../../../utils/docTypesHelper'
 
 const initSearchCriterias = (search: string): SearchCriterias<DocumentsFilters> => ({
@@ -91,17 +93,90 @@ const fetchList = (
     ...getCommonParamsList(fetchParams, groupId),
     signal
   }
+  const paramsWithInclude = {
+    ...params,
+    _include: ['Encounter:encounter', 'Patient:patient'] as ('Encounter:encounter' | 'Patient:patient')[]
+  }
   const paramsFetchAll = {
     patient: patient?.id,
     uniqueFacet: ['subject'] as 'subject'[],
     ...getCommonParamsAll(groupId),
     signal
   }
-  return fetcherWithParams(
-    () => fetchDocumentReference(params),
-    () => fetchDocumentReference(paramsFetchAll),
-    { ...fetchParams, filters, deidentified, groupId, patient }
+
+  return fetchDocumentsList(paramsWithInclude, paramsFetchAll, patient, deidentified, groupId, signal)
+}
+
+const getPatientsCount = (
+  response: { data: FHIR_Bundle_Response<DocumentReference> } | null,
+  facet = 'unique-subject'
+) => {
+  return response?.data?.resourceType === 'Bundle'
+    ? ((
+        getExtension(response.data.meta, facet) || {
+          valueDecimal: 0
+        }
+      ).valueDecimal ?? 0)
+    : 0
+}
+
+const isDocumentReference = (resource: Resource | undefined): resource is DocumentReference => {
+  return resource?.resourceType === 'DocumentReference'
+}
+
+const isEncounter = (resource: Resource | undefined): resource is Encounter => {
+  return resource?.resourceType === 'Encounter'
+}
+
+const isPatientResource = (resource: Resource | undefined): resource is FhirPatient => {
+  return resource?.resourceType === 'Patient'
+}
+
+const getBundleResources = (response: { data: FHIR_Bundle_Response<DocumentReference> }): Resource[] => {
+  if (response.data.resourceType !== 'Bundle') return []
+
+  return (
+    response.data.entry
+      ?.map((entry) => entry.resource as unknown as Resource | undefined)
+      .filter((resource): resource is Resource => !!resource) ?? []
   )
+}
+
+const fetchDocumentsList = async (
+  paramsWithInclude: Parameters<typeof fetchDocumentReference>[0],
+  paramsFetchAll: Parameters<typeof fetchDocumentReference>[0] | null,
+  patient: Patient | null,
+  deidentified: boolean,
+  groupId: string[],
+  signal?: AbortSignal
+): Promise<ExplorationResults<DocumentReference>> => {
+  const [list, all] = await Promise.all([
+    fetchDocumentReference(paramsWithInclude),
+    paramsFetchAll ? fetchDocumentReference(paramsFetchAll) : null
+  ])
+
+  const resources = getBundleResources(list)
+  const documents = resources.filter(isDocumentReference)
+  const includedPatients = resources.filter(isPatientResource)
+  const includedEncounters = resources.filter(isEncounter)
+
+  const listResources = patient
+    ? await linkElementWithEncounter(documents, patient.infos.hospits, deidentified)
+    : includedEncounters.length > 0 && (deidentified || includedPatients.length > 0)
+      ? await getResourceInfosFromBundle(documents, deidentified, includedPatients, includedEncounters)
+      : await getResourceInfos(documents, deidentified, groupId?.[0], signal)
+
+  const total = list.data.resourceType === 'Bundle' ? (list.data.total ?? 0) : 0
+  const totalPatients = getPatientsCount(list)
+
+  return {
+    total,
+    totalAllResults: all && all.data.resourceType === 'Bundle' ? (all.data.total ?? 0) : total,
+    totalPatients,
+    totalAllPatients: all ? getPatientsCount(all) : totalPatients,
+    list: listResources as DocumentReference[],
+    meta: list.data.resourceType === 'Bundle' ? list.data.meta : undefined
+  }
 }
 
 export const mapToTable = (

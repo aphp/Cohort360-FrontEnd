@@ -222,6 +222,7 @@ type fetchDocumentReferenceProps = {
   signal?: AbortSignal
   _id?: string
   _list?: string[]
+  _include?: ('Encounter:encounter' | 'Patient:patient')[]
   size?: number
   offset?: number
   searchBy?: SearchByTypes
@@ -265,6 +266,7 @@ export const fetchDocumentReference = async (
   const {
     signal,
     _id,
+    _include,
     size,
     offset,
     searchBy,
@@ -288,6 +290,7 @@ export const fetchDocumentReference = async (
   const encounterIdentifier = args['encounter-identifier']
   const patientIdentifier = args['patient-identifier']
   const appConfig = getConfig()
+  const includes = _include ? _include.filter(uniq) : []
 
   _list = _list ? _list.filter(uniq) : []
   facet = facet ? facet.filter(uniq) : []
@@ -346,6 +349,8 @@ export const fetchDocumentReference = async (
   if (appConfig.core.fhir.facetsExtensions && uniqueFacet && uniqueFacet.length > 0)
     options = [...options, `unique-facet=${uniqueFacet.reduce(paramValuesReducer, '')}`]
   if (_elements && _elements.length > 0) options = [...options, `_elements=${_elements.reduce(paramValuesReducer, '')}`]
+  if (includes.length > 0)
+    options = [...options, ...includes.map((include) => `_include=${encodeURIComponent(include)}`)]
 
   const response = await fhirSearch<FHIR_Bundle_Response<DocumentReference>>('DocumentReference', options, {
     signal: signal
