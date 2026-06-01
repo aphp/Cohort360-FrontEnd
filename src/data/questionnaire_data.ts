@@ -20,6 +20,17 @@ export const booleanFieldsData = [
   }
 ]
 
+export const ultrasoundMonitoringData = [
+  {
+    id: 'Marqué par',
+    label: 'Marqué par'
+  },
+  {
+    id: 'Normal',
+    label: 'Normal'
+  }
+]
+
 export const vmeData = [
   {
     id: 'Non faite',

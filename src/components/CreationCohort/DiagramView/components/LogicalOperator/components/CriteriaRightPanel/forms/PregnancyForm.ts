@@ -222,13 +222,13 @@ export const form: () => CriteriaForm<PregnancyDataType> = () => ({
           type: 'autocomplete',
           label: 'Suivi échographique',
           extraLabel: () => 'Suivi échographique',
-          valueSetId: getConfig().features.questionnaires.valueSets.booleanFields.url,
-          valueSetData: getConfig().features.questionnaires.valueSets.booleanFields.data,
-          noOptionsText: 'Veuillez entrer "oui" ou "non"',
+          valueSetId: getConfig().features.questionnaires.valueSets.ultrasoundMonitoring.url,
+          valueSetData: getConfig().features.questionnaires.valueSets.ultrasoundMonitoring.data,
+          noOptionsText: 'Veuillez entrer une valeur de suivi échographique',
           buildInfo: {
             fhirKey: {
-              id: 'F_MATER_001552',
-              type: 'valueBoolean'
+              id: 'F_MATER_003026',
+              type: 'valueCoding'
             },
             chipDisplayMethodExtraArgs: [{ type: 'string', value: 'Suivi échographique :' }]
           }
