@@ -33,6 +33,7 @@ const JsonView: React.FC<JsonEditorWithAjvProps> = ({ onJsonIssuesChange, minHei
   const debouncedValue = useDebounce(debounceMs, editorValue)
 
   const didJsonValueChanged = useRef<boolean>(false)
+  const skipNextEditorChangeRef = useRef<boolean>(false)
 
   const validate = useMemo(() => {
     if (!JsonDefaultSchema) return null
@@ -48,6 +49,8 @@ const JsonView: React.FC<JsonEditorWithAjvProps> = ({ onJsonIssuesChange, minHei
   useEffect(() => {
     if (didInitPrettyRef.current) return
     if (!request.json) return
+
+    skipNextEditorChangeRef.current = true
 
     try {
       setEditorValue(JSON.stringify(JSON.parse(request.json), null, 2))
@@ -114,6 +117,13 @@ const JsonView: React.FC<JsonEditorWithAjvProps> = ({ onJsonIssuesChange, minHei
           value={editorValue}
           onChange={(v) => {
             const next = v ?? ''
+
+            if (skipNextEditorChangeRef.current) {
+              skipNextEditorChangeRef.current = false
+              setEditorValue(next)
+              return
+            }
+
             didJsonValueChanged.current = true
             setEditorValue(next)
             dispatch(editJson(next))
