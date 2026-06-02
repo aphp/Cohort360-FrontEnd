@@ -5,7 +5,7 @@ import { loader } from '@monaco-editor/react'
 
 // Self-host Monaco: empêche @monaco-editor/loader de fetch cdn.jsdelivr.net
 // (egress bloqué dans les pods k8s APHP -> editor jamais initialisé en CI/prod).
-;(self as unknown as { MonacoEnvironment: monaco.Environment }).MonacoEnvironment = {
+;(globalThis as unknown as { MonacoEnvironment: monaco.Environment }).MonacoEnvironment = {
   getWorker(_workerId, label) {
     if (label === 'json') return new jsonWorker()
     return new editorWorker()
