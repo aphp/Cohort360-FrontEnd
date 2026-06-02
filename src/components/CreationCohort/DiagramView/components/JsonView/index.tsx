@@ -1,6 +1,7 @@
 import { useAppDispatch, useAppSelector } from 'state'
 
 import React, { useEffect, useMemo, useRef, useState } from 'react'
+import './monacoSetup'
 import MonacoEditor, { type OnMount } from '@monaco-editor/react'
 import 'monaco-editor/esm/vs/language/json/monaco.contribution'
 import Ajv from 'ajv'
