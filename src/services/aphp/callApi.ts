@@ -68,29 +68,19 @@ import { getConfig } from 'config'
 import { hasSearchParam } from './serviceFhirConfig'
 
 const paramValuesReducer = (accumulator: string, currentValue: string): string => {
-  if (accumulator) {
-    return `${accumulator},${currentValue}`
-  }
-  if (currentValue) {
-    return currentValue
-  }
-  return accumulator
+  const delimiter = accumulator && currentValue ? ',' : ''
+  return `${accumulator}${delimiter}${currentValue}`
 }
 
 const paramsReducer = (accumulator: string, currentValue: string): string => {
-  if (accumulator) {
-    return `${accumulator}&${currentValue}`
-  }
-  if (currentValue) {
-    return currentValue
-  }
-  return accumulator
+  const delimiter = accumulator && currentValue ? '&' : ''
+  return `${accumulator}${delimiter}${currentValue}`
 }
 
 const uniq = (item: string, index: number, array: string[]) => array.indexOf(item) === index && item
 
 const uniqueValues = <T extends string>(values?: T[]): T[] =>
-  values ? values.filter((item, index, array) => uniq(item, index, array)) : []
+  values?.filter((item, index, array) => uniq(item, index, array)) ?? []
 
 const reduceParamValues = (values: string[]): string =>
   values.reduce((accumulator, currentValue) => paramValuesReducer(accumulator, currentValue), '')

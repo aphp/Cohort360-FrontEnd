@@ -1,7 +1,7 @@
 import { ChipStatus } from 'components/ui/StatusChip'
 import { plural } from 'utils/string'
 import { mapToDateHours } from 'mappers/dates'
-import { CohortComposition } from 'types'
+import type { CohortComposition, FHIR_Bundle_Response } from 'types'
 import {
   AdditionalInfo,
   Data,
@@ -40,7 +40,6 @@ import {
 import { FhirItem } from 'types/valueSet'
 import { Buffer } from 'buffer'
 import { SourceType } from 'types/scope'
-import { FHIR_Bundle_Response } from 'types'
 import { getResourceInfos, getResourceInfosFromBundle } from 'utils/fillElement'
 import { getExtension } from 'utils/fhir'
 import { linkElementWithEncounter } from 'utils/encounter'
@@ -160,18 +159,21 @@ const fetchDocumentsList = async (
   const includedPatients = resources.filter(isPatientResource)
   const includedEncounters = resources.filter(isEncounter)
 
-  const listResources = patient
-    ? await linkElementWithEncounter(documents, patient.infos.hospits, deidentified)
-    : includedEncounters.length > 0 && (deidentified || includedPatients.length > 0)
-      ? await getResourceInfosFromBundle(documents, deidentified, includedPatients, includedEncounters)
-      : await getResourceInfos(documents, deidentified, groupId?.[0], signal)
+  let listResources
+  if (patient) {
+    listResources = await linkElementWithEncounter(documents, patient.infos.hospits, deidentified)
+  } else if (includedEncounters.length > 0 && (deidentified || includedPatients.length > 0)) {
+    listResources = await getResourceInfosFromBundle(documents, deidentified, includedPatients, includedEncounters)
+  } else {
+    listResources = await getResourceInfos(documents, deidentified, groupId?.[0], signal)
+  }
 
   const total = list.data.resourceType === 'Bundle' ? (list.data.total ?? 0) : 0
   const totalPatients = getPatientsCount(list)
 
   return {
     total,
-    totalAllResults: all && all.data.resourceType === 'Bundle' ? (all.data.total ?? 0) : total,
+    totalAllResults: all?.data.resourceType === 'Bundle' ? (all.data.total ?? 0) : total,
     totalPatients,
     totalAllPatients: all ? getPatientsCount(all) : totalPatients,
     list: listResources as DocumentReference[],

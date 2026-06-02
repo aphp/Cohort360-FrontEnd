@@ -39,6 +39,14 @@ type ResourceToFill =
   | Observation
   | QuestionnaireResponse
 
+type CohortResourceType =
+  | CohortComposition
+  | CohortImaging
+  | CohortPMSI
+  | CohortMedication<MedicationRequest | MedicationAdministration>
+  | CohortObservation
+  | CohortQuestionnaireResponse
+
 export const getPatientIdPath = (element: ResourceToFill) => {
   const patientIdPath = {
     [ResourceType.DOCUMENTS]: (element as DocumentReference).subject?.reference?.replace(/^Patient\//, ''),
@@ -144,16 +152,7 @@ export const fillServiceProviderWithOrganization = async (entries: DocumentRefer
   })
 }
 
-const fillEntriesWithLinkedResources = <
-  T extends ResourceToFill,
-  U extends
-    | CohortComposition
-    | CohortImaging
-    | CohortPMSI
-    | CohortMedication<MedicationRequest | MedicationAdministration>
-    | CohortObservation
-    | CohortQuestionnaireResponse
->(
+const fillEntriesWithLinkedResources = <T extends ResourceToFill, U extends CohortResourceType>(
   elementEntries: T[],
   deidentifiedBoolean: boolean,
   patients: Patient[],
@@ -188,17 +187,7 @@ const fillEntriesWithLinkedResources = <
   })
 }
 
-const withDocumentOrganizations = async <
-  U extends
-    | CohortComposition
-    | CohortImaging
-    | CohortPMSI
-    | CohortMedication<MedicationRequest | MedicationAdministration>
-    | CohortObservation
-    | CohortQuestionnaireResponse
->(
-  filledEntries: U[]
-): Promise<U[]> => {
+const withDocumentOrganizations = async <U extends CohortResourceType>(filledEntries: U[]): Promise<U[]> => {
   if (filledEntries.length > 0 && filledEntries[0].resourceType === ResourceType.DOCUMENTS) {
     return (await fillServiceProviderWithOrganization(filledEntries as DocumentReference[])) as U[]
   }
@@ -206,16 +195,7 @@ const withDocumentOrganizations = async <
   return filledEntries
 }
 
-export const getResourceInfosFromBundle = async <
-  T extends ResourceToFill,
-  U extends
-    | CohortComposition
-    | CohortImaging
-    | CohortPMSI
-    | CohortMedication<MedicationRequest | MedicationAdministration>
-    | CohortObservation
-    | CohortQuestionnaireResponse
->(
+export const getResourceInfosFromBundle = async <T extends ResourceToFill, U extends CohortResourceType>(
   elementEntries: T[],
   deidentifiedBoolean: boolean,
   patients: Patient[],
@@ -226,16 +206,7 @@ export const getResourceInfosFromBundle = async <
   return await withDocumentOrganizations(filledEntries)
 }
 
-export const getResourceInfos = async <
-  T extends ResourceToFill,
-  U extends
-    | CohortComposition
-    | CohortImaging
-    | CohortPMSI
-    | CohortMedication<MedicationRequest | MedicationAdministration>
-    | CohortObservation
-    | CohortQuestionnaireResponse
->(
+export const getResourceInfos = async <T extends ResourceToFill, U extends CohortResourceType>(
   elementEntries: T[],
   deidentifiedBoolean: boolean,
   groupId?: string,
