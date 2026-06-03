@@ -136,7 +136,7 @@ const PatientBoard = ({ patient }: PatientBoardProps) => {
                       label={subTab.label}
                       value={subTab.value}
                       component={Link}
-                      to={`/patients/${patient.id}/${selectedTab}?${groupIdParam}subtab=${subTab.value}`}
+                      to={`/patients/${patient.id}/${currentTab}?${groupIdParam}subtab=${subTab.value}`}
                     />
                   )
                 })}
