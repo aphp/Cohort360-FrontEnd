@@ -60,12 +60,7 @@ const fetchPatientCount = async (cohortId: string, patientsFilters?: SearchCrite
         _text: patientsFilters.searchInput,
         minBirthdate: minBirthdate,
         maxBirthdate: maxBirthdate,
-        deceased:
-          vitalStatuses && vitalStatuses.length === 1
-            ? vitalStatuses.includes(VitalStatus.DECEASED)
-              ? true
-              : false
-            : undefined
+        deceased: vitalStatuses?.length === 1 ? vitalStatuses.includes(VitalStatus.DECEASED) : undefined
       })
     } else {
       patientsResp = await fetchPatient({ size: 0, _list: [cohortId] })
@@ -385,19 +380,19 @@ export const getResourceType = (tableName: string): ResourceType => {
   const resourceType = {
     imaging_study: ResourceType.IMAGING,
     drug_exposure_administration: ResourceType.MEDICATION_ADMINISTRATION,
-    measurement: ResourceType.OBSERVATION,
+    Observation_Laboratory: ResourceType.OBSERVATION,
     imaging_series: ResourceType.UNKNOWN,
-    condition_occurrence: ResourceType.CONDITION,
+    condition: ResourceType.CONDITION,
     iris: ResourceType.UNKNOWN,
     visit_detail: ResourceType.UNKNOWN,
-    person: ResourceType.PATIENT,
+    Patient: ResourceType.PATIENT,
     note: ResourceType.DOCUMENTS,
     note_legacy: ResourceType.DOCUMENTS,
     fact_relationship: ResourceType.UNKNOWN,
     care_site: ResourceType.UNKNOWN,
     visit_occurrence: ResourceType.UNKNOWN,
     cost: ResourceType.CLAIM,
-    procedure_occurrence: ResourceType.PROCEDURE,
+    procedure: ResourceType.PROCEDURE,
     drug_exposure_prescription: ResourceType.MEDICATION_REQUEST,
     QuestionnaireResponse: ResourceType.QUESTIONNAIRE_RESPONSE
   }[tableName]
@@ -415,35 +410,35 @@ export const getExportTableLabel = (tableName: string) => {
   const tableLabel = {
     imaging_study: 'Fait - Imagerie - Étude',
     drug_exposure_administration: 'Fait - Médicaments - Administration',
-    measurement: 'Fait - Biologie',
+    observation_laboratory: 'Fait - Biologie',
     imaging_series: 'Fait - Imagerie - Séries',
-    condition_occurrence: 'Fait - PMSI - Diagnostics',
+    condition: 'Fait - PMSI - Diagnostics',
     care_site: 'Structure hospitalière',
     iris: 'Zone géographique',
     visit_detail: 'Détail de prise en charge',
-    person: 'Patient',
+    patient: 'Patient',
     note: 'Fait - Documents cliniques',
     note_legacy: 'Fait - Documents cliniques',
     fact_relationship: 'Référentiel',
     visit_occurrence: 'Prise en charge',
     cost: 'Fait - PMSI - GHM',
-    procedure_occurrence: 'Fait - PMSI - Actes',
+    procedure: 'Fait - PMSI - Actes',
     drug_exposure_prescription: 'Fait - Médicaments - Prescription',
-    QuestionnaireResponse: 'Dossier de Spécialité'
-  }[tableName]
+    questionnaireresponse: 'Dossier de Spécialité'
+  }[tableName.toLowerCase()]
   return tableLabel ?? '-'
 }
 
 /**
- * Sorts an array of table information, placing the 'person' table first.
+ * Sorts an array of table information, placing the 'patient' table first.
  *
  * @param {TableInfo[]} tables - Array of table information objects
- * @returns {TableInfo[]} Sorted array with 'person' table first
+ * @returns {TableInfo[]} Sorted array with 'patient' table first
  */
 export const sortTables = (tables: TableInfo[]): TableInfo[] => {
   return tables.sort((a, b) => {
-    if (a.name === 'person') return -1
-    if (b.name === 'person') return 1
+    if (a.name === 'Patient') return -1
+    if (b.name === 'Patient') return 1
     return a.name.localeCompare(b.name)
   })
 }

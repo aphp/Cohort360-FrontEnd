@@ -5,6 +5,7 @@ import CalendarRange from 'components/ui/Inputs/CalendarRange'
 import {
   Autocomplete,
   Checkbox,
+  Chip,
   FormControlLabel,
   Grid,
   Radio,
@@ -31,6 +32,7 @@ import { selectValueSetCodes } from 'state/valueSets'
 import SearchbarWithCheck from 'components/ui/Searchbar/SearchbarWithChecks'
 import { SearchbarWithCheckWrapper } from 'components/ui/Searchbar/styles'
 import CustomAlert from 'components/ui/Alert'
+import CancelIcon from '@mui/icons-material/Cancel'
 
 /************************************************************************************/
 /*                        Criteria Form Item Renderer                               */
@@ -127,7 +129,12 @@ const FORM_ITEM_RENDERER: { [key in CriteriaFormItemType]: CriteriaFormItemView<
     )
   },
   autocomplete: (props) => {
-    const arrayPropValue = isArray(props.value) ? props.value : !!props.value ? [props.value] : []
+    const getArrayPropValue = () => {
+      if (isArray(props.value)) return props.value
+      if (props.value) return [props.value]
+      return []
+    }
+    const arrayPropValue = getArrayPropValue()
     const codeSystem = props.getValueSetOptions(props.definition.valueSetId)
     const groupBy = props.definition.groupBy
     const valueWithLabels = (arrayPropValue ?? []).map(
@@ -145,9 +152,28 @@ const FORM_ITEM_RENDERER: { [key in CriteriaFormItemType]: CriteriaFormItemView<
         getOptionLabel={(option) => `${props.definition.prependCode ? option.id + ' - ' : ''}${option.label}`}
         isOptionEqualToValue={(option, value) => option.id === value.id}
         value={value}
-        onChange={(e, value) => props.updateData(value ? (isArray(value) ? value.map((v) => v.id) : [value.id]) : null)}
+        onChange={(e, value) => {
+          if (!value) {
+            props.updateData(null)
+            return
+          }
+          props.updateData(isArray(value) ? value.map((v) => v.id) : [value.id])
+        }}
         renderInput={(params) => <TextField {...params} label={props.definition.label} />}
         groupBy={groupBy ? (option) => option[groupBy] ?? '' : undefined}
+        renderTags={(tagValue, getTagProps) =>
+          tagValue.map((option, index) => {
+            const { onDelete } = getTagProps({ index })
+            return (
+              <Chip
+                key={option.id}
+                label={`${props.definition.prependCode ? option.id + ' - ' : ''}${option.label}`}
+                onDelete={onDelete}
+                deleteIcon={<CancelIcon data-testid="CancelIcon" />}
+              />
+            )
+          })
+        }
         renderGroup={
           groupBy
             ? (params) => {
@@ -222,7 +248,7 @@ const FORM_ITEM_RENDERER: { [key in CriteriaFormItemType]: CriteriaFormItemView<
         type="number"
         variant="outlined"
         value={props.value}
-        onChange={(e) => props.updateData(e.target.value ? parseFloat(e.target.value) : null)}
+        onChange={(e) => props.updateData(e.target.value ? Number.parseFloat(e.target.value) : null)}
         placeholder={props.definition.label}
         disabled={props.disabled}
         fullWidth

@@ -1,364 +1,320 @@
 {
+  "chapters": [
+    {
+      "code": "CR-AUTRE",
+      "display": "Comptes Rendus Autres"
+    },
+    {
+      "code": "CR-CONS",
+      "display": "Comptes Rendus Consultation"
+    },
+    {
+      "code": "CR-EXAM",
+      "display": "Comptes Rendus Examens"
+    },
+    {
+      "code": "CRH",
+      "display": "Comptes Rendus Hospitalisation"
+    },
+    {
+      "code": "LT",
+      "display": "Lettres"
+    },
+    {
+      "code": "ORDO",
+      "display": "Ordonnances"
+    }
+  ],
   "docTypes": [
     {
-      "type": "Bilan Médical Initial (BMI)",
-      "label": "Bilan Médical Initial (BMI)",
-      "code": "bmi"
-    },
-
-    {
-      "type": "Comptes Rendus Hospitalisation",
-      "label": "CR de Jour",
-      "code": "crh-j"
+      "type": "Comptes Rendus Autres",
+      "code": "CR-BILFONC",
+      "label": "CR Bilan fonctionnel"
     },
     {
-      "type": "Comptes Rendus Hospitalisation",
-      "label": "CRH Chirurgie",
-      "code": "crh-chir"
+      "type": "Comptes Rendus Autres",
+      "code": "CR-DIALY",
+      "label": "CR Dialyse"
     },
     {
-      "type": "Comptes Rendus Hospitalisation",
-      "label": "CRH EEG",
-      "code": "crh-eeg"
+      "type": "Comptes Rendus Autres",
+      "code": "CR-ANESTH",
+      "label": "CR Anesthésie"
     },
     {
-      "type": "Comptes Rendus Hospitalisation",
-      "label": "CRH Evolution",
-      "code": "crh-evol"
+      "type": "Comptes Rendus Autres",
+      "code": "CR-STAFF",
+      "label": "CR Staff médical"
     },
     {
-      "type": "Comptes Rendus Hospitalisation",
-      "label": "CRH Hématologie",
-      "code": "crh-hemato"
+      "type": "Comptes Rendus Autres",
+      "code": "CR-NUTRI",
+      "label": "CR Nutrition / diététique"
     },
     {
-      "type": "Comptes Rendus Hospitalisation",
-      "label": "CRH Hopital",
-      "code": "crh-hospi"
+      "type": "Comptes Rendus Autres",
+      "code": "CR-ACTE-THER",
+      "label": "CR Acte thérapeutique"
     },
     {
-      "type": "Comptes Rendus Hospitalisation",
-      "label": "Lettre Sortie (CRH provisoire)",
-      "code": "crh-lt-sor"
+      "type": "Comptes Rendus Autres",
+      "code": "CR-SAMU",
+      "label": "CR Intervention SAMU"
     },
     {
-      "type": "Comptes Rendus Hospitalisation",
-      "label": "CRH Néonatologie",
-      "code": "crh-neonat"
+      "type": "Comptes Rendus Autres",
+      "code": "CR-RCP",
+      "label": "CR Réunion de concertation pluridisciplinaire (RCP)"
     },
     {
-      "type": "Comptes Rendus Hospitalisation",
-      "label": "CRH Neurologie",
-      "code": "crh-neurol"
+      "type": "Comptes Rendus Autres",
+      "code": "CR-OP",
+      "label": "CR Opératoire"
     },
     {
-      "type": "Comptes Rendus Hospitalisation",
-      "label": "CRH Neuropathies périphériques",
-      "code": "crh-neurop"
+      "type": "Comptes Rendus Autres",
+      "code": "CR-BPOSTOPER",
+      "label": "CR Bilan post-opératoire"
     },
     {
-      "type": "Comptes Rendus Hospitalisation",
-      "label": "CRH Orthopédie",
-      "code": "crh-ortho"
+      "type": "Comptes Rendus Autres",
+      "code": "CR-ACCOU",
+      "label": "CR Accouchement"
     },
     {
-      "type": "Comptes Rendus Hospitalisation",
-      "label": "CRH Pédiatrie générale",
-      "code": "crh-pedia"
+      "type": "Comptes Rendus Autres",
+      "code": "CR-HAD",
+      "label": "CR Hospitalisation à domicile (HAD)"
     },
     {
-      "type": "Comptes Rendus Hospitalisation",
-      "label": "CRH Service",
-      "code": "crh-s"
+      "type": "Comptes Rendus Autres",
+      "code": "CR-BPREOPER",
+      "label": "CR Bilan pré-opératoire"
     },
-
     {
-      "type": "Comptes Rendus Consultation",
-      "label": "CR Consultation",
-      "code": "cr-cons"
+      "type": "Comptes Rendus Autres",
+      "code": "CR-URG",
+      "label": "CR Urgence"
+    },
+    {
+      "type": "Comptes Rendus Autres",
+      "code": "CR-ANAPATH",
+      "label": "CR Anatomopathologie"
     },
     {
       "type": "Comptes Rendus Consultation",
-      "label": "CR Consultation Anesthésie",
-      "code": "cr-cons-anesth"
+      "code": "CR-CONS-ANESTH",
+      "label": "CR Consultation d’anesthésie"
     },
     {
       "type": "Comptes Rendus Consultation",
-      "label": "CR Consultation sport nutrition",
-      "code": "cr-cons-nutri-sport"
+      "code": "CR-CONS-OPH",
+      "label": "CR Consultation d’ophtalmologie"
     },
     {
       "type": "Comptes Rendus Consultation",
-      "label": "CR Nutrition",
-      "code": "cr-nutri"
+      "code": "CR-TELECONS",
+      "label": "CR Téléconsultation"
     },
     {
-      "type": "Comptes Rendus Consultation",
-      "label": "CR Nutrition Consultation Initiale",
-      "code": "cr-nutri-i"
-    },
-
-    {
-      "type": "Comptes Rendus Actes",
-      "label": "CR Acte prévention ou dépistage",
-      "code": "cr-prev-dep"
+      "type": "Comptes Rendus Examens",
+      "code": "CR-ENDO-DIG",
+      "label": "CR Endoscopie digestive"
     },
     {
-      "type": "Comptes Rendus Actes",
-      "label": "CR Actes diagnostics autres",
-      "code": "cr-acte-diag-autre"
+      "type": "Comptes Rendus Examens",
+      "code": "CR-DOP-MI",
+      "label": "CR Doppler membres inférieurs"
     },
     {
-      "type": "Comptes Rendus Actes",
-      "label": "CR Actes thérapeutiques autres",
-      "code": "cr-acte-ther-autre"
+      "type": "Comptes Rendus Examens",
+      "code": "CR-ECHO-OBS",
+      "label": "CR Échographie obstétricale"
     },
     {
-      "type": "Comptes Rendus Actes",
-      "label": "CR Anatomie pathologie",
-      "code": "cr-anapath"
+      "type": "Comptes Rendus Examens",
+      "code": "CR-ECG",
+      "label": "CR Électrocardiogramme (ECG)"
     },
     {
-      "type": "Comptes Rendus Actes",
-      "label": "CR Anesthésie",
-      "code": "cr-anesth"
+      "type": "Comptes Rendus Examens",
+      "code": "CR-RECTO",
+      "label": "CR Rectoscopie"
     },
     {
-      "type": "Comptes Rendus Actes",
-      "label": "CR Bilan fonctionnel",
-      "code": "cr-bilfonc"
+      "type": "Comptes Rendus Examens",
+      "code": "CR-BRONC",
+      "label": "CR Bronchoscopie"
     },
     {
-      "type": "Comptes Rendus Actes",
-      "label": "CR Bronchoscopie",
-      "code": "cr-bron"
+      "type": "Comptes Rendus Examens",
+      "code": "CR-EEG",
+      "label": "CR Électroencéphalogramme (EEG)"
     },
     {
-      "type": "Comptes Rendus Actes",
-      "label": "CR Coloscopie",
-      "code": "cr-colo"
+      "type": "Comptes Rendus Examens",
+      "code": "CR-ACTES-DG",
+      "label": "CR Actes diagnostiques"
     },
     {
-      "type": "Comptes Rendus Actes",
-      "label": "CR Coronarographie",
-      "code": "cr-coro"
+      "type": "Comptes Rendus Examens",
+      "code": "CR-BIOLO",
+      "label": "CR Biologie"
     },
     {
-      "type": "Comptes Rendus Actes",
-      "label": "CR Endoscopie Digestive",
-      "code": "cr-endo"
+      "type": "Comptes Rendus Examens",
+      "code": "CR-CORO",
+      "label": "CR Coronarographie"
     },
     {
-      "type": "Comptes Rendus Actes",
-      "label": "CR Examen laboratoire",
-      "code": "cr-labo"
+      "type": "Comptes Rendus Examens",
+      "code": "CR-ECHO-COEUR",
+      "label": "CR Échographie cardiaque"
     },
     {
-      "type": "Comptes Rendus Actes",
-      "label": "CR Fibroscopie",
-      "code": "cr-fibr"
+      "type": "Comptes Rendus Examens",
+      "code": "CR-BUD",
+      "label": "CR Bilan urodynamique (BUD)"
     },
     {
-      "type": "Comptes Rendus Actes",
-      "label": "CR Imagerie",
-      "code": "cr-image"
+      "type": "Comptes Rendus Examens",
+      "code": "CR-IMAG",
+      "label": "CR Imagerie médicale"
     },
     {
-      "type": "Comptes Rendus Actes",
-      "label": "CR Opératoire accouchement",
-      "code": "cr-oper-accouch"
+      "type": "Comptes Rendus Examens",
+      "code": "CR-ANUSC",
+      "label": "CR Anuscopie"
     },
     {
-      "type": "Comptes Rendus Actes",
-      "label": "CR Opératoire",
-      "code": "cr-oper"
+      "type": "Comptes Rendus Examens",
+      "code": "CR-EFR",
+      "label": "CR Explorations fonctionnelles respiratoires (EFR)"
     },
     {
-      "type": "Comptes Rendus Actes",
-      "label": "CR Téléconsultation",
-      "code": "cr-telecons"
+      "type": "Comptes Rendus Examens",
+      "code": "CR-COLO",
+      "label": "CR Coloscopie"
     },
-
+    {
+      "type": "Comptes Rendus Hospitalisation",
+      "code": "CRH-GHR",
+      "label": "CR Hospitalisation GHR"
+    },
+    {
+      "type": "Comptes Rendus Hospitalisation",
+      "code": "CRH-CHIR",
+      "label": "CR Hospitalisation chirurgie"
+    },
+    {
+      "type": "Comptes Rendus Hospitalisation",
+      "code": "CRH-HDJ",
+      "label": "CR Hospitalisation de jour (HDJ)"
+    },
+    {
+      "type": "Comptes Rendus Hospitalisation",
+      "code": "CRH-HDS",
+      "label": "CR Hospitalisation de semaine (HDS)"
+    },
+    {
+      "type": "Comptes Rendus Hospitalisation",
+      "code": "CRH-SDC",
+      "label": "CR Séjour de courte durée (SDC)"
+    },
+    {
+      "type": "Comptes Rendus Hospitalisation",
+      "code": "CRH-HC",
+      "label": "CR Hospitalisation complète"
+    },
+    {
+      "type": "Divers",
+      "code": "MULTI",
+      "label": "Document multi-pages"
+    },
+    {
+      "type": "Divers",
+      "code": "Pending classification",
+      "label": "En attente de classification"
+    },
+    {
+      "type": "Divers",
+      "code": "INCONNU",
+      "label": "inconnu"
+    },
+    {
+      "type": "Divers",
+      "code": "DOC-SCAN",
+      "label": "Document scanné"
+    },
+    {
+      "type": "Divers",
+      "code": "DOC-IMPOR",
+      "label": "Document importé"
+    },
     {
       "type": "Lettres",
-      "label": "Lettre Autre",
-      "code": "lt-autr"
+      "code": "SYNTH",
+      "label": "Lettre de synthèse"
     },
     {
       "type": "Lettres",
-      "label": "Lettre Consultation",
-      "code": "lt-cons"
+      "code": "DOC-EVOL",
+      "label": "Document Evolution clinique"
     },
     {
       "type": "Lettres",
-      "label": "Lettre Consultation Initiale",
-      "code": "lt-cons-i"
+      "code": "LT-SOR",
+      "label": "Lettre de sortie"
     },
     {
       "type": "Lettres",
-      "label": "Lettre Consultation Suivi",
-      "code": "lt-cons-s"
+      "code": "DOC-PAT",
+      "label": "Document remis au patient"
     },
     {
       "type": "Lettres",
-      "label": "Lettre CR tout venant",
-      "code": "lt-crt"
+      "code": "LT-AUTR",
+      "label": "Autre lettre"
     },
     {
       "type": "Lettres",
-      "label": "Lettre CRH",
-      "code": "lt-crh"
+      "code": "LT-TRANSF",
+      "label": "Lettre de transfert"
     },
     {
       "type": "Lettres",
-      "label": "Lettre CRH HDJ",
-      "code": "lt-crhj"
+      "code": "CERTIF",
+      "label": "Certificat"
     },
     {
       "type": "Lettres",
-      "label": "Lettre Sortie",
-      "code": "lt-sor"
+      "code": "BMI",
+      "label": "Courbe IMC / bilan pondéral"
     },
     {
       "type": "Lettres",
-      "label": "Lettre Type",
-      "code": "lt-type"
-    },
-
-    {
-      "type": "Divers",
-      "label": "Certificat",
-      "code": "certi"
+      "code": "QUEST",
+      "label": "Questionnaire"
     },
     {
-      "type": "Divers",
-      "label": "CR Bilan Post-Opératoire",
-      "code": "cr-bpostoper"
+      "type": "Lettres",
+      "code": "PPS",
+      "label": "Plan personnalisé de soins (PPS)"
     },
     {
-      "type": "Divers",
-      "label": "CR Bilan Pré-Opératoire",
-      "code": "cr-bpreoper"
+      "type": "Ordonnances",
+      "code": "ORDO-SOIN",
+      "label": "Ordonnance de soins"
     },
     {
-      "type": "Divers",
-      "label": "CR Fiche suivi soins",
-      "code": "cr-suivi-soins"
+      "type": "Ordonnances",
+      "code": "ORDO-MED",
+      "label": "Ordonnance de médicaments"
     },
     {
-      "type": "Divers",
-      "label": "CR HAD",
-      "code": "cr-had"
-    },
-    {
-      "type": "Divers",
-      "label": "CR Passage Urgences",
-      "code": "cr-urge"
-    },
-    {
-      "type": "Divers",
-      "label": "CR SAMU SMUR Pompiers",
-      "code": "cr-samu"
-    },
-    {
-      "type": "Divers",
-      "label": "CR Staff",
-      "code": "crstaff"
-    },
-    {
-      "type": "Divers",
-      "label": "Dispensation autre",
-      "code": "disp-autre"
-    },
-    {
-      "type": "Divers",
-      "label": "Dispensation",
-      "code": "disp-medic"
-    },
-    {
-      "type": "Divers",
-      "label": "Document autre",
-      "code": "doc-autre"
-    },
-    {
-      "type": "Divers",
-      "label": "Document du patient",
-      "code": "doc-pat"
-    },
-    {
-      "type": "Divers",
-      "label": "Document importé",
-      "code": "doc-impor"
-    },
-    {
-      "type": "Divers",
-      "label": "Evolution",
-      "code": "doc-evol"
-    },
-    {
-      "type": "Divers",
-      "label": "Fiche Communicante",
-      "code": "fich-comm"
-    },
-    {
-      "type": "Divers",
-      "label": "Fiche transfert",
-      "code": "fich-trans"
-    },
-    {
-      "type": "Divers",
-      "label": "Ordonnance",
-      "code": "lt-ordo"
-    },
-    {
-      "type": "Divers",
-      "label": "Plan de soins, protocoles (ALD)",
-      "code": "prot-ald"
-    },
-    {
-      "type": "Divers",
-      "label": "Plan personnalisé de soins",
-      "code": "pps"
-    },
-    {
-      "type": "Divers",
-      "label": "Prescription autre",
-      "code": "presc-autre"
-    },
-    {
-      "type": "Divers",
-      "label": "Prescription de soins",
-      "code": "presc-soins"
-    },
-    {
-      "type": "Divers",
-      "label": "Prescription médicament",
-      "code": "presc-medic"
-    },
-    {
-      "type": "Divers",
-      "label": "Réunion de Concertation Pluridisciplinaire (RCP)",
-      "code": "rcp"
-    },
-    {
-      "type": "Divers",
-      "label": "Synthèse d'épisode de soins",
-      "code": "synth-episode"
-    },
-    {
-      "type": "Divers",
-      "label": "Synthèse",
-      "code": "synth"
-    },
-    {
-      "type": "Divers",
-      "label": "Volontés et droits du patient",
-      "code": "doc-pat-droit"
-    },
-    {
-      "type": "Document Inconnu",
-      "label": "Document Inconnu",
-      "code": "inconnu"
+      "type": "Ordonnances",
+      "code": "ORDO-EXAM",
+      "label": "Ordonnance d’examens"
     }
   ]
 }

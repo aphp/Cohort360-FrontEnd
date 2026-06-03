@@ -95,7 +95,11 @@ const CriteriaCard = ({
         <Grid size={1}>
           {needCollapse && (
             <IconButton onClick={() => setOpenCollapse(!openCollapse)} size="small">
-              {openCollapse ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+              {openCollapse ? (
+                <KeyboardArrowUpIcon data-testid="KeyboardArrowUpIcon" />
+              ) : (
+                <KeyboardArrowDownIcon data-testid="KeyboardArrowDownIcon" />
+              )}
             </IconButton>
           )}
         </Grid>
@@ -103,7 +107,7 @@ const CriteriaCard = ({
       <Grid container size={{ xs: 5, xl: 2 }} justifyContent="flex-end">
         {criterion.error && (
           <IconButton size="small" onClick={() => editCriteria(criterion)} color="secondary" disabled={disabled}>
-            <WarningIcon />
+            <WarningIcon data-testid="WarningIcon" />
           </IconButton>
         )}
         <IconButton
@@ -120,7 +124,7 @@ const CriteriaCard = ({
           style={disabled ? { color: '#CBCFCF' } : { color: 'currentcolor' }}
           disabled={disabled}
         >
-          <EditIcon />
+          <EditIcon data-testid="EditIcon" />
         </IconButton>
         <IconButton
           size="small"
@@ -128,7 +132,7 @@ const CriteriaCard = ({
           style={disabled ? { color: '#CBCFCF' } : { color: 'currentcolor' }}
           disabled={disabled}
         >
-          <DeleteIcon />
+          <DeleteIcon data-testid="DeleteIcon" />
         </IconButton>
       </Grid>
     </CriteriaWrapper>

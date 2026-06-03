@@ -1,18 +1,20 @@
-import { Grid, Link, Typography } from '@mui/material'
-import React, { useEffect } from 'react'
+import SaveIcon from '@mui/icons-material/Save'
+import { Box, Link, Typography } from '@mui/material'
 import cohortLogo from 'assets/images/logo-login.png'
-import services from 'services/aphp'
 import { isAxiosError } from 'axios'
+import React from 'react'
+import Markdown from 'react-markdown'
+import services from 'services/aphp'
 import { useAppDispatch, useAppSelector } from 'state'
 import { updateMaintenance } from 'state/me'
-import { useStyles } from 'views/PageNotFound/styles'
+import useStyles from './styles'
 
 const Maintenance = () => {
   const { classes } = useStyles()
   const dispatch = useAppDispatch()
   const maintenance = useAppSelector((state) => state.me?.maintenance)
 
-  useEffect(() => {
+  React.useEffect(() => {
     ;(async () => {
       const maintenanceResponse = await services.practitioner.maintenance()
 
@@ -26,26 +28,39 @@ const Maintenance = () => {
   }, [dispatch])
 
   return (
-    <>
-      <Link className={classes.logo}>
-        <img src={cohortLogo} alt="Cohort360 logo" style={{ height: 50 }} />
-      </Link>
-      <Grid container className={classes.megaContainer} sx={{ flexDirection: 'column', alignItems: 'center' }}>
-        <Grid container size={5} sx={{ flexDirection: 'column', alignItems: 'center' }} style={{ marginTop: '16em' }}>
-          <Typography variant="h1" className={classes.oups}>
-            Application non disponible
-          </Typography>
-          {maintenance?.message && (
-            <Typography color="primary" variant="h2" style={{ margin: '12px 0' }}>
-              {maintenance.message}
+    <Box className={classes.page}>
+      <Box className={classes.header}>
+        <Link className={classes.logo} aria-label="Cohort360">
+          <img src={cohortLogo} alt="Cohort360 logo" style={{ height: 50 }} />
+        </Link>
+      </Box>
+      <Box className={classes.contentWrapper}>
+        <Typography className={classes.title}>Cohort360 est temporairement indisponible</Typography>
+        {maintenance?.message && (
+          <Markdown
+            components={{
+              p: ({ children }) => <Typography className={classes.message}>{children}</Typography>,
+              a: ({ href, children }) => (
+                <Link href={href} target="_blank" rel="noopener noreferrer">
+                  {children}
+                </Link>
+              )
+            }}
+          >
+            {maintenance.message}
+          </Markdown>
+        )}
+
+        {!maintenance?.is_data_saved_message_hidden && (
+          <Box className={classes.infoBanner}>
+            <SaveIcon sx={{ fontSize: 14 }} />
+            <Typography component="p" className={classes.infoBannerText}>
+              Les requêtes, cohortes et échantillons déjà enregistrés seront conservées.
             </Typography>
-          )}
-          <Typography color="primary" variant="h2" style={{ margin: '12px 0' }}>
-            Nous vous informerons dès que Cohort360 sera de nouveau accessible. Merci pour votre compréhension.
-          </Typography>
-        </Grid>
-      </Grid>
-    </>
+          </Box>
+        )}
+      </Box>
+    </Box>
   )
 }
 

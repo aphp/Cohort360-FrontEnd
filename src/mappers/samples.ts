@@ -60,6 +60,7 @@ const mapSamplesToRows = (
       },
       {
         title: 'Éditer la cohorte',
+        testId: 'EditIcon',
         icon: EditIcon,
         onClick: () => onClickEdit(cohort),
         disabled: disabled
@@ -87,15 +88,15 @@ const mapSamplesToRows = (
         sx: { fontWeight: 900 }
       },
       { id: `${cohort.uuid}-actions`, value: actions as Action[], type: CellType.ACTIONS },
-      ...(!requestId
-        ? [
+      ...(requestId
+        ? []
+        : [
             {
               id: `${cohort.uuid}-parentName`,
               value: parentName,
               type: CellType.TEXT
             }
-          ]
-        : []),
+          ]),
       {
         id: `${cohort.uuid}-statusChip`,
         value: statusChip,
@@ -146,7 +147,7 @@ const mapSamplesToColumns = (
     { label: '', code: Order.FAVORITE },
     { label: ResearchesTableLabels.SAMPLE_NAME, code: Order.NAME, align: 'left' },
     { label: '' },
-    ...(!cohortId ? [{ label: ResearchesTableLabels.PARENT_COHORT, code: Order.REQUEST }] : []),
+    ...(cohortId ? [] : [{ label: ResearchesTableLabels.PARENT_COHORT, code: Order.REQUEST }]),
     { label: ResearchesTableLabels.STATUS },
     { label: ResearchesTableLabels.PATIENT_TOTAL, code: Order.RESULT_SIZE },
     { label: ResearchesTableLabels.TOTAL_PERCENTAGE },

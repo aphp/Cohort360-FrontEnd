@@ -19,7 +19,7 @@ export const getLastDiagnosisLabels = (mainDiagnosisList: Condition[]) => {
 
 export const getPmsiDate = (tabId: PMSIResourceTypes, pmsiItem: CohortPMSI) => {
   const dateMapper = {
-    [ResourceType.CONDITION]: (pmsiItem as Condition).recordedDate,
+    [ResourceType.CONDITION]: (pmsiItem as Condition).onsetDateTime,
     [ResourceType.PROCEDURE]: (pmsiItem as Procedure).performedDateTime,
     [ResourceType.CLAIM]: (pmsiItem as Claim).created
   }

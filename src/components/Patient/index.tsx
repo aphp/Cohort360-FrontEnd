@@ -94,7 +94,7 @@ const PatientBoard = ({ patient }: PatientBoardProps) => {
   return (
     <>
       <SidebarButton role="button" onClick={() => setIsSidebarOpened(true)}>
-        <ChevronLeftIcon color="action" width="20px" />
+        <ChevronLeftIcon data-testid="ChevronLeftIcon" color="action" width="20px" />
       </SidebarButton>
       <PatientHeader patient={patient} groupId={patient.groupId} />
       <Grid container sx={{ flexDirection: 'column', alignItems: 'center', backgroundColor: '#E6F1FD' }}>
@@ -127,16 +127,19 @@ const PatientBoard = ({ patient }: PatientBoardProps) => {
                 value={currentSubTab}
                 onChange={(_, newSubTab) => handleChangeSubTab(newSubTab)}
               >
-                {subTabs.map((subTab) => (
-                  <Tab
-                    sx={{ fontSize: 12 }}
-                    key={subTab.value}
-                    label={subTab.label}
-                    value={subTab.value}
-                    component={Link}
-                    to={`/patients/${patient.id}/${currentTab}?${patient.groupId ? `groupId=${patient.groupId}&` : ''}subtab=${subTab.value}`}
-                  />
-                ))}
+                {subTabs.map((subTab) => {
+                  const groupIdParam = patient.groupId ? `${patient.groupId}&` : ''
+                  return (
+                    <Tab
+                      sx={{ fontSize: 12 }}
+                      key={subTab.value}
+                      label={subTab.label}
+                      value={subTab.value}
+                      component={Link}
+                      to={`/patients/${patient.id}/${selectedTab}?${groupIdParam}subtab=${subTab.value}`}
+                    />
+                  )
+                })}
               </TabsWrapper>
             </Grid>
           )}

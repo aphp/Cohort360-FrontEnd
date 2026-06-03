@@ -137,14 +137,14 @@ const CohortsList: React.FC<CohortsListProps> = ({ rowsPerPage = 20, favorites =
       <IconButtonWithTooltip
         disabled={maintenanceIsActive}
         title="Éditer la requête"
-        icon={<EditIcon />}
+        icon={<EditIcon data-testid="EditIcon" />}
         onClick={() => setOpenParentEditionModal(true)}
         color={'#5bc5f2'}
       />
       <IconButtonWithTooltip
         disabled={maintenanceIsActive}
         title="Supprimer la requête"
-        icon={<DeleteIcon />}
+        icon={<DeleteIcon data-testid="DeleteIcon" />}
         onClick={() => setOpenDeletionModal(true)}
         color={'#ed6d91'}
       />

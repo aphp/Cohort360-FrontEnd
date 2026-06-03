@@ -54,6 +54,8 @@ const Requeteur = () => {
   const [requestLoading, setRequestLoading] = useState(0)
   const [criteriaLoading, setCriteriaLoading] = useState(0)
   const [valueSetsLoading, setValueSetsLoading] = useState(true)
+  const [canExecuteJson, setCanExecuteJson] = useState(true)
+
   const isRendered = useRef<boolean>(false)
 
   const _fetchRequest = useCallback(async () => {
@@ -144,7 +146,7 @@ const Requeteur = () => {
         globalCount
       )
 
-      if (createCohortResult && createCohortResult.status === 201) {
+      if (createCohortResult?.status === 201) {
         dispatch(resetCohortCreation())
         navigate(`/home`)
       }
@@ -206,9 +208,9 @@ const Requeteur = () => {
 
   return (
     <>
-      {(requestId || requestIdFromUrl) && <DiagramView />}
+      {(requestId || requestIdFromUrl) && <DiagramView isValidJson={setCanExecuteJson} />}
 
-      <ControlPanel onExecute={_canExecute() ? _onExecute : undefined} />
+      <ControlPanel canExecuteJson={canExecuteJson} onExecute={_canExecute() ? _onExecute : undefined} />
 
       {!requestIdFromUrl && !requestId && (
         <ModalCreateNewRequest

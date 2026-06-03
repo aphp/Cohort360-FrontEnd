@@ -1,5 +1,5 @@
-import React, { PropsWithChildren } from 'react'
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import React, { PropsWithChildren, useEffect } from 'react'
+import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom'
 
 import { useAppSelector } from 'state/index'
 
@@ -10,9 +10,26 @@ import AutoLogoutContainer from '../AutoLogoutContainer'
 import { WebSocketProvider } from 'components/WebSocket/WebSocketProvider'
 import Maintenance from 'views/Maintenance'
 import Snackbar from 'components/Snackbar/Snackbar'
+import { ACCESS_TOKEN } from 'constants.js'
 
 type LayoutProps = {
   displaySideBar: boolean
+}
+
+const CrossTabAuthSync = () => {
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    const onStorageChange = (e: StorageEvent) => {
+      if (e.key === ACCESS_TOKEN && !e.newValue && window.location.pathname !== '/') {
+        navigate('/', { replace: true })
+      }
+    }
+    window.addEventListener('storage', onStorageChange)
+    return () => window.removeEventListener('storage', onStorageChange)
+  }, [navigate])
+
+  return null
 }
 
 const Layout = (props: PropsWithChildren<LayoutProps>) => {
@@ -35,6 +52,7 @@ const AppNavigation = () => {
   }
   return (
     <Router>
+      <CrossTabAuthSync />
       <Routes>
         {configRoutes().map((route, index) => {
           return route.isPrivate ? (
@@ -49,10 +67,9 @@ const AppNavigation = () => {
                   </WebSocketProvider>
                 }
               >
-                {route.children &&
-                  route.children.map((child, index) => (
-                    <Route key={index + (child.path ?? '')} path={child.path} element={child.element} />
-                  ))}
+                {route.children?.map((child, index) => (
+                  <Route key={index + (child.path ?? '')} path={child.path} element={child.element} />
+                ))}
               </Route>
             </Route>
           ) : (

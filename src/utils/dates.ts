@@ -66,6 +66,15 @@ export const isDateValid = (date?: string | null, format = 'YYYY-MM-DD') => {
   return moment(date, format, true).isValid()
 }
 
+export const isDateBefore = (date: string, nbDays: number) => {
+  const inputDate = new Date(date)
+  const now = new Date()
+  const diffMs = Math.abs(now.getTime() - inputDate.getTime())
+  const diffDays = diffMs / (1000 * 60 * 60 * 24)
+  if (diffDays < nbDays) return false
+  return true
+}
+
 /**
  * Formats a date string to French format (DD/MM/YYYY) with optional time
  *

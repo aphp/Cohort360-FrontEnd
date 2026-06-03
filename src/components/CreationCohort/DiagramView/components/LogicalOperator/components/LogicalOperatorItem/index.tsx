@@ -65,7 +65,12 @@ const LogicalOperatorDisplay = ({ value }: LogicalOperatorDisplayProps) => {
       </Box>
     )
   }
-  const label = type === CriteriaGroupType.OR_GROUP ? (isInclusive ? 'OU' : 'NON OU') : isInclusive ? 'ET' : 'NON ET'
+  let label: string
+  if (type === CriteriaGroupType.OR_GROUP) {
+    label = isInclusive ? 'OU' : 'NON OU'
+  } else {
+    label = isInclusive ? 'ET' : 'NON ET'
+  }
   return (
     <Typography variant="h5" className={classes.textOperator}>
       {label}
@@ -185,6 +190,21 @@ const LogicalOperatorItem: React.FC<LogicalOperatorItemProps> = ({ itemId, crite
   } = useLogicalOperator(itemId)
 
   if (!currentOperator) return <></>
+
+  let backgroundColor: string
+  if (disabled) {
+    backgroundColor = '#0000001F'
+  } else {
+    backgroundColor = currentOperator.isInclusive ? '#19235A' : '#F2B0B0'
+  }
+
+  let textColor: string
+  if (disabled) {
+    textColor = '#00000042'
+  } else {
+    textColor = currentOperator.isInclusive ? 'white' : '#19235a'
+  }
+
   return (
     <>
       <Box
@@ -192,8 +212,8 @@ const LogicalOperatorItem: React.FC<LogicalOperatorItemProps> = ({ itemId, crite
         id={`logical-operator-${itemId}`}
         style={{
           border: disabled ? '3px solid #00000042' : '',
-          background: disabled ? '#0000001F' : !currentOperator.isInclusive ? '#F2B0B0' : '#19235A',
-          color: disabled ? '#00000042' : !currentOperator.isInclusive ? '#19235a' : 'white',
+          background: backgroundColor,
+          color: textColor,
           padding: '0px 10px',
           width: 'fit-content'
         }}
@@ -223,7 +243,7 @@ const LogicalOperatorItem: React.FC<LogicalOperatorItemProps> = ({ itemId, crite
             </Typography>
             {!isMainOperator && (
               <IconButton className={classes.deleteButton} size="small" onClick={deleteLogicalOperator}>
-                <DeleteIcon />
+                <DeleteIcon data-testid="DeleteIcon" />
               </IconButton>
             )}
           </>
@@ -243,7 +263,7 @@ const LogicalOperatorItem: React.FC<LogicalOperatorItemProps> = ({ itemId, crite
         cancelText="Annuler"
         maxWidth="md"
       >
-        <WarningIcon color="warning" style={{ verticalAlign: 'middle', marginRight: 8 }} />
+        <WarningIcon data-testid="WarningIcon" color="warning" style={{ verticalAlign: 'middle', marginRight: 8 }} />
         L'ajout de contraintes temporelles n'étant possible que sur un groupe de critères ET, passer sur un groupe de
         critères OU vous fera perdre toutes les contraintes temporelles de ce groupe.
       </Modal>

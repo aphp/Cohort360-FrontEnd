@@ -59,8 +59,8 @@ export const pregnancyForm: {
     type: 'valueBoolean'
   },
   ultrasoundMonitoring: {
-    id: 'F_MATER_001552',
-    type: 'valueBoolean'
+    id: 'F_MATER_003026',
+    type: 'valueCoding'
   },
   pregnancyType: {
     id: 'F_MATER_001024',

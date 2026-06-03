@@ -7,9 +7,9 @@ import React, {
   useState
 } from 'react'
 import { useNavigate } from 'react-router-dom'
-import localforage from 'localforage'
 import {
   Alert,
+  Box,
   Button,
   CircularProgress,
   Dialog,
@@ -30,9 +30,10 @@ import logo from 'assets/images/logo-login.png'
 import logoAPHP from 'assets/images/logo-aphp.png'
 import Keycloak from 'assets/icones/keycloak.svg?react'
 
-import { useAppDispatch } from 'state'
+import { useAppDispatch, useAppSelector } from 'state'
 import { MeState, login as loginAction } from 'state/me'
 import { ACCESS_TOKEN, REFRESH_TOKEN } from 'constants.js'
+import { isAccessTokenValid } from 'utils/tokens'
 
 import services from 'services/aphp'
 
@@ -85,23 +86,33 @@ const LegalMentionDialog = ({ open, setOpen }: LegalMentionDialogProps) => {
 
   return (
     <Dialog open={open} onClose={_setOpen}>
-      <DialogTitle>Mention légale</DialogTitle>
+      <DialogTitle>Mentions légales</DialogTitle>
       <DialogContent>
-        <DialogContentText align="justify">
-          L’usage de Cohort360 est soumis au respect des règles d’accès aux données de santé définies par la Commission
-          Médicale d’Etablissement de l’AP-HP disponibles à l’adresse recherche-innovation.aphp.fr.
-        </DialogContentText>
-        <DialogContentText>
-          En appuyant sur le bouton « OK », vous acceptez ces conditions d’utilisation. Les données relatives à votre
-          connexion et à vos actions sur l’application (date, heure, type d’action), sont enregistrées et traitées pour
-          des finalités de sécurité du système d’information et afin de réaliser des statistiques d’utilisation de
-          l’application.
-        </DialogContentText>
-        <DialogContentText>
-          Elles sont destinées à l’équipe projet de la DSI et sont conservées dans des fichiers de logs pendant 3 ans.
-          Vous pouvez exercer votre droit d’accès et de rectification aux informations qui vous concernent, en écrivant
-          à la déléguée à la protection des données de l’AP-HP à l’adresse protection.donnees.dsi@aphp.fr.
-        </DialogContentText>
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+          <DialogContentText align="justify">
+            L'usage de Cohort360 est soumis au respect des règles d'accès aux données de santé définies par la
+            Commission Médicale d'Etablissement de l'AP-HP disponibles à l'adresse recherche-innovation.aphp.fr.
+          </DialogContentText>
+          <DialogContentText align="justify">
+            L'usage de Cohort360 est également soumis au respect des règles d'utilisation acceptées par l'utilisateur au
+            moment de sa formation.
+          </DialogContentText>
+          <DialogContentText align="justify">
+            En appuyant sur le bouton « OK », vous acceptez ces conditions d'utilisation. Les données relatives à votre
+            connexion et à vos actions sur l'application (date, heure, type d'action, APH, nom, prénom, mail, périmètre
+            d'habilitation), sont enregistrées et traitées pour des finalités de sécurité du système d'information et
+            afin de réaliser des statistiques d'utilisation de l'application.
+          </DialogContentText>
+          <DialogContentText align="justify">
+            Ces données sont conservées pendant la durée strictement nécessaire à leur finalité. Vous pouvez exercer
+            votre droit d'accès et de rectification aux informations qui vous concernent, en écrivant à la déléguée à la
+            protection des données de l'AP-HP à l'adresse <Link href="mailto:dpo@aphp.fr">dpo@aphp.fr</Link>.
+          </DialogContentText>
+          <DialogContentText align="justify">
+            Pour toute autre question, contactez l'équipe support :{' '}
+            <Link href="mailto:id.recherche.support.dsn@aphp.fr">id.recherche.support.dsn@aphp.fr</Link>.
+          </DialogContentText>
+        </Box>
       </DialogContent>
       <DialogActions>
         <Button onClick={() => setOpen(false)}>OK</Button>
@@ -115,6 +126,7 @@ const Login = () => {
   const { classes, cx } = useStyles()
   const appConfig = useContext(AppConfig)
   const dispatch = useAppDispatch()
+  const me = useAppSelector((state) => state.me)
   const [loading, setLoading] = useState(false)
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
@@ -127,9 +139,16 @@ const Login = () => {
   const oidcCode = urlParams.get('code')
 
   useEffect(() => {
-    localforage.setItem('persist:root', '')
     if (oidcCode) login()
   }, [])
+
+  useEffect(() => {
+    if (!oidcCode && me && isAccessTokenValid()) {
+      const oldPath = localStorage.getItem('old-path')
+      localStorage.removeItem('old-path')
+      navigate(oldPath ?? '/home', { replace: true })
+    }
+  }, [me, navigate, oidcCode])
 
   const loadBootstrapData = async (practitionerData: User, lastConnection: string) => {
     const maintenanceResponse = await services.practitioner.maintenance()
@@ -402,7 +421,7 @@ const Login = () => {
 
             <Typography align="center">
               <Link href="#" onClick={() => setOpen(true)} underline="hover">
-                En vous connectant, vous acceptez la mention légale.
+                En vous connectant, vous acceptez les mentions légales.
               </Link>
             </Typography>
           </Grid>

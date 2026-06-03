@@ -47,8 +47,8 @@ const AlertWrapper = styled(Alert)(({ severity }) => {
 
 const CustomAlert = ({ severity = 'warning', icon, ...props }: AlertProps) => {
   const defaultIcons = {
-    warning: <WarningIcon />,
-    info: <InfoIcon />,
+    warning: <WarningIcon data-testid="WarningIcon" />,
+    info: <InfoIcon data-testid="InfoIcon" />,
     error: <ErrorIcon />,
     success: <CheckCircleIcon />
   }

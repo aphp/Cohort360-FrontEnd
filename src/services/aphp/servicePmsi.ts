@@ -3,7 +3,7 @@ import { ExplorationResults, FetchOptions, FetchParams, Patient } from 'types/ex
 import { Direction, Order, PMSIFilters } from 'types/searchCriterias'
 import { fetcherWithParams, getCommonParamsAll, getCommonParamsList } from 'utils/exploration'
 import { fetchClaim, fetchCondition, fetchProcedure } from './callApi'
-import { getCategory } from 'utils/fhir'
+import { getCategory, getExtensionStringValue } from 'utils/fhir'
 import { getConfig } from 'config'
 
 const getPMSIFilters = (
@@ -36,7 +36,7 @@ export const fetchConditionList = (
     uniqueFacet: ['subject'],
     subject: patient?.infos?.id,
     ...getPMSIFilters(filters, fetchParams, groupId),
-    _sort: fetchParams.orderBy.orderBy === Order.CODE ? Order.CODE : Order.RECORDED_DATE,
+    _sort: fetchParams.orderBy.orderBy === Order.CODE ? Order.CODE : Order.ONSET_DATE,
     signal
   }
   const paramsFetchAll = {
@@ -163,8 +163,8 @@ export const fetchLastPmsi = async ({ patient, groupId }: { patient: Patient; gr
       lastProcedure: procedureList ? procedureList[0] : null,
       mainDiagnosis: conditionList.filter(
         (condition) =>
-          getCategory(condition, getConfig().features.condition.valueSets.conditionStatus.url)?.coding?.[0].code ===
-          'dp'
+          getExtensionStringValue(condition, getConfig().features.condition.extensions.orbisStatus)?.toUpperCase() ===
+          'DP'
       ),
       procedures: procedureList,
       diagnostics: conditionList

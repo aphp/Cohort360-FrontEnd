@@ -69,7 +69,7 @@ const ValueSetField = ({ value, references, placeholder, disabled = false, onSel
             </IconButton>
           )}
           <IconButton sx={{ color: '#5BC5F2' }} size="small" onClick={handleOpen} disabled={disabled}>
-            <SearchOutlined />
+            <SearchOutlined data-testid="SearchOutlinedIcon" />
           </IconButton>
         </Grid>
       </Grid>

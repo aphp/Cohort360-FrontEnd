@@ -8,6 +8,7 @@ import { DisplayOptions, GAP } from 'types/exploration'
 import AccordionWrapper from 'components/ui/Accordion'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import { ChipWrapper } from 'components/ui/Chip/styles'
+import CancelIcon from '@mui/icons-material/Cancel'
 
 type Criteria = {
   value: FilterValue
@@ -34,6 +35,7 @@ const CriteriasSection = ({ value, displayOptions, onDelete, onSaveFilters }: Cr
         disabled={disabled}
         onDelete={() => onDelete(category, value)}
         customVariant="filters"
+        deleteIcon={<CancelIcon data-testid="CancelIcon" />}
       />
     )
   }

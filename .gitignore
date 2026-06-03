@@ -32,6 +32,7 @@ yarn-error.log*
 # Cohort360 specific
 .env*
 !.env.example
+!.env.dev-proxy.example
 .mp4
 public/config.*.json
 *storybook.log

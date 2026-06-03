@@ -11,19 +11,54 @@ type DroppableWrapperProps = {
   isActive: boolean
 }
 
-export const DraggableWrapper = styled(Grid)<DraggableWrapperProps>(
-  ({ isActive, isDragging, isDropZone, isDisabled }) => ({
+export const DraggableWrapper = styled(Grid)<DraggableWrapperProps>(({
+  isActive,
+  isDragging,
+  isDropZone,
+  isDisabled
+}) => {
+  let cursor: string
+  if (isDisabled || isDropZone) {
+    cursor = 'auto'
+  } else {
+    cursor = isActive ? 'grabbing' : 'grab'
+  }
+
+  let opacity: number
+  if (isDropZone) {
+    opacity = 0
+  } else if (isDragging) {
+    opacity = isActive ? 1 : 0.6
+  } else {
+    opacity = 1
+  }
+
+  let overflow: string
+  if (isDisabled) {
+    overflow = 'visible'
+  } else {
+    overflow = isDragging ? 'hidden' : 'visible'
+  }
+
+  let border: string
+  if (isDragging) {
+    border = isActive ? '1px solid #19235a' : '1px solid #00000014'
+  } else {
+    border = ''
+  }
+
+  return {
     position: 'relative',
     zIndex: isActive ? 3 : 2,
     '& > *': {
-      cursor: isDisabled || isDropZone ? 'auto' : isActive ? 'grabbing' : 'grab',
-      opacity: isDropZone ? 0 : isDragging ? (isActive ? 1 : 0.6) : 1,
-      overflow: isDisabled ? 'visible' : isDragging ? 'hidden' : 'visible',
-      border: isDragging ? (isActive ? '1px solid #19235a' : '1px solid #00000014') : '',
+      cursor,
+      opacity,
+      overflow,
+      border,
       backgroundColor: isDragging && isActive ? 'rgba(255,255,255,0.95)' : undefined
     }
-  })
-)
+  }
+})
 
 const attract = keyframes`
   0% {

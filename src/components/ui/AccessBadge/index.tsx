@@ -28,7 +28,7 @@ const AccessBadge = ({ accessLevel, loading = false }: AccessBadgeProps) => {
       color="primary"
       icon={
         accessLevel === AccessLevel.NOMINATIVE ? (
-          <VisibilityOutlined fontSize="small" />
+          <VisibilityOutlined data-testid="VisibilityOutlinedIcon" fontSize="small" />
         ) : (
           <VisibilityOffOutlined fontSize="small" />
         )

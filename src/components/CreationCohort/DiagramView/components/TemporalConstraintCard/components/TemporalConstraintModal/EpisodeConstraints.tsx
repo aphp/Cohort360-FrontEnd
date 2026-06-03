@@ -60,10 +60,10 @@ const EpisodeConstraints: React.FC<EpisodeConstraintsProps> = ({ constraints, on
   const onChangeValue = (value: TemporalConstraintsKind) => {
     setRadioValues(value)
 
-    if (value !== TemporalConstraintsKind.PARTIAL_EPISODE_CONSTRAINT) {
-      onChangeConstraints([{ idList: ['All'], constraintType: value }])
-    } else {
+    if (value === TemporalConstraintsKind.PARTIAL_EPISODE_CONSTRAINT) {
       onChangeConstraints([])
+    } else {
+      onChangeConstraints([{ idList: ['All'], constraintType: value }])
     }
   }
 
@@ -81,7 +81,7 @@ const EpisodeConstraints: React.FC<EpisodeConstraintsProps> = ({ constraints, on
         <Grid container sx={{ flexDirection: 'row', alignItems: 'center' }}>
           <Typography variant="h3">Contraintes sur les épisodes</Typography>
           <Tooltip title="Les contraintes sur les épisodes ne s'appliquent qu'aux critères de dossiers de spécialité de type: Maternité">
-            <InfoIcon fontSize="small" color="primary" style={{ marginLeft: 4 }} />
+            <InfoIcon data-testid="InfoIcon" fontSize="small" color="primary" style={{ marginLeft: 4 }} />
           </Tooltip>
         </Grid>
         <RadioGroup
@@ -133,7 +133,7 @@ const EpisodeConstraints: React.FC<EpisodeConstraintsProps> = ({ constraints, on
         cancelText="Annuler"
         maxWidth="md"
       >
-        <WarningIcon color="warning" style={{ verticalAlign: 'middle', marginRight: 8 }} />
+        <WarningIcon data-testid="WarningIcon" color="warning" style={{ verticalAlign: 'middle', marginRight: 8 }} />
         Attention, en passant sur un type de contrainte temporelle globale, vous perdrez toutes les contraintes
         partielles déjà ajoutées.
       </Modal>

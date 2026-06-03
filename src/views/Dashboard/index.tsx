@@ -107,6 +107,16 @@ const Dashboard = ({ context }: DashboardProps) => {
   if ((dashboard.loading === false && dashboard.rightToExplore === false) || currentTab === ResourceType.CLAIM)
     return <CohortRightOrNotExist />
   else if (dashboard.loading === false && dashboard.totalPatients === 0) return <CohortNoPatient />
+
+  let cohortId: string | undefined
+  if (context === URLS.COHORT || context === URLS.PERIMETERS) {
+    cohortId = groupId
+  } else if (context === URLS.PATIENTS) {
+    cohortId = me?.topLevelCareSites?.join(',')
+  } else {
+    cohortId = undefined
+  }
+
   return (
     <PageContainer alignItems="center">
       <TopBar
@@ -161,13 +171,7 @@ const Dashboard = ({ context }: DashboardProps) => {
       <Grid container size={11} sx={{ alignItems: 'center', flexDirection: 'column' }}>
         {currentTab === ResourceType.PREVIEW ? (
           <CohortPreview
-            cohortId={
-              context === URLS.COHORT || context === URLS.PERIMETERS
-                ? groupId
-                : context === URLS.PATIENTS
-                  ? me?.topLevelCareSites?.join(',')
-                  : undefined
-            }
+            cohortId={cohortId}
             total={dashboard.totalPatients}
             agePyramidData={dashboard.agePyramidData}
             genderRepartitionMap={dashboard.genderRepartitionMap}

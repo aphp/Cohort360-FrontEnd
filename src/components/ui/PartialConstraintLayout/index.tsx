@@ -54,7 +54,7 @@ const PartialConstraintLayout: React.FC<PartialConstraintLayoutProps> = ({ isEpi
 
   const _onConfirm = () => {
     const newConstraint: TemporalConstraintsType = {
-      idList: encounterConstraint.criteriaIds.sort(),
+      idList: encounterConstraint.criteriaIds.sort((a, b) => a - b),
       constraintType: isEpisode ? TemporalConstraintsKind.SAME_EPISODE_OF_CARE : TemporalConstraintsKind.SAME_ENCOUNTER
     }
     setEncounterConstraint(defaultEncounterConstraint)
@@ -132,7 +132,7 @@ const PartialConstraintLayout: React.FC<PartialConstraintLayoutProps> = ({ isEpi
               title={title}
               actions={
                 <IconButton onClick={() => onDelete(constraint)}>
-                  <DeleteIcon />
+                  <DeleteIcon data-testid="DeleteIcon" />
                 </IconButton>
               }
               wrap
@@ -161,7 +161,7 @@ const PartialConstraintLayout: React.FC<PartialConstraintLayoutProps> = ({ isEpi
               setShowAddConstraintIcon(false)
             }}
           >
-            <AddCircleIcon sx={{ height: '2em', width: '2em' }} />
+            <AddCircleIcon data-testid="AddCircleIcon" sx={{ height: '2em', width: '2em' }} />
           </IconButton>
         )}
 

@@ -19,7 +19,7 @@ const CohortRightOrNotExist = () => {
       <Grid container>
         <Grid container sx={{ flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
           <Grid style={{ padding: 16 }}>
-            <WarningIcon style={{ fontSize: 60 }} />
+            <WarningIcon data-testid="WarningIcon" style={{ fontSize: 60 }} />
           </Grid>
           <Grid style={{ padding: '8px 32px' }}>
             <Typography style={{ marginBottom: 16 }} variant="h5" align="center">

@@ -41,7 +41,7 @@ export const renderLabel = (label: string, tooltip?: string, altStyle?: boolean)
         {label}
         {tooltip && (
           <Tooltip title={tooltip}>
-            <InfoIcon fontSize="small" color="primary" style={{ marginLeft: 4 }} />
+            <InfoIcon data-testid="InfoIcon" fontSize="small" color="primary" style={{ marginLeft: 4 }} />
           </Tooltip>
         )}
       </FormLabel>

@@ -63,10 +63,10 @@ const SearchInput = ({
           }}
           endAdornment={
             <InputAdornment position="end" style={{ padding: '0px 25px' }}>
-              {error?.isError && <WarningIcon style={{ fill: '#F44336', height: 20 }} />}
+              {error?.isError && <WarningIcon data-testid="WarningIcon" style={{ fill: '#F44336', height: 20 }} />}
               {displayHelpIcon && (
                 <IconButton style={{ padding: 2 }} onClick={() => setHelpOpen(true)}>
-                  <InfoIcon style={{ height: 22 }} />
+                  <InfoIcon data-testid="InfoIcon" style={{ height: 22 }} />
                 </IconButton>
               )}
               {searchOnClick && (
@@ -81,7 +81,7 @@ const SearchInput = ({
                   }}
                   style={{ padding: 2 }}
                 >
-                  <ClearIcon style={{ fill: '#6f6f6f', height: 18 }} />
+                  <ClearIcon style={{ fill: '#6f6f6f', height: 18 }} data-testid="ClearIcon" />
                 </IconButton>
               )}
             </InputAdornment>
@@ -94,19 +94,24 @@ const SearchInput = ({
         <Grid container>
           <ErrorWrapper>
             <Typography style={{ fontWeight: 'bold' }}>Des erreurs ont été détectées dans votre recherche.</Typography>
-            {error?.errorsDetails?.map((detail: ErrorDetails, count: number) => (
-              <Typography key={count}>
-                {`- ${
-                  detail.errorPositions && detail.errorPositions.length > 0
-                    ? detail.errorPositions.length === 1
-                      ? `Au caractère ${detail.errorPositions[0]} : `
-                      : `Aux caractères ${detail.errorPositions.join(', ')} : `
-                    : ''
-                }
-              ${detail.errorName ? `${detail.errorName}.` : ''}
-              ${detail.errorSolution ? `${detail.errorSolution}.` : ''}`}
-              </Typography>
-            ))}
+            {error?.errorsDetails?.map((detail: ErrorDetails, count: number) => {
+              let positionPrefix = ''
+              if (detail.errorPositions && detail.errorPositions.length > 0) {
+                positionPrefix =
+                  detail.errorPositions.length === 1
+                    ? `Au caractère ${detail.errorPositions[0]} : `
+                    : `Aux caractères ${detail.errorPositions.join(', ')} : `
+              }
+              const namePart = detail.errorName ? `${detail.errorName}.` : ''
+              const solutionPart = detail.errorSolution ? `${detail.errorSolution}.` : ''
+              return (
+                <Typography key={count}>
+                  {`- ${positionPrefix}
+              ${namePart}
+              ${solutionPart}`}
+                </Typography>
+              )
+            })}
           </ErrorWrapper>
         </Grid>
       )}

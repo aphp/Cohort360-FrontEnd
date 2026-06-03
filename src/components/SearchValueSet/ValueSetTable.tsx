@@ -77,7 +77,7 @@ const ValueSetRow = ({
         </Typography>
       )
     }
-    return stat !== undefined ? stat.toLocaleString() : '-'
+    return stat === undefined ? '-' : stat.toLocaleString()
   }
 
   return (
@@ -95,8 +95,16 @@ const ValueSetRow = ({
                 {internalLoading && <CircularProgress size={'15px'} color="info" />}
                 {!internalLoading && (
                   <>
-                    {open && <KeyboardArrowDown onClick={() => setOpen(false)} color="info" />}
-                    {!open && <KeyboardArrowRight onClick={handleOpen} color="info" />}
+                    {open && (
+                      <KeyboardArrowDown
+                        data-testid="KeyboardArrowDownIcon"
+                        onClick={() => setOpen(false)}
+                        color="info"
+                      />
+                    )}
+                    {!open && (
+                      <KeyboardArrowRight data-testid="KeyboardArrowRightIcon" onClick={handleOpen} color="info" />
+                    )}
                   </>
                 )}
               </>

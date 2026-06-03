@@ -11,6 +11,7 @@ import { getConfig } from 'config'
 import { getValueSetsFromSystems } from 'utils/valueSets'
 import { FhirItem } from 'types/valueSet'
 import { Hierarchy } from 'types/hierarchy'
+import { Sources } from 'types/searchCriterias'
 
 export type Cim10DataType = CommonCriteriaData &
   WithOccurenceCriteriaDataType &
@@ -37,7 +38,7 @@ export const form: () => CriteriaForm<Cim10DataType> = () => ({
     encounterEndDate: null,
     encounterStatus: [],
     code: null,
-    source: 'AREM',
+    source: getConfig().features.condition.filters?.sources.arem ?? Sources.AREM,
     diagnosticType: null
   },
   infoAlert: ['Tous les éléments des champs multiples sont liés par une contrainte OU'],
@@ -62,11 +63,12 @@ export const form: () => CriteriaForm<Cim10DataType> = () => ({
           type: 'radioChoice',
           label: 'Source',
           choices: [
-            { id: 'AREM', label: 'AREM' },
-            { id: 'ORBIS', label: 'ORBIS' }
+            { id: getConfig().features.condition.filters?.sources.arem ?? Sources.AREM, label: Sources.AREM },
+            { id: getConfig().features.condition.filters?.sources.orbis ?? Sources.ORBIS, label: Sources.ORBIS }
           ],
           buildInfo: {
             fhirKey: ConditionParamsKeys.SOURCE,
+            chipDisplayMethod: 'getRadioLabel',
             chipDisplayMethodExtraArgs: [{ type: 'string', value: 'Source: ' }]
           }
         },

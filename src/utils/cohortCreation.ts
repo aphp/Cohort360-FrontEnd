@@ -14,7 +14,7 @@
  * - Request joining for complex query composition
  *
  * @module cohortCreation
- * @version 1.6.1
+ * @version 1.6.2
  * @since 1.0.0
  */
 
@@ -46,7 +46,7 @@ import { ScopeElement } from 'types/scope'
 import { formatAge } from './age'
 
 /** Current version of the Requeteur format used for cohort requests */
-const REQUETEUR_VERSION = 'v1.6.1'
+const REQUETEUR_VERSION = 'v1.6.2'
 
 /** Default criteria group used as fallback when group lookup fails */
 const DEFAULT_GROUP_ERROR: CriteriaGroup = {
@@ -101,7 +101,7 @@ type RequeteurGroupType =
  * Complete search request structure in Requeteur format.
  * This is the top-level object that gets serialized and sent to the backend.
  */
-type RequeteurSearchType = {
+export type RequeteurSearchType = {
   /** Version of the Requeteur format */
   version: string
   /** Type identifier for the request */
@@ -446,9 +446,7 @@ export function buildRequest(
   const deidentified: boolean =
     selectedPopulation === null
       ? false
-      : selectedPopulation
-          .map((population) => population && population.access)
-          .filter((elem) => elem && elem === 'Pseudonymisé').length > 0
+      : selectedPopulation.map((population) => population?.access).some((elem) => elem && elem === 'Pseudonymisé')
 
   const exploreCriteriaGroup = (itemIds: number[]): (RequeteurCriteriaType | RequeteurGroupType)[] => {
     let children: (RequeteurCriteriaType | RequeteurGroupType)[] = []
@@ -456,7 +454,30 @@ export function buildRequest(
     for (const itemId of itemIds) {
       let child: RequeteurCriteriaType | RequeteurGroupType | null = null
       const isGroup = itemId < 0
-      if (!isGroup) {
+      if (isGroup) {
+        const group: CriteriaGroup = criteriaGroup.find(({ id }) => id === itemId) ?? DEFAULT_GROUP_ERROR
+
+        // DO SPECIAL THING FOR `NamongM`
+        if (group.type === CriteriaGroupType.N_AMONG_M) {
+          child = {
+            _type: CriteriaGroupType.N_AMONG_M,
+            _id: group.id,
+            isInclusive: group.isInclusive ?? true,
+            criteria: exploreCriteriaGroup(group.criteriaIds),
+            nAmongMOptions: {
+              n: group.options.number,
+              operator: group.options.operator
+            }
+          }
+        } else {
+          child = {
+            _type: group.type,
+            _id: group.id,
+            isInclusive: group.isInclusive ?? true,
+            criteria: exploreCriteriaGroup(group.criteriaIds)
+          }
+        }
+      } else {
         const item: SelectedCriteriaType | undefined = selectedCriteria.find(({ id }) => id === itemId)
         if (!item) {
           console.error('Unknown criteria id', itemId)
@@ -480,35 +501,13 @@ export function buildRequest(
                     : undefined
                 }
               : undefined,
-          occurrence: !(item.type === CriteriaType.PATIENT || item.type === CriteriaType.IPP_LIST)
-            ? {
-                n: item.occurrence.value,
-                operator: item.occurrence.comparator
-              }
-            : undefined
-        }
-      } else {
-        const group: CriteriaGroup = criteriaGroup.find(({ id }) => id === itemId) ?? DEFAULT_GROUP_ERROR
-
-        // DO SPECIAL THING FOR `NamongM`
-        if (group.type === CriteriaGroupType.N_AMONG_M) {
-          child = {
-            _type: CriteriaGroupType.N_AMONG_M,
-            _id: group.id,
-            isInclusive: group.isInclusive ?? true,
-            criteria: exploreCriteriaGroup(group.criteriaIds),
-            nAmongMOptions: {
-              n: group.options.number,
-              operator: group.options.operator
-            }
-          }
-        } else {
-          child = {
-            _type: group.type,
-            _id: group.id,
-            isInclusive: group.isInclusive ?? true,
-            criteria: exploreCriteriaGroup(group.criteriaIds)
-          }
+          occurrence:
+            item.type === CriteriaType.PATIENT || item.type === CriteriaType.IPP_LIST
+              ? undefined
+              : {
+                  n: item.occurrence.value,
+                  operator: item.occurrence.comparator
+                }
         }
       }
       if (child) {
@@ -642,11 +641,11 @@ export async function unbuildRequest(_json: string): Promise<UnbuildRequestRetur
     }
   }
 
-  if (request !== undefined) {
+  if (request === undefined) {
+    return { population, criteria: [], criteriaGroup: [], idRemap: {} }
+  } else {
     criteriaGroup = [...criteriaGroup, { ...request }]
     exploreRequest(request)
-  } else {
-    return { population, criteria: [], criteriaGroup: [], idRemap: {} }
   }
 
   const convertJsonObjectsToCriteria = async (

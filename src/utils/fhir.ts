@@ -44,7 +44,7 @@ export const getExtension = (
 export const getPreferedCode = (code?: CodeableConcept): Coding | undefined => {
   return (
     code?.coding?.find((c) => c.userSelected === true) ||
-    (!getConfig().core.fhir.selectedCodeOnly ? code?.coding?.[0] : undefined)
+    (getConfig().core.fhir.selectedCodeOnly ? undefined : code?.coding?.[0])
   )
 }
 
@@ -70,6 +70,15 @@ export const getExtensionIntegerValue = (
   return extension?.valueInteger
 }
 
+export const getExtensionStringValue = (
+  resource: FhirElement | undefined,
+  url?: string,
+  ...alternativeUrls: string[]
+): string | undefined => {
+  const extension = getExtension(resource, url, ...alternativeUrls)
+  return extension?.valueString
+}
+
 /**
  * Gets a category from a Condition resource based on system URL
  *
@@ -85,6 +94,8 @@ export const getExtensionIntegerValue = (
 export const getCategory = (resource: Condition | undefined, url?: string): CodeableConcept | undefined => {
   if (resource?.category && url) {
     return resource.category.find((e) => e?.coding?.find((a) => a.system === url))
+  } else if (resource?.extension && url) {
+    return resource.extension.find((e) => e?.extension?.find((a) => a.url === url))
   }
   return undefined
 }

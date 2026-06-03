@@ -138,12 +138,11 @@ const AutoLogoutContainer = () => {
    * 4. Dispatches logout action to Redux store
    * 5. Pauses the idle timer
    */
-  const logout = () => {
+  const logout = async () => {
     dispatch(closeAction())
-    navigate('/')
-    localStorage.clear()
-    dispatch(logoutAction())
     pause()
+    await dispatch(logoutAction())
+    navigate('/')
   }
 
   /**
@@ -179,17 +178,30 @@ const AutoLogoutContainer = () => {
    */
   const refreshToken = async () => {
     try {
-      const res = await apiBackend.post(`/auth/refresh/`, { refresh_token: localStorage.getItem(REFRESH_TOKEN) })
+      const currentRefreshToken = localStorage.getItem(REFRESH_TOKEN)
+      if (!currentRefreshToken) {
+        await logout()
+        return
+      }
+
+      const res = await apiBackend.post(`/auth/refresh/`, { refresh_token: currentRefreshToken })
 
       if (res.status === 200) {
+        if (!res.data.access_token) {
+          await logout()
+          return
+        }
+
         localStorage.setItem(ACCESS_TOKEN, res.data.access_token)
-        localStorage.setItem(REFRESH_TOKEN, res.data.refresh_token)
+        if (res.data.refresh_token) {
+          localStorage.setItem(REFRESH_TOKEN, res.data.refresh_token)
+        }
       } else {
-        logout()
+        await logout()
       }
     } catch (error) {
       console.error(error)
-      logout()
+      await logout()
     }
   }
 

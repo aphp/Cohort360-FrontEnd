@@ -148,7 +148,7 @@ const servicesCohortCreation: IServiceCohortCreation = {
       serialized_query: json
     }
     const snapshot = (await apiBack.post<Snapshot>('/cohort/request-query-snapshots/', data)) || {}
-    return snapshot && snapshot.data ? snapshot.data : null
+    return snapshot?.data ? snapshot.data : null
   },
 
   createReport: async (id) => {
@@ -176,7 +176,7 @@ const servicesCohortCreation: IServiceCohortCreation = {
 
     if (snapshotId || snapshotsHistoryFromQuery?.length > 0) {
       currentSnapshotResponse = await apiBack.get<Snapshot>(
-        `/cohort/request-query-snapshots/${snapshotId ? snapshotId : snapshotsHistoryFromQuery?.[0].uuid}/`
+        `/cohort/request-query-snapshots/${snapshotId ?? snapshotsHistoryFromQuery?.[0].uuid}/`
       )
     }
 
@@ -206,9 +206,9 @@ const servicesCohortCreation: IServiceCohortCreation = {
 
     result = {
       requestName,
-      snapshotsHistory: snapshotsHistoryFromQuery ? snapshotsHistoryFromQuery : [],
+      snapshotsHistory: snapshotsHistoryFromQuery ?? [],
       json: currentSnapshot ? currentSnapshot.serialized_query : '',
-      currentSnapshot: currentSnapshot ? currentSnapshot : {},
+      currentSnapshot: currentSnapshot ?? {},
       count: currentSnapshot ? currentSnapshot.dated_measures[0] : {},
       shortCohortLimit,
       count_outdated

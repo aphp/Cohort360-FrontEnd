@@ -109,7 +109,7 @@ export const getFilterLabel = (key: FilterKeys, value: FilterValue): string => {
     [FilterKeys.IPP]: (value) => `IPP : ${value}`,
     [FilterKeys.BODYSITE]: (value) => `Parties du corps : ${value}`,
     [FilterKeys.CODE]: (value) => `Code : ${getFullLabelFromCode(value as LabelObject)}`,
-    [FilterKeys.SOURCE]: (value) => `Source : ${value}`,
+    [FilterKeys.SOURCE]: (value) => `Source : ${(value as string)?.split('/')?.pop()?.toUpperCase()}`,
     [FilterKeys.EXECUTIVE_UNITS]: (value) => {
       const hierarchy = value as Hierarchy<ScopeElement>
       return `Unité exécutrice : ${perimeterDisplay(hierarchy.source_value, hierarchy.name)}`

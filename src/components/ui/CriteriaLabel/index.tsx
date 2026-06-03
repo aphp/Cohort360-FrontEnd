@@ -16,7 +16,7 @@ export const CriteriaLabel = (props: PropsWithChildren<StyledFormLabelProps>) =>
       {label}
       {!!infoIcon && (
         <Tooltip title={infoIcon}>
-          <InfoIcon fontSize="small" color="primary" style={{ marginLeft: 4 }} />
+          <InfoIcon data-testid="InfoIcon" fontSize="small" color="primary" style={{ marginLeft: 4 }} />
         </Tooltip>
       )}
       {props.children}

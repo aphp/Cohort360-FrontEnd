@@ -76,7 +76,7 @@ const TemporalConstraint: React.FC = () => {
             onClick={handleOnClick}
             className={classes.root}
             style={{
-              backgroundColor: !maintenanceIsActive ? '#FFE2A9' : '#DEDEDE'
+              backgroundColor: maintenanceIsActive ? '#DEDEDE' : '#FFE2A9'
             }}
             disabled={maintenanceIsActive}
           >

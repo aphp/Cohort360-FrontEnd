@@ -83,10 +83,7 @@ const SearchValueSet = ({ references, selectedNodes, onSelect }: SearchValueSetP
                   Référentiels :
                 </Typography>
                 <ReferencesParameters
-                  disabled={
-                    loadingStatus.init === LoadingStatus.FETCHING ||
-                    (mode === SearchMode.RESEARCH && loadingStatus.search === LoadingStatus.FETCHING)
-                  }
+                  disabled={loadingStatus.init === LoadingStatus.FETCHING}
                   onSelect={onChangeReferences}
                   type={mode === SearchMode.EXPLORATION ? Type.SINGLE : Type.MULTIPLE}
                   values={refs}
@@ -98,12 +95,11 @@ const SearchValueSet = ({ references, selectedNodes, onSelect }: SearchValueSetP
                     <Input
                       value={searchInput}
                       placeholder="Rechercher un code"
-                      disabled={loadingStatus.search === LoadingStatus.FETCHING}
                       fullWidth
                       onChange={(event) => onChangeSearchInput(event.target.value)}
                       endAdornment={
                         <IconButton onClick={() => onChangeSearchInput('')}>
-                          <ClearIcon style={{ fill: '#6f6f6f', height: 18 }} />
+                          <ClearIcon style={{ fill: '#6f6f6f', height: 18 }} data-testid="ClearIcon" />
                         </IconButton>
                       }
                     />
