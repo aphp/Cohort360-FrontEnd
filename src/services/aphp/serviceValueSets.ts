@@ -343,9 +343,9 @@ export { getValueSetFromCodeSystem } from 'utils/valueSets'
 
 export const getCodeSystemFromValueSet = (valueSetUrl: string): string[] | undefined => {
   // Import locally to avoid circular dependency
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
   const { getReferences } = require('data/valueSets')
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
   const { getConfig } = require('config')
   const references = getReferences(getConfig())
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
