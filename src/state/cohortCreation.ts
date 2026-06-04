@@ -27,6 +27,10 @@ import { Hierarchy } from 'types/hierarchy'
 import { getConfig } from 'config'
 import { ScopeElement } from 'types/scope'
 
+// `unwrap()` rethrows this error name when an async thunk skips execution via its `condition` option.
+const isThunkConditionAbort = (e: unknown): boolean =>
+  typeof e === 'object' && e !== null && (e as { name?: unknown }).name === 'ConditionError'
+
 /**
  * State interface for cohort creation functionality.
  * Contains all data needed for building and managing cohort requests.
@@ -343,6 +347,11 @@ const saveJson = createAsyncThunk<SaveJsonReturn, SaveJsonParams, { state: RootS
       console.error(error)
       throw error
     }
+  },
+  {
+    // gestion-de-projet#3259: concurrent saveJson dispatches race and both POST
+    // as firstTime=true, producing snapshots with duplicate version numbers.
+    condition: (_, { getState }) => !getState().cohortCreation.request.saveLoading
   }
 )
 
@@ -394,14 +403,20 @@ const buildCohortCreation = createAsyncThunk<BuildCohortReturn, BuildCohortParam
 
       const json = buildRequest(_selectedPopulation, _selectedCriteria, _criteriaGroup, _temporalConstraints)
       if (json !== state?.cohortCreation?.request?.json) {
-        const saveJsonResponse = await dispatch(saveJson({ newJson: json })).unwrap()
-        await dispatch(
-          countCohortCreation({
-            json: json,
-            snapshotId: saveJsonResponse.currentSnapshot.uuid,
-            requestId: saveJsonResponse.requestId
-          })
-        )
+        try {
+          const saveJsonResponse = await dispatch(saveJson({ newJson: json })).unwrap()
+          await dispatch(
+            countCohortCreation({
+              json: json,
+              snapshotId: saveJsonResponse.currentSnapshot.uuid,
+              requestId: saveJsonResponse.requestId
+            })
+          )
+        } catch (e) {
+          // Swallow the abort when saveJson's condition skipped the dispatch;
+          // the in-flight save will finalize the snapshot.
+          if (!isThunkConditionAbort(e)) throw e
+        }
       }
 
       const allowSearchIpp = _selectedPopulation ? await services.perimeters.allowSearchIpp(_selectedPopulation) : false
