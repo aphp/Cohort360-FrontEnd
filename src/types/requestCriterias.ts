@@ -79,15 +79,15 @@ export const DocumentsParamsKeys = {
   ONLY_PDF_AVAILABLE: 'onlyPdfAvailable',
   NDA: 'encounter.identifier',
   DATE: 'date',
-  EXECUTIVE_UNITS: `encounter.${encounterCareSite}`,
+  EXECUTIVE_UNITS: `author`,
   ENCOUNTER_STATUS: 'encounter.status'
 }
 
 export const ConditionParamsKeys = {
   NDA: 'encounter.identifier',
   CODE: 'code',
-  DIAGNOSTIC_TYPES: 'orbis-status',
-  DATE: 'recorded-date',
+  DIAGNOSTIC_TYPES: 'diagnosisType',
+  DATE: 'onset-date',
   EXECUTIVE_UNITS: `encounter.${encounterCareSite}`,
   SOURCE: '_source',
   ENCOUNTER_STATUS: 'encounter.status',
@@ -147,6 +147,7 @@ export const ObservationParamsKeys = {
 }
 
 export const ImagingParamsKeys = {
+  BODYSITE: 'bodysite',
   IPP: 'patient.identifier',
   MODALITY: 'modality',
   NDA: 'encounter.identifier',
@@ -258,15 +259,17 @@ export enum VitalStatusLabel {
   ALL = 'Tous les patients'
 }
 
+export enum ViewMode {
+  LOGICAL_OPERATOR_INTERFACE = 'logicalOperator',
+  JSON_INTERFACE = 'json'
+}
+
 // Update the config dynamically
 onUpdateConfig((config) => {
   const encounterCareSite = hasSearchParam(ResourceType.ENCOUNTER, 'encounter-care-site', config)
     ? 'encounter-care-site'
     : 'service-provider'
-  console.log('updated config', config)
-
   EncounterParamsKeys.SERVICE_PROVIDER = encounterCareSite
-  DocumentsParamsKeys.EXECUTIVE_UNITS = `encounter.${encounterCareSite}`
   ConditionParamsKeys.EXECUTIVE_UNITS = `encounter.${encounterCareSite}`
   ProcedureParamsKeys.EXECUTIVE_UNITS = `encounter.${encounterCareSite}`
   ClaimParamsKeys.EXECUTIVE_UNITS = `encounter.${encounterCareSite}`

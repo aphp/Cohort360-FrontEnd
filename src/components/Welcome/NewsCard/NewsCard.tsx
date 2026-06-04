@@ -8,7 +8,7 @@ import { listStaticContents, WebContent } from 'services/aphp/callApi'
 import Markdown from 'react-markdown'
 
 const TutorialsCard = () => {
-  const [_news, setNews] = useState<WebContent[]>()
+  const [news, setNews] = useState<WebContent[]>()
   const { classes } = useStyles()
 
   useEffect(() => {
@@ -28,13 +28,13 @@ const TutorialsCard = () => {
       </div>
 
       <>
-        {_news?.map((entry, index) => (
-          <div key={index}>
+        {news?.map((entry, index) => (
+          <div key={index + entry.title}>
             <Divider className={classes.divider} style={{ marginTop: 8, marginBottom: 16 }} />
             <Typography color="textSecondary" style={{ paddingBottom: 8, color: '#303030' }}>
               <b>{entry.title}</b>
             </Typography>
-            <Typography color="textSecondary" className={classes.markdown}>
+            <Typography component={'span'} color="textSecondary" className={classes.markdown}>
               <Markdown>{entry.content}</Markdown>
             </Typography>
           </div>

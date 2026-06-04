@@ -22,8 +22,7 @@ const BadgeContainer = styled(Box)(({ theme }) => ({
   padding: '2px 8px',
   position: 'relative',
   overflow: 'hidden',
-  minHeight: 20,
-  margin: '0 8px'
+  minHeight: 20
 }))
 
 const ShimmerOverlay = styled(Box)({
@@ -36,7 +35,7 @@ const ShimmerOverlay = styled(Box)({
   animation: `${shimmerAnimation} 2s infinite`
 })
 
-const BadgeText = styled(Typography)(({ theme }) => ({
+const BadgeText = styled(Typography)(() => ({
   fontSize: '11px',
   fontWeight: 700,
   color: 'white',

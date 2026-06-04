@@ -14,7 +14,7 @@
  * - Request joining for complex query composition
  *
  * @module cohortCreation
- * @version 1.6.1
+ * @version 1.6.2
  * @since 1.0.0
  */
 
@@ -47,7 +47,7 @@ import { getValueSetFromCodeSystem } from './valueSets'
 import { formatAge } from './age'
 
 /** Current version of the Requeteur format used for cohort requests */
-const REQUETEUR_VERSION = 'v1.6.1'
+const REQUETEUR_VERSION = 'v1.6.2'
 
 /** Default criteria group used as fallback when group lookup fails */
 const DEFAULT_GROUP_ERROR: CriteriaGroup = {
@@ -102,7 +102,7 @@ type RequeteurGroupType =
  * Complete search request structure in Requeteur format.
  * This is the top-level object that gets serialized and sent to the backend.
  */
-type RequeteurSearchType = {
+export type RequeteurSearchType = {
   /** Version of the Requeteur format */
   version: string
   /** Type identifier for the request */
@@ -447,9 +447,7 @@ export function buildRequest(
   const deidentified: boolean =
     selectedPopulation === null
       ? false
-      : selectedPopulation
-          .map((population) => population && population.access)
-          .filter((elem) => elem && elem === 'Pseudonymisé').length > 0
+      : selectedPopulation.map((population) => population?.access).some((elem) => elem && elem === 'Pseudonymisé')
 
   const exploreCriteriaGroup = (itemIds: number[]): (RequeteurCriteriaType | RequeteurGroupType)[] => {
     let children: (RequeteurCriteriaType | RequeteurGroupType)[] = []
@@ -457,7 +455,30 @@ export function buildRequest(
     for (const itemId of itemIds) {
       let child: RequeteurCriteriaType | RequeteurGroupType | null = null
       const isGroup = itemId < 0
-      if (!isGroup) {
+      if (isGroup) {
+        const group: CriteriaGroup = criteriaGroup.find(({ id }) => id === itemId) ?? DEFAULT_GROUP_ERROR
+
+        // DO SPECIAL THING FOR `NamongM`
+        if (group.type === CriteriaGroupType.N_AMONG_M) {
+          child = {
+            _type: CriteriaGroupType.N_AMONG_M,
+            _id: group.id,
+            isInclusive: group.isInclusive ?? true,
+            criteria: exploreCriteriaGroup(group.criteriaIds),
+            nAmongMOptions: {
+              n: group.options.number,
+              operator: group.options.operator
+            }
+          }
+        } else {
+          child = {
+            _type: group.type,
+            _id: group.id,
+            isInclusive: group.isInclusive ?? true,
+            criteria: exploreCriteriaGroup(group.criteriaIds)
+          }
+        }
+      } else {
         const item: SelectedCriteriaType | undefined = selectedCriteria.find(({ id }) => id === itemId)
         if (!item) {
           console.error('Unknown criteria id', itemId)
@@ -481,35 +502,13 @@ export function buildRequest(
                     : undefined
                 }
               : undefined,
-          occurrence: !(item.type === CriteriaType.PATIENT || item.type === CriteriaType.IPP_LIST)
-            ? {
-                n: item.occurrence.value,
-                operator: item.occurrence.comparator
-              }
-            : undefined
-        }
-      } else {
-        const group: CriteriaGroup = criteriaGroup.find(({ id }) => id === itemId) ?? DEFAULT_GROUP_ERROR
-
-        // DO SPECIAL THING FOR `NamongM`
-        if (group.type === CriteriaGroupType.N_AMONG_M) {
-          child = {
-            _type: CriteriaGroupType.N_AMONG_M,
-            _id: group.id,
-            isInclusive: group.isInclusive ?? true,
-            criteria: exploreCriteriaGroup(group.criteriaIds),
-            nAmongMOptions: {
-              n: group.options.number,
-              operator: group.options.operator
-            }
-          }
-        } else {
-          child = {
-            _type: group.type,
-            _id: group.id,
-            isInclusive: group.isInclusive ?? true,
-            criteria: exploreCriteriaGroup(group.criteriaIds)
-          }
+          occurrence:
+            item.type === CriteriaType.PATIENT || item.type === CriteriaType.IPP_LIST
+              ? undefined
+              : {
+                  n: item.occurrence.value,
+                  operator: item.occurrence.comparator
+                }
         }
       }
       if (child) {
@@ -520,7 +519,29 @@ export function buildRequest(
   }
 
   const mainCriteriaGroups = criteriaGroup.find(({ id }) => id === 0)
-
+  let request: RequeteurGroupType | undefined = undefined
+  if (mainCriteriaGroups) {
+    const baseGroup = {
+      _id: 0,
+      isInclusive: !!mainCriteriaGroups.isInclusive,
+      criteria: exploreCriteriaGroup(mainCriteriaGroups.criteriaIds),
+      temporalConstraints: temporalConstraints.filter(({ constraintType }) => constraintType !== 'none')
+    }
+    if (mainCriteriaGroups.type === CriteriaGroupType.N_AMONG_M)
+      request = {
+        ...baseGroup,
+        _type: CriteriaGroupType.N_AMONG_M,
+        nAmongMOptions: {
+          n: mainCriteriaGroups.options.number,
+          operator: mainCriteriaGroups.options.operator
+        }
+      }
+    else
+      request = {
+        ...baseGroup,
+        _type: mainCriteriaGroups.type
+      }
+  }
   const json: RequeteurSearchType = {
     version: REQUETEUR_VERSION,
     _type: 'request',
@@ -529,18 +550,7 @@ export function buildRequest(
         ?.map((_selectedPopulation) => _selectedPopulation?.cohort_id)
         .filter((item): item is string => !!item && item !== 'loading')
     },
-    request: !mainCriteriaGroups
-      ? undefined
-      : {
-          _id: 0,
-          _type:
-            mainCriteriaGroups.type === CriteriaGroupType.OR_GROUP
-              ? CriteriaGroupType.OR_GROUP
-              : CriteriaGroupType.AND_GROUP,
-          isInclusive: !!mainCriteriaGroups.isInclusive,
-          criteria: exploreCriteriaGroup(mainCriteriaGroups.criteriaIds),
-          temporalConstraints: temporalConstraints.filter(({ constraintType }) => constraintType !== 'none')
-        }
+    request
   }
 
   return JSON.stringify(json)
@@ -632,11 +642,11 @@ export async function unbuildRequest(_json: string): Promise<UnbuildRequestRetur
     }
   }
 
-  if (request !== undefined) {
+  if (request === undefined) {
+    return { population, criteria: [], criteriaGroup: [], idRemap: {} }
+  } else {
     criteriaGroup = [...criteriaGroup, { ...request }]
     exploreRequest(request)
-  } else {
-    return { population, criteria: [], criteriaGroup: [], idRemap: {} }
   }
 
   const convertJsonObjectsToCriteria = async (
@@ -679,7 +689,7 @@ export async function unbuildRequest(_json: string): Promise<UnbuildRequestRetur
                     timeDelayMax: groupItem.nAmongMOptions.timeDelayMax ?? 0
                   }
                 })
-              } as CriteriaGroup)
+              }) as CriteriaGroup
           )
           .sort((prev, next) => next.id - prev.id)
       : []

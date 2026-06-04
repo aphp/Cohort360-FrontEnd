@@ -37,12 +37,19 @@ const useStyles = makeStyles()(() => ({
     position: 'relative',
     '&:hover': {
       background: '#19235A'
+    },
+    '&.Mui-disabled': {
+      background: '#0000001F',
+      color: 'rgba(0,0,0,0.26)',
+      cursor: 'auto'
     }
   },
   operatorChild: {
     marginLeft: 23,
     borderLeft: '4px solid #19235a',
-    paddingLeft: 35
+    paddingLeft: 35,
+    display: 'flex',
+    flexDirection: 'column'
   }
 }))
 

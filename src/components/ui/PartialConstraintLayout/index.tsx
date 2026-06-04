@@ -54,7 +54,7 @@ const PartialConstraintLayout: React.FC<PartialConstraintLayoutProps> = ({ isEpi
 
   const _onConfirm = () => {
     const newConstraint: TemporalConstraintsType = {
-      idList: encounterConstraint.criteriaIds.sort(),
+      idList: encounterConstraint.criteriaIds.sort((a, b) => a - b),
       constraintType: isEpisode ? TemporalConstraintsKind.SAME_EPISODE_OF_CARE : TemporalConstraintsKind.SAME_ENCOUNTER
     }
     setEncounterConstraint(defaultEncounterConstraint)
@@ -132,7 +132,7 @@ const PartialConstraintLayout: React.FC<PartialConstraintLayoutProps> = ({ isEpi
               title={title}
               actions={
                 <IconButton onClick={() => onDelete(constraint)}>
-                  <DeleteIcon />
+                  <DeleteIcon data-testid="DeleteIcon" />
                 </IconButton>
               }
               wrap
@@ -142,9 +142,8 @@ const PartialConstraintLayout: React.FC<PartialConstraintLayoutProps> = ({ isEpi
                 <Grid
                   key={criteriaId}
                   container
-                  alignItems="center"
-                  xs={constraint.idList.length > 3 ? 6 : false}
-                  sx={{ margin: '4px 0' }}
+                  size={constraint.idList.length > 3 ? { xs: 6 } : undefined}
+                  sx={{ alignItems: 'center', margin: '4px 0' }}
                 >
                   <AvatarWrapper size={20} fontSize={12} marginLeft={0.5} marginRight={0.5}>
                     {criteriaId}
@@ -162,7 +161,7 @@ const PartialConstraintLayout: React.FC<PartialConstraintLayoutProps> = ({ isEpi
               setShowAddConstraintIcon(false)
             }}
           >
-            <AddCircleIcon sx={{ height: '2em', width: '2em' }} />
+            <AddCircleIcon data-testid="AddCircleIcon" sx={{ height: '2em', width: '2em' }} />
           </IconButton>
         )}
 
@@ -254,7 +253,7 @@ const PartialConstraintLayout: React.FC<PartialConstraintLayoutProps> = ({ isEpi
                       />
                     }
                     label={
-                      <Grid container alignItems="center" wrap="nowrap">
+                      <Grid container sx={{ alignItems: 'center' }} wrap="nowrap">
                         <AvatarWrapper size={20} fontSize={12} marginLeft={0.5} marginRight={0.5}>
                           {criteria.id}
                         </AvatarWrapper>

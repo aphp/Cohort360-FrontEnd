@@ -120,11 +120,11 @@ const Preview: React.FC<PreviewProps> = ({
   }, [])
 
   return (
-    <Grid container direction="column" alignItems="center" className={classes.root}>
-      <Grid container item justifyContent="space-between" alignItems="center">
-        <Grid container item xs={12} sm={6} md={4} justifyContent="center">
+    <Grid container sx={{ flexDirection: 'column', alignItems: 'center' }} className={classes.root}>
+      <Grid container size={12} sx={{ justifyContent: 'space-between', alignItems: 'center' }}>
+        <Grid container size={{ xs: 12, sm: 6, md: 4 }} sx={{ justifyContent: 'center' }}>
           <Paper id="patient-number-card" className={classes.nbPatientsOverlay}>
-            <Grid container item className={classes.chartTitle}>
+            <Grid container size={12} className={classes.chartTitle}>
               <Typography id="patient-number-card-title" variant="h3" color="primary">
                 Nombre de patients
               </Typography>
@@ -141,48 +141,46 @@ const Preview: React.FC<PreviewProps> = ({
             )}
           </Paper>
         </Grid>
-        <Grid item xs={12} sm={6} md={8}>
+        <Grid size={{ xs: 12, sm: 6, md: 8 }}>
           <RepartitionTable genderRepartitionMap={genderRepartitionMap} loading={loading} />
         </Grid>
       </Grid>
 
       <Grid container>
-        <Grid container item xs={12} sm={6} lg={4} justifyContent="center">
+        <Grid container size={{ xs: 12, sm: 6, lg: 4 }} sx={{ justifyContent: 'center' }}>
           <Chart id="vital-repartition-card" isLoading={loading} title="Répartition par statut vital">
             <PieChart data={vitalStatusData ?? []} />
           </Chart>
         </Grid>
 
-        <Grid container item xs={12} sm={6} lg={4} justifyContent="center">
+        <Grid container size={{ xs: 12, sm: 6, lg: 4 }} sx={{ justifyContent: 'center' }}>
           <Chart id="visit-type-repartition-card" isLoading={loading} title="Répartition par type de visite">
             <DonutChart data={visitTypeRepartitionData} />
           </Chart>
         </Grid>
 
-        <Grid container item xs={12} sm={12} lg={4} justifyContent="center">
+        <Grid container size={{ xs: 12, sm: 12, lg: 4 }} sx={{ justifyContent: 'center' }}>
           <Chart id="gender-repartition-card" isLoading={loading} title="Répartition par genre">
             <BarChart data={genderData} />
           </Chart>
         </Grid>
 
-        <Grid container item md={12} lg={6} justifyContent="center">
+        <Grid container size={{ md: 12, sm: 12, lg: 6 }} sx={{ justifyContent: 'center' }}>
           <Chart id="age-structure-card" isLoading={loading} title="Pyramide des âges">
             <PyramidChart data={agePyramidData} />
           </Chart>
         </Grid>
 
-        <Grid container item md={12} lg={6} justifyContent="center">
-          <Grid container item justifyContent="center">
-            <Chart id="month-repartition-visit-card" isLoading={loading} title="Répartition des visites par mois">
-              <GroupedBarChart data={monthlyVisitData} />
-            </Chart>
-          </Grid>
+        <Grid container size={{ md: 12, sm: 12, lg: 6 }} sx={{ justifyContent: 'center' }}>
+          <Chart id="month-repartition-visit-card" isLoading={loading} title="Répartition des visites par mois">
+            <GroupedBarChart data={monthlyVisitData} />
+          </Chart>
         </Grid>
       </Grid>
 
       {appConfig.features.locationMap.enabled && cohortId && (
-        <Grid container item justifyContent="space-between" alignItems="center">
-          <Grid item xs={12} sm={12} md={12} justifyContent="center">
+        <Grid size={12} container sx={{ justifyContent: 'space-between', alignItems: 'center' }}>
+          <Grid size={{ xs: 12, sm: 12, md: 12 }} sx={{ justifyContent: 'center' }}>
             <Chart
               id="location-map"
               isLoading={loading}

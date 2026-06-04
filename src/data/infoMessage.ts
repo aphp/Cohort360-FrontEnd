@@ -16,7 +16,7 @@ export const sortContent = (content: WebContent[]): WebContent[] => {
       if (!aOrder) return -1
       if (!bOrder) return 1
 
-      return parseInt(aOrder) - parseInt(bOrder)
+      return Number.parseInt(aOrder) - Number.parseInt(bOrder)
     } catch {
       // If parsing fails, treat as if content doesn't have metadata
       if (!a.metadata?.["order"]) return -1

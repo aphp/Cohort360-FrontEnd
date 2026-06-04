@@ -100,6 +100,7 @@ export const useHierarchy = <T>(
       setLoadingStatus({ ...loadingStatus, search: LoadingStatus.SUCCESS })
       return { display: getDisplayFromTrees(endCodes, newTrees), count }
     } catch (e) {
+      console.error(e)
       return {
         display: [],
         count: 0
@@ -116,8 +117,8 @@ export const useHierarchy = <T>(
     const { display, count } = await search(fetchSearch)
 
     const cleaned = display.filter((e) => e)
-    if (display.length !== cleaned.length) setHasError(true)
-    else setHasError(false)
+    if (display.length === cleaned.length) setHasError(false)
+    else setHasError(true)
     if (mode == SearchMode.EXPLORATION && id) {
       const currentHierarchy = hierarchies.get(id) || DEFAULT_HIERARCHY_INFO
       setHierarchies(replaceInMap(id, { ...currentHierarchy, tree: cleaned, page }, hierarchies))

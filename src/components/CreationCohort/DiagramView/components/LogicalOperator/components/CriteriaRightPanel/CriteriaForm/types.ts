@@ -308,14 +308,15 @@ export type CriteriaItemBuildInfo = {
 
 export type GenericCriteriaItem = CriteriaItems & CriteriaItemBuildInfo
 
-export type WithBuildInfo<T extends DataTypeMappings> = T extends CriteriaTypeMapping<
-  infer DefinitionType,
-  // Used to be useful for the buildInfo type but not anymore, though didn't find a typing replacement to extract the DefintionType without The DataType
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  infer DataType
->
-  ? DefinitionType & CriteriaItemBuildInfo
-  : never
+export type WithBuildInfo<T extends DataTypeMappings> =
+  T extends CriteriaTypeMapping<
+    infer DefinitionType,
+    // Used to be useful for the buildInfo type but not anymore, though didn't find a typing replacement to extract the DefintionType without The DataType
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    infer DataType
+  >
+    ? DefinitionType & CriteriaItemBuildInfo
+    : never
 
 /**
  * Criteria item definition

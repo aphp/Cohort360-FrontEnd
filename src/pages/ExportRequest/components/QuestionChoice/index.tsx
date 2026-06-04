@@ -88,7 +88,7 @@ interface QuestionSelectorDialogProps {
   onClose: () => void
   selectedQuestions: QuestionLeaf[]
   onDefaultQuestionnaireIds: (questionnaireIds: string[]) => void
-  onConfirm: (selected: QuestionLeaf[], selectedQuestionnaireIds: string[]) => void
+  onConfirm: (selected: QuestionLeaf[], pivotColumns: string[]) => void
 }
 
 /***********************************
@@ -105,7 +105,7 @@ const normalize = (str: string) =>
   str
     .toLocaleLowerCase('fr-FR')
     .normalize('NFD')
-    .replace(/\p{Diacritic}/gu, '')
+    .replaceAll(/\p{Diacritic}/gu, '')
 
 /**
  * Checks if a linkId starts with the F_MATER_ prefix.
@@ -346,7 +346,11 @@ const QuestionSelectorDialog: React.FC<QuestionSelectorDialogProps> = ({
     setCheckedByQuestionnaire((prev) => {
       const map = new Map(prev)
       const set = new Set(map.get(selectedQuestionnaireId) ?? [])
-      set.has(linkId) ? set.delete(linkId) : set.add(linkId)
+      if (set.has(linkId)) {
+        set.delete(linkId)
+      } else {
+        set.add(linkId)
+      }
       map.set(selectedQuestionnaireId, set)
       return map
     })
@@ -376,19 +380,22 @@ const QuestionSelectorDialog: React.FC<QuestionSelectorDialogProps> = ({
     })
   }
 
-  const getQuestionnaireIdBySelectedLeaves = () => {
-    const questionnaireIds = new Set<string>()
-    checkedByQuestionnaire.forEach((set, qId) => {
-      if (set.size > 0) {
-        questionnaireIds.add(qId)
+  const buildPivotColumns = (): string[] => {
+    const hasAnySelection = Array.from(checkedByQuestionnaire.values()).some((set) => set.size > 0)
+    if (!hasAnySelection) return []
+
+    return questionnaires.flatMap((q) => {
+      const checked = checkedByQuestionnaire.get(q.id)
+      if (checked && checked.size > 0) {
+        return Array.from(checked)
       }
+      return collectLeaves(q.item).map((l) => l.linkId)
     })
-    return Array.from(questionnaireIds)
   }
 
   const handleConfirm = () => {
-    const pivotQuestionnaireIds = getQuestionnaireIdBySelectedLeaves()
-    onConfirm(allSelectedLeaves, pivotQuestionnaireIds)
+    const pivotColumns = buildPivotColumns()
+    onConfirm(allSelectedLeaves, pivotColumns)
     setInputQuery('') // reset search input
     setCheckedByQuestionnaire(new Map()) // reset checked state
     onClose()
@@ -405,11 +412,11 @@ const QuestionSelectorDialog: React.FC<QuestionSelectorDialogProps> = ({
       <DialogTitle>
         <span>Sélection des questions</span>
         <FormControl sx={{ ml: 2, minWidth: 200 }} size="small">
-          <InputLabel id="questionnaire-select-label">Formulaire</InputLabel>
+          <InputLabel id="questionnaire-select-label">Dossiers de Spécialité</InputLabel>
           <Select
             labelId="questionnaire-select-label"
             value={selectedQuestionnaireId}
-            label="Formulaire"
+            label="Dossiers de Spécialité"
             onChange={handleQuestionnaireChange}
           >
             {questionnaires.map((q) => (

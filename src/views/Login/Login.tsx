@@ -7,9 +7,9 @@ import React, {
   useState
 } from 'react'
 import { useNavigate } from 'react-router-dom'
-import localforage from 'localforage'
 import {
   Alert,
+  Box,
   Button,
   CircularProgress,
   Dialog,
@@ -30,14 +30,15 @@ import logo from 'assets/images/logo-login.png'
 import logoAPHP from 'assets/images/logo-aphp.png'
 import Keycloak from 'assets/icones/keycloak.svg?react'
 
-import { useAppDispatch } from 'state'
+import { useAppDispatch, useAppSelector } from 'state'
 import { MeState, login as loginAction } from 'state/me'
 import { ACCESS_TOKEN, REFRESH_TOKEN } from 'constants.js'
+import { isAccessTokenValid } from 'utils/tokens'
 
 import services from 'services/aphp'
 
 import useStyles from './styles'
-import { getDaysLeft } from 'utils/formatDate'
+import { getDaysLeft } from 'utils/dates'
 import { AccessExpiration, User } from 'types'
 import { isAxiosError } from 'axios'
 import { saveRights } from 'state/scope'
@@ -85,23 +86,33 @@ const LegalMentionDialog = ({ open, setOpen }: LegalMentionDialogProps) => {
 
   return (
     <Dialog open={open} onClose={_setOpen}>
-      <DialogTitle>Mention légale</DialogTitle>
+      <DialogTitle>Mentions légales</DialogTitle>
       <DialogContent>
-        <DialogContentText align="justify">
-          L’usage de Cohort360 est soumis au respect des règles d’accès aux données de santé définies par la Commission
-          Médicale d’Etablissement de l’AP-HP disponibles à l’adresse recherche-innovation.aphp.fr.
-        </DialogContentText>
-        <DialogContentText>
-          En appuyant sur le bouton « OK », vous acceptez ces conditions d’utilisation. Les données relatives à votre
-          connexion et à vos actions sur l’application (date, heure, type d’action), sont enregistrées et traitées pour
-          des finalités de sécurité du système d’information et afin de réaliser des statistiques d’utilisation de
-          l’application.
-        </DialogContentText>
-        <DialogContentText>
-          Elles sont destinées à l’équipe projet de la DSI et sont conservées dans des fichiers de logs pendant 3 ans.
-          Vous pouvez exercer votre droit d’accès et de rectification aux informations qui vous concernent, en écrivant
-          à la déléguée à la protection des données de l’AP-HP à l’adresse protection.donnees.dsi@aphp.fr.
-        </DialogContentText>
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+          <DialogContentText align="justify">
+            L'usage de Cohort360 est soumis au respect des règles d'accès aux données de santé définies par la
+            Commission Médicale d'Etablissement de l'AP-HP disponibles à l'adresse recherche-innovation.aphp.fr.
+          </DialogContentText>
+          <DialogContentText align="justify">
+            L'usage de Cohort360 est également soumis au respect des règles d'utilisation acceptées par l'utilisateur au
+            moment de sa formation.
+          </DialogContentText>
+          <DialogContentText align="justify">
+            En appuyant sur le bouton « OK », vous acceptez ces conditions d'utilisation. Les données relatives à votre
+            connexion et à vos actions sur l'application (date, heure, type d'action, APH, nom, prénom, mail, périmètre
+            d'habilitation), sont enregistrées et traitées pour des finalités de sécurité du système d'information et
+            afin de réaliser des statistiques d'utilisation de l'application.
+          </DialogContentText>
+          <DialogContentText align="justify">
+            Ces données sont conservées pendant la durée strictement nécessaire à leur finalité. Vous pouvez exercer
+            votre droit d'accès et de rectification aux informations qui vous concernent, en écrivant à la déléguée à la
+            protection des données de l'AP-HP à l'adresse <Link href="mailto:dpo@aphp.fr">dpo@aphp.fr</Link>.
+          </DialogContentText>
+          <DialogContentText align="justify">
+            Pour toute autre question, contactez l'équipe support :{' '}
+            <Link href="mailto:id.recherche.support.dsn@aphp.fr">id.recherche.support.dsn@aphp.fr</Link>.
+          </DialogContentText>
+        </Box>
       </DialogContent>
       <DialogActions>
         <Button onClick={() => setOpen(false)}>OK</Button>
@@ -115,6 +126,7 @@ const Login = () => {
   const { classes, cx } = useStyles()
   const appConfig = useContext(AppConfig)
   const dispatch = useAppDispatch()
+  const me = useAppSelector((state) => state.me)
   const [loading, setLoading] = useState(false)
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
@@ -127,9 +139,16 @@ const Login = () => {
   const oidcCode = urlParams.get('code')
 
   useEffect(() => {
-    localforage.setItem('persist:root', '')
     if (oidcCode) login()
   }, [])
+
+  useEffect(() => {
+    if (!oidcCode && me && isAccessTokenValid()) {
+      const oldPath = localStorage.getItem('old-path')
+      localStorage.removeItem('old-path')
+      navigate(oldPath ?? '/home', { replace: true })
+    }
+  }, [me, navigate, oidcCode])
 
   const loadBootstrapData = async (practitionerData: User, lastConnection: string) => {
     const maintenanceResponse = await services.practitioner.maintenance()
@@ -220,7 +239,7 @@ const Login = () => {
     } else {
       if (!username || !password) {
         setLoading(false)
-        return setError(true), setErrorMessage("L'un des champs nom d'utilisateur ou mot de passe est vide.")
+        return (setError(true), setErrorMessage("L'un des champs nom d'utilisateur ou mot de passe est vide."))
       }
       if (username && password) {
         localStorage.setItem('oidcAuth', 'false')
@@ -249,7 +268,7 @@ const Login = () => {
       loadBootstrapData(practitioner, lastConnection)
     } else {
       setLoading(false)
-      return setError(true), setErrorMessage("Votre nom d'utilisateur ou mot de passe est incorrect.")
+      return (setError(true), setErrorMessage("Votre nom d'utilisateur ou mot de passe est incorrect."))
     }
   }
 
@@ -275,7 +294,9 @@ const Login = () => {
   }
 
   const onKeyDown = (event: ReactKeyboardEvent<HTMLDivElement>) => {
-    event.key === 'Enter' ? _onSubmit(event) : null
+    if (event.key === 'Enter') {
+      _onSubmit(event)
+    }
   }
 
   useEffect(() => {
@@ -300,7 +321,7 @@ const Login = () => {
   if (noRights) return <NoRights oidcCode={oidcCode} />
 
   return oidcCode ? (
-    <Grid className={classes.oidcConnexionProgress}>
+    <Grid container className={classes.oidcConnexionProgress}>
       <Typography variant="h2" color="primary">
         Connexion...
       </Typography>
@@ -310,31 +331,46 @@ const Login = () => {
   ) : (
     <>
       <Grid container component="main" className={classes.root}>
-        <Grid item xs={false} sm={6} md={6} className={classes.image} />
+        <Grid size={{ xs: false, sm: 6, md: 6 }} className={classes.image} />
 
         <Grid
           container
-          item
-          xs={12}
-          sm={6}
-          md={6}
-          direction="column"
-          justifyContent="center"
-          alignItems="center"
+          size={{ xs: 12, sm: 6, md: 6 }}
+          sx={{
+            flexDirection: 'column',
+            justifyContent: 'center',
+            alignItems: 'center'
+          }}
           className={classes.rightPanel}
         >
-          <Grid container xs={8} lg={6} item direction="column" alignItems="center" justifyContent="center">
+          <Grid
+            container
+            size={{ xs: 8, lg: 6 }}
+            sx={{
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}
+          >
             <img className={classes.logo} src={logo} alt="Logo Cohort360" />
 
             <Typography color="primary" className={classes.bienvenue}>
               Bienvenue ! Connectez-vous.
             </Typography>
             {(appConfig.system.displayJwtLogin || display_jwt_form) && (
-              <Grid container direction="column" alignItems="center" justifyContent="center">
+              <Grid
+                container
+                size={9}
+                sx={{
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}
+              >
                 <TextField
+                  fullWidth
                   margin="normal"
                   required
-                  style={{ width: '50%' }}
                   id="identifiant"
                   label="Identifiant"
                   name="Identifiant"
@@ -345,9 +381,9 @@ const Login = () => {
                 />
 
                 <TextField
+                  fullWidth
                   margin="normal"
                   required
-                  style={{ width: '50%' }}
                   name="Votre mot de passe"
                   label="Votre mot de passe"
                   type="password"
@@ -385,7 +421,7 @@ const Login = () => {
 
             <Typography align="center">
               <Link href="#" onClick={() => setOpen(true)} underline="hover">
-                En vous connectant, vous acceptez la mention légale.
+                En vous connectant, vous acceptez les mentions légales.
               </Link>
             </Typography>
           </Grid>

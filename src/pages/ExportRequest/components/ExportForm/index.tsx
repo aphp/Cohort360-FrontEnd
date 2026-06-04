@@ -41,6 +41,7 @@ import { Cohort } from 'types'
 import { TableSetting, TableInfo } from 'types/export'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { sortTables } from 'pages/ExportRequest/components/exportUtils'
+import { useDebounceAction } from 'hooks/useDebounceAction'
 
 import { getConfig } from 'config'
 
@@ -68,10 +69,10 @@ type ErrorTables = Array<{
   error?: Error
 }>
 
-/** Initial state for table settings with person table pre-selected */
+/** Initial state for table settings with patient table pre-selected */
 const tableSettingsInitialState: TableSetting[] = [
   {
-    tableName: 'person',
+    tableName: 'Patient',
     isChecked: true,
     columns: null,
     fhirFilter: null,
@@ -79,10 +80,10 @@ const tableSettingsInitialState: TableSetting[] = [
   }
 ]
 
-/** Initial state for error tracking with person table having no errors */
+/** Initial state for error tracking with patient table having no errors */
 const errorTablesInitialState: ErrorTables = [
   {
-    tableName: 'person',
+    tableName: 'Patient',
     error: Error.NO_ERROR
   }
 ]
@@ -118,6 +119,7 @@ const ExportForm: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams()
   const cohortID = searchParams.get('groupId')
   const [loading, setLoading] = useState<boolean>(false)
+  const [exporting, setExporting] = useState<boolean>(false)
   const [cohortListLoading, setCohortListLoading] = useState<boolean>(false)
   const navigate = useNavigate()
   const dispatch = useAppDispatch()
@@ -291,8 +293,8 @@ const ExportForm: React.FC = () => {
   }, [])
 
   const resetSelectedTables = () => {
-    const newSelectedTables = tableSettingsInitialState
-    setTablesSettings(newSelectedTables)
+    setTablesSettings(tableSettingsInitialState)
+    setErrorTables(errorTablesInitialState)
   }
 
   const handleSelectAllTables = useCallback(
@@ -316,7 +318,7 @@ const ExportForm: React.FC = () => {
       } else {
         setTablesSettings([
           {
-            tableName: 'person',
+            tableName: 'Patient',
             isChecked: true,
             columns: null,
             fhirFilter: null,
@@ -339,6 +341,7 @@ const ExportForm: React.FC = () => {
     })
 
     const error = response.status !== 201
+    setExporting(false)
 
     dispatch(
       showDialog({
@@ -353,6 +356,8 @@ const ExportForm: React.FC = () => {
       })
     )
   }
+
+  const debouncedSubmitPayload = useDebounceAction(handleSubmitPayload, 500)
 
   const handleChangeMotivation = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     if (e.target.value.length < 10) {
@@ -399,11 +404,11 @@ const ExportForm: React.FC = () => {
   ])
 
   return (
-    <Grid container>
-      <Grid container item className={classes.selectedCohortGrid}>
+    <Grid container size={12}>
+      <Grid container className={classes.selectedCohortGrid}>
         <>
           {displayForm ? (
-            <Grid container alignItems={'center'}>
+            <Grid container sx={{ alignItems: 'center' }}>
               <Typography variant="h2">Cohorte sélectionnée :&nbsp;</Typography>
               <Typography variant="h3" color="#544d4d">
                 {exportCohort?.name}
@@ -424,7 +429,7 @@ const ExportForm: React.FC = () => {
                 getOptionLabel={(option) => {
                   return `${option.name}`
                 }}
-                renderInput={(params) => <TextField {...params} label="Sélectionnez une Cohorte" />}
+                renderInput={(params) => <TextField {...params} label="Sélectionner une cohorte" />}
                 value={exportCohort}
                 onChange={(_, value) => {
                   setExportCohort(value)
@@ -462,7 +467,7 @@ const ExportForm: React.FC = () => {
             Le motif doit comporter au moins 10 caractères
           </Typography>
 
-          <Grid container className={classes.oneFileGrid} alignItems="center">
+          <Grid container size={12} className={classes.oneFileGrid} sx={{ alignItems: 'center' }}>
             <FormControlLabel
               control={
                 <Checkbox
@@ -483,12 +488,12 @@ const ExportForm: React.FC = () => {
                 </span>
               }
             >
-              <InfoIcon fontSize="small" color="primary" />
+              <InfoIcon data-testid="InfoIcon" fontSize="small" color="primary" />
             </Tooltip>
           </Grid>
 
-          <Grid item container alignItems="center" flexWrap="nowrap">
-            <Grid item container xs={3}>
+          <Grid container size={12} sx={{ alignItems: 'center', flexWrap: 'nowrap' }}>
+            <Grid container size={{ xs: 3 }}>
               <Typography className={classes.dialogHeader} variant="h5">
                 Tables exportées
               </Typography>
@@ -502,11 +507,11 @@ const ExportForm: React.FC = () => {
                   )
                 }
               >
-                <InfoIcon />
+                <InfoIcon data-testid="InfoIcon" />
               </IconButton>
             </Grid>
 
-            <Grid container className={classes.fileTypeGrid} xs={5}>
+            <Grid container className={classes.fileTypeGrid} size={{ xs: 5 }}>
               <Typography variant="h3">Type de fichier : </Typography>
               <Select
                 className={classes.fileTypeSelect}
@@ -521,21 +526,21 @@ const ExportForm: React.FC = () => {
             </Grid>
 
             {oneFile !== true && (
-              <Grid item xs={4} container className={classes.selectAllTablesGrid}>
+              <Grid size={{ xs: 4 }} container className={classes.selectAllTablesGrid}>
                 <FormControlLabel
                   className={classes.selectAllTablesFormControl}
                   control={
                     <Checkbox
                       color="secondary"
                       indeterminate={
-                        (exportTableList &&
+                        (exportTableList?.length !== undefined &&
                           tablesSettings.filter((tableSetting) => tableSetting.isChecked).length !==
                             exportTableList.length &&
                           tablesSettings.some((tableSetting) => tableSetting.isChecked)) ??
                         false
                       }
                       checked={
-                        (exportTableList &&
+                        (exportTableList?.length !== undefined &&
                           tablesSettings.filter((tableSetting) => tableSetting.isChecked).length ===
                             exportTableList.length) ??
                         false
@@ -553,7 +558,7 @@ const ExportForm: React.FC = () => {
             )}
           </Grid>
           {loading ? (
-            <Grid container className={classes.exportTableGrid} justifyContent={'center'}>
+            <Grid container className={classes.exportTableGrid} sx={{ justifyContent: 'center' }}>
               <CircularProgress />
             </Grid>
           ) : (
@@ -565,14 +570,14 @@ const ExportForm: React.FC = () => {
               Conditions de l'EDS
             </Typography>
 
-            <Grid item container gap="8px" justifyContent={'space-between'}>
+            <Grid container sx={{ gap: '8px', justifyContent: 'space-between' }}>
               <Typography variant="caption" className={classes.textBody2}>
                 Le niveau d’habilitation dont vous disposez dans Cohort360 vous autorise à exporter des données à
                 caractère personnel conformément à la réglementation et aux règles institutionnelles d’utilisation des
                 données du Système d’Information clinique de l’AP-HP. Vous êtes garant des données exportées et vous
                 vous engagez à :
               </Typography>
-              <Grid item container>
+              <Grid container>
                 <Typography variant="caption" className={classes.conditionItem}>
                   N’exporter, parmi les catégories de données accessibles, que les données strictement nécessaires et
                   pertinentes au regard des objectifs de la recherche
@@ -605,6 +610,12 @@ const ExportForm: React.FC = () => {
                   À ne pas croiser les données avec tout autre jeu de données, sans autorisation auprès de la CNIL
                 </Typography>
               </Grid>
+              <Typography variant="caption" className={classes.textBody2}>
+                Les publications relatives à des études réalisées à partir des données de l’EDS de l’AP-HP y font
+                référence sous la forme de « l’Entrepôt de Données de Santé de l’Assistance Publique – Hôpitaux de Paris
+                (AP-HP) » ou « AP-HP Clinical Data Warehouse » ou « Clinical Data Warehouse of Greater Paris University
+                Hospitals ».
+              </Typography>
 
               <FormControlLabel
                 control={
@@ -623,14 +634,19 @@ const ExportForm: React.FC = () => {
                 }
               />
               <Button
-                disabled={conditions === false || motivation === null || error === Error.ERROR_MOTIF || limitError}
-                onClick={handleSubmitPayload}
+                disabled={
+                  conditions === false || motivation === null || error === Error.ERROR_MOTIF || limitError || exporting
+                }
+                onClick={() => {
+                  setExporting(true)
+                  debouncedSubmitPayload()
+                }}
               >
                 Confirmer
               </Button>
             </Grid>
           </Grid>
-          <Grid container item mb="12px" justifyContent={'flex-end'}>
+          <Grid container sx={{ mb: '12px', justifyContent: 'flex-end' }}>
             {error === Error.ERROR_MOTIF && (
               <CustomAlert severity="error">
                 Merci d'indiquer le motif de votre demande d'export, ce motif doit contenir au moins 10 caractères.

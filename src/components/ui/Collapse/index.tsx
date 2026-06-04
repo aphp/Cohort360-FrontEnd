@@ -18,13 +18,14 @@ const Collapse = ({ value = true, title, children, info }: PropsWithChildren<Col
   const [checked, setChecked] = useState(value)
 
   return (
-    <Grid container direction="column">
+    <Grid container sx={{ flexDirection: 'column' }}>
       <Grid
-        item
         container
-        direction="row"
-        alignItems="center"
-        marginBottom={checked ? 2 : 0}
+        sx={{
+          flexDirection: 'row',
+          alignItems: 'center',
+          marginBottom: checked ? 2 : 0
+        }}
         onClick={() => setChecked(!checked)}
       >
         <Typography style={{ cursor: 'pointer' }} variant="h6">
@@ -32,12 +33,16 @@ const Collapse = ({ value = true, title, children, info }: PropsWithChildren<Col
         </Typography>
         {info && (
           <Tooltip title={info}>
-            <InfoIcon fontSize="small" color="primary" style={{ marginLeft: 4 }} />
+            <InfoIcon data-testid="InfoIcon" fontSize="small" color="primary" style={{ marginLeft: 4 }} />
           </Tooltip>
         )}
 
         <IconButton size="small">
-          {checked ? <KeyboardArrowUpIcon fontSize="small" /> : <KeyboardArrowDownIcon fontSize="small" />}
+          {checked ? (
+            <KeyboardArrowUpIcon data-testid="KeyboardArrowUpIcon" fontSize="small" />
+          ) : (
+            <KeyboardArrowDownIcon data-testid="KeyboardArrowDownIcon" fontSize="small" />
+          )}
         </IconButton>
       </Grid>
 

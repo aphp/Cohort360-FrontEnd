@@ -66,8 +66,8 @@ const SavedFilters = ({
         }}
         submitText="Appliquer le filtre"
       >
-        <Grid container item xs={12} alignItems="center" gap={1}>
-          <Grid item xs={3}>
+        <Grid container size={12} sx={{ alignItems: 'center', gap: 1 }}>
+          <Grid size={3}>
             <Button
               fullWidth
               color="info"
@@ -79,13 +79,13 @@ const SavedFilters = ({
             </Button>
           </Grid>
           <Tooltip title={maintenanceIsActive ? "Ce bouton est desactivé en raison d'une maintenance." : undefined}>
-            <Grid item xs={1}>
+            <Grid size={1}>
               <Button
                 color="warning"
                 onClick={() => setToggleDeleteModal(true)}
                 disabled={!selectedItems.length || maintenanceIsActive}
               >
-                <DeleteOutline />
+                <DeleteOutline data-testid="DeleteOutlineIcon" />
               </Button>
             </Grid>
           </Tooltip>

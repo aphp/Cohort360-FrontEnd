@@ -2,6 +2,7 @@ import React, { useState, useEffect, ReactElement, useContext } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 import {
+  Box,
   Button,
   Collapse,
   Divider,
@@ -11,12 +12,12 @@ import {
   Link,
   List,
   ListItem,
-  ListItemText,
+  ListItemButton,
   ListItemIcon,
+  ListItemText,
   Typography,
   Tooltip,
-  Zoom,
-  Box
+  Zoom
 } from '@mui/material'
 
 import AddIcon from '@mui/icons-material/Add'
@@ -140,7 +141,11 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
               [classes.menuButton]: !open
             })}
           >
-            {open ? <ChevronLeftIcon color="action" width="20px" /> : <MenuIcon width="20px" fill="#FFF" />}
+            {open ? (
+              <ChevronLeftIcon data-testid="ChevronLeftIcon" color="action" width="20px" />
+            ) : (
+              <MenuIcon width="20px" fill="#FFF" />
+            )}
           </IconButton>
         </div>
 
@@ -148,8 +153,8 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
 
         <List className={classes.list}>
           <ListItem>
-            <Grid container justifyContent="space-between" alignItems="center" wrap="nowrap">
-              <Grid container wrap="nowrap" xs={10} alignItems="center" item>
+            <Grid container sx={{ justifyContent: 'space-between', alignItems: 'center' }} wrap="nowrap">
+              <Grid container wrap="nowrap" size={{ xs: 10 }} sx={{ alignItems: 'center' }}>
                 <Impersonation
                   UserInfo={({ practitioner }) => (
                     <>
@@ -165,7 +170,7 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
                   )}
                 />
               </Grid>
-              <Grid container xs={2} item>
+              <Grid container size={{ xs: 2 }}>
                 <ListItemIcon
                   className={cx(classes.logoutButton, {
                     [classes.hide]: !open
@@ -186,7 +191,7 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
 
           {!open && (
             <ListItem>
-              <Grid container item>
+              <Grid container>
                 <ListItemIcon className={classes.logoutButton} style={{ marginLeft: -6 }}>
                   <Tooltip title="Se déconnecter">
                     <IconButton
@@ -238,7 +243,7 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
             )}
           </ListItem>
           {!!cohortCreation?.request?.requestId && (
-            <ListItem style={{ padding: !open ? '0 16px' : undefined }}>
+            <ListItem style={{ padding: open ? undefined : '0 16px' }}>
               {!open && (
                 <Tooltip title="Modifier la requête en cours">
                   <IconButton
@@ -246,7 +251,7 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
                     className={cx(classes.button, classes.miniButton)}
                     disabled={maintenanceIsActive}
                   >
-                    <EditIcon />
+                    <EditIcon data-testid="EditIcon" />
                   </IconButton>
                 </Tooltip>
               )}
@@ -267,18 +272,18 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
             </ListItem>
           )}
 
-          <ListItem id="accueil" className={classes.listItem} button onClick={() => navigate('/home')}>
-            <Tooltip title={!open ? 'Accueil' : ''}>
+          <ListItemButton id="accueil" className={classes.listItem} onClick={() => navigate('/home')}>
+            <Tooltip title={open ? '' : 'Accueil'}>
               <ListItemIcon className={classes.listIcon}>
                 <HomeIcon width="20px" fill="#FFF" />
               </ListItemIcon>
             </Tooltip>
 
             <ListItemText className={classes.title} primary="Accueil" />
-          </ListItem>
+          </ListItemButton>
 
-          <ListItem id="patients" className={classes.listItem} button onClick={handleDisplayPatientList}>
-            <Tooltip title={!open ? 'Mes patients' : ''}>
+          <ListItemButton id="patients" className={classes.listItem} onClick={handleDisplayPatientList}>
+            <Tooltip title={open ? '' : 'Mes patients'}>
               <ListItemIcon className={classes.listIcon}>
                 <PatientIcon width="20px" fill="#FFF" />
               </ListItemIcon>
@@ -286,7 +291,7 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
 
             <ListItemText className={classes.title} primary="Mes patients" />
             {displayPatientList ? <ExpandLess color="action" /> : <ExpandMore color="action" />}
-          </ListItem>
+          </ListItemButton>
 
           <Collapse
             className={cx(classes.nestedList, { [classes.hide]: !open })}
@@ -332,8 +337,8 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
             </List>
           </Collapse>
 
-          <ListItem id="research" className={classes.listItem} button onClick={handleDisplaySearchList}>
-            <Tooltip title={!open ? 'Mes recherches' : ''}>
+          <ListItemButton id="research" className={classes.listItem} onClick={handleDisplaySearchList}>
+            <Tooltip title={open ? '' : 'Mes recherches'}>
               <ListItemIcon className={classes.listIcon}>
                 <ResearchIcon width="20px" fill="#FFF" />
               </ListItemIcon>
@@ -341,7 +346,7 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
 
             <ListItemText className={classes.title} primary="Mes recherches" />
             {displaySearchList ? <ExpandLess color="action" /> : <ExpandMore color="action" />}
-          </ListItem>
+          </ListItemButton>
 
           <Collapse
             in={displaySearchList}
@@ -425,16 +430,13 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
               rel="noopener noreferrer"
               component="a"
             >
-              <Tooltip title={!open ? 'Documentation' : ''}>
+              <Tooltip title={open ? '' : 'Documentation'}>
                 <ListItemIcon className={classes.listIcon}>
                   <MenuBookIcon width="20px" htmlColor="#FFF" />
                 </ListItemIcon>
               </Tooltip>
 
-              <>
-                <ListItemText className={classes.title} primary="Documentation" style={{ flex: 'unset' }} />
-                <ShimmerBadge>Nouveau</ShimmerBadge>
-              </>
+              <ListItemText className={classes.title} primary={<ShimmerBadge>Documentation</ShimmerBadge>} />
             </ListItem>
           )}
         </List>

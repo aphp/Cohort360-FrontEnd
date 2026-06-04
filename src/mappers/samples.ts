@@ -4,8 +4,8 @@ import { CohortCallbacks, ResearchesTableLabels } from 'types/cohorts'
 import { Order } from 'types/searchCriterias'
 import { Action, CellType, Column, Favorite, Row, Table } from 'types/table'
 import { getExportTooltip, getGlobalEstimation, isCohortExportable, isExportDisabled } from 'utils/explorationUtils'
-import { formatDate } from 'utils/formatDate'
-import { format } from 'utils/numbers'
+import { formatDate } from 'utils/dates'
+import { format, formatPercentage } from 'utils/numbers'
 import Download from 'assets/icones/download.svg?react'
 import EditIcon from '@mui/icons-material/Edit'
 import FluentNavigation from 'assets/icones/fluent_navigation.svg?react'
@@ -20,7 +20,7 @@ const getSamplesInfos = (cohort: Cohort) => {
   const globalTotal = getGlobalEstimation(cohort)
   const createdAt = formatDate(cohort.created_at)
   const samples = cohort.sample_cohorts?.length ?? 0
-  const samplingRatio = cohort.sampling_ratio ? `${(cohort.sampling_ratio * 100).toString()} %` : 'N/A'
+  const samplingRatio = formatPercentage(cohort.sampling_ratio)
   return {
     name,
     parentName,
@@ -60,6 +60,7 @@ const mapSamplesToRows = (
       },
       {
         title: 'Éditer la cohorte',
+        testId: 'EditIcon',
         icon: EditIcon,
         onClick: () => onClickEdit(cohort),
         disabled: disabled
@@ -87,15 +88,15 @@ const mapSamplesToRows = (
         sx: { fontWeight: 900 }
       },
       { id: `${cohort.uuid}-actions`, value: actions as Action[], type: CellType.ACTIONS },
-      ...(!requestId
-        ? [
+      ...(requestId
+        ? []
+        : [
             {
               id: `${cohort.uuid}-parentName`,
               value: parentName,
               type: CellType.TEXT
             }
-          ]
-        : []),
+          ]),
       {
         id: `${cohort.uuid}-statusChip`,
         value: statusChip,
@@ -146,7 +147,7 @@ const mapSamplesToColumns = (
     { label: '', code: Order.FAVORITE },
     { label: ResearchesTableLabels.SAMPLE_NAME, code: Order.NAME, align: 'left' },
     { label: '' },
-    ...(!cohortId ? [{ label: ResearchesTableLabels.PARENT_COHORT, code: Order.REQUEST }] : []),
+    ...(cohortId ? [] : [{ label: ResearchesTableLabels.PARENT_COHORT, code: Order.REQUEST }]),
     { label: ResearchesTableLabels.STATUS },
     { label: ResearchesTableLabels.PATIENT_TOTAL, code: Order.RESULT_SIZE },
     { label: ResearchesTableLabels.TOTAL_PERCENTAGE },

@@ -16,7 +16,7 @@ type ExplorationBoardProps<T> = {
 
 const ExplorationBoard = <T,>({ config }: ExplorationBoardProps<T>) => {
   const [searchParams] = useSearchParams()
-  const pageFromUrl = parseInt(searchParams.get('page') ?? '1', 10)
+  const pageFromUrl = Number.parseInt(searchParams.get('page') ?? '1', 10)
   const {
     fetchStatus,
     additionalInfo,
@@ -33,7 +33,7 @@ const ExplorationBoard = <T,>({ config }: ExplorationBoardProps<T>) => {
   const { count, pagination, data, dataLoading, onChangePage } = useData(config, searchCriterias, pageFromUrl)
 
   return (
-    <Grid item xs={12} container gap={GAP} margin={'16px 0'}>
+    <Grid size={12} container sx={{ gap: GAP }} margin={'16px 0'}>
       {config.getMessages?.().map((msg, index) => (
         <CustomAlert key={index}>{msg}</CustomAlert>
       ))}

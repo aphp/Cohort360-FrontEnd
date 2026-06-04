@@ -9,7 +9,7 @@ export const updatePerimeters = async (
     topLevelCareSites: string[],
     practitionerPerimeters: ScopeElement[]
   ) => void,
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
+
   onError: (error: CustomError) => void = () => {}
 ): Promise<void> => {
   const practitionerPerimeters = await services.perimeters.getRights({})

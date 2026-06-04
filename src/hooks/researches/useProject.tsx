@@ -19,7 +19,9 @@ const useProject = (projectId?: string) => {
   })
 
   useEffect(() => {
-    isError && dispatch(setMessage({ type: 'error', content: 'Erreur lors de la récupération du projet' }))
+    if (isError) {
+      dispatch(setMessage({ type: 'error', content: 'Erreur lors de la récupération du projet' }))
+    }
   }, [isError, dispatch])
 
   return {

@@ -58,14 +58,12 @@ const SearchValueSet = ({ references, selectedNodes, onSelect }: SearchValueSetP
   return (
     <Grid
       container
-      direction="column"
-      wrap="nowrap"
-      justifyContent={'space-between'}
+      sx={{ flexDirection: 'column', flexWrap: 'nowrap', justifyContent: 'space-between' }}
       height={'100vh'}
       className="SearchValueSet"
     >
       <Grid container padding="30px 30px 8px 30px">
-        <Grid item xs={12} marginBottom={'20px'}>
+        <Grid size={12} marginBottom={'20px'}>
           <TabsWrapper
             customVariant="secondary"
             variant="fullWidth"
@@ -77,35 +75,31 @@ const SearchValueSet = ({ references, selectedNodes, onSelect }: SearchValueSetP
             ))}
           </TabsWrapper>
         </Grid>
-        <Grid item xs={12}>
+        <Grid size={12}>
           <Paper sx={{ padding: '20px' }}>
-            <Grid container alignItems="center">
-              <Grid item xs={6}>
+            <Grid container sx={{ alignItems: 'center' }}>
+              <Grid size={6}>
                 <Typography color="#0063AF" variant="h3">
                   Référentiels :
                 </Typography>
                 <ReferencesParameters
-                  disabled={
-                    loadingStatus.init === LoadingStatus.FETCHING ||
-                    (mode === SearchMode.RESEARCH && loadingStatus.search === LoadingStatus.FETCHING)
-                  }
+                  disabled={loadingStatus.init === LoadingStatus.FETCHING}
                   onSelect={onChangeReferences}
                   type={mode === SearchMode.EXPLORATION ? Type.SINGLE : Type.MULTIPLE}
                   values={refs}
                 />
               </Grid>
-              <Grid item xs={6}>
+              <Grid size={6}>
                 <Collapse in={mode === SearchMode.RESEARCH && !!refs.find((ref) => ref.checked)}>
-                  <Grid height="42px" container alignItems="center">
+                  <Grid height="42px" container sx={{ alignItems: 'center' }}>
                     <Input
                       value={searchInput}
                       placeholder="Rechercher un code"
-                      disabled={loadingStatus.search === LoadingStatus.FETCHING}
                       fullWidth
                       onChange={(event) => onChangeSearchInput(event.target.value)}
                       endAdornment={
                         <IconButton onClick={() => onChangeSearchInput('')}>
-                          <ClearIcon style={{ fill: '#6f6f6f', height: 18 }} />
+                          <ClearIcon style={{ fill: '#6f6f6f', height: 18 }} data-testid="ClearIcon" />
                         </IconButton>
                       }
                     />
@@ -116,7 +110,7 @@ const SearchValueSet = ({ references, selectedNodes, onSelect }: SearchValueSetP
           </Paper>
         </Grid>
       </Grid>
-      <Grid container direction="column" wrap="nowrap" padding={'0px 30px'} height={'100%'}>
+      <Grid container sx={{ flexDirection: 'column', flexWrap: 'nowrap' }} padding={'0px 30px'} height={'100%'}>
         <Displayer isDisplayed={mode === SearchMode.EXPLORATION} height="100%" className="ValueSetExploration">
           <ValueSetTable
             mode={SearchMode.EXPLORATION}

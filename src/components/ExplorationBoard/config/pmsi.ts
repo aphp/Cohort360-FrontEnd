@@ -1,33 +1,42 @@
 import { getConfig } from 'config'
+import { plural } from 'utils/string'
 import { Condition } from 'fhir/r4'
 import { mapToDate } from 'mappers/dates'
 import { getPmsiCodes, getPmsiDate } from 'mappers/pmsi'
 import { fetchClaimList, fetchConditionList, fetchProcedureList } from 'services/aphp/servicePmsi'
-import { PatientState } from 'state/patient'
 import { CohortPMSI } from 'types'
-import { AdditionalInfo, Data, DISPLAY_OPTIONS, ExplorationConfig, ExplorationResults } from 'types/exploration'
+import {
+  AdditionalInfo,
+  Data,
+  DISPLAY_OPTIONS,
+  ExplorationConfig,
+  ExplorationResults,
+  Patient
+} from 'types/exploration'
 import { PMSIResourceTypes, ResourceType } from 'types/requestCriterias'
 import { SourceType } from 'types/scope'
 import { Direction, Order, PMSIFilters, SearchCriterias } from 'types/searchCriterias'
 import { CellType, Column, Row, Table } from 'types/table'
 import { FhirItem, Reference } from 'types/valueSet'
 import { fetchValueSet, narrowSearchCriterias, resolveAdditionalInfos } from 'utils/exploration'
-import { getCategory } from 'utils/fhir'
+
+import { getCategory, getExtensionStringValue } from 'utils/fhir'
 import { getValueSetsByUrls } from 'utils/valueSets'
 
 const fetchAdditionalInfos = async (additionalInfo: AdditionalInfo): Promise<AdditionalInfo> => {
   const fetchersMap: Record<string, () => Promise<FhirItem[] | undefined>> = {
     diagnosticTypesList: () =>
-      !additionalInfo.diagnosticTypesList
-        ? fetchValueSet(getConfig().features.condition.valueSets.conditionStatus.url)
-        : Promise.resolve(undefined),
+      additionalInfo.diagnosticTypesList
+        ? Promise.resolve(undefined)
+        : fetchValueSet(getConfig().features.condition.valueSets.conditionStatus.url),
     encounterStatusList: () =>
-      !additionalInfo.encounterStatusList
-        ? fetchValueSet(getConfig().core.valueSets.encounterStatus.url)
-        : Promise.resolve(undefined)
+      additionalInfo.encounterStatusList
+        ? Promise.resolve(undefined)
+        : fetchValueSet(getConfig().core.valueSets.encounterStatus.url)
   }
+  const sourceType = SourceType.CCAM
   const resolved = await resolveAdditionalInfos(fetchersMap)
-  return { ...additionalInfo, ...resolved }
+  return { ...additionalInfo, sourceType, ...resolved }
 }
 
 const initSearchCriterias = (search: string): SearchCriterias<PMSIFilters> => ({
@@ -70,13 +79,16 @@ const mapToTable = (
     const hasDiagnosticType = type === ResourceType.CONDITION
     const date = getPmsiDate(type, elem)
     const codes = getPmsiCodes(type, elem)
+    const source = elem.meta?.source?.split('/').filter(Boolean).pop()?.toUpperCase()
+
+    const ippGroupQuery = groupId ? `?groupId=${groupId}` : ''
     const row: Row = [
       !isPatient && {
         id: `${elem.id}-ipp`,
         value: elem.IPP
           ? {
               label: elem.IPP,
-              url: `/patients/${elem.idPatient}${groupId ? `?groupId=${groupId}` : ''}`
+              url: `/patients/${elem.idPatient}${ippGroupQuery}`
             }
           : 'Non renseigné',
         type: elem.IPP ? CellType.LINK : CellType.TEXT
@@ -93,7 +105,7 @@ const mapToTable = (
       },
       {
         id: `${elem.id}-source`,
-        value: elem.meta?.source ?? 'Non renseigné',
+        value: source ?? 'Non renseigné',
         type: CellType.TEXT,
         sx: { fontWeight: 700, fontSize: 12 }
       },
@@ -112,10 +124,10 @@ const mapToTable = (
       hasDiagnosticType && {
         id: `${elem.id}-type`,
         value:
-          getCategory(
+          getExtensionStringValue(
             elem as Condition,
-            getConfig().features.condition.valueSets.conditionStatus.url
-          )?.coding?.[0]?.code?.toUpperCase() ?? '-',
+            getConfig().features.condition.extensions.orbisStatus
+          )?.toUpperCase() ?? '-',
         type: CellType.TEXT
       },
       {
@@ -130,12 +142,12 @@ const mapToTable = (
 }
 
 const getMessages = () => [
-  'Attention : Les données AREM sont disponibles uniquement pour la période du 07/12/2009 au 31/07/2024. Seuls les diagnostics rattachés à une visite Orbis (avec un Dossier Administratif - NDA) sont actuellement disponibles.'
+  "Les données AREM sont disponibles pour la période du 07/12/2009 jusqu'à la dernière période validée pour l'année courante dans le Datalake et la base centrale de l'EDS, à savoir avec un décalage d’environ 1-2 mois. Contrairement à la source ORBIS, les données provenant d'AREM sont décalées. Ce décalage d’environ 2 mois est lié au temps de traitement pour la phase de codification et de vérification par l'équipe DIM (Département d'Information Médicale)."
 ]
 
 export const conditionConfig = (
   deidentified: boolean,
-  patient: PatientState,
+  patient: Patient | null,
   groupId: string[],
   displayOptions = DISPLAY_OPTIONS,
   search = ''
@@ -159,14 +171,14 @@ export const conditionConfig = (
     return { ..._infos, references, sourceType }
   },
   getCount: (counts) => [
-    { label: `diagnostic${counts[0].total > 1 ? 's' : ''} CIM10`, display: true, count: counts[0] },
-    { label: `patient${counts[1].total > 1 ? 's' : ''}`, display: !!!patient, count: counts[1] }
+    { label: `diagnostic${plural(counts[0].total)} CIM10`, display: true, count: counts[0] },
+    { label: `patient${plural(counts[1].total)}`, display: !!!patient, count: counts[1] }
   ]
 })
 
 export const procedureConfig = (
   deidentified: boolean,
-  patient: PatientState,
+  patient: Patient | null,
   groupId: string[],
   displayOptions = DISPLAY_OPTIONS,
   search = ''
@@ -190,14 +202,14 @@ export const procedureConfig = (
     return { ..._infos, references, sourceType }
   },
   getCount: (counts) => [
-    { label: `acte${counts[0].total > 1 ? 's' : ''} CCAM`, display: true, count: counts[0] },
-    { label: `patient${counts[1].total > 1 ? 's' : ''}`, display: !!!patient, count: counts[1] }
+    { label: `acte${plural(counts[0].total)} CCAM`, display: true, count: counts[0] },
+    { label: `patient${plural(counts[1].total)}`, display: !!!patient, count: counts[1] }
   ]
 })
 
 export const claimConfig = (
   deidentified: boolean,
-  patient: PatientState,
+  patient: Patient | null,
   groupId: string[],
   displayOptions = DISPLAY_OPTIONS,
   search = ''
@@ -219,6 +231,6 @@ export const claimConfig = (
   },
   getCount: (counts) => [
     { label: 'GHM', display: true, count: counts[0] },
-    { label: `patient${counts[1].total > 1 ? 's' : ''}`, display: !!!patient, count: counts[1] }
+    { label: `patient${plural(counts[1].total)}`, display: !!!patient, count: counts[1] }
   ]
 })

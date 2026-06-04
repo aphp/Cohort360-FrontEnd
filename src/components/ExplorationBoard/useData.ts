@@ -67,7 +67,7 @@ export const useData = <T>(
     } catch (error) {
       if (error instanceof CanceledError) setLoadingStatus(LoadingStatus.FETCHING)
       setLoadingStatus(LoadingStatus.SUCCESS)
-      setData(null)
+      setData({ total: 0, totalAllResults: 0, totalPatients: 0, totalAllPatients: 0, list: [] })
       setCount(
         config.getCount
           ? config.getCount([
@@ -81,8 +81,7 @@ export const useData = <T>(
 
   useEffect(() => {
     if (data) {
-      const hasSearch =
-        config.hasSearchDisplay && config.hasSearchDisplay(searchCriterias.searchInput, searchCriterias.searchBy)
+      const hasSearch = config.hasSearchDisplay?.(searchCriterias.searchInput, searchCriterias.searchBy)
       if (config.mapToTimeline) config.mapToTimeline(data).then(setTimeline)
       else setTimeline(null)
       if (config.mapToDiagram && data.meta) setDiagrams(config.mapToDiagram(data.meta))

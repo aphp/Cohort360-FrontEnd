@@ -13,7 +13,7 @@ import {
   mapGenderStatusToLabel
 } from 'types/searchCriterias'
 import moment from 'moment'
-import { capitalizeFirstLetter } from './capitalize'
+import { capitalizeFirstLetter } from './string'
 import { SimpleCodeType } from 'types'
 import { CohortsType, CohortsTypeLabel } from 'types/cohorts'
 import { Hierarchy } from 'types/hierarchy'
@@ -65,6 +65,7 @@ export const removeFilter = <F>(key: FilterKeys, value: FilterValue, filters: F)
         break
       case FilterKeys.NDA:
       case FilterKeys.IPP:
+      case FilterKeys.BODYSITE:
         castedFilters[key] = removeElementInArray((castedFilters[key] as string).split(','), value as string).join(',')
         break
       case FilterKeys.DURATION_RANGE:
@@ -106,8 +107,9 @@ export const getFilterLabel = (key: FilterKeys, value: FilterValue): string => {
     [FilterKeys.END_DATE]: (value) => `Avant le : ${moment(value as string).format('DD/MM/YYYY')}`,
     [FilterKeys.NDA]: (value) => `NDA : ${value}`,
     [FilterKeys.IPP]: (value) => `IPP : ${value}`,
+    [FilterKeys.BODYSITE]: (value) => `Parties du corps : ${value}`,
     [FilterKeys.CODE]: (value) => `Code : ${getFullLabelFromCode(value as LabelObject)}`,
-    [FilterKeys.SOURCE]: (value) => `Source : ${value}`,
+    [FilterKeys.SOURCE]: (value) => `Source : ${(value as string)?.split('/')?.pop()?.toUpperCase()}`,
     [FilterKeys.EXECUTIVE_UNITS]: (value) => {
       const hierarchy = value as Hierarchy<ScopeElement>
       return `Unité exécutrice : ${perimeterDisplay(hierarchy.source_value, hierarchy.name)}`
@@ -188,6 +190,7 @@ export const selectFiltersAsArray = (filters: Filters, searchInput: string | und
           break
         case FilterKeys.NDA:
         case FilterKeys.IPP:
+        case FilterKeys.BODYSITE:
           ;(value as string).split(',').forEach((elem) =>
             result.push({
               category: key,
@@ -223,6 +226,7 @@ export const atLeastOneSearchCriteria = (searchCriterias: SearchCriterias<Filter
     !!searchInput ||
     ('ipp' in filters && !!filters.ipp) ||
     ('nda' in filters && !!filters.nda) ||
+    ('bodySite' in filters && !!filters.bodySite) ||
     ('durationRange' in filters && (!!filters.durationRange?.[0] || !!filters.durationRange?.[1])) ||
     ('birthdatesRanges' in filters && (!!filters.birthdatesRanges?.[0] || !!filters.birthdatesRanges?.[1])) ||
     ('genders' in filters && filters.genders?.length > 0) ||

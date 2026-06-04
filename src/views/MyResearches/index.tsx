@@ -13,7 +13,7 @@ import SearchInput from 'components/ui/Searchbar/SearchInput'
 
 import useCounts from 'hooks/researches/useCounts'
 
-import { ExplorationTabs } from 'types'
+import { TabType } from 'types'
 import { ExplorationsSearchParams } from 'types/cohorts'
 import { cleanSearchParams, getPathDepth } from 'utils/explorationUtils'
 import moment from 'moment'
@@ -115,10 +115,10 @@ const MyResearches = () => {
       hasMounted.current = true
       return
     }
-    if (!newSearchInput) {
-      searchParams.delete(ExplorationsSearchParams.SEARCH_INPUT)
-    } else {
+    if (newSearchInput) {
       searchParams.set(ExplorationsSearchParams.SEARCH_INPUT, newSearchInput)
+    } else {
+      searchParams.delete(ExplorationsSearchParams.SEARCH_INPUT)
     }
     setSearchParams(searchParams)
     navigate({
@@ -128,10 +128,10 @@ const MyResearches = () => {
   }
 
   const handleDateChange = (date: string | null, key: ExplorationsSearchParams) => {
-    if (!date) {
-      searchParams.delete(key)
-    } else {
+    if (date) {
       searchParams.set(key, moment(date).isValid() ? moment(date).format('YYYY-MM-DD') : '')
+    } else {
+      searchParams.delete(key)
     }
     setSearchParams(searchParams)
     navigate({
@@ -140,7 +140,7 @@ const MyResearches = () => {
     })
   }
 
-  const handleTabChange = (newTab: ExplorationTabs) => {
+  const handleTabChange = (newTab: TabType) => {
     setSlideIsActive(false)
     const cleanedSearchParams = cleanSearchParams(searchParams)
     setSearchParams(cleanedSearchParams)
@@ -173,15 +173,26 @@ const MyResearches = () => {
   return (
     <PageContainer alignItems={'center'} sx={{ backgroundColor: '#E6F1FD' }}>
       <HeaderLayout title="Mes recherches" searchArea={searchArea} />
-      <Grid container xs={11}>
+      <Grid container size={11}>
         <TabsWrapper value={selectedTab} onChange={(_, tab) => handleTabChange(tab)}>
           {explorationTabs.map((tab) => (
-            <Tab key={tab.id} label={tab.label} value={tab} component="div" disableRipple />
+            <Tab id={tab.id} key={tab.id} label={tab.label} value={tab} component="div" disableRipple />
           ))}
         </TabsWrapper>
       </Grid>
-      <Grid container bgcolor={'#FFF'} sx={{ minHeight: `calc(100vh - ${headerHeight}px)` }} justifyContent={'center'}>
-        <Grid key={location.pathname} container xs={11} style={{ padding: '20px 0' }} gap={'20px'} direction={'column'}>
+      <Grid
+        container
+        size={12}
+        bgcolor={'#FFF'}
+        sx={{ minHeight: `calc(100vh - ${headerHeight}px)`, justifyContent: 'center' }}
+      >
+        <Grid
+          key={location.pathname}
+          container
+          size={11}
+          style={{ padding: '20px 0' }}
+          sx={{ gap: '20px', flexDirection: 'column', flexWrap: 'nowrap' }}
+        >
           <Breadcrumb />
           <Slide direction={direction} in={true} mountOnEnter unmountOnExit appear={slideIsActive} timeout={300}>
             <Grid container key={location.pathname}>

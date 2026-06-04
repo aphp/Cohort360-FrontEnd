@@ -93,10 +93,8 @@ const Contact: React.FC = () => {
 
       contactSubmitForm.append('label', contactRequest.requestType)
       contactSubmitForm.append('title', contactRequest.object)
-      contactSubmitForm.append(
-        'description',
-        `${contactRequest.url !== '' ? `**URL concernée :** ${contactRequest.url}\n\n` : ''} ${contactRequest.message}`
-      )
+      const urlPrefix = contactRequest.url === '' ? '' : `**URL concernée :** ${contactRequest.url}\n\n`
+      contactSubmitForm.append('description', `${urlPrefix} ${contactRequest.message}`)
       if (contactRequest.files && contactRequest.files.length > 0) {
         contactSubmitForm.append('attachment', contactRequest.files[0])
       }
@@ -105,7 +103,11 @@ const Contact: React.FC = () => {
 
       setContactRequest(defaultContactRequest)
       setLoading(false)
-      postIssueResp ? setCreateIssueSuccess(true) : setCreateIssueFail(true)
+      if (postIssueResp) {
+        setCreateIssueSuccess(true)
+      } else {
+        setCreateIssueFail(true)
+      }
     } catch (error) {
       console.error('Erreur lors de la création du ticket', error)
       setContactRequest(defaultContactRequest)
@@ -117,9 +119,9 @@ const Contact: React.FC = () => {
   return (
     <>
       <PageContainer>
-        <Grid container direction="column" alignItems="center">
+        <Grid container sx={{ flexDirection: 'column', alignItems: 'center' }}>
           <CssBaseline />
-          <Grid container item direction="column" xs={11}>
+          <Grid container size={{ xs: 11 }} sx={{ flexDirection: 'column' }}>
             {loading ? (
               <CircularProgress size={60} className={classes.loading} />
             ) : (

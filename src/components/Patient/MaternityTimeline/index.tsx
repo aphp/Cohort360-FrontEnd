@@ -62,7 +62,7 @@ const Timeline = ({ questionnaireResponses, questionnaires }: TimelineProps) => 
   return (
     <>
       {questionnaireResponses.length === 0 ? (
-        <Grid container justifyContent="center">
+        <Grid container sx={{ justifyContent: 'center' }}>
           <Typography variant="button">Aucun formulaire à afficher</Typography>
         </Grid>
       ) : (

@@ -10,7 +10,8 @@ import {
   SubItem,
   Favorite,
   Action,
-  CheckboxAction
+  CheckboxAction,
+  Icon
 } from 'types/table'
 import {
   Checkbox,
@@ -20,7 +21,9 @@ import {
   SxProps,
   TableCell,
   TableRow as TableRowMui,
+  TextField,
   Theme,
+  Tooltip,
   Typography
 } from '@mui/material'
 import GenderIcon from '../GenderIcon'
@@ -60,7 +63,7 @@ const TableRow = ({ row, sx }: RowProps) => {
 
   return (
     <>
-      <TableRowMui sx={{ ...sx, cursor: row._onClick ? 'pointer' : 'inherit' }} onClick={row._onClick}>
+      <TableRowMui sx={{ ...sx }} onClick={row._onClick}>
         {row.map((cell, index) => {
           if (cell.isHidden) return <Fragment key={index} />
           return (
@@ -83,9 +86,10 @@ const TableRow = ({ row, sx }: RowProps) => {
                     <IconButtonWithTooltip
                       key={action.title}
                       disabled={action.disabled}
-                      icon={<IconComponent />}
+                      icon={<IconComponent data-testid={action.testId} />}
                       onClick={action.onClick}
                       title={action.title}
+                      color={action.color ?? 'inherit'}
                     />
                   )
                 })}
@@ -127,6 +131,24 @@ const TableRow = ({ row, sx }: RowProps) => {
                 </Grid>
               )}
               {cell.type == CellType.TEXT && <p>{cell.value as string}</p>}
+              {cell.type === CellType.TEXT_EDITION &&
+                (() => {
+                  const { title, color, disabled, onClick } = cell.value as Action
+                  return (
+                    <TextField
+                      value={title}
+                      onChange={(e) => onClick(e.target.value)}
+                      fullWidth
+                      size="small"
+                      disabled={disabled}
+                      sx={{
+                        '& .MuiInputBase-input': {
+                          color: color
+                        }
+                      }}
+                    />
+                  )
+                })()}
               {cell.type == CellType.PARAGRAPHS && <Paragraphs value={cell.value as Paragraph[]} />}
               {cell.type == CellType.STATUS_CHIP &&
                 (() => {
@@ -140,6 +162,12 @@ const TableRow = ({ row, sx }: RowProps) => {
                       tooltip={(cell.value as Status).tooltip}
                     />
                   )
+                })()}
+              {cell.type === CellType.ICON &&
+                (() => {
+                  const { icon: IconComponent, style, tooltip, testId } = cell.value as Icon
+                  const iconElement = <IconComponent sx={style} data-testid={testId} />
+                  return tooltip ? <Tooltip title={tooltip}>{iconElement}</Tooltip> : iconElement
                 })()}
               {cell.type === CellType.LINK && (
                 <div style={{ display: 'flex' }}>
@@ -196,7 +224,11 @@ const TableRow = ({ row, sx }: RowProps) => {
                   size="small"
                   onClick={() => setSubitemIndex(index === subitemIndex ? null : index)}
                 >
-                  {subitemIndex === index ? <KeyboardArrowUp /> : <KeyboardArrowDown />}
+                  {subitemIndex === index ? (
+                    <KeyboardArrowUp data-testid="KeyboardArrowUpIcon" />
+                  ) : (
+                    <KeyboardArrowDown data-testid="KeyboardArrowDownIcon" />
+                  )}
                 </IconButton>
               )}
             </TableCellWrapper>
@@ -219,8 +251,6 @@ const TableRow = ({ row, sx }: RowProps) => {
                   backgroundColor: (sx as any)?.backgroundColor ?? '#fafafa',
                   fontSize: 10
                 }}
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                sxRow={{ backgroundColor: (sx as any)?.backgroundColor ?? '#fff', fontSize: 12 }}
               />
             </Collapse>
           </TableCell>

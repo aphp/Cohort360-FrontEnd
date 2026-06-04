@@ -3,12 +3,12 @@ import React, { useState, useEffect } from 'react'
 import { Alert, Snackbar } from '@mui/material'
 
 import { useAppSelector, useAppDispatch } from 'state'
-import { clearMessage, MessageState } from 'state/message'
+import { clearMessage } from 'state/message'
 
 type SnackbarTypeOfMessage = 'success' | 'error' | 'warning' | 'info' | undefined
 
 const Cohort360_Snackbar = () => {
-  const { message } = useAppSelector<{ message: MessageState }>((state) => ({ message: state.message }))
+  const message = useAppSelector((state) => state.message)
   const dispatch = useAppDispatch()
 
   const content: string = message ? message.content : ''

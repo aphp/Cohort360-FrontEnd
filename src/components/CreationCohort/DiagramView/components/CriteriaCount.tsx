@@ -1,19 +1,7 @@
 import { Tooltip } from '@mui/material'
 import React from 'react'
 import { useAppSelector } from 'state'
-
-const displayCount = (criteriaCount: number) => {
-  if (criteriaCount < 1000) {
-    return criteriaCount.toString() // Normal values (less than 1,000)
-  } else if (criteriaCount < 1000000) {
-    return `~${Math.round(criteriaCount / 1000)}k` // Thousands
-  } else if (criteriaCount < 1000000000) {
-    return `~${Math.round(criteriaCount / 1000000)}M` // Millions
-  } else if (criteriaCount < 1000000000000) {
-    return `~${Math.round(criteriaCount / 1000000000)}B` // Billions
-  }
-  return `~${Math.round(criteriaCount / 1000000000000)}T` // Trillions
-}
+import { displayCount } from 'utils/numbers'
 
 export type CriteriaCountType = {
   display: string
@@ -42,11 +30,11 @@ export const getStageDetails = (
   const countDetail = stageDetails?.[`criteria_count_${id}`]
   const ratioDetail = stageDetails?.[`criteria_ratio_${id}`]
   if (countDetail !== undefined) {
-    const criteriaCountValue = parseFloat(countDetail)
+    const criteriaCountValue = Number.parseFloat(countDetail)
     return { display: displayCount(criteriaCountValue), value: criteriaCountValue }
   }
   if (ratioDetail !== undefined) {
-    const criteriaCountValue = parseFloat(ratioDetail)
+    const criteriaCountValue = Number.parseFloat(ratioDetail)
     return { display: `${(criteriaCountValue * 100).toFixed(0)}%` }
   }
   return undefined

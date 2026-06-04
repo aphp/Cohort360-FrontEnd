@@ -6,7 +6,7 @@ type BadgeProps = {
 }
 
 const Badge: React.FC<BadgeProps> = ({ total }) => {
-  return <BadgeWrapper>{total}</BadgeWrapper>
+  return <BadgeWrapper className="badge">{total}</BadgeWrapper>
 }
 
 export default Badge

@@ -3,7 +3,7 @@ import apiFhir from 'services/apiFhir'
 import { Back_API_Response, FHIR_API_Response, FHIR_Bundle_Response } from 'types'
 import { Hierarchy } from 'types/hierarchy'
 import { getApiResponseResourceOrThrow, getApiResponseResourcesOrThrow } from 'utils/apiHelpers'
-import { capitalizeFirstLetter } from 'utils/capitalize'
+import { capitalizeFirstLetter } from 'utils/string'
 import { getConfig } from 'config'
 import { LOW_TOLERANCE_TAG } from './callApi'
 import { sortArray } from 'utils/arrays'
@@ -192,7 +192,7 @@ export const getChildrenFromCodes = async (
 
   const batchResults = await Promise.all(batchPromises)
 
-  const combinedResults = batchResults.reduce(
+  return batchResults.reduce(
     (acc, batch) => {
       acc.results.push(...batch.results)
       acc.count += batch.count
@@ -200,8 +200,6 @@ export const getChildrenFromCodes = async (
     },
     { results: [] as Hierarchy<FhirItem>[], count: 0 }
   )
-
-  return combinedResults
 }
 
 /**
@@ -284,11 +282,10 @@ export const searchInValueSets = async (
   }
 
   const searchValue = search || HIERARCHY_ROOT
+  const filter = searchValue === HIERARCHY_ROOT ? '' : `&filter=${encodeURIComponent(searchValue)}`
   try {
     const res = await apiFhir.get<FHIR_API_Response<ValueSet>>(
-      `/ValueSet/$expand?url=${valueSetUrls.join(',')}&filter=${encodeURIComponent(
-        searchValue
-      )}&excludeNested=false&_tag=text-search-rank&_tag=${LOW_TOLERANCE_TAG}${options}`,
+      `/ValueSet/$expand?url=${valueSetUrls.join(',')}${filter}&excludeNested=false&_tag=text-search-rank&_tag=${LOW_TOLERANCE_TAG}${options}`,
       { signal }
     )
     const response = formatValuesetExpansion(getApiResponseResourceOrThrow(res).expansion, valueSetUrls[0])

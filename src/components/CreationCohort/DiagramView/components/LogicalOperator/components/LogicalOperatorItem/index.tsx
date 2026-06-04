@@ -1,25 +1,26 @@
-import React, { Fragment, useEffect, useRef, useState } from 'react'
+import React, { useRef, useState } from 'react'
 import { Box, IconButton, MenuItem, Select, Typography } from '@mui/material'
 import DeleteIcon from '@mui/icons-material/Delete'
 import useStyles from './styles'
-import ConfirmationDialog from 'components/ui/ConfirmationDialog/ConfirmationDialog'
 import { CriteriaGroup, CriteriaGroupType } from 'types'
 import CriteriaCount, { CriteriaCountType } from '../../../CriteriaCount'
 import { useLogicalOperator } from './useLogicalOperator'
-import IncludesIcon from 'assets/icones/includes.svg?react'
-import ExcludesIcon from 'assets/icones/excludes.svg?react'
 import { Comparators } from 'types/requestCriterias'
 import { hasOptions } from './utils'
+import IncludesIcon from 'assets/icones/includes.svg?react'
+import ExcludesIcon from 'assets/icones/excludes.svg?react'
+import Modal from 'components/ui/Modal'
+import WarningIcon from '@mui/icons-material/Warning'
 
 type LogicalOperatorItemProps = {
   itemId: number
   criteriaCount?: CriteriaCountType
+  disabled: boolean
 }
 
 type OperatorSelectorProps = {
   currentOperator: CriteriaGroup
   onChange: (value: CriteriaGroupType) => void
-  onConfirm: (open: boolean) => void
 }
 
 type NumberSelectorProps = {
@@ -28,6 +29,7 @@ type NumberSelectorProps = {
 }
 
 type InclusiveSelectorProps = {
+  currentOperator: CriteriaGroup
   isInclusive: boolean
   onChange: (value: boolean) => void
 }
@@ -41,22 +43,34 @@ const LogicalOperatorDisplay = ({ value }: LogicalOperatorDisplayProps) => {
   if (!value) return null
   const { type, isInclusive } = value
   if (hasOptions(value)) {
+    if (type === CriteriaGroupType.OR_GROUP) {
+      return (
+        <Box display="flex" alignItems="center" gap={1}>
+          {isInclusive ? (
+            <Typography variant="h5" className={classes.textOperator}>
+              OU
+            </Typography>
+          ) : (
+            <Typography variant="h5" className={classes.textOperator}>
+              NON OU
+            </Typography>
+          )}
+        </Box>
+      )
+    }
     return (
       <Box display="flex" alignItems="center" gap={1}>
-        {isInclusive ? (
-          <Typography variant="h5" className={classes.textOperator}>
-            OU
-          </Typography>
-        ) : (
-          <Typography variant="h5" className={classes.textOperator}>
-            NON OU
-          </Typography>
-        )}
+        {isInclusive ? <IncludesIcon /> : <ExcludesIcon />}
         {value.options.operator} {value.options.number}
       </Box>
     )
   }
-  const label = type === CriteriaGroupType.OR_GROUP ? (isInclusive ? 'OU' : 'NON OU') : isInclusive ? 'ET' : 'NON ET'
+  let label: string
+  if (type === CriteriaGroupType.OR_GROUP) {
+    label = isInclusive ? 'OU' : 'NON OU'
+  } else {
+    label = isInclusive ? 'ET' : 'NON ET'
+  }
   return (
     <Typography variant="h5" className={classes.textOperator}>
       {label}
@@ -64,12 +78,12 @@ const LogicalOperatorDisplay = ({ value }: LogicalOperatorDisplayProps) => {
   )
 }
 
-const InclusiveSelector = ({ isInclusive, onChange }: InclusiveSelectorProps) => {
+const InclusiveSelector = ({ currentOperator, isInclusive, onChange }: InclusiveSelectorProps) => {
   const { classes } = useStyles()
   return (
     <Select
+      id={`select-inclusive-${currentOperator.id}`}
       labelId="inclusive-simple-select-label"
-      id="inclusive-select"
       value={String(isInclusive)}
       classes={{ icon: classes.selectIcon }}
       className={classes.inputSelect}
@@ -89,7 +103,7 @@ const NumberSelector = ({ currentOperator, onChange }: NumberSelectorProps) => {
   return (
     <Select
       labelId="select-criteria-number"
-      id="select-criteria-number"
+      id={`select-value-${currentOperator.id}`}
       value={currentOperator.options.number ?? 0}
       type="number"
       classes={{ icon: classes.selectIcon }}
@@ -116,7 +130,7 @@ const NumberSelector = ({ currentOperator, onChange }: NumberSelectorProps) => {
   )
 }
 
-const OperatorSelector = ({ currentOperator, onChange, onConfirm }: OperatorSelectorProps) => {
+const OperatorSelector = ({ currentOperator, onChange }: OperatorSelectorProps) => {
   const { classes } = useStyles()
 
   const getDisplayType = (operator: CriteriaGroup): CriteriaGroupType => {
@@ -137,13 +151,12 @@ const OperatorSelector = ({ currentOperator, onChange, onConfirm }: OperatorSele
   return (
     <Select
       labelId="inclusive-simple-select-label"
-      id="inclusive-select"
+      id={`select-operator-${currentOperator.id}`}
       value={getDisplayType(currentOperator)}
       classes={{ icon: classes.selectIcon }}
       className={classes.inputSelect}
       onChange={(event) => {
         const newType = event.target.value as CriteriaGroupType
-        if (newType !== CriteriaGroupType.AND_GROUP) onConfirm(true)
         onChange(newType)
       }}
       style={{ color: 'currentColor' }}
@@ -153,41 +166,59 @@ const OperatorSelector = ({ currentOperator, onChange, onConfirm }: OperatorSele
       <MenuItem value={CriteriaGroupType.OR_GROUP}>un des</MenuItem>
       <MenuItem value={CriteriaGroupType.AT_LEAST}>au moins</MenuItem>
       <MenuItem value={CriteriaGroupType.EXACTLY}>exactement</MenuItem>
-      {/* <MenuItem value={CriteriaGroupType.AT_MOST}>au plus</MenuItem> */}
     </Select>
   )
 }
 
-const LogicalOperatorItem: React.FC<LogicalOperatorItemProps> = ({ itemId, criteriaCount }) => {
+const LogicalOperatorItem: React.FC<LogicalOperatorItemProps> = ({ itemId, criteriaCount, disabled }) => {
   const { classes } = useStyles()
 
   const timeout = useRef<NodeJS.Timeout | null>(null)
 
   const [isOpen, setIsOpen] = useState<boolean>(false)
-  const [openConfirmationDialog, setOpenConfirmationDialog] = useState<boolean>(false)
   const {
     isMainOperator,
     currentOperator,
+    operatorConfirmation,
     handleChangeInclusive,
     handleChangeNumber,
     handleChangeOperator,
+    handleConfimation,
     deleteLogicalOperator,
-    deleteInvalidConstraints
+    deleteInvalidConstraints,
+    setOperatorConfirmation
   } = useLogicalOperator(itemId)
 
   if (!currentOperator) return <></>
+
+  let backgroundColor: string
+  if (disabled) {
+    backgroundColor = '#0000001F'
+  } else {
+    backgroundColor = currentOperator.isInclusive ? '#19235A' : '#F2B0B0'
+  }
+
+  let textColor: string
+  if (disabled) {
+    textColor = '#00000042'
+  } else {
+    textColor = currentOperator.isInclusive ? 'white' : '#19235a'
+  }
+
   return (
     <>
       <Box
         className={isMainOperator ? classes.mainLogicalOperator : classes.logicalOperator}
+        id={`logical-operator-${itemId}`}
         style={{
-          background: !currentOperator.isInclusive ? '#F2B0B0' : '#19235A',
-          color: !currentOperator.isInclusive ? '#19235a' : 'white',
+          border: disabled ? '3px solid #00000042' : '',
+          background: backgroundColor,
+          color: textColor,
           padding: '0px 10px',
           width: 'fit-content'
         }}
         onMouseEnter={() => {
-          setIsOpen(true)
+          if (!disabled) setIsOpen(true)
           if (timeout.current) clearTimeout(timeout.current)
         }}
         onMouseLeave={() => (timeout.current = setTimeout(() => setIsOpen(false), 800))}
@@ -195,15 +226,15 @@ const LogicalOperatorItem: React.FC<LogicalOperatorItemProps> = ({ itemId, crite
         {itemId !== 0 ? <CriteriaCount criteriaCount={criteriaCount} /> : null}
         {isOpen && (
           <>
-            <InclusiveSelector isInclusive={currentOperator.isInclusive ?? true} onChange={handleChangeInclusive} />
+            <InclusiveSelector
+              currentOperator={currentOperator}
+              isInclusive={currentOperator.isInclusive ?? true}
+              onChange={handleChangeInclusive}
+            />
             <Typography variant="h5" className={classes.descriptionText}>
               les patients validant
             </Typography>
-            <OperatorSelector
-              currentOperator={currentOperator}
-              onChange={handleChangeOperator}
-              onConfirm={setOpenConfirmationDialog}
-            />
+            <OperatorSelector currentOperator={currentOperator} onChange={handleConfimation} />
             {hasOptions(currentOperator) && (
               <NumberSelector currentOperator={currentOperator} onChange={handleChangeNumber} />
             )}
@@ -212,26 +243,30 @@ const LogicalOperatorItem: React.FC<LogicalOperatorItemProps> = ({ itemId, crite
             </Typography>
             {!isMainOperator && (
               <IconButton className={classes.deleteButton} size="small" onClick={deleteLogicalOperator}>
-                <DeleteIcon />
+                <DeleteIcon data-testid="DeleteIcon" />
               </IconButton>
             )}
           </>
         )}
         {!isOpen && <LogicalOperatorDisplay value={currentOperator} />}
       </Box>
-
-      <ConfirmationDialog
-        open={openConfirmationDialog}
-        onCancel={() => setOpenConfirmationDialog(false)}
-        onClose={() => setOpenConfirmationDialog(false)}
-        onConfirm={() => {
-          deleteInvalidConstraints()
-          handleChangeOperator(CriteriaGroupType.OR_GROUP)
+      <Modal
+        open={operatorConfirmation.confirmation}
+        onClose={() => {
+          setOperatorConfirmation({ nextType: CriteriaGroupType.OR_GROUP, confirmation: false })
         }}
-        message={
-          "L'ajout de contraintes temporelles n'étant possible que sur un groupe de critères ET, passer sur un groupe de critères OU vous fera perdre toutes les contraintes temporelles de ce groupe."
-        }
-      />
+        onSubmit={() => {
+          deleteInvalidConstraints()
+          handleChangeOperator(operatorConfirmation.nextType)
+        }}
+        submitText="Confirmer"
+        cancelText="Annuler"
+        maxWidth="md"
+      >
+        <WarningIcon data-testid="WarningIcon" color="warning" style={{ verticalAlign: 'middle', marginRight: 8 }} />
+        L'ajout de contraintes temporelles n'étant possible que sur un groupe de critères ET, passer sur un groupe de
+        critères OU vous fera perdre toutes les contraintes temporelles de ce groupe.
+      </Modal>
     </>
   )
 }

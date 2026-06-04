@@ -1,5 +1,4 @@
-import { SelectedStatus } from 'types/hierarchy'
-import { Codes, CodesCache, GroupedBySystem, Hierarchy, InfiniteMap, Mode } from 'types/hierarchy'
+import { Codes, CodesCache, GroupedBySystem, Hierarchy, InfiniteMap, Mode, SelectedStatus } from 'types/hierarchy'
 import { arrayToMap } from './arrays'
 import { HIERARCHY_ROOT, UNKOWN_HIERARCHY_CHAPTER } from 'services/aphp/serviceValueSets'
 
@@ -375,7 +374,7 @@ export const getSelectedCodesFromTrees = <T>(
   const selectedCodes: Codes<Hierarchy<T>> = new Map()
   trees.forEach((tree, key) => {
     const isFound = prevCodes.get(key)
-    if (system !== key && isFound && isFound.get(HIERARCHY_ROOT)) selectedCodes.set(key, isFound)
+    if (system !== key && isFound?.get(HIERARCHY_ROOT)) selectedCodes.set(key, isFound)
     else selectedCodes.set(key, getSelectedCodesFromTree(tree))
   })
   return selectedCodes

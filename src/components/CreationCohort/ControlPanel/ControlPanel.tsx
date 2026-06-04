@@ -1,5 +1,5 @@
 /* eslint-disable max-statements */
-import React, { useState, useEffect, useContext } from 'react'
+import React, { useState, useEffect, useContext, useMemo } from 'react'
 import moment from 'moment'
 
 import {
@@ -10,7 +10,6 @@ import {
   FormControlLabel,
   FormControl,
   Grid,
-  Link,
   List,
   ListItem,
   Radio,
@@ -21,30 +20,39 @@ import {
   Snackbar
 } from '@mui/material'
 
-import ArrowBackIcon from '@mui/icons-material/ArrowBack'
-import ArrowForwardIcon from '@mui/icons-material/ArrowForward'
 import DescriptionIcon from '@mui/icons-material/Description'
 import HighlightOffIcon from '@mui/icons-material/HighlightOff'
+import PlayArrowIcon from '@mui/icons-material/PlayArrow'
 import InfoIcon from '@mui/icons-material/Info'
 import ShareIcon from '@mui/icons-material/Share'
-import SupervisedUserCircleIcon from '@mui/icons-material/SupervisedUserCircle'
-import UpdateSharpIcon from '@mui/icons-material/UpdateSharp'
 
 import ModalCohortTitle from '../Modals/ModalCohortTitle/ModalCohortTitle'
 import ModalShareRequest from 'components/Researches/Modals/ModalShareRequest'
+import VersionsDialog from './Versions/VersionsDialog'
+import VersionsSection from './Versions'
 
 import { useAppSelector, useAppDispatch } from 'state'
 import {
-  resetCohortCreation,
   countCohortCreation,
   deleteCriteriaGroup,
   buildCohortCreation,
   unbuildCohortCreation,
   addActionToNavHistory,
-  updateCount
+  updateCount,
+  editSnapshotHistory,
+  saveJson
 } from 'state/cohortCreation'
 
-import { CohortCount, JobStatus, CurrentSnapshot, LoadingStatus, RequestType, Snapshot, WSJobStatus } from 'types'
+import {
+  CohortCount,
+  JobStatus,
+  CurrentSnapshot,
+  LoadingStatus,
+  RequestType,
+  Snapshot,
+  WSJobStatus,
+  QuerySnapshotInfo
+} from 'types'
 
 import useStyle from './styles'
 
@@ -58,12 +66,12 @@ import { AppConfig } from 'config'
 import { setRequestDetailedMode } from 'state/preferences'
 import { hasStageDetails } from '../DiagramView/components/CriteriaCount'
 import { isRequestFinished } from './utils'
+import { CriteriaType } from 'types/requestCriterias'
 
 const ControlPanel: React.FC<{
+  canExecuteJson: boolean
   onExecute?: (cohortName: string, cohortDescription: string, globalCount: boolean) => void
-  onUndo?: () => void
-  onRedo?: () => void
-}> = ({ onExecute, onUndo, onRedo }) => {
+}> = ({ canExecuteJson, onExecute }) => {
   const { classes, cx } = useStyle()
   const dispatch = useAppDispatch()
   const appConfig = useContext(AppConfig)
@@ -74,8 +82,10 @@ const ControlPanel: React.FC<{
   const [reportLoading, setReportLoading] = useState<LoadingStatus>(LoadingStatus.IDDLE)
   const [reportError, setReportError] = useState(false)
   const [openReportConfirmation, setOpenReportConfirmation] = useState<boolean>(false)
+  const [openVersionsDialog, setOpenVersionsDialog] = useState<boolean>(false)
 
   const {
+    viewMode,
     loading = false,
     saveLoading = false,
     count = {},
@@ -87,7 +97,6 @@ const ControlPanel: React.FC<{
     requestId,
     requestName,
     json,
-    shortCohortLimit,
     count_outdated,
     snapshotsHistory
   } = useAppSelector((state) => state.cohortCreation.request || {})
@@ -110,14 +119,24 @@ const ControlPanel: React.FC<{
 
   const maintenanceIsActive = useAppSelector((state) => state.me?.maintenance?.active ?? false)
 
-  const cohortLimit = shortCohortLimit ?? appConfig.features.cohort.shortCohortLimit
+  const cohortLimit = appConfig.features.cohort.shortCohortLimit
+
+  const hasClaim = useMemo(
+    () => selectedCriteria.some((criteria) => criteria.type === CriteriaType.CLAIM),
+    [selectedCriteria]
+  )
 
   const accessIsPseudonymize: boolean | null =
     selectedPopulation === null
       ? null
-      : selectedPopulation
-          .map((population) => population && population.access)
-          .filter((elem) => elem && elem === 'Pseudonymisé').length > 0
+      : selectedPopulation.map((population) => population?.access).some((elem) => elem && elem === 'Pseudonymisé')
+
+  let accessLabel: string
+  if (accessIsPseudonymize === null) {
+    accessLabel = '-'
+  } else {
+    accessLabel = accessIsPseudonymize ? 'Pseudonymisé' : 'Nominatif'
+  }
 
   const checkIfLogicalOperatorIsEmpty = () => {
     let _criteriaGroup = criteriaGroup || []
@@ -146,6 +165,16 @@ const ControlPanel: React.FC<{
     dispatch(buildCohortCreation({ selectedPopulation: null }))
   }
 
+  const executeJson = async () => {
+    try {
+      const saveJsonResponse = await dispatch(saveJson({ newJson: JSON.stringify(JSON.parse(json)) })).unwrap()
+
+      await dispatch(unbuildCohortCreation({ newCurrentSnapshot: saveJsonResponse.currentSnapshot })).unwrap()
+    } catch (e) {
+      console.error('Failed executing serialized query : ', e)
+    }
+  }
+
   const _relaunchCount = (keepCount: boolean) => {
     if (keepCount) setOldCount(count ?? null)
     dispatch(
@@ -157,13 +186,22 @@ const ControlPanel: React.FC<{
     )
   }
 
+  const handleDeleteGhm = () => {
+    dispatch(buildCohortCreation({ selectedPopulation: null }))
+  }
+
   const handleOpenSharedModal = () => {
     setRequestShare({ currentSnapshot, requestId, requestName, name: '', uuid: '' })
     setOpenShareRequestModal(true)
   }
+
   const handleCloseSharedModal = () => {
     setRequestShare(null)
     setOpenShareRequestModal(false)
+  }
+
+  const handleVersionUpdate = (updatedVersion: QuerySnapshotInfo) => {
+    dispatch(editSnapshotHistory(updatedVersion))
   }
 
   const getNewNavHistoryIndex = (navHistory: CurrentSnapshot[], previousSnapshot: CurrentSnapshot) => {
@@ -182,7 +220,6 @@ const ControlPanel: React.FC<{
       const snapshot: Snapshot = await services.cohortCreation.fetchSnapshot(snapshotId)
       const newNavHistoryIndex = getNewNavHistoryIndex(navHistory, currentSnapshot)
       const newCurrentSnapshot: CurrentSnapshot = { ...snapshot, navHistoryIndex: newNavHistoryIndex }
-
       dispatch(addActionToNavHistory(newCurrentSnapshot))
       dispatch(unbuildCohortCreation({ newCurrentSnapshot }))
     }
@@ -200,6 +237,7 @@ const ControlPanel: React.FC<{
       }
       setReportLoading(LoadingStatus.SUCCESS)
     } catch (error) {
+      console.error(error)
       setReportLoading(LoadingStatus.IDDLE)
       setReportError(true)
     }
@@ -256,10 +294,21 @@ const ControlPanel: React.FC<{
           includePatient: message.extra_info?.measure,
           extra: message.extra_info?.extra,
           status: message.status,
-          jobFailMsg: message.extra_info?.request_job_fail_msg
+          jobFailMsg: message.extra_info?.request_job_fail_msg,
+          snapshotId: message.extra_info?.snapshot_id
         }
         dispatch(updateCount(response))
         setPrevCountDisplay(undefined)
+      }
+      if (message.status === JobStatus.FINISHED) {
+        const versionToUpdate = snapshotsHistory.find((v) => v.uuid === message.extra_info?.snapshot_id)
+        if (versionToUpdate) {
+          const updatedVersion: QuerySnapshotInfo = {
+            ...versionToUpdate,
+            patients_count: message.extra_info?.measure
+          }
+          dispatch(editSnapshotHistory(updatedVersion))
+        }
       }
     }
 
@@ -277,7 +326,8 @@ const ControlPanel: React.FC<{
               typeof onExecute !== 'function' ||
               maintenanceIsActive ||
               count_outdated ||
-              includePatient === 0
+              includePatient === 0 ||
+              hasClaim
             }
             onClick={() => setOpenModal('executeCohortConfirmation')}
             className={classes.requestExecution}
@@ -294,7 +344,9 @@ const ControlPanel: React.FC<{
           </Button>
           {appConfig.features.feasibilityReport.enabled && (
             <Button
-              disabled={isLoading || typeof onExecute !== 'function' || maintenanceIsActive || count_outdated}
+              disabled={
+                isLoading || typeof onExecute !== 'function' || maintenanceIsActive || count_outdated || hasClaim
+              }
               onClick={handleGenerateReport}
               className={classes.requestExecution}
               startIcon={<DescriptionIcon color="action" className={classes.iconBorder} />}
@@ -310,34 +362,6 @@ const ControlPanel: React.FC<{
               )}
             </Button>
           )}
-          <Button
-            className={classes.actionButton}
-            onClick={onUndo}
-            disabled={typeof onUndo !== 'function' || maintenanceIsActive}
-            startIcon={<ArrowBackIcon color="action" className={classes.iconBorder} />}
-          >
-            <Typography className={classes.boldText}>Annuler</Typography>
-          </Button>
-
-          <Button
-            className={classes.actionButton}
-            onClick={onRedo}
-            disabled={typeof onRedo !== 'function' || maintenanceIsActive}
-            startIcon={<ArrowForwardIcon color="action" className={classes.iconBorder} />}
-          >
-            <Typography className={classes.boldText}>Rétablir</Typography>
-          </Button>
-
-          <Button
-            onClick={() => {
-              dispatch(resetCohortCreation())
-            }}
-            className={classes.actionButton}
-            startIcon={<UpdateSharpIcon color="action" className={classes.iconBorder} />}
-            disabled={maintenanceIsActive}
-          >
-            <Typography className={classes.boldText}>Réinitialiser</Typography>
-          </Button>
 
           <Button
             onClick={() => {
@@ -345,7 +369,7 @@ const ControlPanel: React.FC<{
             }}
             className={classes.actionButton}
             startIcon={<ShareIcon color="action" className={classes.iconBorder} />}
-            disabled={maintenanceIsActive}
+            disabled={maintenanceIsActive || hasClaim}
           >
             <Typography className={classes.boldText}>Partager ma requête</Typography>
           </Button>
@@ -357,7 +381,7 @@ const ControlPanel: React.FC<{
                 onClick={cleanLogicalOperator}
                 className={classes.actionButton}
                 startIcon={<HighlightOffIcon color="action" className={classes.iconBorder} />}
-                disabled={maintenanceIsActive}
+                disabled={maintenanceIsActive || hasClaim}
               >
                 <Tooltip title="Supprimer les groupes ne contenant aucun élément">
                   <Typography className={classes.boldText}>Nettoyer le diagramme</Typography>
@@ -365,12 +389,29 @@ const ControlPanel: React.FC<{
               </Button>
             </>
           )}
+
+          {/* Execute the query in json view */}
+          {viewMode === 'json' && (
+            <>
+              <Divider />
+              <Button
+                onClick={executeJson}
+                className={classes.actionButton}
+                disabled={!!canExecuteJson}
+                startIcon={<PlayArrowIcon color="action" className={classes.iconBorder} />}
+              >
+                <Tooltip title="Exécuter la requête construite dans l'interface Json">
+                  <Typography className={classes.boldText}>Exécuter la requête</Typography>
+                </Tooltip>
+              </Button>
+            </>
+          )}
         </Grid>
-        <Grid className={classes.container}>
-          <Grid container justifyContent="space-between">
+        <Grid container className={classes.container}>
+          <Grid container size={12} justifyContent="space-between">
             <Typography className={cx(classes.boldText, classes.patientTypo)}>ACCÈS :</Typography>
             <Typography className={cx(classes.blueText, classes.boldText, classes.patientTypo)}>
-              {accessIsPseudonymize === null ? '-' : accessIsPseudonymize ? 'Pseudonymisé' : 'Nominatif'}
+              {accessLabel}
             </Typography>
           </Grid>
         </Grid>
@@ -381,8 +422,8 @@ const ControlPanel: React.FC<{
           )}
         </JToolComponentEggWrapper>
 
-        <Grid className={classes.container}>
-          <Grid container justifyContent="space-between">
+        <Grid container className={classes.container}>
+          <Grid container size={12} justifyContent="space-between">
             <Typography className={cx(classes.boldText, classes.patientTypo)}>PATIENTS INCLUS :</Typography>
             {isLoading && prevCountDisplay === undefined ? (
               <CircularProgress
@@ -394,11 +435,11 @@ const ControlPanel: React.FC<{
               <Grid container alignItems="center" style={{ width: 'fit-content' }}>
                 <Typography className={cx(classes.boldText, classes.patientTypo, classes.blueText)}>
                   {format(includePatient ?? prevCountDisplay)}
-                  {oldCount !== null && !!oldCount.includePatient
-                    ? (includePatient ?? 0) - oldCount.includePatient > 0
-                      ? ` (+${(includePatient ?? 0) - oldCount.includePatient})`
-                      : ` (${(includePatient ?? 0) - oldCount.includePatient})`
-                    : ''}
+                  {(() => {
+                    if (!oldCount?.includePatient) return ''
+                    const delta = (includePatient ?? 0) - oldCount.includePatient
+                    return delta > 0 ? ` (+${delta})` : ` (${delta})`
+                  })()}
                 </Typography>
                 {oldCount !== null && !!oldCount.includePatient && (
                   <Tooltip
@@ -410,7 +451,7 @@ const ControlPanel: React.FC<{
                       'DD/MM/YYYY'
                     )} et la date du jour.`}
                   >
-                    <InfoIcon />
+                    <InfoIcon data-testid="InfoIcon" />
                   </Tooltip>
                 )}
               </Grid>
@@ -428,7 +469,7 @@ const ControlPanel: React.FC<{
                     setCriteriaDetailCalculation(e.target.checked)
                   }}
                   color="primary"
-                  disabled={maintenanceIsActive}
+                  disabled={maintenanceIsActive || hasClaim}
                 />
               }
               label="Calcul sur la population source"
@@ -444,10 +485,14 @@ const ControlPanel: React.FC<{
                     value={detailCalculationType}
                     onChange={(e) => setDetailCalculationType(e.target.value as 'all' | 'ratio')}
                   >
-                    <FormControlLabel value="all" control={<Radio disabled={maintenanceIsActive} />} label="Chiffres" />
+                    <FormControlLabel
+                      value="all"
+                      control={<Radio disabled={maintenanceIsActive || hasClaim} />}
+                      label="Chiffres"
+                    />
                     <FormControlLabel
                       value="ratio"
-                      control={<Radio disabled={maintenanceIsActive} />}
+                      control={<Radio disabled={maintenanceIsActive || hasClaim} />}
                       label="Pourcentages"
                     />
                   </RadioGroup>
@@ -522,42 +567,30 @@ const ControlPanel: React.FC<{
             </Button>
           </Alert>
         )}
-        <Grid className={classes.container} style={{ maxHeight: 400, overflow: 'hidden scroll' }}>
-          <Grid container justifyContent="space-between" style={{ margin: 10 }}>
-            <Typography className={classes.boldText} sx={{ margin: '0px 10px' }}>
-              VERSIONS DE LA REQUÊTE :
-            </Typography>
-            <Typography sx={{ margin: '0 10px 10px 10px', fontSize: 11, color: 'grey' }}>
-              Cliquez sur une des versions pour la consulter.
-            </Typography>
-            <Grid container justifyContent={'space-around'} style={{ marginLeft: '0.5em' }}>
-              {snapshotsHistory.map((snapshot, count) => (
-                <Grid container key={count} alignItems="center">
-                  <Link
-                    onClick={() => handleSnapshotChange(snapshot.uuid)}
-                    underline={currentSnapshot.uuid === snapshot.uuid ? 'none' : 'hover'}
-                    style={{
-                      display: 'flex',
-                      cursor: currentSnapshot.uuid === snapshot.uuid ? 'default' : 'pointer',
-                      fontWeight: currentSnapshot.uuid === snapshot.uuid ? 'bold' : ''
-                    }}
-                  >
-                    <div style={{ width: 80, textAlign: 'center' }}>Version {snapshot.version}</div>
-                    <div style={{ width: 8 }}> - </div>
-                    <div style={{ width: 135 }}>{moment(snapshot.created_at).format('DD/MM/YYYY - HH:mm:ss')}</div>
-                  </Link>
-                  <Grid container alignItems="center" style={{ width: 24, margin: '0 4px' }}>
-                    {snapshot.cohorts_count > 0 && (
-                      <Tooltip title="Une ou plusieurs cohortes ont été créées à partir de cette version.">
-                        <SupervisedUserCircleIcon fontSize="small" color="action" sx={{ color: '#f7a600b3' }} />
-                      </Tooltip>
-                    )}
-                  </Grid>
-                </Grid>
-              ))}
-            </Grid>
-          </Grid>
-        </Grid>
+        {hasClaim && (
+          <Alert className={classes.errorAlert} severity="error">
+            Vous devez relancer votre requête pour avoir un nombre de patients à jour et créer une cohorte.
+            <div>
+              <Button
+                onClick={handleDeleteGhm}
+                variant="outlined"
+                color="secondary"
+                size="small"
+                style={{ marginTop: 8 }}
+                disabled={maintenanceIsActive}
+              >
+                Relancer sans GHM
+              </Button>
+            </div>
+          </Alert>
+        )}
+        <VersionsSection
+          snapshotsHistory={snapshotsHistory}
+          currentSnapshot={currentSnapshot}
+          onSnapshotChange={handleSnapshotChange}
+          onOpenVersionsDialog={() => setOpenVersionsDialog(true)}
+          classes={classes}
+        />
       </Grid>
 
       {openModal === 'executeCohortConfirmation' && (
@@ -600,6 +633,15 @@ const ControlPanel: React.FC<{
             Votre requête ne possède aucun critère. Elle ne peut donc pas être partagée.
           </Alert>
         </Snackbar>
+      )}
+
+      {openVersionsDialog && (
+        <VersionsDialog
+          open={openVersionsDialog}
+          onClose={() => setOpenVersionsDialog(false)}
+          versions={snapshotsHistory}
+          onVersionUpdate={handleVersionUpdate}
+        />
       )}
     </>
   )

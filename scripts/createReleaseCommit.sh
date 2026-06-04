@@ -10,14 +10,22 @@ set -e
 # ```
 
 # Exit if no version argument provided
-if [ $# -ne 1 ]; then
+if [[ $# -ne 1 ]]; then
     echo "Usage: $0 <version>"
     exit 1
 fi
 
 VERSION=$1
+CURRENT_BRANCH=$(git branch --show-current)
+EXPECTED_BRANCH="release/$VERSION"
 
 echo "Creating release commit for version $VERSION"
+
+if [[ "$CURRENT_BRANCH" != "$EXPECTED_BRANCH" ]]; then
+    echo "This script must be run from $EXPECTED_BRANCH"
+    echo "Current branch: $CURRENT_BRANCH"
+    exit 1
+fi
 
 # Update version in package.json and package-lock.json
 npm version $VERSION --no-git-tag-version
@@ -29,15 +37,13 @@ tail -n +4 CHANGELOG.md >> temp_changelog.md
 mv temp_changelog.md CHANGELOG.md
 
 echo "You can review the modification and then execute this command to commit and push the changes:"
-echo "git add package.json package-lock.json CHANGELOG.md && git commit -m \"build: set release version $VERSION\" && git tag $VERSION && git push origin $VERSION && git push origin HEAD"
+echo "git add package.json package-lock.json CHANGELOG.md && git commit -m \"build: set release version $VERSION\" && git push origin HEAD"
 
 read -p "Would you like to automatically execute these commands? (y/N) " answer
-if [ "$answer" = "y" ]; then
+if [[ "$answer" = "y" ]]; then
   # Add files and create commit
     git add package.json package-lock.json CHANGELOG.md
     git commit -m "build: set release version $VERSION"
-    git tag $VERSION
-    git push origin $VERSION
     git push origin HEAD
     echo "Release commit created and pushed successfully."
 else

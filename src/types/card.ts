@@ -8,5 +8,6 @@ type Section = {
 
 export type Card = {
   url?: string
+  getUrl: () => string
   sections: Section[]
 }

@@ -11,6 +11,7 @@ import { getConfig } from 'config'
 import { getValueSetsByUrls } from 'utils/valueSets'
 import { Hierarchy } from 'types/hierarchy'
 import { FhirItem } from 'types/valueSet'
+import { Sources } from 'types/searchCriterias'
 
 export type CcamDataType = CommonCriteriaData &
   WithOccurenceCriteriaDataType &
@@ -26,7 +27,7 @@ export const form: () => CriteriaForm<CcamDataType> = () => ({
   title: 'Actes CCAM',
   initialData: {
     type: CriteriaType.PROCEDURE,
-    title: "Critères d'actes CCAM",
+    title: "Critère d'actes CCAM",
     isInclusive: true,
     occurrence: { value: 1, comparator: Comparators.GREATER_OR_EQUAL },
     encounterService: null,
@@ -36,7 +37,7 @@ export const form: () => CriteriaForm<CcamDataType> = () => ({
     encounterEndDate: null,
     encounterStatus: [],
     code: null,
-    source: 'AREM'
+    source: getConfig().features.procedure.filters?.sources.arem ?? Sources.AREM
   },
   infoAlert: ['Tous les éléments des champs multiples sont liés par une contrainte OU'],
   buildInfo: {
@@ -60,17 +61,19 @@ export const form: () => CriteriaForm<CcamDataType> = () => ({
           type: 'radioChoice',
           label: 'Source',
           choices: [
-            { id: 'AREM', label: 'AREM' },
-            { id: 'ORBIS', label: 'ORBIS' }
+            { id: getConfig().features.procedure.filters?.sources.arem ?? Sources.AREM, label: Sources.AREM },
+            { id: getConfig().features.procedure.filters?.sources.orbis ?? Sources.ORBIS, label: Sources.ORBIS }
           ],
           buildInfo: {
             fhirKey: ProcedureParamsKeys.SOURCE,
-            chipDisplayMethodExtraArgs: [{ type: 'string', value: 'Source: ' }]
+            chipDisplayMethodExtraArgs: [{ type: 'string', value: 'Source: ' }],
+            chipDisplayMethod: 'getRadioLabel'
           }
         },
         {
           type: 'info',
-          content: 'Les données AREM sont disponibles uniquement pour la période du 07/12/2009 au 30/11/2024',
+          content:
+            "Les données AREM sont disponibles pour la période du 07/12/2009 jusqu'à la dernière période validée pour l'année courante dans le Datalake et la base centrale de l'EDS, à savoir avec un décalage d’environ 1-2 mois. Contrairement à la source ORBIS, les données provenant d'AREM sont décalées. Ce décalage d’environ 2 mois est lié au temps de traitement pour la phase de codification et de vérification par l'équipe DIM (Département d'Information Médicale).",
           contentType: 'warning'
         },
         {

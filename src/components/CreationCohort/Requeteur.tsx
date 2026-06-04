@@ -9,7 +9,7 @@ import DiagramView from './DiagramView'
 import ModalCreateNewRequest from './Modals/ModalCreateNewRequest/ModalCreateNewRequest'
 
 import { useAppDispatch, useAppSelector } from 'state'
-import { fetchRequestCohortCreation, resetCohortCreation, unbuildCohortCreation } from 'state/cohortCreation'
+import { fetchRequestCohortCreation, resetCohortCreation } from 'state/cohortCreation'
 import { setSelectedRequest } from 'state/request'
 
 import { CurrentSnapshot } from 'types'
@@ -29,7 +29,6 @@ const Requeteur = () => {
     loading = false,
     requestId = '',
     currentSnapshot = {} as CurrentSnapshot,
-    navHistory,
     selectedCriteria = [],
     isCriteriaNominative = false,
     criteriaGroup = [],
@@ -55,6 +54,8 @@ const Requeteur = () => {
   const [requestLoading, setRequestLoading] = useState(0)
   const [criteriaLoading, setCriteriaLoading] = useState(0)
   const [valueSetsLoading, setValueSetsLoading] = useState(true)
+  const [canExecuteJson, setCanExecuteJson] = useState(true)
+
   const isRendered = useRef<boolean>(false)
 
   const _fetchRequest = useCallback(async () => {
@@ -120,10 +121,6 @@ const Requeteur = () => {
     }
   }, [dispatch, selectedCriteria, allowSearchIpp, selectedPopulation])
 
-  const _unbuildRequest = async (newCurrentSnapshot: CurrentSnapshot) => {
-    dispatch(unbuildCohortCreation({ newCurrentSnapshot }))
-  }
-
   useEffect(() => {
     if (selectedPopulation?.some((perimeter) => perimeter?.access === 'Pseudonymisé') && isCriteriaNominative) {
       cleanNominativeCriterias(selectedCriteria, criteriaGroup, dispatch)
@@ -149,31 +146,13 @@ const Requeteur = () => {
         globalCount
       )
 
-      if (createCohortResult && createCohortResult.status === 201) {
+      if (createCohortResult?.status === 201) {
         dispatch(resetCohortCreation())
         navigate(`/home`)
       }
     }
 
     _createCohort()
-  }
-
-  const _onUndo = async () => {
-    const newCurrentSnapshot = navHistory[currentSnapshot.navHistoryIndex - 1]
-    await _unbuildRequest(newCurrentSnapshot)
-  }
-
-  const _onRedo = async () => {
-    const newCurrentSnapshot = navHistory[currentSnapshot.navHistoryIndex + 1]
-    await _unbuildRequest(newCurrentSnapshot)
-  }
-
-  const _canUndo: () => boolean = () => {
-    return !!navHistory[currentSnapshot.navHistoryIndex - 1]
-  }
-
-  const _canRedo: () => boolean = () => {
-    return !!navHistory[currentSnapshot.navHistoryIndex + 1]
   }
 
   const _canExecute: () => boolean = () => {
@@ -229,13 +208,9 @@ const Requeteur = () => {
 
   return (
     <>
-      {(requestId || requestIdFromUrl) && <DiagramView />}
+      {(requestId || requestIdFromUrl) && <DiagramView isValidJson={setCanExecuteJson} />}
 
-      <ControlPanel
-        onExecute={_canExecute() ? _onExecute : undefined}
-        onUndo={_canUndo() ? _onUndo : undefined}
-        onRedo={_canRedo() ? _onRedo : undefined}
-      />
+      <ControlPanel canExecuteJson={canExecuteJson} onExecute={_canExecute() ? _onExecute : undefined} />
 
       {!requestIdFromUrl && !requestId && (
         <ModalCreateNewRequest

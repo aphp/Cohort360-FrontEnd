@@ -24,6 +24,7 @@ import { CohortsType } from 'types/cohorts'
 import { listStaticContents, WebContent } from 'services/aphp/callApi'
 import Markdown from 'react-markdown'
 import { getBannerMessageLevel, sortContent } from 'data/infoMessage'
+import { plural } from 'utils/string'
 
 const Welcome = () => {
   const { classes } = useStyles()
@@ -61,8 +62,8 @@ const Welcome = () => {
         }`}
         lastConnexion={lastConnection}
       />
-      <Grid container xs={11} mt={1.5} mb={2}>
-        <Grid container gap={0.5}>
+      <Grid container size={11} sx={{ mt: 1.5, mb: 2 }}>
+        <Grid container sx={{ gap: 0.5 }}>
           {sortContent(bannerMessages).map((infoMessage) => (
             <CustomAlert key={'alertMessage' + infoMessage.id} severity={getBannerMessageLevel(infoMessage)}>
               <Markdown components={{ p: 'span' }}>{infoMessage.content}</Markdown>
@@ -79,14 +80,14 @@ const Welcome = () => {
             .map((item: AccessExpiration) => (
               <CustomAlert key={item.perimeter + '-' + item.leftDays && item.leftDays} severity="warning">
                 Attention, votre accès au périmètre suivant: {item.perimeter}, arrivera à expiration dans{' '}
-                {item.leftDays} jour{item.leftDays > 1 ? 's' : ''}. Veuillez vous rapprocher de votre référent EDS pour
-                faire renouveler vos accès à l'application.
+                {item.leftDays} jour{plural(item.leftDays)}. Veuillez vous rapprocher de votre référent EDS pour faire
+                renouveler vos accès à l'application.
               </CustomAlert>
             ))}
         </Grid>
-        <Grid container spacing={1}>
-          <Grid container className={classes.newsGrid} item xs={12} md={6}>
-            <Grid item className={classes.pt3}>
+        <Grid container size={12} spacing={1}>
+          <Grid container className={classes.newsGrid} size={{ xs: 12, md: 6 }}>
+            <Grid className={classes.pt3}>
               <Paper
                 id="patients-card"
                 className={classes.paper}
@@ -96,15 +97,15 @@ const Welcome = () => {
               </Paper>
             </Grid>
 
-            <Grid item className={classes.pt3}>
+            <Grid className={classes.pt3}>
               <Paper id="news-card" className={classes.paper} style={{ maxHeight: 450, minHeight: 450, height: 450 }}>
                 <NewsCard />
               </Paper>
             </Grid>
           </Grid>
 
-          <Grid container item xs={12} md={6}>
-            <Grid item xs={12} className={classes.pt3}>
+          <Grid container size={{ xs: 12, md: 6 }}>
+            <Grid size={12} className={classes.pt3}>
               <Paper
                 id="search-patient-card"
                 className={classes.paper}
@@ -114,7 +115,7 @@ const Welcome = () => {
               </Paper>
             </Grid>
 
-            <Grid item xs={12} className={classes.pt3}>
+            <Grid size={12} className={classes.pt3}>
               <Paper
                 id="tutorials-card"
                 className={classes.paper}
@@ -126,8 +127,8 @@ const Welcome = () => {
           </Grid>
         </Grid>
 
-        <Grid container item style={{ paddingTop: 12 }}>
-          <Grid item xs={12}>
+        <Grid size={12} container sx={{ paddingTop: '12px' }}>
+          <Grid size={12}>
             <Paper id="favorite-cohort-research-card" className={classes.paper}>
               <PreviewCard
                 title={'Mes cohortes favorites'}
@@ -139,8 +140,8 @@ const Welcome = () => {
             </Paper>
           </Grid>
         </Grid>
-        <Grid container item style={{ paddingTop: 12 }}>
-          <Grid item xs={12}>
+        <Grid size={12} container sx={{ paddingTop: '12px' }}>
+          <Grid size={12}>
             <Paper id="last-created-cohort-research-card" className={classes.paper}>
               <PreviewCard
                 title={'Mes dernières cohortes créées'}
@@ -152,8 +153,8 @@ const Welcome = () => {
             </Paper>
           </Grid>
         </Grid>
-        <Grid container item style={{ paddingTop: 12 }}>
-          <Grid item xs={12}>
+        <Grid size={12} container sx={{ paddingTop: '12px' }}>
+          <Grid size={12}>
             <Paper id="last-created-request-research-card" className={classes.paper}>
               <PreviewCard
                 title={'Mes dernières requêtes créées'}

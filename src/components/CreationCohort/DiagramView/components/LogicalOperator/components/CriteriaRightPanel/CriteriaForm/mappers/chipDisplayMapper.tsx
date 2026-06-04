@@ -13,7 +13,8 @@ import {
   DocumentAttachmentMethod,
   DocumentAttachmentMethodLabel,
   LabelObject,
-  SearchByTypes
+  SearchByTypes,
+  Sources
 } from 'types/searchCriterias'
 import { Hierarchy } from 'types/hierarchy'
 import { ScopeElement } from 'types/scope'
@@ -79,14 +80,20 @@ const getSearchDocumentLabel = (value: string, searchBy: string | null) => {
 }
 
 const getDocumentTypesLabel = (values: string[]) => {
-  const typeGroups = allDocTypes.docTypes.reduce((acc, docType) => {
-    acc[docType.type] = acc[docType.type] ? [...acc[docType.type], docType.code] : [docType.code]
-    return acc
-  }, {} as Record<string, string[]>)
-  const typeMap = allDocTypes.docTypes.reduce((acc, docType) => {
-    acc[docType.code] = docType
-    return acc
-  }, {} as Record<string, { type: string; label: string; code: string }>)
+  const typeGroups = allDocTypes.docTypes.reduce(
+    (acc, docType) => {
+      acc[docType.type] = acc[docType.type] ? [...acc[docType.type], docType.code] : [docType.code]
+      return acc
+    },
+    {} as Record<string, string[]>
+  )
+  const typeMap = allDocTypes.docTypes.reduce(
+    (acc, docType) => {
+      acc[docType.code] = docType
+      return acc
+    },
+    {} as Record<string, { type: string; label: string; code: string }>
+  )
   return values
     .reduce((acc, selectedDocType) => {
       const selectedDocTypeGroup = typeMap[selectedDocType].type
@@ -106,7 +113,7 @@ const getDocumentTypesLabel = (values: string[]) => {
 
 const chipForNumberAndComparator = (value: NumberAndComparatorDataType, name: string) => {
   if (value.comparator === Comparators.BETWEEN) {
-    return `${name} comprise entre ${value.value} et ${!value.maxValue ? '?' : value.maxValue}`
+    return `${name} comprise entre ${value.value} et ${value.maxValue ? value.maxValue : '?'}`
   }
   return `${name} ${value.comparator} ${+value.value}`
 }
@@ -155,7 +162,7 @@ const getLabelsForCodeSearchItem = (
         (cacheKey
           ? valueSets.cache[cacheKey]
           : item.valueSetsInfo.flatMap((valueset) => valueSets.cache[valueset.url])) || []
-      ).find((code) => code && code.id === value.id) as LabelObject
+      ).find((code) => code?.id === value.id) as LabelObject
     })
     .filter((code) => code !== undefined)
 }
@@ -321,6 +328,15 @@ export const CHIPS_DISPLAY_METHODS = {
     valueSets: ValueSetStore,
     args: Array<ChipDisplayMethod | DataTypes>
   ) => getSearchDocumentLabel(val as string, args[0] as string),
+  getRadioLabel: (
+    val: DataTypes,
+    item: GenericCriteriaItem,
+    valueSets: ValueSetStore,
+    args: Array<ChipDisplayMethod | DataTypes>
+  ) => {
+    const choice = ('choices' in item && item.choices?.find((c) => c.id === val)?.label) ?? Sources.AREM
+    return `${item.label} ${choice}`
+  },
   getDocumentTypesLabel: (
     val: DataTypes,
     item: GenericCriteriaItem,

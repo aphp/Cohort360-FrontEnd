@@ -76,6 +76,7 @@ const ModalShareRequest: React.FC<{
       setLoading(false)
       onClose()
     } catch (error) {
+      console.error(error)
       setLoading(false)
       onClose()
       dispatch(

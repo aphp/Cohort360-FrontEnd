@@ -26,6 +26,7 @@ import {
   getFoldersSearchParams
 } from 'utils/explorationUtils'
 import { ExplorationsSearchParams } from 'types/cohorts'
+import { plural } from 'utils/string'
 
 const ProjectsList = () => {
   const navigate = useNavigate()
@@ -108,10 +109,40 @@ const ProjectsList = () => {
     setOpenEditionModal(false)
   }
 
+  let projectsListContent: React.ReactNode
+  if (loading) {
+    projectsListContent = <CenteredCircularProgress />
+  } else if (projectsList.length === 0) {
+    projectsListContent = (
+      <Grid container sx={{ justifyContent: 'center' }} marginTop={'12px'}>
+        <Typography>Aucun projet à afficher</Typography>
+      </Grid>
+    )
+  } else {
+    projectsListContent = projectsList.map((project: ProjectType) => (
+      <ProjectCard
+        key={project.uuid}
+        title={project.name}
+        creationDate={project.created_at}
+        requestNumber={project.requests_count ?? 0}
+        onclick={() => navigate(`/researches/projects/${project.uuid}${location.search}`)}
+        onedit={() => {
+          setSelectedProject(project)
+          setOpenEditionModal(true)
+        }}
+        ondelete={() => {
+          setSelectedProject(project)
+          setOpenDeletionModal(true)
+        }}
+        disabled={maintenanceIsActive}
+      />
+    ))
+  }
+
   return (
-    <Grid container style={{ padding: '20px 0' }} gap="20px">
-      <Grid container justifyContent={'space-between'} alignItems={'center'}>
-        <Grid item>
+    <Grid container size={12} style={{ padding: '20px 0' }} sx={{ gap: '20px' }}>
+      <Grid container size={12} sx={{ justifyContent: 'space-between', alignItems: 'center' }}>
+        <Grid>
           <Select
             value={`${order.orderDirection}${order.orderBy}`}
             label="Tri par"
@@ -119,7 +150,7 @@ const ProjectsList = () => {
             onChange={(newValue) => changeOrderBy(newValue)}
           />
         </Grid>
-        <Grid item>
+        <Grid>
           <Button
             width="fit-content"
             onClick={() => setOpenEditionModal(true)}
@@ -130,37 +161,12 @@ const ProjectsList = () => {
             Nouveau projet
           </Button>
         </Grid>
-        <Grid item>
-          <DisplayDigits label={`projet${total > 1 ? 's' : ''}`} nb={total} />
+        <Grid>
+          <DisplayDigits label={`projet${plural(total)}`} nb={total} />
         </Grid>
       </Grid>
-      <Grid container gap="50px" id="projects-list-div">
-        {loading ? (
-          <CenteredCircularProgress />
-        ) : projectsList.length === 0 ? (
-          <Grid container justifyContent={'center'} marginTop={'12px'}>
-            <Typography>Aucun projet à afficher</Typography>
-          </Grid>
-        ) : (
-          projectsList.map((project: ProjectType) => (
-            <ProjectCard
-              key={project.uuid}
-              title={project.name}
-              creationDate={project.created_at}
-              requestNumber={project.requests_count ?? 0}
-              onclick={() => navigate(`/researches/projects/${project.uuid}${location.search}`)}
-              onedit={() => {
-                setSelectedProject(project)
-                setOpenEditionModal(true)
-              }}
-              ondelete={() => {
-                setSelectedProject(project)
-                setOpenDeletionModal(true)
-              }}
-              disabled={maintenanceIsActive}
-            />
-          ))
-        )}
+      <Grid container size={12} sx={{ gap: '50px' }} id="projects-list-div">
+        {projectsListContent}
       </Grid>
 
       <AddOrEditItem

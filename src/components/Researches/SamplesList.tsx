@@ -120,7 +120,7 @@ const SamplesList = () => {
         header={
           <LevelHeader
             loading={cohortLoading}
-            name={cohortId ? parentCohort?.name ?? 'N/A' : 'Tous mes échantillons'}
+            name={cohortId ? (parentCohort?.name ?? 'N/A') : 'Tous mes échantillons'}
             description={parentCohort?.description ?? ''}
             actions={
               cohortId && (
@@ -153,14 +153,14 @@ const SamplesList = () => {
                   <IconButtonWithTooltip
                     disabled={maintenanceIsActive}
                     title="Éditer la cohorte parent"
-                    icon={<EditIcon />}
+                    icon={<EditIcon data-testid="EditIcon" />}
                     onClick={() => setOpenParentEditionModal(true)}
                     color={'#5bc5f2'}
                   />
                   <IconButtonWithTooltip
                     disabled={maintenanceIsActive}
                     title="Supprimer la cohorte"
-                    icon={<DeleteIcon />}
+                    icon={<DeleteIcon data-testid="DeleteIcon" />}
                     onClick={() => setOpenDeletionModal(true)}
                     color={'#ed6d91'}
                   />

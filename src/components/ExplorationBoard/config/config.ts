@@ -1,4 +1,4 @@
-import { DisplayOptions, ExplorationConfig } from 'types/exploration'
+import { DisplayOptions, ExplorationConfig, Patient } from 'types/exploration'
 import { ResourceType } from 'types/requestCriterias'
 import {
   BiologyFilters,
@@ -16,7 +16,6 @@ import { formsConfig } from './forms'
 import { imagingConfig } from './imaging'
 import { claimConfig, conditionConfig, procedureConfig } from './pmsi'
 import { medicationAdministrationConfig, medicationRequestConfig } from './medication'
-import { PatientState } from 'state/patient'
 
 type ResourceFilterMap = {
   [ResourceType.PATIENT]: PatientsFilters
@@ -35,7 +34,7 @@ export type ExplorationResourceType = keyof ResourceFilterMap
 
 export type ExplorationConfigFor<T extends keyof ResourceFilterMap> = ExplorationConfig<ResourceFilterMap[T]>
 
-export const buildExplorationConfig = (deidentified: boolean, patient: PatientState | null, groupId: string[]) => {
+export const buildExplorationConfig = (deidentified: boolean, patient: Patient | null, groupId: string[]) => {
   const configMap = {
     [ResourceType.PATIENT]: patientsConfig,
     [ResourceType.OBSERVATION]: biologyConfig,

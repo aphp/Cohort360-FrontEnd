@@ -31,6 +31,7 @@ export const mapJobStatus = (status?: JobStatus, jobFailMessage?: string) => {
   switch (status) {
     case JobStatus.FINISHED:
       return { label: 'Terminé', status: ChipStatus.FINISHED }
+    case JobStatus.STARTED:
     case JobStatus.PENDING:
     case JobStatus.NEW:
       return { label: 'En cours', status: ChipStatus.IN_PROGRESS }

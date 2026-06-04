@@ -40,14 +40,14 @@ const Chart = ({
   return (
     <ChartContainer id={id} sx={{ height: height }}>
       {title && (
-        <ChartHeader container item>
-          <Grid container item>
+        <ChartHeader container>
+          <Grid container>
             <Typography variant="h3" color="primary">
               {title}
               {tooltip && (
                 <Tooltip title="Les localisations des patients sont affichées uniquement si leur adresse est disponible (certains patients n'ayant pas d'adresse associée).">
                   <IconButton style={{ padding: '0 0 0 4px', marginTop: '-2.5px', position: 'absolute' }}>
-                    <InfoIcon style={{ height: 22 }} />
+                    <InfoIcon data-testid="InfoIcon" style={{ height: 22 }} />
                   </IconButton>
                 </Tooltip>
               )}
@@ -56,7 +56,7 @@ const Chart = ({
                   <IconButton
                     style={{ padding: '0 0 0 4px', marginTop: '-2.5px', marginLeft: '25px', position: 'absolute' }}
                   >
-                    <WarningIcon color="warning" style={{ height: 22 }} />
+                    <WarningIcon data-testid="WarningIcon" color="warning" style={{ height: 22 }} />
                   </IconButton>
                 </Tooltip>
               )}
@@ -64,7 +64,7 @@ const Chart = ({
           </Grid>
         </ChartHeader>
       )}
-      <Grid container item justifyContent="center" alignItems="center" style={{ flexGrow: 1 }} height="100%">
+      <Grid container sx={{ justifyContent: 'center', alignItems: 'center', flexGrow: 1, height: '100%' }}>
         {isLoading ? <CircularProgress /> : children}
       </Grid>
     </ChartContainer>

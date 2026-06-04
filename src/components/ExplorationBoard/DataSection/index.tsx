@@ -38,12 +38,12 @@ const DataSection = ({
 }: DataSectionProps) => {
   if (isLoading)
     return (
-      <Grid container justifyContent="center" alignItems="center" height="50vh">
+      <Grid container size={12} sx={{ justifyContent: 'center', alignItems: 'center', height: '50vh' }}>
         <CenteredCircularProgress />
       </Grid>
     )
   return (
-    <Grid container justifyContent="center" item xs={12} gap={GAP} sx={{ flexGrow: 1, flexDirection: 'column' }}>
+    <Grid container size={12} sx={{ justifyContent: 'center', gap: GAP, flexGrow: 1, flexDirection: 'column' }}>
       {displayOptions.diagrams && (
         <AccordionWrapper defaultExpanded>
           <AccordionSummary expandIcon={<ExpandMoreIcon htmlColor="#153D8A" />}>
@@ -54,8 +54,8 @@ const DataSection = ({
           <AccordionDetails>
             <Grid container spacing={3}>
               {data.diagrams.map((diagram, index) => (
-                <Grid key={index} item xs={12} md={6} lg={4}>
-                  <Chart isLoading={isLoading} title="Répartition par genre">
+                <Grid key={index} size={{ xs: 12, md: 6, lg: 4 }}>
+                  <Chart isLoading={isLoading} title={diagram.title}>
                     {diagram.type === DiagramType.BAR && (
                       <BarChart data={diagram.data as SimpleChartDataType[]} width={250} />
                     )}
@@ -75,9 +75,11 @@ const DataSection = ({
       {data.timeline && (
         <Timeline questionnaireResponses={data.timeline.data} questionnaires={data.timeline.questionnaires} />
       )}
-      <Grid container id="list">
-        {!displayOptions.sidebar && data.cards.map((card, index) => <InfoCard key={index} value={card} />)}
-        {!displayOptions.sidebar && data.table && <DataTable value={data.table} orderBy={orderBy} onSort={onSort} />}
+      <Grid container id="list" size={12}>
+        {displayOptions.sidebar && data.cards.map((card, index) => <InfoCard key={index} value={card} />)}
+        {!displayOptions.sidebar && data.table && !data.timeline && (
+          <DataTable value={data.table} orderBy={orderBy} onSort={onSort} />
+        )}
         <StickyPagination
           count={pagination.total}
           currentPage={pagination.currentPage}

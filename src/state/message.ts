@@ -11,7 +11,6 @@ import {
 import { fetchProjects } from './project'
 import { addRequest, fetchRequests } from './request'
 import { fetchExploredCohort } from './exploredCohort'
-import { fetchAllProcedures, fetchLastPmsiInfo, fetchPatientInfo } from './patient'
 
 export type MessageState = null | {
   type?: 'success' | 'error' | 'warning' | 'info'
@@ -67,18 +66,6 @@ const setMessageSlice = createSlice({
     builder.addCase(fetchExploredCohort.rejected, () => ({
       type: 'error',
       content: 'Une erreur est survenue lors de la récupération de la cohorte'
-    }))
-    builder.addCase(fetchPatientInfo.rejected, () => ({
-      type: 'error',
-      content: 'Une erreur est survenue lors de la récupération des informations du patient'
-    }))
-    builder.addCase(fetchLastPmsiInfo.rejected, () => ({
-      type: 'error',
-      content: 'Une erreur est survenue lors de la récupération des dernières informations PMSI du patient'
-    }))
-    builder.addCase(fetchAllProcedures.rejected, () => ({
-      type: 'error',
-      content: 'Une erreur est survenue lors de la récupération des PMSI du patient'
     }))
     builder.addCase(fetchProjects.rejected, () => ({
       type: 'error',

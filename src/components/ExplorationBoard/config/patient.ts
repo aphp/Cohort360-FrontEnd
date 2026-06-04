@@ -12,7 +12,8 @@ import {
   ExplorationConfig,
   FetchOptions,
   FetchParams,
-  ExplorationResults
+  ExplorationResults,
+  Patient as PatientType
 } from 'types/exploration'
 import { PatientTableLabels } from 'types/patient'
 import { ResourceType, VitalStatusLabel } from 'types/requestCriterias'
@@ -32,9 +33,8 @@ import { getAge, substructAgeString } from 'utils/age'
 import { fetcherWithParams, getCommonParamsAll, getCommonParamsList, narrowSearchCriterias } from 'utils/exploration'
 import { getExtension } from 'utils/fhir'
 import { getAgeRepartitionMapAphp, getGenderRepartitionMapAphp, getGenderRepartitionSimpleData } from 'utils/graphUtils'
-import { capitalizeFirstLetter } from 'utils/capitalize'
+import { capitalizeFirstLetter, plural } from 'utils/string'
 import { Card } from 'types/card'
-import { PatientState } from 'state/patient'
 import { getConfig } from 'config'
 
 const fetchAdditionalInfos = async (additionalInfo: AdditionalInfo, deidentified?: boolean) => {
@@ -67,14 +67,17 @@ const getPatientInfos = (patient: Patient, deidentified: boolean, groupId: strin
   }
   const lastEncounter =
     getExtension(patient, appConfig.core.extensions.patientLastEnconterUrl)?.valueReference?.display ?? 'N/A'
-  const surname = deidentified
-    ? 'Prénom'
-    : patient.name?.[0].given?.[0]
-    ? capitalizeFirstLetter(patient.name?.[0].given?.[0])
-    : 'Non renseigné'
+  let surname: string
+  if (deidentified) {
+    surname = 'Prénom'
+  } else if (patient.name?.[0].given?.[0]) {
+    surname = capitalizeFirstLetter(patient.name?.[0].given?.[0])
+  } else {
+    surname = 'Non renseigné'
+  }
   const lastname = deidentified
     ? 'Nom'
-    : patient.name
+    : (patient.name
         ?.map((e) => {
           if (e.use === 'official') {
             return e.family ?? 'Non renseigné'
@@ -83,18 +86,33 @@ const getPatientInfos = (patient: Patient, deidentified: boolean, groupId: strin
             return `(${patient.gender === 'female' ? 'née' : 'né'} : ${e.family})`
           }
         })
-        .join(' ') ?? 'Non renseigné'
+        .join(' ') ?? 'Non renseigné')
   const ipp = {
     label: deidentified
       ? patient.id
-      : patient.identifier?.find(
+      : (patient.identifier?.find(
           (identifier) =>
             identifier.type?.coding?.[0].code === appConfig.features.patient.patientIdentifierExtensionCode?.code &&
             identifier.type?.coding?.[0].system === appConfig.features.patient.patientIdentifierExtensionCode?.system
         )?.value ??
         patient.identifier?.[0].value ??
-        'inconnu',
-    url: `/patients/${patient.id}${groupId ? `?groupId=${groupId}` : ''}` /*${_search}*/
+        'inconnu'),
+    url: (() => {
+      const groupParam = groupId ? `?groupId=${groupId}` : ''
+      return `/patients/${patient.id}/preview/${groupParam}`
+    })(),
+    getUrl: () => {
+      const url = new URL(window.location.href)
+      const pathParts = url.pathname.split('/').map((part) => part || '')
+      if (pathParts[2]) pathParts[2] = patient.id ?? ''
+      const newPath = pathParts.join('/')
+      const searchParams = new URLSearchParams(url.searchParams)
+      searchParams.delete('groupId')
+      if (groupId && groupId.length > 0) groupId.forEach((id) => searchParams.append('groupId', id))
+      const queryString = searchParams.toString()
+      const querySuffix = queryString ? `?${queryString}` : ''
+      return `${newPath}${querySuffix}`
+    }
   }
   const age = {
     age: getAge(patient) ?? 'Non renseigné',
@@ -108,15 +126,15 @@ const mapToTable = (data: Data, deidentified: boolean, groupId: string[]): Table
   const rows: Row[] = []
   const columns: Column[] = [
     {
-      label: `${PatientTableLabels.IPP}${!deidentified ? '' : ' chiffré'}`,
-      code: !deidentified ? Order.IPP : undefined
+      label: `${PatientTableLabels.IPP}${deidentified ? ' chiffré' : ''}`,
+      code: deidentified ? undefined : Order.IPP
     },
     { label: PatientTableLabels.GENDER, code: `${Order.GENDER},${Order.ID}` },
-    { label: PatientTableLabels.NAME, code: !deidentified ? Order.NAME : undefined },
-    { label: PatientTableLabels.LASTNAME, code: !deidentified ? Order.FAMILY : undefined },
+    { label: PatientTableLabels.NAME, code: deidentified ? undefined : Order.NAME },
+    { label: PatientTableLabels.LASTNAME, code: deidentified ? undefined : Order.FAMILY },
     {
-      label: !deidentified ? PatientTableLabels.BIRTHDATE : PatientTableLabels.AGE,
-      code: `${!deidentified ? Order.BIRTHDATE : Order.AGE_MONTH},${Order.ID}`
+      label: deidentified ? PatientTableLabels.AGE : PatientTableLabels.BIRTHDATE,
+      code: `${deidentified ? Order.AGE_MONTH : Order.BIRTHDATE},${Order.ID}`
     },
     { label: PatientTableLabels.LAST_ENCOUNTER },
     { label: PatientTableLabels.VITAL_STATUS }
@@ -175,6 +193,7 @@ const mapToCards = (data: Data, deidentified: boolean, groupId: string[]) => {
     const { vitalStatus, surname, lastname, ipp, age, gender } = getPatientInfos(patient, deidentified, groupId)
     const info: Card = {
       url: ipp.url,
+      getUrl: ipp.getUrl,
       sections: []
     }
     info.sections.push({
@@ -236,6 +255,12 @@ const fetchList = (
   ]
   const minBirthdate = birthdates && Math.abs(moment(birthdates[0]).diff(moment(), deidentified ? 'months' : 'days'))
   const maxBirthdate = birthdates && Math.abs(moment(birthdates[1]).diff(moment(), deidentified ? 'months' : 'days'))
+  let deceased: boolean | undefined
+  if (vitalStatuses.length === 1) {
+    deceased = vitalStatuses.includes(VitalStatus.DECEASED)
+  } else {
+    deceased = undefined
+  }
   const params = {
     pivotFacet: includeFacets
       ? (['age-month_gender', 'deceased_gender'] as ('age-month_gender' | 'deceased_gender')[])
@@ -244,7 +269,7 @@ const fetchList = (
     searchBy,
     minBirthdate: minBirthdate,
     maxBirthdate: maxBirthdate,
-    deceased: vitalStatuses.length === 1 ? (vitalStatuses.includes(VitalStatus.DECEASED) ? true : false) : undefined,
+    deceased,
     deidentified,
     _elements: ['gender', 'name', 'birthDate', 'deceased', 'identifier', 'extension'] as (
       | 'id'
@@ -265,7 +290,7 @@ const fetchList = (
   return fetcherWithParams(
     () => fetchPatient(params),
     () => fetchPatient(paramsFetchAll),
-    { ...fetchParams, filters, deidentified, groupId, isPatientData: true }
+    { ...fetchParams, filters, deidentified, patient: null, groupId, isPatientData: true }
   )
 }
 
@@ -294,7 +319,7 @@ const getDiagramData = (meta: Meta): Diagram[] => {
 
 export const patientsConfig = (
   deidentified: boolean,
-  patient: PatientState,
+  patient: PatientType | null,
   groupId: string[],
   displayOptions = DISPLAY_OPTIONS,
   search = ''
@@ -319,7 +344,7 @@ export const patientsConfig = (
     mapToDiagram: patient && appConfig.core.fhir.facetsExtensions ? undefined : getDiagramData,
     fetchAdditionalInfos: (additionalInfo) => fetchAdditionalInfos(additionalInfo, deidentified),
     getCount: (counts) => [
-      { label: `patient${counts[0].total > 1 ? 's' : ''}`, display: true, count: counts[0] },
+      { label: `patient${plural(counts[0].total)}`, display: true, count: counts[0] },
       { label: '', display: false, count: counts[1] }
     ]
   }

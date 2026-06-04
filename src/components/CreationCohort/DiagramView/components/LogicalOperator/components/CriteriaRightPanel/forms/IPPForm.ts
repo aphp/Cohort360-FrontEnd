@@ -1,4 +1,5 @@
 import { CriteriaType, IppParamsKeys, ResourceType } from 'types/requestCriterias'
+import { plural } from 'utils/string'
 import { CommonCriteriaData, CriteriaForm } from '../CriteriaForm/types'
 
 export type IPPListDataType = CommonCriteriaData & {
@@ -46,7 +47,7 @@ export const form: () => CriteriaForm<IPPListDataType> = () => ({
               .trim()
               .split(',')
               .filter((ipp) => ipp.length > 0)
-            return `${ippList.length} IPP détecté${ippList.length > 1 ? 's' : ''}.`
+            return `${ippList.length} IPP détecté${plural(ippList.length)}.`
           },
           multiline: true,
           buildInfo: {

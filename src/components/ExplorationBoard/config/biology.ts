@@ -1,9 +1,9 @@
 import { getConfig } from 'config'
+import { plural } from 'utils/string'
 import { Observation } from 'fhir/r4'
 import { formatValueRange } from 'mappers/biology'
 import { mapToDate } from 'mappers/dates'
 import { fetchObservation } from 'services/aphp/callApi'
-import { PatientState } from 'state/patient'
 import { CohortObservation } from 'types'
 import {
   AdditionalInfo,
@@ -12,7 +12,8 @@ import {
   ExplorationConfig,
   ExplorationResults,
   FetchOptions,
-  FetchParams
+  FetchParams,
+  Patient
 } from 'types/exploration'
 import { ResourceType } from 'types/requestCriterias'
 import { SourceType } from 'types/scope'
@@ -32,9 +33,9 @@ import { getValueSetsByUrls } from 'utils/valueSets'
 const fetchAdditionalInfos = async (additionalInfo: AdditionalInfo): Promise<AdditionalInfo> => {
   const fetchersMap: Record<string, () => Promise<FhirItem[] | undefined>> = {
     encounterStatusList: () =>
-      !additionalInfo.encounterStatusList
-        ? fetchValueSet(getConfig().core.valueSets.encounterStatus.url)
-        : Promise.resolve(undefined)
+      additionalInfo.encounterStatusList
+        ? Promise.resolve(undefined)
+        : fetchValueSet(getConfig().core.valueSets.encounterStatus.url)
   }
   const resolved = await resolveAdditionalInfos(fetchersMap)
   const references: Reference[] = getValueSetsByUrls([
@@ -104,13 +105,14 @@ const mapToTable = (data: Data, deidentified: boolean, groupId: string[], isPati
           valueUnit
         )}`
       : '-'
+    const ippGroupQuery = groupId ? `?groupId=${groupId}` : ''
     const row: Row = [
       !isPatient && {
         id: `${elem.id}-ipp`,
         value: elem.IPP
           ? {
               label: elem.IPP,
-              url: `/patients/${elem.idPatient}${groupId ? `?groupId=${groupId}` : ''}`
+              url: `/patients/${elem.idPatient}${ippGroupQuery}`
             }
           : 'Non renseigné',
         type: elem.IPP ? CellType.LINK : CellType.TEXT
@@ -127,14 +129,14 @@ const mapToTable = (data: Data, deidentified: boolean, groupId: string[], isPati
       },
       {
         id: `${elem.id}-anabio`,
-        value: anabio === 'No matching concept' ? '-' : anabio ?? '-',
+        value: anabio === 'No matching concept' ? '-' : (anabio ?? '-'),
         type: CellType.TEXT,
         sx: { fontWeight: 900 }
       },
       {
         id: `${elem.id}-loinc`,
-        value: `${codeLOINC === 'No matching concept' || codeLOINC === 'Non Renseigné' ? '' : codeLOINC ?? ''} - ${
-          libelleLOINC === 'No matching concept' ? '-' : libelleLOINC ?? '-'
+        value: `${codeLOINC === 'No matching concept' || codeLOINC === 'Non Renseigné' ? '' : (codeLOINC ?? '')} - ${
+          libelleLOINC === 'No matching concept' ? '-' : (libelleLOINC ?? '-')
         }`,
         type: CellType.TEXT,
         sx: { fontWeight: 900 }
@@ -166,7 +168,7 @@ const mapToTable = (data: Data, deidentified: boolean, groupId: string[], isPati
 const fetchList = (
   fetchParams: FetchParams,
   { filters }: FetchOptions<BiologyFilters>,
-  patient: PatientState,
+  patient: Patient | null,
   deidentified: boolean,
   groupId: string[],
   signal?: AbortSignal
@@ -182,12 +184,12 @@ const fetchList = (
     maxDate: durationRange[1] ?? '',
     code: code.map((code) => encodeURI(`${code.system}|${code.id}`)).join(','),
     rowStatus: validatedStatus,
-    subject: patient?.patientInfo?.id,
+    subject: patient?.id,
     ...getCommonParamsList(fetchParams, groupId),
     signal
   }
   const paramsFetchAll = {
-    subject: patient?.patientInfo?.id,
+    subject: patient?.id,
     rowStatus: validatedStatus,
     uniqueFacet: ['subject'] as 'subject'[],
     ...getCommonParamsAll(groupId),
@@ -202,7 +204,7 @@ const fetchList = (
 
 export const biologyConfig = (
   deidentified: boolean,
-  patient: PatientState,
+  patient: Patient | null,
   groupId: string[],
   displayOptions = DISPLAY_OPTIONS,
   search = ''
@@ -217,10 +219,10 @@ export const biologyConfig = (
     narrowSearchCriterias(deidentified, searchCriterias, !!patient, [], ['searchBy']),
   fetchAdditionalInfos,
   getMessages: () => [
-    "Les mesures de biologie sont pour l'instant restreintes aux 3870 codes ANABIO correspondants aux analyses les plus utilisées au niveau national et à l'AP-HP. De plus, les résultats concernent uniquement les analyses quantitatives enregistrées sur GLIMS, qui ont été validées et mises à jour depuis mars 2020."
+    "Les mesures de biologies correspondent aux codes dont l'utilisation à l'AP-HP est supérieure à 3 analyses biologiques. De plus, les résultats concernent uniquement les analyses quantitatives enregistrées sur GLIMS, qui ont été validées et mises à jour depuis mars 2020."
   ],
   getCount: (counts) => [
-    { label: `résultat${counts[0].total > 1 ? 's' : ''}`, display: true, count: counts[0] },
-    { label: `patient${counts[1].total > 1 ? 's' : ''}`, display: !!!patient, count: counts[1] }
+    { label: `résultat${plural(counts[0].total)}`, display: true, count: counts[0] },
+    { label: `patient${plural(counts[1].total)}`, display: !!!patient, count: counts[1] }
   ]
 })

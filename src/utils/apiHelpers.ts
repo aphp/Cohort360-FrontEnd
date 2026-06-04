@@ -8,6 +8,7 @@ export function getApiResponseResource<T extends FhirResource>(
   try {
     return getApiResponseResourceOrThrow(response)
   } catch (e) {
+    console.error(e)
     return undefined
   }
 }
@@ -18,6 +19,7 @@ export function getApiResponseResources<T extends FhirResource>(
   try {
     return getApiResponseResourcesOrThrow(response)
   } catch (e) {
+    console.error(e)
     return undefined
   }
 }
@@ -42,7 +44,7 @@ export function getResponseDataOrThrow<T extends Resource, R>(
   response: AxiosResponse<FHIR_API_Response<T>>,
   responseMapper: (response: T) => R
 ): R {
-  if (!response || !(response && response.data) || response.data.resourceType === 'OperationOutcome') {
+  if (!response?.data || response.data.resourceType === 'OperationOutcome') {
     throw new Error(
       (response.data as OperationOutcome).issue.map((issue) => issue.details?.text || issue.code).join('\n')
     )

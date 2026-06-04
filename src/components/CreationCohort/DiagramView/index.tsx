@@ -1,13 +1,13 @@
-import React, { useEffect, useState } from 'react'
-import { Button, Grid } from '@mui/material'
+import React, { useEffect, useMemo, useState } from 'react'
+import { Button, Grid, Box, Stack, Typography } from '@mui/material'
 
 import LogicalOperator from './components/LogicalOperator'
+import JsonView from './components/JsonView'
 import TemporalConstraintCard from './components/TemporalConstraintCard/TemporalConstraintCard'
 import CohortCreationBreadcrumbs from './components/Breadcrumbs/Breadcrumbs'
 import { useAppDispatch, useAppSelector } from 'state'
-import { Rights, SourceType } from 'types/scope'
-import { buildCohortCreation } from 'state/cohortCreation'
-import { ScopeElement } from 'types/scope'
+import { Rights, SourceType, ScopeElement } from 'types/scope'
+import { buildCohortCreation, editDiagramViewMode } from 'state/cohortCreation'
 import { Hierarchy } from 'types/hierarchy'
 import Panel from '../../ui/Panel'
 import PopulationCard from './components/PopulationCard/PopulationCard'
@@ -15,8 +15,15 @@ import ModalRightError from './components/PopulationCard/components/ModalRightEr
 import { checkNominativeCriteria, cleanNominativeCriterias } from 'utils/cohortCreation'
 import ScopeTree from 'components/ScopeTree'
 import CustomAlert from 'components/ui/Alert'
+import { HiddenScrollBar } from 'components/ui/Scrollbar/styles'
+import { CriteriaType, ViewMode } from 'types/requestCriterias'
+import { PinkSwitch } from './styles'
 
-const DiagramView = () => {
+interface DiagramViewWithAjvProps {
+  isValidJson: (canExecuteJson: boolean) => void
+}
+
+const DiagramView: React.FC<DiagramViewWithAjvProps> = ({ isValidJson }) => {
   const dispatch = useAppDispatch()
   const { selectedPopulation = [], ...requestState } = useAppSelector((state) => state.cohortCreation.request || {})
   const { rights } = useAppSelector((state) => state.scope || {})
@@ -51,8 +58,21 @@ const DiagramView = () => {
       dispatch(buildCohortCreation({ selectedPopulation: rights }))
   }, [selectedPopulation, rights])
 
+  const hasClaim = useMemo(
+    () => requestState.selectedCriteria.some((criteria) => criteria.type === CriteriaType.CLAIM),
+    [requestState.selectedCriteria]
+  )
+
+  const hasSelectedPopulation = !!(selectedPopulation && selectedPopulation.length > 0)
+  let mainContent: React.ReactNode
+  if (requestState.viewMode === 'logicalOperator') {
+    mainContent = hasSelectedPopulation ? <LogicalOperator /> : <></>
+  } else {
+    mainContent = <JsonView onJsonIssuesChange={isValidJson} />
+  }
+
   return (
-    <Grid
+    <HiddenScrollBar
       container
       flexDirection="column"
       flexWrap="nowrap"
@@ -61,12 +81,20 @@ const DiagramView = () => {
       padding="24px 26px 76px 26px"
       overflow="auto"
       marginRight="300px"
+      position="relative"
     >
-      <div style={{ minWidth: 500, paddingRight: 24 }}>
+      <div style={{ minWidth: 500, paddingRight: 24, display: 'flex', flexDirection: 'column', minHeight: '100%' }}>
         {maintenanceIsActive && (
           <CustomAlert severity="warning" style={{ marginTop: '-12px', marginBottom: '10px' }}>
             Une maintenance est en cours. Seules les consultations de cohortes, requêtes et données patients sont
             activées. Les créations, éditions et suppressions de cohortes et de requêtes sont désactivées.
+          </CustomAlert>
+        )}
+        {hasClaim && (
+          <CustomAlert severity="warning" style={{ marginTop: '-12px', marginBottom: '10px' }}>
+            En raison de la suppression temporaire du critère de GHM, seules les consultations de cohortes, requêtes et
+            données patients sont activées. Les créations, éditions et suppressions de cohortes et de requêtes sont
+            désactivées.
           </CustomAlert>
         )}
         <CohortCreationBreadcrumbs />
@@ -74,7 +102,7 @@ const DiagramView = () => {
         <Grid container justifyContent="center" alignItems="center">
           {selectedPopulation && selectedPopulation.length > 0 && (
             <PopulationCard
-              onEditDisabled={maintenanceIsActive}
+              onEditDisabled={maintenanceIsActive || hasClaim}
               onEdit={() => setOpenDrawer(true)}
               loading={requestState.loading}
               population={selectedPopulation}
@@ -91,7 +119,35 @@ const DiagramView = () => {
           )}
           {selectedPopulation && selectedPopulation.length > 0 ? <TemporalConstraintCard /> : <></>}
         </Grid>
-        {selectedPopulation && selectedPopulation.length > 0 ? <LogicalOperator /> : <></>}
+        {mainContent}
+
+        {/* Switch between view modes */}
+        <Box
+          sx={{
+            borderRadius: 1,
+            px: 1,
+            py: 0.5,
+            mt: 'auto'
+          }}
+        >
+          <Stack direction="row" alignItems="center" spacing={1}>
+            <Typography variant="caption" fontWeight={'bold'}>
+              Interface graphique
+            </Typography>
+            <PinkSwitch
+              size="medium"
+              checked={requestState.viewMode === 'json'}
+              onChange={(e) => {
+                dispatch(
+                  editDiagramViewMode(e.target.checked ? ViewMode.JSON_INTERFACE : ViewMode.LOGICAL_OPERATOR_INTERFACE)
+                )
+              }}
+            />
+            <Typography variant="caption" fontWeight={'bold'}>
+              Interface json
+            </Typography>
+          </Stack>
+        </Box>
       </div>
       <Panel
         title="Structure hospitalière"
@@ -108,7 +164,7 @@ const DiagramView = () => {
         />
       </Panel>
       <ModalRightError open={rightsError} handleClose={() => setOpenDrawer(true)} />
-    </Grid>
+    </HiddenScrollBar>
   )
 }
 

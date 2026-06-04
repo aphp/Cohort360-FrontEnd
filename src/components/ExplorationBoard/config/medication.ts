@@ -1,11 +1,11 @@
 import { Paragraph } from 'components/ui/Paragraphs'
+import { plural } from 'utils/string'
 import { getConfig } from 'config'
 import { MedicationAdministration, MedicationRequest } from 'fhir/r4'
 import { mapToDate } from 'mappers/dates'
 import { getCodes, getMedicationDate } from 'mappers/medication'
 import { fetchMedicationAdministration, fetchMedicationRequest } from 'services/aphp/callApi'
 import { getCodeList } from 'services/aphp/serviceValueSets'
-import { PatientState } from 'state/patient'
 import { CohortMedication } from 'types'
 import {
   AdditionalInfo,
@@ -14,7 +14,8 @@ import {
   ExplorationConfig,
   ExplorationResults,
   FetchOptions,
-  FetchParams
+  FetchParams,
+  Patient
 } from 'types/exploration'
 import { ResourceType } from 'types/requestCriterias'
 import { SourceType } from 'types/scope'
@@ -35,17 +36,17 @@ const fetchAdditionalInfos = async (additionalInfo: AdditionalInfo): Promise<Add
   const config = getConfig().features
   const fetchersMap: Record<string, () => Promise<FhirItem[] | undefined>> = {
     encounterStatusList: () =>
-      !additionalInfo.encounterStatusList
-        ? fetchValueSet(getConfig().core.valueSets.encounterStatus.url)
-        : Promise.resolve(undefined),
+      additionalInfo.encounterStatusList
+        ? Promise.resolve(undefined)
+        : fetchValueSet(getConfig().core.valueSets.encounterStatus.url),
     prescriptionList: () =>
-      !additionalInfo.prescriptionList
-        ? getCodeList(config.medication.valueSets.medicationPrescriptionTypes.url).then((res) => res.results)
-        : Promise.resolve(undefined),
+      additionalInfo.prescriptionList
+        ? Promise.resolve(undefined)
+        : getCodeList(config.medication.valueSets.medicationPrescriptionTypes.url).then((res) => res.results),
     administrationList: () =>
-      !additionalInfo.administrationList
-        ? getCodeList(config.medication.valueSets.medicationAdministrations.url).then((res) => res.results)
-        : Promise.resolve(undefined)
+      additionalInfo.administrationList
+        ? Promise.resolve(undefined)
+        : getCodeList(config.medication.valueSets.medicationAdministrations.url).then((res) => res.results)
   }
   const resolved = await resolveAdditionalInfos(fetchersMap)
   const references: Reference[] = getValueSetsByUrls([
@@ -56,12 +57,9 @@ const fetchAdditionalInfos = async (additionalInfo: AdditionalInfo): Promise<Add
   return { ...additionalInfo, references, sourceType, ...resolved }
 }
 
-const initSearchCriterias = (
-  search: string,
-  medType: ResourceType.MEDICATION_REQUEST | ResourceType.MEDICATION_ADMINISTRATION
-): SearchCriterias<MedicationFilters> => ({
+const initSearchCriterias = (search: string): SearchCriterias<MedicationFilters> => ({
   orderBy: {
-    orderBy: medType === ResourceType.MEDICATION_REQUEST ? Order.DATE : Order.EFFECTIVE_TIME,
+    orderBy: Order.PERIOD_START,
     orderDirection: Direction.DESC
   },
   searchInput: search,
@@ -109,8 +107,8 @@ const mapToTable = (
         getConfig().features.medication.valueSets.medicationAtcOrbis.url
       )
       const atcDisplay: Paragraph[] = [
-        { text: `${codeATC === 'No matching concept' || codeATC === 'Non Renseigné' ? '' : codeATC ?? ''}` },
-        { text: `${displayATC === 'No matching concept' ? '-' : displayATC ?? '-'}`, sx: { fontWeight: 900 } }
+        { text: `${codeATC === 'No matching concept' || codeATC === 'Non Renseigné' ? '' : (codeATC ?? '')}` },
+        { text: `${displayATC === 'No matching concept' ? '-' : (displayATC ?? '-')}`, sx: { fontWeight: 900 } }
       ]
       const [codeUCD, displayUCD] = getCodes(
         elem,
@@ -118,8 +116,8 @@ const mapToTable = (
         '.*-ucd'
       )
       const ucdDisplay: Paragraph[] = [
-        { text: `${codeUCD === 'No matching concept' || codeUCD === 'Non Renseigné' ? '' : codeUCD ?? ''}` },
-        { text: `${displayUCD === 'No matching concept' ? '-' : displayUCD ?? '-'}`, sx: { fontWeight: 900 } }
+        { text: `${codeUCD === 'No matching concept' || codeUCD === 'Non Renseigné' ? '' : (codeUCD ?? '')}` },
+        { text: `${displayUCD === 'No matching concept' ? '-' : (displayUCD ?? '-')}`, sx: { fontWeight: 900 } }
       ]
       const prescriptionType = (elem as MedicationRequest).category?.[0].coding?.[0].display ?? '-'
       const administrationRoute =
@@ -129,13 +127,14 @@ const mapToTable = (
         (elem as MedicationAdministration).dosage?.dose?.unit ?? '-'
       }`
       const comment = (elem as MedicationAdministration).dosage?.text ?? 'Non renseigné'
+      const ippGroupQuery = groupId ? `?groupId=${groupId}` : ''
       const row: Row = [
         !isPatient && {
           id: `${elem}-ipp`,
           value: elem.IPP
             ? {
                 label: elem.IPP,
-                url: `/patients/${elem.idPatient}${groupId ? `?groupId=${groupId}` : ''}`
+                url: `/patients/${elem.idPatient}${ippGroupQuery}`
               }
             : 'Non renseigné',
           type: elem.IPP ? CellType.LINK : CellType.TEXT
@@ -169,7 +168,7 @@ const mapToTable = (
         },
         {
           id: `${elem.id}-administration`,
-          value: administrationRoute === 'No matching concept' ? '-' : administrationRoute ?? '-',
+          value: administrationRoute === 'No matching concept' ? '-' : (administrationRoute ?? '-'),
           type: CellType.TEXT,
           align: 'center'
         },
@@ -200,7 +199,7 @@ const mapToTable = (
 const getMedicationFilters = (
   { nda, ipp, executiveUnits, encounterStatus, durationRange, code }: MedicationFilters,
   fetchParams: FetchParams,
-  patient: PatientState,
+  patient: Patient | null,
   groupId: string[]
 ) => ({
   encounter: nda,
@@ -211,21 +210,21 @@ const getMedicationFilters = (
   maxDate: durationRange[1] ?? '',
   code: code.map((code) => encodeURI(`${code.system}|${code.id}`)).join(','),
   uniqueFacet: ['subject'],
-  subject: patient?.patientInfo?.id,
+  subject: patient?.id,
   ...getCommonParamsList(fetchParams, groupId)
 })
 
 const fetchAdministrationList = (
   fetchParams: FetchParams,
   { filters }: FetchOptions<MedicationFilters>,
-  patient: PatientState,
+  patient: Patient | null,
   deidentified: boolean,
   groupId: string[],
   signal?: AbortSignal
 ): Promise<ExplorationResults<MedicationAdministration>> => {
   const { administrationRoutes } = filters
   const params = {
-    type: administrationRoutes?.map((type) => type.id),
+    route: administrationRoutes?.map((type) => type.id),
     ...getMedicationFilters(filters, fetchParams, patient, groupId),
     signal
   }
@@ -233,7 +232,7 @@ const fetchAdministrationList = (
     uniqueFacet: ['subject'],
     minDate: null,
     maxDate: null,
-    subject: patient?.patientInfo?.id,
+    subject: patient?.id,
     ...getCommonParamsAll(groupId),
     signal
   }
@@ -247,7 +246,7 @@ const fetchAdministrationList = (
 const fetchRequestList = (
   fetchParams: FetchParams,
   { filters }: FetchOptions<MedicationFilters>,
-  patient: PatientState,
+  patient: Patient | null,
   deidentified: boolean,
   groupId: string[],
   signal?: AbortSignal
@@ -262,7 +261,7 @@ const fetchRequestList = (
     uniqueFacet: ['subject'],
     minDate: null,
     maxDate: null,
-    subject: patient?.patientInfo?.id,
+    subject: patient?.id,
     ...getCommonParamsAll(groupId),
     signal
   }
@@ -275,7 +274,7 @@ const fetchRequestList = (
 
 export const medicationRequestConfig = (
   deidentified: boolean,
-  patient: PatientState,
+  patient: Patient | null,
   groupId: string[],
   displayOptions = DISPLAY_OPTIONS,
   search = ''
@@ -283,7 +282,7 @@ export const medicationRequestConfig = (
   type: ResourceType.MEDICATION_REQUEST,
   deidentified,
   displayOptions,
-  initSearchCriterias: () => initSearchCriterias(search, ResourceType.MEDICATION_REQUEST),
+  initSearchCriterias: () => initSearchCriterias(search),
   fetchList: (fetchParams, options, signal) =>
     fetchRequestList(fetchParams, options, patient, deidentified, groupId, signal),
   mapToTable: (data) => mapToTable(data, deidentified, !!patient, groupId, ResourceType.MEDICATION_REQUEST),
@@ -291,14 +290,14 @@ export const medicationRequestConfig = (
     narrowSearchCriterias(deidentified, searchCriterias, !!patient, ['administrationRoutes'], ['searchBy']),
   fetchAdditionalInfos,
   getCount: (counts) => [
-    { label: `prescription${counts[0].total > 1 ? 's' : ''}`, display: true, count: counts[0] },
-    { label: `patient${counts[1].total > 1 ? 's' : ''}`, display: !!!patient, count: counts[1] }
+    { label: `prescription${plural(counts[0].total)}`, display: true, count: counts[0] },
+    { label: `patient${plural(counts[1].total)}`, display: !!!patient, count: counts[1] }
   ]
 })
 
 export const medicationAdministrationConfig = (
   deidentified: boolean,
-  patient: PatientState,
+  patient: Patient | null,
   groupId: string[],
   displayOptions = DISPLAY_OPTIONS,
   search = ''
@@ -306,7 +305,7 @@ export const medicationAdministrationConfig = (
   type: ResourceType.MEDICATION_ADMINISTRATION,
   deidentified,
   displayOptions,
-  initSearchCriterias: () => initSearchCriterias(search, ResourceType.MEDICATION_ADMINISTRATION),
+  initSearchCriterias: () => initSearchCriterias(search),
   fetchList: (fetchParams, options, signal) =>
     fetchAdministrationList(fetchParams, options, patient, deidentified, groupId, signal),
   mapToTable: (data) => mapToTable(data, deidentified, !!patient, groupId, ResourceType.MEDICATION_ADMINISTRATION),
@@ -314,7 +313,7 @@ export const medicationAdministrationConfig = (
     narrowSearchCriterias(deidentified, searchCriterias, !!patient, ['prescriptionTypes'], ['searchBy']),
   fetchAdditionalInfos,
   getCount: (counts) => [
-    { label: `administration${counts[0].total > 1 ? 's' : ''}`, display: true, count: counts[0] },
-    { label: `patient${counts[1].total > 1 ? 's' : ''}`, display: !!!patient, count: counts[1] }
+    { label: `administration${plural(counts[0].total)}`, display: true, count: counts[0] },
+    { label: `patient${plural(counts[1].total)}`, display: !!!patient, count: counts[1] }
   ]
 })

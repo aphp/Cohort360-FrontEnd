@@ -18,7 +18,9 @@ const useCohort = (cohortId?: string) => {
   })
 
   useEffect(() => {
-    isError && dispatch(setMessage({ type: 'error', content: 'Erreur lors de la récupération de la cohorte' }))
+    if (isError) {
+      dispatch(setMessage({ type: 'error', content: 'Erreur lors de la récupération de la cohorte' }))
+    }
   }, [isError, dispatch])
 
   return {

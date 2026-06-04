@@ -34,8 +34,8 @@ export const Pagination = ({ currentPage, count, onPageChange }: PaginationProps
   }, [currentPage])
 
   const submitPageChange = () => {
-    const pageNum = parseInt(goToPage, 10)
-    if (!isNaN(pageNum) && pageNum > 0 && pageNum <= count) {
+    const pageNum = Number.parseInt(goToPage, 10)
+    if (!Number.isNaN(pageNum) && pageNum > 0 && pageNum <= count) {
       if (pageNum <= config.core.pagination.limit) {
         onPageChange(pageNum)
       } else {
@@ -58,7 +58,7 @@ export const Pagination = ({ currentPage, count, onPageChange }: PaginationProps
     }
   }
   return (
-    <Grid container justifyContent={'center'} alignItems="center" xs={12}>
+    <Grid container size={{ xs: 12 }} sx={{ justifyContent: 'center', alignItems: 'center' }}>
       <StyledPagination
         role="search"
         shape="circular"

@@ -12,19 +12,17 @@ type PreviewCardProps = {
 const PreviewCard = ({ children, title, linkLabel, onClickLink }: PropsWithChildren<PreviewCardProps>) => {
   return (
     <>
-      <Grid container spacing={3}>
-        <Grid id="research-card-title" item xs={9}>
+      <Grid container>
+        <Grid id="research-card-title" size={{ xs: 9 }}>
           <Typography component="h2" variant="h2" color="primary" gutterBottom>
             {title}
           </Typography>
         </Grid>
-        <Grid item container xs={3} justifyContent="flex-end">
+        <Grid container size={{ xs: 3 }} sx={{ justifyContent: 'flex-end' }}>
           <LinkWrapper onClick={onClickLink}>{linkLabel}</LinkWrapper>
         </Grid>
       </Grid>
-      <Grid item margin="16px 0px 0px">
-        {children}
-      </Grid>
+      <Grid sx={{ margin: '16px 0px 0px' }}>{children}</Grid>
     </>
   )
 }

@@ -9,7 +9,7 @@ import { Grid, CircularProgress, Tooltip, Box } from '@mui/material'
 import SearchInput from 'components/ui/Searchbar/SearchInput'
 import DataTable from 'components/ui/Table'
 import { useNavigate, useSearchParams } from 'react-router-dom'
-import { fetchExportsList } from 'services/aphp/serviceExportCohort'
+import { downloadExport, fetchExportsList, retryExport } from 'services/aphp/serviceExportCohort'
 import { cleanSearchParams } from 'utils/paginationUtils'
 import { Back_API_Response, LoadingStatus } from 'types'
 import { cancelPendingRequest } from 'utils/abortController'
@@ -23,6 +23,7 @@ import { GAP } from 'types/exploration'
 import Button from 'components/ui/Button'
 import AddIcon from '@mui/icons-material/Add'
 import PageContainer from 'components/ui/PageContainer'
+import WaitingPopup from 'views/WaitingPopup/WaitingPopup'
 
 const RESULTS_PER_PAGE = 20
 
@@ -40,12 +41,14 @@ const RESULTS_PER_PAGE = 20
  */
 const Export = () => {
   const controllerRef = useRef<AbortController>(new AbortController())
+  const downloadControllerRef = useRef<AbortController | null>(null)
   const navigate = useNavigate()
   const user = useAppSelector((state) => state.me?.impersonation?.username ?? state.me?.userName) ?? ''
   const deidentified = useAppSelector((state) => state.me?.deidentified)
   const [exportList, setExportList] = useState<Back_API_Response<ExportList> | null>(null)
   const maintenanceIsActive = useAppSelector((state) => state.me?.maintenance?.active) ?? false
   const [loadingStatus, setLoadingStatus] = useState(LoadingStatus.FETCHING)
+  const [downloading, setDownloading] = useState<boolean | null>(false)
   const [searchParams, setSearchParams] = useSearchParams()
   const [pagination, setPagination] = useState({ current: 0, total: 0 })
   const [{ orderBy, searchInput }, { changeOrderBy, changeSearchInput }] = useSearchCriterias(
@@ -91,31 +94,79 @@ const Export = () => {
     _fetchExportList({ page, input: args.input ?? searchInput ?? '', orderBy: args.orderBy ?? orderBy })
   }
 
+  /**
+   * Cancels the ongoing download request if it exists.
+   * This function is called when the user clicks the cancel button in the waiting popup.
+   */
+  const cancelDownload = () => {
+    downloadControllerRef.current?.abort()
+  }
+
+  /**
+   * Initiates the download of an export file.
+   * @param id The ID of the export to download
+   */
+  const onDownload = async (id: string) => {
+    const controller = new AbortController()
+    downloadControllerRef.current = controller
+
+    setDownloading(true)
+
+    try {
+      await downloadExport(id, controller.signal)
+    } catch (e: Error | unknown) {
+      if (e instanceof Error && e.name === 'AbortError') {
+        console.log('Download annulé')
+      } else {
+        console.error(e)
+      }
+    } finally {
+      setDownloading(false)
+      downloadControllerRef.current = null
+    }
+  }
+
+  const onRetry = async (id: string) => {
+    await retryExport(id, controllerRef.current?.signal)
+    handleSearch({ page: 1 })
+  }
+
   useEffect(() => {
-    handleSearch({ page: Math.max(1, parseInt(searchParams.get('page') ?? '1', 10)) })
+    handleSearch({ page: Math.max(1, Number.parseInt(searchParams.get('page') ?? '1', 10)) })
   }, [])
 
   useEffect(() => {
     if (deidentified) navigate('/home')
   }, [deidentified, navigate])
 
-  const table = useMemo(() => mapExportListToTable(exportList?.results ?? []), [exportList])
+  const table = useMemo(
+    () =>
+      mapExportListToTable(exportList?.results ?? [], {
+        onDownload: (id) => {
+          void onDownload(id)
+        },
+        onRetry: (id) => {
+          void onRetry(id)
+        }
+      }),
+    [exportList]
+  )
 
   return (
     <PageContainer>
-      <Grid container direction="column" style={{ minHeight: '100vh' }}>
-        <Grid container justifyContent="center" alignItems="center">
+      <Grid container size={12} sx={{ flexDirection: 'column' }} style={{ minHeight: '100vh' }}>
+        <Grid container size={12} sx={{ justifyContent: 'center', alignItems: 'center' }}>
           <HeaderLayout id="export-page-title" title="Mes exports" titleOnly />
-          <Grid container xs={11} gap={GAP} style={{ flexGrow: 1 }} mt={2}>
-            <Grid item container gap={1} justifyContent="space-between">
-              <Grid container xs={12} sm={6}>
+          <Grid container size={11} sx={{ gap: GAP }} mt={2}>
+            <Grid container size={12} sx={{ gap: 1, justifyContent: 'space-between' }}>
+              <Grid container size={{ xs: 12, sm: 6 }}>
                 <SearchInput
                   value={searchInput ?? ''}
                   placeholder="Rechercher un export"
                   onChange={(input) => handleSearch({ input })}
                 />
               </Grid>
-              <Grid container xs={12} sm={5} justifyContent={'flex-end'}>
+              <Grid container size={{ xs: 12, sm: 5 }} sx={{ justifyContent: 'flex-end' }}>
                 <Tooltip title={maintenanceIsActive ? "Ce bouton est desactivé en raison d'une maintenance." : ''}>
                   <Box>
                     <Button
@@ -130,19 +181,14 @@ const Export = () => {
                 </Tooltip>
               </Grid>
             </Grid>
-            <Grid item container direction="column" flexGrow={1}>
+            <Grid container size={12} sx={{ flexDirection: 'column', flexGrow: 1 }}>
               {loadingStatus === LoadingStatus.FETCHING && (
-                <Grid container justifyContent="center" height="50vh">
+                <Grid container sx={{ justifyContent: 'center' }} height="50vh">
                   <CircularProgress />
                 </Grid>
               )}
               {loadingStatus === LoadingStatus.SUCCESS && (
-                <DataTable
-                  value={table}
-                  orderBy={orderBy}
-                  onSort={(orderBy) => handleSearch({ orderBy })}
-                  sxRow={{ backgroundColor: 'white', flexGrow: 1 }}
-                />
+                <DataTable value={table} orderBy={orderBy} onSort={(orderBy) => handleSearch({ orderBy })} />
               )}
             </Grid>
           </Grid>
@@ -155,6 +201,7 @@ const Export = () => {
           onPageChange={(page) => handleSearch({ page })}
         />
       )}
+      {downloading && <WaitingPopup open={downloading} onCancel={cancelDownload} />}
     </PageContainer>
   )
 }

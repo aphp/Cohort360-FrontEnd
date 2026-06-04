@@ -5,12 +5,13 @@ import { Grid, Typography } from '@mui/material'
 import { useAppSelector } from 'state'
 
 import { CriteriaGroupType, TemporalConstraintsKind, TemporalConstraintsType } from 'types'
-import ConfirmationDialog from 'components/ui/ConfirmationDialog/ConfirmationDialog'
+import WarningIcon from '@mui/icons-material/Warning'
 
 import _ from 'lodash'
 import { getSelectableGroups } from 'utils/temporalConstraints'
 import RadioGroup from 'components/ui/RadioGroup'
 import PartialConstraintLayout from 'components/ui/PartialConstraintLayout'
+import Modal from 'components/ui/Modal'
 
 interface StayConstraintsProps {
   constraints: TemporalConstraintsType[]
@@ -58,10 +59,10 @@ const StayConstraints: React.FC<StayConstraintsProps> = ({ constraints, onChange
   const onChangeValue = (value: TemporalConstraintsKind) => {
     setRadioValues(value)
 
-    if (value !== TemporalConstraintsKind.PARTIAL_CONSTRAINT) {
-      onChangeConstraints([{ idList: ['All'], constraintType: value }])
-    } else {
+    if (value === TemporalConstraintsKind.PARTIAL_CONSTRAINT) {
       onChangeConstraints([])
+    } else {
+      onChangeConstraints([{ idList: ['All'], constraintType: value }])
     }
   }
 
@@ -109,21 +110,24 @@ const StayConstraints: React.FC<StayConstraintsProps> = ({ constraints, onChange
         />
       )}
 
-      <ConfirmationDialog
+      <Modal
         open={openConfirmationDialog}
-        message={
-          'Attention, en passant sur un type de contrainte temporelle globale, vous perdrez toutes les contraintes partielles déjà ajoutées.'
-        }
-        onClose={() => setOpenConfirmationDialog(false)}
-        onCancel={() => {
+        onClose={() => {
           setOpenConfirmationDialog(false)
           setRadioValues(TemporalConstraintsKind.PARTIAL_CONSTRAINT)
         }}
-        onConfirm={() => {
+        onSubmit={() => {
           onChangeValue(radioValues)
           setOpenConfirmationDialog(false)
         }}
-      />
+        submitText="Confirmer"
+        cancelText="Annuler"
+        maxWidth="md"
+      >
+        <WarningIcon data-testid="WarningIcon" color="warning" style={{ verticalAlign: 'middle', marginRight: 8 }} />
+        Attention, en passant sur un type de contrainte temporelle globale, vous perdrez toutes les contraintes
+        partielles déjà ajoutées.
+      </Modal>
     </>
   )
 }

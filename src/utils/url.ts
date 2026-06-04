@@ -49,7 +49,7 @@ export const validatePageNumber = (
   const maxAllowedPages = config.core.pagination.limit
 
   // page NaN ou invalide
-  if (isNaN(requestedPage) || requestedPage <= 0) {
+  if (Number.isNaN(requestedPage) || requestedPage <= 0) {
     onRedirect(1)
   }
 

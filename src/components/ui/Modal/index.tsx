@@ -1,8 +1,17 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { PropsWithChildren } from 'react'
 
-import { Button, Dialog, DialogActions, DialogTitle, Divider, Grid, Typography } from '@mui/material'
-import { DialogContentWrapper } from './styles'
+import {
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Divider,
+  Grid,
+  Typography,
+  Breakpoint
+} from '@mui/material'
 
 type ModalProps = {
   open: boolean
@@ -13,6 +22,8 @@ type ModalProps = {
   submitText?: string
   cancelText?: string
   isError?: boolean
+  disabled?: boolean
+  maxWidth?: Breakpoint
   onSubmit?: (value: any) => void
   onClose?: () => void
 }
@@ -27,11 +38,24 @@ const Modal = ({
   submitText = 'Valider',
   cancelText = 'Annuler',
   isError = false,
+  disabled = false,
+  maxWidth = 'sm',
   onSubmit,
   onClose
 }: PropsWithChildren<ModalProps>) => {
   return (
-    <Dialog open={open} onClose={onClose}>
+    <Dialog
+      open={open}
+      onClose={onClose}
+      slotProps={{
+        paper: {
+          sx: {
+            width,
+            maxWidth
+          }
+        }
+      }}
+    >
       {title && (
         <>
           <DialogTitle sx={{ padding: '25px 30px' }}>
@@ -39,16 +63,14 @@ const Modal = ({
               {title}
             </Typography>
           </DialogTitle>
-          <Grid container justifyContent="center">
-            <Grid item xs={6}>
+          <Grid container sx={{ justifyContent: 'center' }}>
+            <Grid size={{ xs: 6 }}>
               <Divider />
             </Grid>
           </Grid>
         </>
       )}
-      <DialogContentWrapper width={width} style={{ padding: '25px 30px' }}>
-        {children}
-      </DialogContentWrapper>
+      <DialogContent sx={{ padding: '25px 30px' }}>{children}</DialogContent>
       {!readonly && (
         <DialogActions style={{ backgroundColor: '#00000011', padding: '10px 30px' }}>
           <Button color="info" onClick={onClose}>
@@ -65,7 +87,7 @@ const Modal = ({
       )}
       {readonly && (
         <DialogActions style={{ backgroundColor: '#00000011', padding: '10px 30px' }}>
-          <Button color="info" onClick={onClose}>
+          <Button color="info" onClick={onClose} disabled={disabled}>
             <Typography fontSize="15px" fontWeight="600" color="#5B5E63">
               {cancelText}
             </Typography>

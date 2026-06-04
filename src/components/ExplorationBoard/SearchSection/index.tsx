@@ -54,15 +54,15 @@ const SearchSection = ({
     if (search.searchInput !== searchCriterias.searchInput) onSearch({ searchInput: search.searchInput })
   }
   return (
-    <Grid container justifyContent={'space-between'} mt={0.5} ref={ref}>
-      <Grid container xs={12} lg={displayOptions.sidebar ? 12 : 8} gap={isXS ? 1 : 0} spacing={isXS ? 0 : 1}>
+    <Grid container size={12} sx={{ justifyContent: 'space-between', mt: 0.5 }} ref={ref}>
+      <Grid container size={{ xs: 12, lg: displayOptions.sidebar ? 12 : 8 }} spacing={1}>
         {displayOptions.search && (
-          <Grid container item xs={isXS ? 12 : 8} alignItems={'center'}>
+          <Grid container size={isXS ? 12 : 8} sx={{ alignItems: 'center' }}>
             <OccurrencesSearch search={searchCriterias} onChange={handleChangeFields} infos={infos} />
           </Grid>
         )}
         {displayOptions.filterBy && (
-          <Grid container item xs={isXS ? 12 : 2} alignItems={'center'}>
+          <Grid container size={isXS ? 12 : 2} sx={{ alignItems: 'center' }}>
             <FilterBy
               infos={infos}
               filters={searchCriterias.filters}
@@ -71,24 +71,27 @@ const SearchSection = ({
           </Grid>
         )}
         {displayOptions.myFilters && savedFiltersData.allFilters && savedFiltersData.allFilters.count > 0 && (
-          <Grid container item xs={isXS ? 12 : 2} alignItems={'center'}>
+          <Grid container size={isXS ? 12 : 2} sx={{ alignItems: 'center' }}>
             <SavedFilters infos={infos} {...savedFiltersActions} {...savedFiltersData} />
           </Grid>
         )}
         {displayOptions.orderBy && (
-          <Grid container item xs={isXS ? 12 : 2} alignItems={'center'}>
+          <Grid container size={isXS ? 12 : 2} sx={{ alignItems: 'center' }}>
             <OrderBy infos={infos} orderBy={searchCriterias.orderBy} onSubmit={(orderBy) => onSearch({ orderBy })} />
           </Grid>
         )}
       </Grid>
-      <Grid container alignItems="center" xs={12} lg={4}>
+      <Grid container size={{ xs: 12, lg: 4 }} sx={{ alignItems: 'center' }}>
         {displayOptions.count && count && (
           <Grid
             container
-            alignItems="center"
-            gap={1}
-            justifyContent={isMD || isLG || isXL ? 'flex-end' : 'center'}
-            mt={isLG || isXL ? 0 : '12px'}
+            size={12}
+            sx={{
+              alignItems: 'center',
+              gap: 1,
+              justifyContent: isMD || isLG || isXL ? 'flex-end' : 'center',
+              mt: isLG || isXL ? 0 : '12px'
+            }}
           >
             {isLoading ? (
               <CircularProgress size={20} />

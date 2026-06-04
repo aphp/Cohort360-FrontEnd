@@ -12,6 +12,7 @@ import FilterList from '@mui/icons-material/FilterList'
 
 import { FilterKeys, FilterValue, SearchCriteriaKeys } from 'types/searchCriterias'
 import { useSizeObserver } from 'hooks/ui/useSizeObserver'
+import { plural } from 'utils/string'
 
 type ActionBarProps = {
   loading: boolean
@@ -48,9 +49,9 @@ const ActionBar: React.FC<ActionBarProps> = ({
   } = useSizeObserver()
 
   return (
-    <Grid container justifyContent={'space-between'} alignItems={'center'} gap={2} mt={1}>
-      <Grid container justifyContent={'space-between'} ref={ref}>
-        <Grid container item xs={12} md={8} gap="4px">
+    <Grid container size={12} sx={{ justifyContent: 'space-between', alignItems: 'center', gap: 2 }} mt={1}>
+      <Grid container size={12} sx={{ justifyContent: 'space-between' }} ref={ref}>
+        <Grid container size={{ xs: 12, md: 8 }} sx={{ gap: '4px' }}>
           {onFilter && (
             <Button
               onClick={onFilter}
@@ -86,7 +87,7 @@ const ActionBar: React.FC<ActionBarProps> = ({
               <Button
                 width="fit-content"
                 onClick={onDelete}
-                endIcon={<DeleteIcon />}
+                endIcon={<DeleteIcon data-testid="DeleteIcon" />}
                 customVariant="pink"
                 disabled={disabled}
               >
@@ -95,28 +96,22 @@ const ActionBar: React.FC<ActionBarProps> = ({
             </>
           )}
         </Grid>
-        <Grid container item alignItems="center" xs={12} lg={4}>
+        <Grid container sx={{ alignItems: 'center' }} size={{ xs: 12, lg: 4 }}>
           <Grid
             container
-            item
-            alignItems="center"
-            gap={1}
-            justifyContent={isMD || isLG || isXL ? 'flex-end' : 'center'}
+            size={12}
+            sx={{ alignItems: 'center', gap: 1, justifyContent: isMD || isLG || isXL ? 'flex-end' : 'center' }}
             mt={isMD || isLG || isXL ? 0 : '12px'}
           >
             {totalSelected > 0 && (
               <DisplayDigits
                 nb={totalSelected}
-                label={`${label}${totalSelected > 1 ? 's' : ''} sélectionné${label !== 'échantillon' ? 'e' : ''}${
-                  totalSelected > 1 ? 's' : ''
-                } /`}
+                label={`${label}${plural(totalSelected)} sélectionné${label === 'échantillon' ? '' : 'e'}${plural(
+                  totalSelected
+                )} /`}
               />
             )}
-            {loading ? (
-              <CircularProgress size={20} />
-            ) : (
-              <DisplayDigits nb={total} label={`${label}${total > 1 ? 's' : ''}`} />
-            )}
+            {loading ? <CircularProgress size={20} /> : <DisplayDigits nb={total} label={`${label}${plural(total)}`} />}
           </Grid>
         </Grid>
       </Grid>

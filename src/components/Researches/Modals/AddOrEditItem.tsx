@@ -22,6 +22,14 @@ const AddOrEditItem: React.FC<{
   const noName = !name?.trim()
   const error = nameTooLong || noName
 
+  let nameHelperText = ''
+  if (nameTooLong || (noName && hasInteracted)) {
+    nameHelperText =
+      noName && hasInteracted
+        ? 'Le nom doit comporter au moins un caractère.'
+        : 'Le nom est trop long (255 caractères max.)'
+  }
+
   const handleSubmit = () => {
     if (!name || error) {
       return
@@ -35,7 +43,9 @@ const AddOrEditItem: React.FC<{
     if (isEdition) {
       onUpdate(itemData)
     } else {
-      onCreate && onCreate(itemData)
+      if (onCreate) {
+        onCreate(itemData)
+      }
     }
 
     onClose()
@@ -68,13 +78,7 @@ const AddOrEditItem: React.FC<{
             margin="normal"
             fullWidth
             error={nameTooLong || (noName && hasInteracted)}
-            helperText={
-              nameTooLong || (noName && hasInteracted)
-                ? noName && hasInteracted
-                  ? 'Le nom doit comporter au moins un caractère.'
-                  : 'Le nom est trop long (255 caractères max.)'
-                : ''
-            }
+            helperText={nameHelperText}
           />
 
           <Typography variant="h3">Description :</Typography>

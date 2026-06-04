@@ -23,8 +23,14 @@ export const getScopeLevelBySourceType = (type: SourceType) => {
   const sourceTypeLevels = getConfig().core.perimeterSourceTypeHierarchy
   // TODO: Refactor this function to use an external mapping file/configuration
   const level0 = sourceTypeLevels[0]
-  const level1 =
-    sourceTypeLevels.length > 3 ? sourceTypeLevels[3] : sourceTypeLevels.length > 1 ? sourceTypeLevels[1] : level0
+  let level1: string
+  if (sourceTypeLevels.length > 3) {
+    level1 = sourceTypeLevels[3]
+  } else if (sourceTypeLevels.length > 1) {
+    level1 = sourceTypeLevels[1]
+  } else {
+    level1 = level0
+  }
   const level2 = sourceTypeLevels.length > 5 ? sourceTypeLevels[5] : sourceTypeLevels[sourceTypeLevels.length - 1]
   switch (type) {
     case SourceType.APHP:
@@ -32,11 +38,11 @@ export const getScopeLevelBySourceType = (type: SourceType) => {
     case SourceType.BIOLOGY:
     case SourceType.GHM:
     case SourceType.MEDICATION:
-    case SourceType.DOCUMENT:
     case SourceType.IMAGING:
     case SourceType.MATERNITY:
     case SourceType.FORM_RESPONSE:
       return level1
+    case SourceType.DOCUMENT:
     case SourceType.CCAM:
     case SourceType.CIM10:
     case SourceType.SUPPORTED:

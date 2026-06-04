@@ -90,7 +90,7 @@ export const parseOccurence = (value: string) => {
     const [, comparator, number] = match
     const criterion = {
       comparator: comparator ? filterToComparator(comparator) : Comparators.GREATER_OR_EQUAL,
-      value: parseFloat(number)
+      value: Number.parseFloat(number)
     }
     return criterion
   } else {

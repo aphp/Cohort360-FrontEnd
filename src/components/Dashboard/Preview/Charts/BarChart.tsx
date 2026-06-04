@@ -75,7 +75,7 @@ const BarChart: React.FC<BarChartProps> = memo(({ data, height = 250, width = 30
         d3.select(this).transition().duration('50').attr('opacity', '.5')
         div.transition().duration(50).style('opacity', 1)
         div
-          .html(`${d.value} (${parseInt((d.value / total_value) * 10000) / 100}%)`)
+          .html(`${d.value} (${Number.parseInt((d.value / total_value) * 10000) / 100}%)`)
           .style('left', event.pageX + 10 + 'px')
           .style('top', event.pageY - 15 + 'px')
       })

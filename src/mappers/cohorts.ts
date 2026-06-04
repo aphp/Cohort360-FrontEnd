@@ -3,7 +3,7 @@ import { CohortCallbacks, ResearchesTableLabels, SubItemType } from 'types/cohor
 import { Order } from 'types/searchCriterias'
 import { Action, CellType, Column, Favorite, Row, SubItem, Table } from 'types/table'
 import { getExportTooltip, getGlobalEstimation, isCohortExportable, isExportDisabled } from 'utils/explorationUtils'
-import { formatDate } from 'utils/formatDate'
+import { formatDate } from 'utils/dates'
 import { format } from 'utils/numbers'
 import Download from 'assets/icones/download.svg?react'
 import EditIcon from '@mui/icons-material/Edit'
@@ -68,14 +68,16 @@ const mapCohortsToRows = (
       },
       {
         title: 'Éditer la cohorte',
+        testId: 'EditIcon',
         icon: EditIcon,
         onClick: () => onClickEdit(cohort),
         disabled: disabled
       }
     ]
     const row: Row = [
-      ...(!simplified
-        ? [
+      ...(simplified
+        ? []
+        : [
             {
               id: `${cohort.uuid}-select`,
               value: {
@@ -85,8 +87,7 @@ const mapCohortsToRows = (
               },
               type: CellType.CHECKBOX
             }
-          ]
-        : []),
+          ]),
       {
         id: `${cohort.uuid}-isFavorite`,
         value: {
@@ -113,8 +114,9 @@ const mapCohortsToRows = (
         type: CellType.ACTIONS,
         sx: { width: 'fit-content' }
       },
-      ...(!requestId
-        ? [
+      ...(requestId
+        ? []
+        : [
             {
               id: `${cohort.uuid}-parentName`,
               value: parentName,
@@ -126,8 +128,7 @@ const mapCohortsToRows = (
                 whiteSpace: 'wrap'
               }
             }
-          ]
-        : []),
+          ]),
       {
         id: `${cohort.uuid}-statusChip`,
         value: statusChip,
@@ -157,7 +158,8 @@ const mapCohortsToRows = (
         type: CellType.SUB_ITEM
       }
     ]
-    row._onClick = () => onClickRow(cohort)
+    row._onClick = () => cohort.request_job_status === JobStatus.FINISHED && onClickRow(cohort)
+    row.sx = { cursor: cohort.request_job_status === JobStatus.FINISHED ? 'pointer' : 'not-allowed' }
     rows.push(row)
   })
 
@@ -172,8 +174,9 @@ const mapCohortsToColumns = (
   requestId?: string
 ): Column[] => {
   const columns: Column[] = [
-    ...(!simplified
-      ? [
+    ...(simplified
+      ? []
+      : [
           {
             label: '',
             isCheckbox: true,
@@ -183,22 +186,21 @@ const mapCohortsToColumns = (
               onSelectAll
             }
           }
-        ]
-      : []),
-    { label: '', code: !simplified ? Order.FAVORITE : undefined },
-    { label: ResearchesTableLabels.COHORT_NAME, code: !simplified ? Order.NAME : undefined, align: 'left' },
+        ]),
+    { label: '', code: simplified ? undefined : Order.FAVORITE },
+    { label: ResearchesTableLabels.COHORT_NAME, code: simplified ? undefined : Order.NAME, align: 'left' },
     { label: '' },
-    ...(!requestId
-      ? [{ label: ResearchesTableLabels.PARENT_REQUEST, code: !simplified ? Order.REQUEST : undefined }]
-      : []),
+    ...(requestId
+      ? []
+      : [{ label: ResearchesTableLabels.PARENT_REQUEST, code: simplified ? undefined : Order.REQUEST }]),
     { label: ResearchesTableLabels.STATUS },
-    { label: ResearchesTableLabels.PATIENT_TOTAL, code: !simplified ? Order.RESULT_SIZE : undefined },
+    { label: ResearchesTableLabels.PATIENT_TOTAL, code: simplified ? undefined : Order.RESULT_SIZE },
     {
       label: ResearchesTableLabels.APHP_TOTAL,
       tooltip:
         "Cet intervalle correspond à une estimation du nombre de patients correspondant aux critères de votre requête avec comme population source tous les hôpitaux de l'APHP."
     },
-    { label: ResearchesTableLabels.CREATED_AT, code: !simplified ? Order.CREATED_AT : undefined },
+    { label: ResearchesTableLabels.CREATED_AT, code: simplified ? undefined : Order.CREATED_AT },
     { label: ResearchesTableLabels.SAMPLES }
   ]
 

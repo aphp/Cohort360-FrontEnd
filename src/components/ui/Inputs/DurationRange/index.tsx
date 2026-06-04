@@ -8,6 +8,7 @@ import { BlockWrapper } from 'components/ui/Layout'
 import DurationInput from './DurationInput'
 import { ErrorMessage } from '../Errors'
 import { DurationLabel } from './styles'
+import { SxProps, Theme } from '@mui/material'
 
 type DurationRangeProps = {
   value: DurationRangeType
@@ -17,6 +18,7 @@ type DurationRangeProps = {
   unit?: string
   onChange?: (newDuration: DurationRangeType) => void
   onError: (isError: boolean) => void
+  sx?: SxProps<Theme>
 }
 const defaultMinDuration: DurationType = {
   year: null,
@@ -35,7 +37,8 @@ const DurationRange = ({
   disabled = false,
   unit = 'Âge',
   onChange,
-  onError
+  onError,
+  sx
 }: DurationRangeProps) => {
   const [minDuration, setMinDuration] = useState<DurationType>(convertStringToDuration(value[0]) || defaultMinDuration)
   const [maxDuration, setMaxDuration] = useState<DurationType>(convertStringToDuration(value[1]) || defaultMaxDuration)
@@ -44,18 +47,22 @@ const DurationRange = ({
   useEffect(() => {
     setError({ isError: false, errorMessage: '' })
     onError(false)
-    if (!checkMinMaxValue(minDuration, maxDuration)) {
+    if (checkMinMaxValue(minDuration, maxDuration))
+      onChange?.([convertDurationToString(minDuration), convertDurationToString(maxDuration)])
+    else {
       setError({ isError: true, errorMessage: 'La date maximale doit être supérieure à la date minimale.' })
       onChange?.([convertDurationToString(minDuration), convertDurationToString(maxDuration)])
       onError(true)
-    } else onChange?.([convertDurationToString(minDuration), convertDurationToString(maxDuration)])
+    }
   }, [minDuration, maxDuration])
 
   return (
     <BlockWrapper>
       {label && (
         <BlockWrapper margin="0px 0px 10px 0px">
-          <DurationLabel variant="h3">{label}</DurationLabel>
+          <DurationLabel sx={sx} variant="h3">
+            {label}
+          </DurationLabel>
         </BlockWrapper>
       )}
       <BlockWrapper margin="0px 0px 10px 0px">

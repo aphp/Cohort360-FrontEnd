@@ -21,7 +21,7 @@ import FilterLanguageListener from './FilterLanguageListener'
 import FilterLanguageVisitor from './FilterLanguageVisitor'
 
 // for running tests with parameters, TODO: discuss strategy for typed parameters in CI
-// eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 type int = number
 
 export default class FilterLanguageParser extends Parser {

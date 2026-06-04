@@ -175,6 +175,7 @@ const servicesCohorts: IServiceCohorts = {
         isSample
       }
     } catch (error) {
+      console.error(error)
       return {
         name: '',
         description: '',
@@ -221,7 +222,7 @@ const servicesCohorts: IServiceCohorts = {
                   .replace('Positions:', '')
                   .split('char:')
                   .slice(1)
-                  .map((el) => parseInt(el))
+                  .map((el) => Number.parseInt(el))
               : []
 
             const errorSolution = splitError.find((errorPart) => errorPart.includes('Solution'))
@@ -241,7 +242,7 @@ const servicesCohorts: IServiceCohorts = {
       })
 
       return {
-        isError: checkDocumentSearchInput.find((parameter) => parameter.name === 'VALIDÉ') ? false : true,
+        isError: !checkDocumentSearchInput.find((parameter) => parameter.name === 'VALIDÉ'),
         errorsDetails: parsedErrors
       }
     } else {

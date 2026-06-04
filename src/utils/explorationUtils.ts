@@ -10,7 +10,7 @@ import {
   Order,
   SearchCriterias
 } from 'types/searchCriterias'
-import { isDateValid } from './formatDate'
+import { isDateValid } from './dates'
 import { AppConfig } from 'config'
 import { format } from './numbers'
 import { SetURLSearchParams } from 'react-router-dom'
@@ -159,7 +159,7 @@ export const getRequestsSearchParams = (searchParams: URLSearchParams) => {
     searchInput: searchParams.get(ExplorationsSearchParams.SEARCH_INPUT) ?? '',
     startDate: searchParams.get(ExplorationsSearchParams.START_DATE) ?? undefined,
     endDate: searchParams.get(ExplorationsSearchParams.END_DATE) ?? undefined,
-    page: parseInt(searchParams.get('page') ?? '1', 10),
+    page: Number.parseInt(searchParams.get('page') ?? '1', 10),
     orderBy: (searchParams.get(ExplorationsSearchParams.ORDER_BY) as Order) ?? Order.UPDATED,
     orderDirection: (searchParams.get(ExplorationsSearchParams.DIRECTION) as Direction) ?? Direction.DESC
   }
@@ -180,7 +180,7 @@ export const getStatusParam = (searchParam: string | null): LabelObject[] => {
   return statusParam
 }
 
-export const parseSearchParamValue = (searchParam: string | null, options: {}) => {
+export const parseSearchParamValue = (searchParam: string | null, options: object) => {
   if (searchParam === null) {
     return null
   }
@@ -198,7 +198,11 @@ export const removeFromSearchParams = (
     ?.filter((searchValue) => searchValue !== (keyToRemove === FilterKeys.STATUS ? (value as LabelObject).id : value))
     .join()
 
-  cleanedParam ? searchParams.set(keyToRemove, cleanedParam) : searchParams.delete(keyToRemove)
+  if (cleanedParam) {
+    searchParams.set(keyToRemove, cleanedParam)
+  } else {
+    searchParams.delete(keyToRemove)
+  }
   setSearchParams(searchParams)
 }
 
@@ -224,7 +228,7 @@ export const getCohortsSearchParams = (
 ): SearchCriterias<CohortsFilters> & { page: number } => {
   return {
     searchInput: searchParams.get(ExplorationsSearchParams.SEARCH_INPUT) ?? '',
-    page: parseInt(searchParams.get('page') ?? '1', 10),
+    page: Number.parseInt(searchParams.get('page') ?? '1', 10),
     orderBy: {
       orderBy: (searchParams.get(ExplorationsSearchParams.ORDER_BY) as Order) ?? Order.CREATED_AT,
       orderDirection: (searchParams.get(ExplorationsSearchParams.DIRECTION) as Direction) ?? Direction.DESC
@@ -260,10 +264,10 @@ export const getExportTooltip = (isExportable: boolean, cohort?: Cohort) => {
   } else if (cohort.request_job_status === JobStatus.PENDING || cohort.request_job_status === JobStatus.LONG_PENDING) {
     return 'Cette cohorte ne peut pas être exportée car elle est en cours de création'
   } else if (cohort.request_job_status === JobStatus.FINISHED) {
-    if (!isExportable) {
-      return "Vous n'avez pas les droits suffisants pour exporter cette cohorte"
-    } else {
+    if (isExportable) {
       return 'Exporter la cohorte'
+    } else {
+      return "Vous n'avez pas les droits suffisants pour exporter cette cohorte"
     }
   } else if (!cohort.exportable) {
     return 'Cette cohorte ne peut pas être exportée car elle dépasse le seuil de nombre de patients maximum autorisé'
@@ -313,7 +317,11 @@ const handleFilteredValues = (
   const selectedStatusParam = value?.split(',')
   const selectedStatus = selectedStatusParam?.filter((status) => validOptions.includes(status))
   if (selectedStatus?.length !== selectedStatusParam?.length) {
-    selectedStatus?.length === 0 ? searchParams.delete(paramKey) : searchParams.set(paramKey, selectedStatus?.join())
+    if (selectedStatus?.length === 0) {
+      searchParams.delete(paramKey)
+    } else {
+      searchParams.set(paramKey, selectedStatus?.join())
+    }
     return true
   }
   return false

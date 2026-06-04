@@ -28,6 +28,16 @@ const RequestForm: React.FC<RequestFormProps> = ({
   onChangeProjectName,
   projectList
 }) => {
+  let titleHelperText = ''
+  if (error === ERROR_TITLE) {
+    titleHelperText =
+      currentRequest.name.length === 0
+        ? 'Le nom de la requête doit comporter au moins un caractère.'
+        : 'Le nom est trop long (255 caractères max.)'
+  } else if (error === ERROR_REGEX) {
+    titleHelperText = "Le nom de la cohorte ne peut pas être composé uniquement d'espaces."
+  }
+
   return (
     <>
       <Grid container direction="column" marginBottom={3}>
@@ -41,15 +51,7 @@ const RequestForm: React.FC<RequestFormProps> = ({
           margin="normal"
           fullWidth
           error={error === ERROR_TITLE || error === ERROR_REGEX}
-          helperText={
-            error === ERROR_TITLE
-              ? currentRequest.name.length === 0
-                ? 'Le nom de la requête doit comporter au moins un caractère.'
-                : 'Le nom est trop long (255 caractères max.)'
-              : error === ERROR_REGEX
-              ? "Le nom de la cohorte ne peut pas être composé uniquement d'espaces."
-              : ''
-          }
+          helperText={titleHelperText}
         />
       </Grid>
 

@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   AccessExpiration,
   AccessExpirationsProps,
@@ -128,7 +127,7 @@ const servicesPerimeters: IServicePerimeters = {
 
   fetchPerimetersInfos: async (perimetersId) => {
     const [djangoResponse, patientsResp, encountersResp] = await Promise.all([
-      servicesPerimeters.getPerimeters({ cohortIds: perimetersId }),
+      servicesPerimeters.getPerimeters({ cohortIds: perimetersId, limit: -1 }),
       fetchPatient({
         pivotFacet: ['age-month_gender', 'deceased_gender'],
         _list: perimetersId.split(','),
@@ -159,20 +158,14 @@ const servicesPerimeters: IServicePerimeters = {
     const classFacet = getExtension(encountersResp.data.meta, ChartCode.VISIT_TYPE_REPARTITION)
 
     const agePyramidData =
-      patientsResp?.data?.resourceType === 'Bundle'
-        ? getAgeRepartitionMapAphp(ageFacet && ageFacet.extension)
-        : undefined
+      patientsResp?.data?.resourceType === 'Bundle' ? getAgeRepartitionMapAphp(ageFacet?.extension) : undefined
     const genderRepartitionMap =
-      patientsResp?.data?.resourceType === 'Bundle'
-        ? getGenderRepartitionMapAphp(deceasedFacet && deceasedFacet.extension)
-        : undefined
+      patientsResp?.data?.resourceType === 'Bundle' ? getGenderRepartitionMapAphp(deceasedFacet?.extension) : undefined
     const monthlyVisitData =
-      encountersResp?.data?.resourceType === 'Bundle'
-        ? getVisitRepartitionMapAphp(visitFacet && visitFacet.extension)
-        : undefined
+      encountersResp?.data?.resourceType === 'Bundle' ? getVisitRepartitionMapAphp(visitFacet?.extension) : undefined
     const visitTypeRepartitionData =
       encountersResp?.data?.resourceType === 'Bundle'
-        ? getEncounterRepartitionMapAphp(classFacet && classFacet.extension)
+        ? getEncounterRepartitionMapAphp(classFacet?.extension)
         : undefined
 
     return {
@@ -192,7 +185,8 @@ const servicesPerimeters: IServicePerimeters = {
     if (ids) {
       const response = (await servicesPerimeters.getRights({ limit: -1, cohortIds: ids, sourceType: SourceType.ALL }))
         .results
-      if (!response.length)
+      if (response.length) population = response
+      else
         population = [
           {
             id: Rights.EXPIRED,
@@ -209,7 +203,6 @@ const servicesPerimeters: IServicePerimeters = {
             system: System.ScopeTree
           }
         ]
-      else population = response
     }
     return population
   },
@@ -297,6 +290,7 @@ const servicesPerimeters: IServicePerimeters = {
         results: mappedElement
       }
     } catch (error) {
+      console.error(error)
       return response
     }
   },
@@ -329,6 +323,7 @@ const servicesPerimeters: IServicePerimeters = {
         results: mappedElement
       }
     } catch (error) {
+      console.error(error)
       return response
     }
   },

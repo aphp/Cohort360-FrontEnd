@@ -5,6 +5,7 @@ import CalendarRange from 'components/ui/Inputs/CalendarRange'
 import {
   Autocomplete,
   Checkbox,
+  Chip,
   FormControlLabel,
   Grid,
   Radio,
@@ -31,6 +32,7 @@ import { selectValueSetCodes } from 'state/valueSets'
 import SearchbarWithCheck from 'components/ui/Searchbar/SearchbarWithChecks'
 import { SearchbarWithCheckWrapper } from 'components/ui/Searchbar/styles'
 import CustomAlert from 'components/ui/Alert'
+import CancelIcon from '@mui/icons-material/Cancel'
 
 /************************************************************************************/
 /*                        Criteria Form Item Renderer                               */
@@ -76,6 +78,7 @@ const FORM_ITEM_RENDERER: { [key in CriteriaFormItemType]: CriteriaFormItemView<
   durationRange: (props) => {
     return (
       <DurationRange
+        sx={{ fontSize: 12, fontWeight: 600, fontFamily: '' }}
         label={props.definition.label}
         value={props.value ? [props.value.start, props.value.end] : [null, null]}
         disabled={props.disabled}
@@ -126,26 +129,51 @@ const FORM_ITEM_RENDERER: { [key in CriteriaFormItemType]: CriteriaFormItemView<
     )
   },
   autocomplete: (props) => {
-    const arrayPropValue = isArray(props.value) ? props.value : !!props.value ? [props.value] : []
+    const getArrayPropValue = () => {
+      if (isArray(props.value)) return props.value
+      if (props.value) return [props.value]
+      return []
+    }
+    const arrayPropValue = getArrayPropValue()
     const codeSystem = props.getValueSetOptions(props.definition.valueSetId)
     const groupBy = props.definition.groupBy
     const valueWithLabels = (arrayPropValue ?? []).map(
       (code) => codeSystem.find((c) => c.id === code) ?? { id: code, label: code }
     )
-    const value = props.definition.singleChoice ? valueWithLabels?.at(0) ?? null : valueWithLabels ?? []
+    const value = props.definition.singleChoice ? (valueWithLabels?.at(0) ?? null) : (valueWithLabels ?? [])
     return (
       <Autocomplete
         multiple={!props.definition.singleChoice}
         disabled={props.disabled}
         disableClearable={props.definition.singleChoice}
+        disableCloseOnSelect={!props.definition.singleChoice}
         options={codeSystem}
         noOptionsText={props.definition.noOptionsText}
         getOptionLabel={(option) => `${props.definition.prependCode ? option.id + ' - ' : ''}${option.label}`}
         isOptionEqualToValue={(option, value) => option.id === value.id}
         value={value}
-        onChange={(e, value) => props.updateData(value ? (isArray(value) ? value.map((v) => v.id) : [value.id]) : null)}
+        onChange={(e, value) => {
+          if (!value) {
+            props.updateData(null)
+            return
+          }
+          props.updateData(isArray(value) ? value.map((v) => v.id) : [value.id])
+        }}
         renderInput={(params) => <TextField {...params} label={props.definition.label} />}
         groupBy={groupBy ? (option) => option[groupBy] ?? '' : undefined}
+        renderTags={(tagValue, getTagProps) =>
+          tagValue.map((option, index) => {
+            const { onDelete } = getTagProps({ index })
+            return (
+              <Chip
+                key={option.id}
+                label={`${props.definition.prependCode ? option.id + ' - ' : ''}${option.label}`}
+                onDelete={onDelete}
+                deleteIcon={<CancelIcon data-testid="CancelIcon" />}
+              />
+            )
+          })
+        }
         renderGroup={
           groupBy
             ? (params) => {
@@ -163,7 +191,7 @@ const FORM_ITEM_RENDERER: { [key in CriteriaFormItemType]: CriteriaFormItemView<
 
                 return (
                   <React.Fragment>
-                    <Grid container direction="row" alignItems="center">
+                    <Grid container sx={{ flexDirection: 'row', alignItems: 'center' }}>
                       <Checkbox
                         indeterminate={
                           groupChildren.length !== selectedWithinGroup.length && selectedWithinGroup.length > 0
@@ -220,13 +248,15 @@ const FORM_ITEM_RENDERER: { [key in CriteriaFormItemType]: CriteriaFormItemView<
         type="number"
         variant="outlined"
         value={props.value}
-        onChange={(e) => props.updateData(e.target.value ? parseFloat(e.target.value) : null)}
+        onChange={(e) => props.updateData(e.target.value ? Number.parseFloat(e.target.value) : null)}
         placeholder={props.definition.label}
         disabled={props.disabled}
         fullWidth
-        InputProps={{
-          inputProps: {
-            min: props.definition.min
+        slotProps={{
+          input: {
+            inputProps: {
+              min: props.definition.min
+            }
           }
         }}
       />
@@ -258,9 +288,8 @@ const FORM_ITEM_RENDERER: { [key in CriteriaFormItemType]: CriteriaFormItemView<
     )
   },
   boolean: (props) => {
-    // eslint-disable-next-line react-hooks/rules-of-hooks
     return (
-      <BlockWrapper container alignItems="center">
+      <BlockWrapper container sx={{ alignItems: 'center' }}>
         <CriteriaLabel
           label={props.definition.label ?? ''}
           infoIcon={props.definition.extraInfo}

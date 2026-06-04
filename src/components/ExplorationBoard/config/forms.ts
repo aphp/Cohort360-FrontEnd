@@ -1,9 +1,9 @@
 import { getConfig } from 'config'
+import { plural } from 'utils/string'
 import { QuestionnaireResponse } from 'fhir/r4'
 import { mapToDate } from 'mappers/dates'
 import services from 'services/aphp'
 import { fetchForms } from 'services/aphp/callApi'
-import { PatientState } from 'state/patient'
 import { CohortQuestionnaireResponse } from 'types'
 import {
   AdditionalInfo,
@@ -12,7 +12,8 @@ import {
   ExplorationConfig,
   ExplorationResults,
   FetchOptions,
-  FetchParams
+  FetchParams,
+  Patient
 } from 'types/exploration'
 import { ResourceType } from 'types/requestCriterias'
 import { Direction, FormNames, LabelObject, MaternityFormFilters, Order, SearchCriterias } from 'types/searchCriterias'
@@ -27,25 +28,27 @@ import {
   resolveAdditionalInfos
 } from 'utils/exploration'
 import { getFormDetails, getFormLabel, getFormName } from 'utils/formUtils'
+import { SourceType } from 'types/scope'
 
 export const fetchAdditionalInfos = async (additionalInfo: AdditionalInfo): Promise<AdditionalInfo> => {
   const fetchersMap: Record<string, () => Promise<FhirItem[] | LabelObject[] | undefined>> = {
     encounterStatusList: () =>
-      !additionalInfo.encounterStatusList
-        ? fetchValueSet(getConfig().core.valueSets.encounterStatus.url)
-        : Promise.resolve(undefined),
+      additionalInfo.encounterStatusList
+        ? Promise.resolve(undefined)
+        : fetchValueSet(getConfig().core.valueSets.encounterStatus.url),
     questionnaires: () =>
-      !additionalInfo.questionnaires
-        ? services.patients.fetchQuestionnaires().then((resp) =>
+      additionalInfo.questionnaires
+        ? Promise.resolve(undefined)
+        : services.patients.fetchQuestionnaires().then((resp) =>
             resp.map((elem) => ({
               id: elem.name ?? '',
               label: getFormLabel(elem.name as FormNames) ?? ''
             }))
           )
-        : Promise.resolve(undefined)
   }
+  const sourceType = SourceType.MATERNITY
   const resolved = await resolveAdditionalInfos(fetchersMap)
-  return { ...additionalInfo, ...resolved }
+  return { ...additionalInfo, sourceType, ...resolved }
 }
 
 export const initSearchCriterias = (search: string): SearchCriterias<MaternityFormFilters> => ({
@@ -66,7 +69,7 @@ export const initSearchCriterias = (search: string): SearchCriterias<MaternityFo
 const mapToTable = (data: Data, groupId: string[]): Table => {
   const rows: Row[] = []
   const columns: Column[] = [
-    { label: 'Type de formulaire' },
+    { label: 'Type de dossier de spécialité' },
     { label: "Date d'écriture", code: Order.AUTHORED },
     { label: `IPP` },
     { label: 'Unité exécutrice' },
@@ -75,6 +78,7 @@ const mapToTable = (data: Data, groupId: string[]): Table => {
   ;(data as ExplorationResults<CohortQuestionnaireResponse>).list.forEach((elem) => {
     const formName = elem.formName as FormNames
     const date = elem.authored
+    const ippGroupQuery = groupId ? `?groupId=${groupId}` : ''
     const row: Row = [
       {
         id: `${elem.id}-formName`,
@@ -91,7 +95,7 @@ const mapToTable = (data: Data, groupId: string[]): Table => {
         value: elem.IPP
           ? {
               label: elem.IPP,
-              url: `/patients/${elem.idPatient}${groupId ? `?groupId=${groupId}` : ''}`
+              url: `/patients/${elem.idPatient}${ippGroupQuery}`
             }
           : 'Non renseigné',
         type: elem.IPP ? CellType.LINK : CellType.TEXT
@@ -116,7 +120,7 @@ const mapToTable = (data: Data, groupId: string[]): Table => {
 const fetchList = async (
   fetchParams: FetchParams,
   { filters }: FetchOptions<MaternityFormFilters>,
-  patient: PatientState,
+  patient: Patient | null,
   deidentified: boolean,
   groupId: string[],
   signal?: AbortSignal
@@ -130,13 +134,13 @@ const fetchList = async (
     encounterStatus: encounterStatus.map((status) => status.id),
     formName: formName.join(','),
     uniqueFacet: ['subject'],
-    patient: patient?.patientInfo?.id,
+    patient: patient?.id,
     ...getCommonParamsList(fetchParams, groupId),
     signal
   }
   const paramsFetchAll = {
     uniqueFacet: ['subject'],
-    patient: patient?.patientInfo?.id,
+    patient: patient?.id,
     ...getCommonParamsAll(groupId),
     signal
   }
@@ -160,7 +164,7 @@ const fetchList = async (
 
 export const formsConfig = (
   deidentified: boolean,
-  patient: PatientState,
+  patient: Patient | null,
   groupId: string[],
   displayOptions = DISPLAY_OPTIONS,
   search = ''
@@ -171,7 +175,7 @@ export const formsConfig = (
   initSearchCriterias: () => initSearchCriterias(search),
   fetchList: (fetchParams, options, signal) => fetchList(fetchParams, options, patient, deidentified, groupId, signal),
   mapToTable: (data) => mapToTable(data, groupId),
-  mapToTimeline: !!patient
+  mapToTimeline: patient
     ? async (data: Data) => {
         const questionnaires = await services.patients.fetchQuestionnaires()
         return { data: (data.list ?? []) as CohortQuestionnaireResponse[], questionnaires: questionnaires ?? [] }
@@ -180,10 +184,10 @@ export const formsConfig = (
   narrowSearchCriterias: (searchCriterias) =>
     narrowSearchCriterias(deidentified, searchCriterias, !!patient, [], ['searchBy', 'searchInput']),
   fetchAdditionalInfos,
-  getCount: !!patient
+  getCount: patient
     ? undefined
     : (counts) => [
-        { label: `résultat${counts[0].total > 1 ? 's' : ''}`, display: true, count: counts[0] },
-        { label: `patient${counts[1].total > 1 ? 's' : ''}`, display: true, count: counts[1] }
+        { label: `résultat${plural(counts[0].total)}`, display: true, count: counts[0] },
+        { label: `patient${plural(counts[1].total)}`, display: true, count: counts[1] }
       ]
 })

@@ -65,7 +65,6 @@ export const WebSocketProvider = ({ children }: PropsWithChildren) => {
 
   useEffect(() => {
     if (websocketRef.current.readyState !== websocket.readyState && websocket.readyState === ReadyState.OPEN) {
-      // Newly Open Websocket
       websocket.sendJsonMessage({ token: token, auth_method: oidcAuthState === 'true' ? 'OIDC' : 'JWT' })
     }
     websocketRef.current = websocket

@@ -29,7 +29,7 @@ export const getDataFromForm = (
       return (
         itemValue
           ?.map((answer) => {
-            const dateTime = moment(answer.valueDateTime)
+            const dateTime = moment.parseZone(answer.valueDateTime)
             return dateTime.isValid() ? dateTime.format('DD/MM/YYYY à HH:mm') : ''
           })
           .filter(Boolean)

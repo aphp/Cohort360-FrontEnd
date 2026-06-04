@@ -12,7 +12,7 @@ type FilterByProps = {
   onSubmit: (filters: Filters) => void
 }
 
-const FilterBy = <T,>({ filters, infos, onSubmit }: FilterByProps) => {
+const FilterBy = ({ filters, infos, onSubmit }: FilterByProps) => {
   const [toggleModal, setToggleModal] = useState(false)
   const [isError, setIsError] = useState(false)
   const [hasChanged, setHasChanged] = useState(false)

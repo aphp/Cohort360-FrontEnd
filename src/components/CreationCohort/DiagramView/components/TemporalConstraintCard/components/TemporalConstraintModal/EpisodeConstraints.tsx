@@ -4,14 +4,13 @@ import { Grid, Tooltip, Typography } from '@mui/material'
 import InfoIcon from '@mui/icons-material/Info'
 
 import { useAppSelector } from 'state'
-
+import WarningIcon from '@mui/icons-material/Warning'
 import { CriteriaGroupType, TemporalConstraintsKind, TemporalConstraintsType } from 'types'
-import ConfirmationDialog from 'components/ui/ConfirmationDialog/ConfirmationDialog'
-
 import _ from 'lodash'
 import { getSelectableGroups } from 'utils/temporalConstraints'
 import RadioGroup from 'components/ui/RadioGroup'
 import PartialConstraintLayout from 'components/ui/PartialConstraintLayout'
+import Modal from 'components/ui/Modal'
 
 interface EpisodeConstraintsProps {
   constraints: TemporalConstraintsType[]
@@ -61,10 +60,10 @@ const EpisodeConstraints: React.FC<EpisodeConstraintsProps> = ({ constraints, on
   const onChangeValue = (value: TemporalConstraintsKind) => {
     setRadioValues(value)
 
-    if (value !== TemporalConstraintsKind.PARTIAL_EPISODE_CONSTRAINT) {
-      onChangeConstraints([{ idList: ['All'], constraintType: value }])
-    } else {
+    if (value === TemporalConstraintsKind.PARTIAL_EPISODE_CONSTRAINT) {
       onChangeConstraints([])
+    } else {
+      onChangeConstraints([{ idList: ['All'], constraintType: value }])
     }
   }
 
@@ -79,10 +78,10 @@ const EpisodeConstraints: React.FC<EpisodeConstraintsProps> = ({ constraints, on
   return (
     <>
       <Grid>
-        <Grid item container direction="row" alignItems="center">
+        <Grid container sx={{ flexDirection: 'row', alignItems: 'center' }}>
           <Typography variant="h3">Contraintes sur les épisodes</Typography>
-          <Tooltip title="Les contraintes sur les épisodes ne s'appliquent qu'aux critères de formulaires de dossiers de maternité">
-            <InfoIcon fontSize="small" color="primary" style={{ marginLeft: 4 }} />
+          <Tooltip title="Les contraintes sur les épisodes ne s'appliquent qu'aux critères de dossiers de spécialité de type: Maternité">
+            <InfoIcon data-testid="InfoIcon" fontSize="small" color="primary" style={{ marginLeft: 4 }} />
           </Tooltip>
         </Grid>
         <RadioGroup
@@ -120,21 +119,24 @@ const EpisodeConstraints: React.FC<EpisodeConstraintsProps> = ({ constraints, on
         />
       )}
 
-      <ConfirmationDialog
+      <Modal
         open={openConfirmationDialog}
-        message={
-          'Attention, en passant sur un type de contrainte temporelle globale, vous perdrez toutes les contraintes partielles déjà ajoutées.'
-        }
-        onClose={() => setOpenConfirmationDialog(false)}
-        onCancel={() => {
+        onClose={() => {
           setOpenConfirmationDialog(false)
           setRadioValues(TemporalConstraintsKind.PARTIAL_EPISODE_CONSTRAINT)
         }}
-        onConfirm={() => {
+        onSubmit={() => {
           onChangeValue(radioValues)
           setOpenConfirmationDialog(false)
         }}
-      />
+        submitText="Confirmer"
+        cancelText="Annuler"
+        maxWidth="md"
+      >
+        <WarningIcon data-testid="WarningIcon" color="warning" style={{ verticalAlign: 'middle', marginRight: 8 }} />
+        Attention, en passant sur un type de contrainte temporelle globale, vous perdrez toutes les contraintes
+        partielles déjà ajoutées.
+      </Modal>
     </>
   )
 }

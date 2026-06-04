@@ -24,13 +24,13 @@ const DurationInput = ({ value, label, includeDays = true, disabled = false, onC
   }, [duration])
 
   return (
-    <BlockWrapper container justifyContent="space-between" alignItems="flex-end">
-      <Grid item xs={!includeDays ? 4 : 3} container alignItems="flex-start">
+    <BlockWrapper container sx={{ justifyContent: 'space-between', alignItems: 'flex-end' }}>
+      <Grid size={includeDays ? 3 : 4} container sx={{ alignItems: 'flex-start' }}>
         <DurationLegendWrapper variant="h5">{label}</DurationLegendWrapper>
       </Grid>
-      <Grid item xs={!includeDays ? 8 : 9} container justifyContent="space-between">
-        <Grid container item xs={!includeDays ? 5 : 3} alignItems="center">
-          <Grid item xs={7}>
+      <Grid size={includeDays ? 9 : 8} container sx={{ justifyContent: 'space-between' }}>
+        <Grid container size={includeDays ? 3 : 5} sx={{ alignItems: 'center' }}>
+          <Grid size={7}>
             <TextFieldWrapper
               activated={!disabled && !!duration.year}
               disabled={disabled}
@@ -45,23 +45,23 @@ const DurationInput = ({ value, label, includeDays = true, disabled = false, onC
               }}
               size="small"
               onChange={(e) => {
-                if (!isNaN(+e.target.value)) {
+                if (!Number.isNaN(+e.target.value)) {
                   setDuration({
                     ...duration,
-                    year: e.target.value !== '' ? Math.floor(Math.abs(+e.target.value)) : 0
+                    year: e.target.value === '' ? 0 : Math.floor(Math.abs(+e.target.value))
                   })
                 }
               }}
             />
           </Grid>
-          <Grid item xs={5}>
+          <Grid size={5}>
             <DurationUnitWrapper activated={!disabled && !!duration.year}>
               {CalendarRequestLabel.YEAR}
             </DurationUnitWrapper>
           </Grid>
         </Grid>
-        <Grid container item xs={!includeDays ? 5 : 3} alignItems="center">
-          <Grid item xs={6}>
+        <Grid container size={includeDays ? 3 : 5} sx={{ alignItems: 'center' }}>
+          <Grid size={6}>
             <TextFieldWrapper
               activated={!disabled && !!duration.month}
               disabled={disabled}
@@ -76,24 +76,24 @@ const DurationInput = ({ value, label, includeDays = true, disabled = false, onC
               }}
               size="small"
               onChange={(e) => {
-                if (!isNaN(+e.target.value) && +e.target.value <= 12) {
+                if (!Number.isNaN(+e.target.value) && +e.target.value <= 12) {
                   setDuration({
                     ...duration,
-                    month: e.target.value !== '' ? Math.floor(Math.abs(+e.target.value)) : 0
+                    month: e.target.value === '' ? 0 : Math.floor(Math.abs(+e.target.value))
                   })
                 }
               }}
             />
           </Grid>
-          <Grid item xs={6}>
+          <Grid size={6}>
             <DurationUnitWrapper activated={!disabled && !!duration.month}>
               {CalendarRequestLabel.MONTH}
             </DurationUnitWrapper>
           </Grid>
         </Grid>
         {includeDays && (
-          <Grid container item xs={3} alignItems="center">
-            <Grid item xs={6}>
+          <Grid container size={3} sx={{ alignItems: 'center' }}>
+            <Grid size={6}>
               <TextFieldWrapper
                 activated={!disabled && !!duration.day}
                 disabled={disabled}
@@ -108,16 +108,16 @@ const DurationInput = ({ value, label, includeDays = true, disabled = false, onC
                 }}
                 size="small"
                 onChange={(e) => {
-                  if (!isNaN(+e.target.value) && +e.target.value <= 31) {
+                  if (!Number.isNaN(+e.target.value) && +e.target.value <= 31) {
                     setDuration({
                       ...duration,
-                      day: e.target.value !== '' ? Math.floor(Math.abs(+e.target.value)) : 0
+                      day: e.target.value === '' ? 0 : Math.floor(Math.abs(+e.target.value))
                     })
                   }
                 }}
               />
             </Grid>
-            <Grid item xs={6}>
+            <Grid size={6}>
               <DurationUnitWrapper activated={!disabled && !!duration.day}>
                 {CalendarRequestLabel.DAY}
               </DurationUnitWrapper>

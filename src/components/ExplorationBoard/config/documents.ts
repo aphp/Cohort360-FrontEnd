@@ -1,6 +1,7 @@
 import { ChipStatus } from 'components/ui/StatusChip'
+import { plural } from 'utils/string'
 import { mapToDateHours } from 'mappers/dates'
-import { CohortComposition } from 'types'
+import type { CohortComposition, FHIR_Bundle_Response } from 'types'
 import {
   AdditionalInfo,
   Data,
@@ -8,7 +9,8 @@ import {
   ExplorationConfig,
   ExplorationResults,
   FetchOptions,
-  FetchParams
+  FetchParams,
+  Patient
 } from 'types/exploration'
 import {
   Order,
@@ -22,15 +24,13 @@ import {
 } from 'types/searchCriterias'
 import { Table, Row, CellType, Column } from 'types/table'
 import { getDocumentStatus } from 'utils/documentsFormatter'
-import docTypes from 'assets/docTypes.json'
 import CheckIcon from 'assets/icones/check.svg?react'
 import CancelIcon from 'assets/icones/times.svg?react'
-import { DocumentReference } from 'fhir/r4'
+import { DocumentReference, Encounter, Patient as FhirPatient, Resource } from 'fhir/r4'
 import { fetchDocumentReference } from 'services/aphp/callApi'
 import { ResourceType } from 'types/requestCriterias'
 import { getConfig } from 'config'
 import {
-  fetcherWithParams,
   fetchValueSet,
   getCommonParamsAll,
   getCommonParamsList,
@@ -39,7 +39,11 @@ import {
 } from 'utils/exploration'
 import { FhirItem } from 'types/valueSet'
 import { Buffer } from 'buffer'
-import { PatientState } from 'state/patient'
+import { SourceType } from 'types/scope'
+import { getResourceInfos, getResourceInfosFromBundle } from 'utils/fillElement'
+import { getExtension } from 'utils/fhir'
+import { linkElementWithEncounter } from 'utils/encounter'
+import { getDocTypeLabel } from '../../../utils/docTypesHelper'
 
 const initSearchCriterias = (search: string): SearchCriterias<DocumentsFilters> => ({
   orderBy: {
@@ -63,7 +67,7 @@ const initSearchCriterias = (search: string): SearchCriterias<DocumentsFilters> 
 const fetchList = (
   fetchParams: FetchParams,
   { filters, searchBy }: FetchOptions<DocumentsFilters>,
-  patient: PatientState,
+  patient: Patient | null,
   deidentified: boolean,
   groupId: string[],
   signal?: AbortSignal
@@ -76,7 +80,7 @@ const fetchList = (
     _elements: searchInput ? [] : undefined,
     highlight_search_results: searchBy === SearchByTypes.TEXT,
     type: docTypes.map((docType) => docType.code).join(','),
-    patient: patient?.patientInfo?.id,
+    patient: patient?.id,
     'encounter-identifier': nda,
     'patient-identifier': ipp,
     onlyPdfAvailable,
@@ -88,20 +92,96 @@ const fetchList = (
     ...getCommonParamsList(fetchParams, groupId),
     signal
   }
+  const paramsWithInclude = {
+    ...params,
+    _include: ['Encounter:encounter', 'Patient:patient'] as ('Encounter:encounter' | 'Patient:patient')[]
+  }
   const paramsFetchAll = {
-    patient: patient?.patientInfo?.id,
+    patient: patient?.id,
     uniqueFacet: ['subject'] as 'subject'[],
     ...getCommonParamsAll(groupId),
     signal
   }
-  return fetcherWithParams(
-    () => fetchDocumentReference(params),
-    () => fetchDocumentReference(paramsFetchAll),
-    { ...fetchParams, filters, deidentified, groupId, patient }
+
+  return fetchDocumentsList(paramsWithInclude, paramsFetchAll, patient, deidentified, groupId, signal)
+}
+
+const getPatientsCount = (
+  response: { data: FHIR_Bundle_Response<DocumentReference> } | null,
+  facet = 'unique-subject'
+) => {
+  return response?.data?.resourceType === 'Bundle'
+    ? ((
+        getExtension(response.data.meta, facet) || {
+          valueDecimal: 0
+        }
+      ).valueDecimal ?? 0)
+    : 0
+}
+
+const isDocumentReference = (resource: Resource | undefined): resource is DocumentReference => {
+  return resource?.resourceType === 'DocumentReference'
+}
+
+const isEncounter = (resource: Resource | undefined): resource is Encounter => {
+  return resource?.resourceType === 'Encounter'
+}
+
+const isPatientResource = (resource: Resource | undefined): resource is FhirPatient => {
+  return resource?.resourceType === 'Patient'
+}
+
+const getBundleResources = (response: { data: FHIR_Bundle_Response<DocumentReference> }): Resource[] => {
+  if (response.data.resourceType !== 'Bundle') return []
+
+  return (
+    response.data.entry
+      ?.map((entry) => entry.resource as unknown as Resource | undefined)
+      .filter((resource): resource is Resource => !!resource) ?? []
   )
 }
 
-const mapToTable = (
+const fetchDocumentsList = async (
+  paramsWithInclude: Parameters<typeof fetchDocumentReference>[0],
+  paramsFetchAll: Parameters<typeof fetchDocumentReference>[0] | null,
+  patient: Patient | null,
+  deidentified: boolean,
+  groupId: string[],
+  signal?: AbortSignal
+): Promise<ExplorationResults<DocumentReference>> => {
+  const [list, all] = await Promise.all([
+    fetchDocumentReference(paramsWithInclude),
+    paramsFetchAll ? fetchDocumentReference(paramsFetchAll) : null
+  ])
+
+  const resources = getBundleResources(list)
+  const documents = resources.filter(isDocumentReference)
+  const includedPatients = resources.filter(isPatientResource)
+  const includedEncounters = resources.filter(isEncounter)
+
+  let listResources
+  if (patient) {
+    listResources = await linkElementWithEncounter(documents, patient.infos.hospits, deidentified)
+  } else if (includedEncounters.length > 0 && (deidentified || includedPatients.length > 0)) {
+    listResources = await getResourceInfosFromBundle(documents, deidentified, includedPatients, includedEncounters)
+  } else {
+    listResources = await getResourceInfos(documents, deidentified, groupId?.[0], signal)
+  }
+
+  const total = list.data.resourceType === 'Bundle' ? (list.data.total ?? 0) : 0
+  const totalPatients = getPatientsCount(list)
+
+  return {
+    total,
+    totalAllResults: all?.data.resourceType === 'Bundle' ? (all.data.total ?? 0) : total,
+    totalPatients,
+    totalAllPatients: all ? getPatientsCount(all) : totalPatients,
+    list: listResources as DocumentReference[],
+    meta: list.data.resourceType === 'Bundle' ? list.data.meta : undefined
+  }
+}
+
+export const mapToTable = (
   data: Data,
   deidentified: boolean,
   isPatient: boolean,
@@ -119,9 +199,22 @@ const mapToTable = (
     { label: 'Aperçu' }
   ].filter((elem) => elem) as Column[]
   ;(data as ExplorationResults<CohortComposition>).list?.forEach((elem) => {
-    const docType = docTypes.docTypes.find(
-      ({ code }) => code.toLowerCase() === (elem?.type?.coding?.[0] ? elem.type.coding[0].code : '-')?.toLowerCase()
-    )
+    // On récupère tous les codes présents dans elem.type.coding
+    const typeCodings = elem?.type?.coding ?? []
+
+    // Pour chaque code, on va chercher le label via getDocTypeLabel,
+    // et on garde soit le label, soit le code à défaut
+    const docTypeLabels = typeCodings
+      .map((coding) => coding.code)
+      .filter((code): code is string => !!code)
+      .map((code) => {
+        const info = getDocTypeLabel(code)
+        return info?.label ?? code
+      })
+
+    // Concaténation des labels avec " - "
+    const concatenatedDocTypes = docTypeLabels.length > 0 ? docTypeLabels.join(' - ') : '-'
+
     const status = {
       label: getDocumentStatus(elem.docStatus),
       status: elem.docStatus === DocumentStatuses.FINAL ? ChipStatus.VALID : ChipStatus.CANCELLED,
@@ -131,6 +224,7 @@ const mapToTable = (
     const documentContent = findContent?.attachment?.data
       ? Buffer.from(findContent?.attachment.data, 'base64').toString('utf-8')
       : ''
+    const ippGroupQuery = groupId ? `?groupId=${groupId}` : ''
     const row: Row = [
       {
         id: `${elem.id}-status`,
@@ -150,7 +244,7 @@ const mapToTable = (
         value: elem.IPP
           ? {
               label: elem.IPP,
-              url: `/patients/${elem.idPatient}${groupId ? `?groupId=${groupId}` : ''}`
+              url: `/patients/${elem.idPatient}${ippGroupQuery}`
             }
           : 'Non renseigné',
         type: elem.IPP ? CellType.LINK : CellType.TEXT
@@ -167,12 +261,12 @@ const mapToTable = (
       },
       {
         id: `${elem.id}-docType`,
-        value: docType?.label ?? '-',
+        value: concatenatedDocTypes,
         type: CellType.TEXT
       },
       {
         id: `${elem.id}-viewDoc`,
-        value: { id: elem.id, deidentified },
+        value: { id: elem.content && elem.id, deidentified },
         type: CellType.DOCUMENT_VIEWER,
         align: 'center'
       },
@@ -191,13 +285,14 @@ const mapToTable = (
 const fetchAdditionalInfos = async (additionalInfo: AdditionalInfo): Promise<AdditionalInfo> => {
   const fetchersMap: Record<string, () => Promise<FhirItem[] | SearchBy[] | undefined>> = {
     encounterStatusList: () =>
-      !additionalInfo.encounterStatusList
-        ? fetchValueSet(getConfig().core.valueSets.encounterStatus.url)
-        : Promise.resolve(undefined),
+      additionalInfo.encounterStatusList
+        ? Promise.resolve(undefined)
+        : fetchValueSet(getConfig().core.valueSets.encounterStatus.url),
     searchByList: () => Promise.resolve(searchByListDocuments)
   }
+  const sourceType = SourceType.DOCUMENT
   const resolved = await resolveAdditionalInfos(fetchersMap)
-  return { ...additionalInfo, ...resolved }
+  return { ...additionalInfo, sourceType, ...resolved }
 }
 
 const getMessages = (deidentified: boolean) => {
@@ -212,7 +307,7 @@ const getMessages = (deidentified: boolean) => {
 
 export const documentsConfig = (
   deidentified: boolean,
-  patient: PatientState,
+  patient: Patient | null,
   groupId: string[],
   displayOptions = DISPLAY_OPTIONS,
   search = ''
@@ -228,8 +323,8 @@ export const documentsConfig = (
     narrowSearchCriterias(deidentified, searchCriterias, !!patient, deidentified ? ['onlyPdfAvailable'] : [], []),
   fetchAdditionalInfos,
   getCount: (counts) => [
-    { label: `document${counts[0].total > 1 ? 's' : ''}`, display: true, count: counts[0] },
-    { label: `patient${counts[1].total > 1 ? 's' : ''}`, display: !!!patient, count: counts[1] }
+    { label: `document${plural(counts[0].total)}`, display: true, count: counts[0] },
+    { label: `patient${plural(counts[1].total)}`, display: !!!patient, count: counts[1] }
   ],
   hasSearchDisplay: (input, searchBy) => !!input && searchBy === SearchByTypes.TEXT
 })

@@ -34,22 +34,24 @@ const ScopeTree = ({ baseTree, selectedNodes, sourceType, onSelect, sx }: ScopeT
   return (
     <Grid
       container
-      direction="column"
-      wrap="nowrap"
+      size={12}
+      sx={{ flexDirection: 'column', flexWrap: 'nowrap', justifyContent: 'space-between' }}
       height={'calc(100% - 20px)'}
       overflow="hidden"
-      justifyContent={'space-between'}
     >
       <Grid container padding={'24px 20px'}>
         <SearchInput value={searchInput} placeholder={'Rechercher'} onChange={onChangeSearchInput} />
       </Grid>
-      <Grid container direction="column" wrap="wrap" height="100vh" overflow="auto" padding={'0px 20px'}>
+      <Grid
+        container
+        sx={{ flexDirection: 'column', flexWrap: 'wrap' }}
+        height="100vh"
+        overflow="auto"
+        padding={'0px 20px'}
+      >
         <Grid
-          item
           container
-          direction="column"
-          justifyContent="space-between"
-          wrap="nowrap"
+          sx={{ flexDirection: 'column', justifyContent: 'space-between', flexWrap: 'nowrap' }}
           height="100%"
           style={{ overflow: 'hidden' }}
         >
@@ -64,9 +66,9 @@ const ScopeTree = ({ baseTree, selectedNodes, sourceType, onSelect, sx }: ScopeT
           />
         </Grid>
       </Grid>
-      <Grid container direction={'column'} style={{ backgroundColor: 'transparent' }}>
+      <Grid container sx={{ flexDirection: 'column' }} style={{ backgroundColor: 'transparent' }}>
         {loadingStatus.search === LoadingStatus.SUCCESS && hierarchy.count / LIMIT_PER_PAGE > 1 && (
-          <Grid container justifyContent={'center'}>
+          <Grid container sx={{ justifyContent: 'center' }}>
             <Pagination
               count={Math.ceil(hierarchy.count / LIMIT_PER_PAGE)}
               currentPage={hierarchy.page}

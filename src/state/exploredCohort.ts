@@ -165,9 +165,7 @@ const fetchExploredCohortInBackground = createAsyncThunk<
                 : false
 
               cohort.deidentifiedBoolean = cohortRights?.[0]?.rights?.read_patient_pseudo
-                ? cohortRights?.[0]?.rights?.read_patient_nomi
-                  ? false
-                  : true
+                ? !cohortRights?.[0]?.rights?.read_patient_nomi
                 : false
             }
           } else {
@@ -207,10 +205,10 @@ const fetchExploredCohortInBackground = createAsyncThunk<
           cohort.cohortId = ''
           cohort.canMakeExport = false
           cohort.deidentifiedBoolean =
-            cohort.cohort && cohort.cohort && Array.isArray(cohort.cohort)
-              ? cohort.cohort.some(
+            cohort.cohort && Array.isArray(cohort.cohort)
+              ? (cohort.cohort.some(
                   (cohort) => getExtension(cohort, 'READ_ACCESS')?.valueString === 'DATA_PSEUDOANONYMISED'
-                ) ?? true
+                ) ?? true)
               : true
         }
       }
@@ -324,7 +322,8 @@ const exploredCohortSlice = createSlice({
      */
     updateCohort: (state: ExploredCohortState, action: PayloadAction<CohortData>) => {
       return { ...state, ...action.payload }
-    }
+    },
+    resetState: () => defaultInitialState
   },
   extraReducers: (builder) => {
     builder.addCase(login, () => defaultInitialState)
@@ -366,5 +365,6 @@ export const {
   removeImportedPatients,
   includePatients,
   removeExcludedPatients,
-  updateCohort
+  updateCohort,
+  resetState
 } = exploredCohortSlice.actions

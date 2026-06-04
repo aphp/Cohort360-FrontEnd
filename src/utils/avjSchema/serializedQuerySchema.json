@@ -1,0 +1,277 @@
+
+{
+  "_meta": {
+    "description": "This file defines the cohort search request format"
+  },
+  "title": "RequeteurJsonType",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "_type",
+    "sourcePopulation",
+    "request"
+  ],
+  "properties": {
+    "version": {
+      "type": "string" 
+    },
+    "_type": {
+      "const": "request"
+    },
+    "sourcePopulation": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "caresiteCohortList": {
+          "type": "array",
+          "items": {
+            "type": "string" 
+          }
+        },
+        "providerCohortList": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "request": {
+      "$ref": "#/$defs/group"
+    }
+  },
+  "$defs": {
+    "criterionOrGroup": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/criteria"
+        },
+        {
+          "$ref": "#/$defs/group"
+        }
+      ]
+    },
+    "group": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/andOrGroup"
+        },
+        {
+          "$ref": "#/$defs/nAmongMGroup"
+        }
+      ]
+    },
+    "andOrGroup": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "_type",
+        "_id",
+        "isInclusive",
+        "criteria"
+      ],
+      "properties": {
+        "_type": {
+          "enum": [
+            "andGroup",
+            "orGroup"
+          ]
+        },
+        "_id": {
+          "type": "integer"
+        },
+        "isInclusive": {
+          "type": "boolean"
+        },
+        "criteria": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/criterionOrGroup"
+          }
+        },
+        "temporalConstraints": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/temporalConstraints"
+          }
+        }
+      }
+    },
+    "nAmongMGroup": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "_type",
+        "_id",
+        "isInclusive",
+        "criteria",
+        "nAmongMOptions"
+      ],
+      "properties": {
+        "_type": {
+          "enum": [
+            "nAmongM"
+          ]
+        },
+        "_id": {
+          "type": "integer"
+        },
+        "isInclusive": {
+          "type": "boolean"
+        },
+        "criteria": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/criterionOrGroup"
+          }
+        },
+        "nAmongMOptions": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "n"
+          ],
+          "properties": {
+            "n": {
+              "type": "number"
+            },
+            "operator": {
+              "$ref": "#/$defs/comparator"
+            },
+            "timeDelayMin": {
+              "type": "number"
+            },
+            "timeDelayMax": {
+              "type": "number"
+            }
+          }
+        },
+        "temporalConstraints": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/temporalConstraints"
+          }
+        }
+      }
+    },
+    "criteria": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "_type",
+        "_id",
+        "name",
+        "isInclusive",
+        "resourceType",
+        "filterFhir"
+      ],
+      "properties": {
+        "_type": {
+          "type": "string"
+        },
+        "_id": {
+          "type": "integer"
+        },
+        "name": {
+          "type": "string"
+        },
+        "isInclusive": {
+          "type": "boolean"
+        },
+        "resourceType": {
+          "type": "string"
+        },
+        "filterFhir": {
+          "type": "string"
+        },
+        "patientAge": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "occurrence": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "n": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "operator": {
+              "$ref": "#/$defs/comparator"
+            },
+            "timeDelayMin": {
+              "type": "number"
+            },
+            "timeDelayMax": {
+              "type": "number"
+            }
+          }
+        }
+      }
+    },
+    "temporalConstraints": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "idList",
+        "constraintType"
+      ],
+      "properties": {
+        "id": {
+          "type": "integer"
+        },
+        "idList": {
+          "anyOf": [
+            {
+              "type": "array",
+              "items": {
+                "const": "All"
+              },
+              "minItems": 1,
+              "maxItems": 1
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              }
+            }
+          ]
+        },
+        "constraintType": {
+          "type": "string"
+        },
+        "timeRelationMinDuration": {
+          "$ref": "#/$defs/duration"
+        },
+        "timeRelationMaxDuration": {
+          "$ref": "#/$defs/duration"
+        }
+      }
+    },
+    "duration": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "years": {
+          "type": "integer"
+        },
+        "months": {
+          "type": "integer"
+        },
+        "days": {
+          "type": "integer"
+        },
+        "hours": {
+          "type": "integer"
+        }
+      }
+    },
+    "comparator": {
+      "type": "string"
+    }
+  }
+}

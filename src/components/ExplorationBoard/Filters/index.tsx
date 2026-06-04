@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useRef } from 'react'
 import CheckboxGroup from 'components/ui/Inputs/CheckboxGroup'
 import DurationRange from 'components/ui/Inputs/DurationRange'
 import { FilterByDocumentStatus, FilterKeys, Filters, genderOptions, vitalStatusesOptions } from 'types/searchCriterias'
-import { Controller, ControllerRenderProps, FieldValues, useForm } from 'react-hook-form'
+import { Controller, ControllerRenderProps, useForm } from 'react-hook-form'
 import ValueSets from 'components/ui/Inputs/ValueSets'
 import CalendarRange from 'components/ui/Inputs/CalendarRange'
 import ExecutiveUnits from 'components/ui/Inputs/ExecutiveUnits'
@@ -14,6 +14,7 @@ import DocTypes from 'components/ui/Inputs/DocTypes'
 import { AdditionalInfo } from 'types/exploration'
 import { Typography } from '@mui/material'
 import { isEqual } from 'lodash'
+import { getConfig } from 'config'
 
 type ExplorationFiltersProps = {
   filters: Filters
@@ -41,23 +42,14 @@ const documentsStatusOptions = [
   }
 ]
 
-const sourceOptions = [
-  {
-    id: Source.AREM,
-    label: Source.AREM
-  },
-  {
-    id: Source.ORBIS,
-    label: Source.ORBIS
-  }
-]
-
 const docStatusesList = [
   { id: FilterByDocumentStatus.VALIDATED, label: FilterByDocumentStatus.VALIDATED },
   { id: FilterByDocumentStatus.NOT_VALIDATED, label: FilterByDocumentStatus.NOT_VALIDATED }
 ]
 
 const ExplorationFilters = ({ filters, infos, onChange, onError, hasChanged }: ExplorationFiltersProps) => {
+  const aremSource = getConfig().features.condition.filters?.sources.arem
+  const orbisSource = getConfig().features.condition.filters?.sources.orbis
   const {
     control,
     handleSubmit,
@@ -92,6 +84,20 @@ const ExplorationFilters = ({ filters, infos, onChange, onError, hasChanged }: E
 
     return () => clearInterval(interval)
   }, [getValues, handleSubmit, onChange, hasChanged, isSubmitting])
+
+  const sourceOptions = useMemo(
+    () => [
+      {
+        id: aremSource ?? Source.AREM,
+        label: Source.AREM
+      },
+      {
+        id: orbisSource ?? Source.ORBIS,
+        label: Source.ORBIS
+      }
+    ],
+    [aremSource, orbisSource]
+  )
 
   const fields: Partial<Record<FilterKeys, React.FC<{ field: ControllerRenderProps }>>> = useMemo(
     () => ({
@@ -162,6 +168,9 @@ const ExplorationFilters = ({ filters, infos, onChange, onError, hasChanged }: E
       [FilterKeys.FORM_NAME]: ({ field }) => (
         <CheckboxGroup {...field} label="Formulaire :" options={infos.questionnaires ?? []} />
       ),
+      [FilterKeys.BODYSITE]: ({ field }) => (
+        <TextInput {...field} label="Parties du corps :" placeholder="Exemple: HEAD,NECK" />
+      ),
       [FilterKeys.MODALITY]: ({ field }) => (
         <MultiSelect {...field} options={infos.modalities ?? []} label="Modalités :" placeholder="Modalités" />
       ),
@@ -182,7 +191,7 @@ const ExplorationFilters = ({ filters, infos, onChange, onError, hasChanged }: E
         />
       )
     }),
-    [infos, onError]
+    [infos, onError, sourceOptions]
   )
 
   return (

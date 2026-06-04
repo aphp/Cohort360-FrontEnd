@@ -1,9 +1,9 @@
 import { getConfig } from 'config'
+import { plural } from 'utils/string'
 import { ImagingStudy, ImagingStudySeries } from 'fhir/r4'
 import { mapToDate } from 'mappers/dates'
 import { fetchImaging } from 'services/aphp/callApi'
 import { getCodeList } from 'services/aphp/serviceValueSets'
-import { PatientState } from 'state/patient'
 import { CohortImaging } from 'types'
 import {
   AdditionalInfo,
@@ -12,7 +12,8 @@ import {
   ExplorationConfig,
   ExplorationResults,
   FetchOptions,
-  FetchParams
+  FetchParams,
+  Patient
 } from 'types/exploration'
 import { ResourceType } from 'types/requestCriterias'
 import { Direction, ImagingFilters, Order, SearchByTypes, SearchCriterias } from 'types/searchCriterias'
@@ -27,20 +28,22 @@ import {
   resolveAdditionalInfos
 } from 'utils/exploration'
 import { getExtension } from 'utils/fhir'
+import { SourceType } from 'types/scope'
 
 const fetchAdditionalInfos = async (additionalInfo: AdditionalInfo): Promise<AdditionalInfo> => {
   const fetchersMap: Record<string, () => Promise<FhirItem[] | undefined>> = {
     encounterStatusList: () =>
-      !additionalInfo.encounterStatusList
-        ? fetchValueSet(getConfig().core.valueSets.encounterStatus.url)
-        : Promise.resolve(undefined),
+      additionalInfo.encounterStatusList
+        ? Promise.resolve(undefined)
+        : fetchValueSet(getConfig().core.valueSets.encounterStatus.url),
     modalities: () =>
-      !additionalInfo.modalities
-        ? getCodeList(getConfig().features.imaging.valueSets.imagingModalities.url, true).then((res) => res.results)
-        : Promise.resolve(undefined)
+      additionalInfo.modalities
+        ? Promise.resolve(undefined)
+        : getCodeList(getConfig().features.imaging.valueSets.imagingModalities.url, true).then((res) => res.results)
   }
+  const sourceType = SourceType.IMAGING
   const resolved = await resolveAdditionalInfos(fetchersMap)
-  return { ...additionalInfo, ...resolved }
+  return { ...additionalInfo, sourceType, ...resolved }
 }
 
 export const initSearchCriterias = (search: string): SearchCriterias<ImagingFilters> => ({
@@ -54,6 +57,7 @@ export const initSearchCriterias = (search: string): SearchCriterias<ImagingFilt
     ipp: '',
     nda: '',
     modality: [],
+    bodySite: '',
     durationRange: [null, null],
     executiveUnits: [],
     encounterStatus: []
@@ -154,6 +158,7 @@ const mapToTable = (data: Data, deidentified: boolean, isPatient: boolean, group
           ?.url?.split('/')
           .pop()
       : getExtension(elem, 'docId')?.valueString
+    const ippGroupQuery = groupId ? `?groupId=${groupId}` : ''
     const row: Row = [
       {
         id: `${elem.id}-subArray`,
@@ -165,7 +170,7 @@ const mapToTable = (data: Data, deidentified: boolean, isPatient: boolean, group
         value: elem.IPP
           ? {
               label: elem.IPP,
-              url: `/patients/${elem.idPatient}${groupId ? `?groupId=${groupId}` : ''}`
+              url: `/patients/${elem.idPatient}${ippGroupQuery}`
             }
           : 'Non renseigné',
         type: elem.IPP ? CellType.LINK : CellType.TEXT
@@ -233,27 +238,28 @@ const mapToTable = (data: Data, deidentified: boolean, isPatient: boolean, group
 const fetchList = (
   fetchParams: FetchParams,
   { filters }: FetchOptions<ImagingFilters>,
-  patient: PatientState,
+  patient: Patient | null,
   deidentified: boolean,
   groupId: string[],
   signal?: AbortSignal
 ): Promise<ExplorationResults<ImagingStudy>> => {
-  const { nda, ipp, executiveUnits, encounterStatus, durationRange, modality } = filters
+  const { nda, ipp, executiveUnits, encounterStatus, durationRange, modality, bodySite } = filters
   const params = {
     encounter: nda,
     ipp,
     minDate: durationRange[0] ?? '',
     maxDate: durationRange[1] ?? '',
+    bodySite: bodySite,
     modalities: modality.map(({ id }) => id),
     executiveUnits: executiveUnits.map((unit) => unit.id),
     encounterStatus: encounterStatus.map(({ id }) => id),
     uniqueFacet: ['subject'],
-    patient: patient?.patientInfo?.id,
+    patient: patient?.id,
     ...getCommonParamsList(fetchParams, groupId),
     signal
   }
   const paramsFetchAll = {
-    patient: patient?.patientInfo?.id,
+    patient: patient?.id,
     uniqueFacet: ['subject'],
     ...getCommonParamsAll(groupId),
     signal
@@ -267,7 +273,7 @@ const fetchList = (
 
 export const imagingConfig = (
   deidentified: boolean,
-  patient: PatientState,
+  patient: Patient | null,
   groupId: string[],
   displayOptions = DISPLAY_OPTIONS,
   search = ''
@@ -285,7 +291,7 @@ export const imagingConfig = (
     "Seuls les examens d'imagerie présents dans le PACS central et rattachés à un patient qui possède une identité Orbis et au moins une visite sont actuellement disponibles dans Cohort360."
   ],
   getCount: (counts) => [
-    { label: `résultat${counts[0].total > 1 ? 's' : ''}`, display: true, count: counts[0] },
-    { label: `patient${counts[1].total > 1 ? 's' : ''}`, display: !!!patient, count: counts[1] }
+    { label: `résultat${plural(counts[0].total)}`, display: true, count: counts[0] },
+    { label: `patient${plural(counts[1].total)}`, display: !!!patient, count: counts[1] }
   ]
 })

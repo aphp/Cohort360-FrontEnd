@@ -52,6 +52,10 @@ export interface IServiceCohortCreation {
    */
   fetchRequest: (requestId: string, snapshotId?: string) => Promise<FetchRequest>
   fetchSnapshot: (snapshotId: string) => Promise<Snapshot>
+  /**
+   * Permet de mettre à jour le nom d'un snapshot
+   */
+  updateSnapshotName: (snapshotId: string, newName: string) => Promise<Snapshot>
 }
 
 const servicesCohortCreation: IServiceCohortCreation = {
@@ -144,7 +148,7 @@ const servicesCohortCreation: IServiceCohortCreation = {
       serialized_query: json
     }
     const snapshot = (await apiBack.post<Snapshot>('/cohort/request-query-snapshots/', data)) || {}
-    return snapshot && snapshot.data ? snapshot.data : null
+    return snapshot?.data ? snapshot.data : null
   },
 
   createReport: async (id) => {
@@ -172,7 +176,7 @@ const servicesCohortCreation: IServiceCohortCreation = {
 
     if (snapshotId || snapshotsHistoryFromQuery?.length > 0) {
       currentSnapshotResponse = await apiBack.get<Snapshot>(
-        `/cohort/request-query-snapshots/${snapshotId ? snapshotId : snapshotsHistoryFromQuery?.[0].uuid}/`
+        `/cohort/request-query-snapshots/${snapshotId ?? snapshotsHistoryFromQuery?.[0].uuid}/`
       )
     }
 
@@ -192,17 +196,19 @@ const servicesCohortCreation: IServiceCohortCreation = {
       }
 
       shortCohortLimit =
-        currentSnapshot.dated_measures.length > 0 ? currentSnapshot.dated_measures?.[0].cohort_limit ?? 0 : 0
+        currentSnapshot.dated_measures.length > 0 ? (currentSnapshot.dated_measures?.[0].cohort_limit ?? 0) : 0
 
       count_outdated =
-        currentSnapshot.dated_measures.length > 0 ? currentSnapshot.dated_measures?.[0].count_outdated ?? false : false
+        currentSnapshot.dated_measures.length > 0
+          ? (currentSnapshot.dated_measures?.[0].count_outdated ?? false)
+          : false
     }
 
     result = {
       requestName,
-      snapshotsHistory: snapshotsHistoryFromQuery ? snapshotsHistoryFromQuery : [],
+      snapshotsHistory: snapshotsHistoryFromQuery ?? [],
       json: currentSnapshot ? currentSnapshot.serialized_query : '',
-      currentSnapshot: currentSnapshot ? currentSnapshot : {},
+      currentSnapshot: currentSnapshot ?? {},
       count: currentSnapshot ? currentSnapshot.dated_measures[0] : {},
       shortCohortLimit,
       count_outdated
@@ -215,6 +221,18 @@ const servicesCohortCreation: IServiceCohortCreation = {
       (await apiBack.get<Snapshot>(`/cohort/request-query-snapshots/${snapshotId}/`)) || {}
 
     return snapshotResponse.data || {}
+  },
+
+  updateSnapshotName: async (snapshotId, newName) => {
+    try {
+      const response: AxiosResponse<Snapshot> = await apiBack.patch(`/cohort/request-query-snapshots/${snapshotId}/`, {
+        name: newName
+      })
+      return response.data
+    } catch (error) {
+      console.error('Erreur lors de la mise à jour du snapshot:', error)
+      throw error
+    }
   }
 }
 
