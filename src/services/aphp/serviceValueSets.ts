@@ -292,7 +292,7 @@ export const searchInValueSets = async (
   const filter = searchValue === HIERARCHY_ROOT ? '' : `&filter=${encodeURIComponent(searchValue)}`
   try {
     const res = await apiFhir.get<FHIR_API_Response<ValueSet>>(
-      `/ValueSet/$expand?url=${valueSetUrls.join(',')}${filter}&excludeNested=false&_tag=text-search-rank&_tag=${LOW_TOLERANCE_TAG}${options}`,
+      `/ValueSet/$expand?activeOnly=true&url=${valueSetUrls.join(',')}${filter}&excludeNested=false&_tag=text-search-rank&_tag=${LOW_TOLERANCE_TAG}${options}`,
       { signal }
     )
     // When searching across multiple ValueSets, don't pass a specific valueSetUrl
