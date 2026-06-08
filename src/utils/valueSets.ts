@@ -37,7 +37,6 @@ const getReference = (systemOrValueSetUrl: string) => {
 export const isDisplayedWithCode = (systemOrValueSetUrl: string) => {
   return getReference(systemOrValueSetUrl)?.joinDisplayWithCode
 }
-}
 
 /**
  * Checks if a system should display system name alongside labels
