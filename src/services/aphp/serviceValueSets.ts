@@ -10,6 +10,7 @@ import { sortArray } from 'utils/arrays'
 import { FhirItem, ValueSetSorting } from 'types/valueSet'
 import axios from 'axios'
 import { getExtension, getExtensionIntegerValue } from 'utils/fhir'
+import { getValueSetFromCodeSystem } from 'utils/valueSets'
 
 export const UNKOWN_HIERARCHY_CHAPTER = 'UNKNOWN'
 export const HIERARCHY_ROOT = '*'
@@ -113,13 +114,19 @@ const formatValuesetExpansion = (
       const stats = code?.extension
         ? extractStats(code.extension)
         : { statTotal: undefined, statTotalUnique: undefined }
+
+      // Find the correct ValueSet URL from the code's system (CodeSystem URL)
+      const codeSystem = code.system as string
+      // Try to get ValueSet from CodeSystem mapping, fallback to provided valueSetUrl, then to system itself
+      const correctValueSetUrl = getValueSetFromCodeSystem(codeSystem) || valueSetUrl || codeSystem
+
       return {
         id: code.code as string, // it will always be defined
-        system: code.system as string, // it will always be defined
+        system: codeSystem, // it will always be defined
         label: code.display as string, // it will always be defined
         childrenIds: code.contains?.map((child) => child.code as string) || [],
         parentIds: getParentIds(code.extension, code.code),
-        valueSetUrl, // Populate ValueSet URL for proper grouping
+        valueSetUrl: correctValueSetUrl, // Use the correct ValueSet URL based on the code's system
         statTotal: stats?.statTotal,
         statTotalUnique: stats?.statTotalUnique
       }
@@ -288,7 +295,12 @@ export const searchInValueSets = async (
       `/ValueSet/$expand?url=${valueSetUrls.join(',')}${filter}&excludeNested=false&_tag=text-search-rank&_tag=${LOW_TOLERANCE_TAG}${options}`,
       { signal }
     )
-    const response = formatValuesetExpansion(getApiResponseResourceOrThrow(res).expansion, valueSetUrls[0])
+    // When searching across multiple ValueSets, don't pass a specific valueSetUrl
+    // Let getValueSetFromCodeSystem determine the correct ValueSet for each code based on its system
+    const response = formatValuesetExpansion(
+      getApiResponseResourceOrThrow(res).expansion,
+      valueSetUrls.length === 1 ? valueSetUrls[0] : undefined
+    )
     response.results = mapAbandonedChildren(response.results)
     return response
   } catch (error) {

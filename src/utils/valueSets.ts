@@ -27,8 +27,14 @@ export const getValueSetReferenceFromCodeSystem = (codeSystemUrl: string) => {
   return references.find((ref) => ref.codeSystemUrls?.includes(codeSystemUrl))
 }
 
-export const isDisplayedWithCode = (system: string) => {
-  const isFound = getValueSetReferenceFromCodeSystem(system)
+export const isDisplayedWithCode = (systemOrValueSetUrl: string) => {
+  // First try to find by CodeSystem URL
+  let isFound = getValueSetReferenceFromCodeSystem(systemOrValueSetUrl)
+  // If not found, try to find by ValueSet URL
+  if (!isFound) {
+    const references = getReferences(getConfig())
+    isFound = references.find((ref) => ref.url === systemOrValueSetUrl)
+  }
   return isFound?.joinDisplayWithCode
 }
 
@@ -43,8 +49,14 @@ export const isDisplayedWithCode = (system: string) => {
  * isDisplayedWithSystem('http://loinc.org') // returns true/false based on configuration
  * ```
  */
-export const isDisplayedWithSystem = (system: string) => {
-  const isFound = getValueSetReferenceFromCodeSystem(system)
+export const isDisplayedWithSystem = (systemOrValueSetUrl: string) => {
+  // First try to find by CodeSystem URL
+  let isFound = getValueSetReferenceFromCodeSystem(systemOrValueSetUrl)
+  // If not found, try to find by ValueSet URL
+  if (!isFound) {
+    const references = getReferences(getConfig())
+    isFound = references.find((ref) => ref.url === systemOrValueSetUrl)
+  }
   return isFound?.joinDisplayWithSystem
 }
 
@@ -61,7 +73,9 @@ export const isDisplayedWithSystem = (system: string) => {
  * ```
  */
 export const getLabelFromCode = <T>(code: Hierarchy<T>) => {
-  if (isDisplayedWithCode(code.system) && code.id !== HIERARCHY_ROOT) return `${code.id} - ${code.label}`
+  // Use valueSetUrl if available, otherwise fallback to system
+  const urlToCheck = code.valueSetUrl || code.system
+  if (isDisplayedWithCode(urlToCheck) && code.id !== HIERARCHY_ROOT) return `${code.id} - ${code.label}`
   return code.label
 }
 
@@ -98,8 +112,14 @@ export const getFullLabelFromCode = (code: LabelObject) => {
  * getLabelFromSystem('http://loinc.org') // returns 'LOINC'
  * ```
  */
-export const getLabelFromSystem = (system: string) => {
-  const isFound = getValueSetReferenceFromCodeSystem(system)
+export const getLabelFromSystem = (systemOrValueSetUrl: string) => {
+  // First try to find by CodeSystem URL
+  let isFound = getValueSetReferenceFromCodeSystem(systemOrValueSetUrl)
+  // If not found, try to find by ValueSet URL
+  if (!isFound) {
+    const references = getReferences(getConfig())
+    isFound = references.find((ref) => ref.url === systemOrValueSetUrl)
+  }
   return isFound?.label || ''
 }
 

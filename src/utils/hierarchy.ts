@@ -245,7 +245,8 @@ export const groupBySystem = <T>(codes: Hierarchy<T, string>[]) => {
 export const groupByValueSet = <T>(codes: Hierarchy<T, string>[]) => {
   const valueSetMap = new Map<string, Hierarchy<T, string>[]>()
   for (const hierarchy of codes) {
-    const valueSetUrl = hierarchy.valueSetUrl || 'unknown-valueset'
+    // Use valueSetUrl if available, otherwise fallback to system (which should now rarely happen after the fix)
+    const valueSetUrl = hierarchy.valueSetUrl || hierarchy.system
     if (!valueSetMap.has(valueSetUrl)) {
       valueSetMap.set(valueSetUrl, [])
     }
@@ -280,6 +281,9 @@ export const getDisplayFromTrees = <T>(
     if (currentTree) {
       const foundNode = getDisplayFromTree([node], currentTree)[0]
       branches.push(foundNode)
+    } else {
+      // If tree doesn't exist yet, return the node as-is so it can be displayed
+      branches.push(node)
     }
   })
   return branches
