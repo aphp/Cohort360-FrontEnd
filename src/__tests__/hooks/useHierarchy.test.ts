@@ -3,6 +3,22 @@ import { HIERARCHY_ROOT } from 'services/aphp/serviceValueSets'
 import { Hierarchy } from 'types/hierarchy'
 import { groupByValueSet } from 'utils/hierarchy'
 
+const getSelectValueSetUrl = (nodes: Hierarchy<any>[]) => nodes?.[0]?.valueSetUrl || nodes?.[0]?.system || ''
+
+const getTreeNodes = (trees: Map<string, Hierarchy<any>[]>, valueSetUrl: string) => trees.get(valueSetUrl) || []
+
+const getCurrentCodes = (codes: Map<string, Map<string, Hierarchy<any>>>, hierarchyId: string) =>
+  codes.get(hierarchyId) || new Map()
+
+const getCurrentSelected = (selectedCodes: Map<string, Map<string, Hierarchy<any>>>, hierarchyId: string) =>
+  selectedCodes.get(hierarchyId) || new Map()
+
+const getCurrentHierarchy = (
+  hierarchies: Map<string, { tree: unknown[]; count: number; page: number; system: string }>,
+  valueSetUrl: string,
+  defaultHierarchyInfo: { tree: unknown[]; count: number; page: number; system: string }
+) => hierarchies.get(valueSetUrl) || defaultHierarchyInfo
+
 describe('useHierarchy - valueSetUrl handling', () => {
   it('should use valueSetUrl when available for node key', () => {
     const node: Hierarchy<any> = {
@@ -136,7 +152,7 @@ describe('useHierarchy - valueSetUrl handling', () => {
     ]
 
     // Simulate the logic in select function: nodes?.[0].valueSetUrl || nodes?.[0].system || ''
-    const valueSetUrl = nodes?.[0]?.valueSetUrl || nodes?.[0]?.system || ''
+    const valueSetUrl = getSelectValueSetUrl(nodes)
 
     expect(valueSetUrl).toBe('https://valueset1')
   })
@@ -145,7 +161,7 @@ describe('useHierarchy - valueSetUrl handling', () => {
     const nodes: Hierarchy<any>[] = []
 
     // Simulate the logic in select function
-    const valueSetUrl = nodes?.[0]?.valueSetUrl || nodes?.[0]?.system || ''
+    const valueSetUrl = getSelectValueSetUrl(nodes)
 
     expect(valueSetUrl).toBe('')
   })
@@ -161,7 +177,7 @@ describe('useHierarchy - valueSetUrl handling', () => {
       }
     ]
 
-    const valueSetUrl = nodes?.[0]?.valueSetUrl || nodes?.[0]?.system || ''
+    const valueSetUrl = getSelectValueSetUrl(nodes)
 
     expect(valueSetUrl).toBe('https://system1')
   })
@@ -192,10 +208,9 @@ describe('useHierarchy - valueSetUrl handling', () => {
   })
 
   it('should create empty Map when HIERARCHY_ROOT exists in selectedCodes', () => {
-    const selectedCodes = new Map()
     const valueSetUrl = 'https://valueset1'
     const currentSelected = new Map()
-    
+
     currentSelected.set(HIERARCHY_ROOT, {
       id: HIERARCHY_ROOT,
       label: 'Root',
@@ -204,7 +219,6 @@ describe('useHierarchy - valueSetUrl handling', () => {
       above_levels_ids: '',
       inferior_levels_ids: ''
     })
-    selectedCodes.set(valueSetUrl, currentSelected)
 
     // Simulate: const toAdd = currentSelected.get(HIERARCHY_ROOT) ? new Map() : currentSelected
     const toAdd = currentSelected.get(HIERARCHY_ROOT) ? new Map() : currentSelected
@@ -213,7 +227,6 @@ describe('useHierarchy - valueSetUrl handling', () => {
   })
 
   it('should use currentSelected when HIERARCHY_ROOT does not exist', () => {
-    const selectedCodes = new Map()
     const valueSetUrl = 'https://valueset1'
     const currentSelected = new Map()
     
@@ -225,7 +238,6 @@ describe('useHierarchy - valueSetUrl handling', () => {
       above_levels_ids: '',
       inferior_levels_ids: ''
     })
-    selectedCodes.set(valueSetUrl, currentSelected)
 
     // Simulate: const toAdd = currentSelected.get(HIERARCHY_ROOT) ? new Map() : currentSelected
     const toAdd = currentSelected.get(HIERARCHY_ROOT) ? new Map() : currentSelected
@@ -238,7 +250,7 @@ describe('useHierarchy - valueSetUrl handling', () => {
     const trees = new Map<string, Hierarchy<any>[]>()
     const valueSetUrl = 'https://valueset1'
 
-    const nodes = trees.get(valueSetUrl) || []
+    const nodes = getTreeNodes(trees, valueSetUrl)
 
     expect(nodes).toEqual([])
   })
@@ -247,7 +259,7 @@ describe('useHierarchy - valueSetUrl handling', () => {
     const codes = new Map<string, Map<string, Hierarchy<any>>>()
     const hierarchyId = 'https://valueset1'
 
-    const currentCodes = codes.get(hierarchyId) || new Map()
+    const currentCodes = getCurrentCodes(codes, hierarchyId)
 
     expect(currentCodes.size).toBe(0)
   })
@@ -256,7 +268,7 @@ describe('useHierarchy - valueSetUrl handling', () => {
     const selectedCodes = new Map<string, Map<string, Hierarchy<any>>>()
     const hierarchyId = 'https://valueset1'
 
-    const currentSelected = selectedCodes.get(hierarchyId) || new Map()
+    const currentSelected = getCurrentSelected(selectedCodes, hierarchyId)
 
     expect(currentSelected.size).toBe(0)
   })
@@ -266,7 +278,7 @@ describe('useHierarchy - valueSetUrl handling', () => {
     const valueSetUrl = 'https://valueset1'
     const DEFAULT_HIERARCHY_INFO = { tree: [], count: 0, page: 1, system: '' }
 
-    const currentHierarchy = hierarchies.get(valueSetUrl) || DEFAULT_HIERARCHY_INFO
+    const currentHierarchy = getCurrentHierarchy(hierarchies, valueSetUrl, DEFAULT_HIERARCHY_INFO)
 
     expect(currentHierarchy).toEqual(DEFAULT_HIERARCHY_INFO)
   })
