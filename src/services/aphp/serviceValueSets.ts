@@ -5,6 +5,7 @@ import { Hierarchy } from 'types/hierarchy'
 import { getApiResponseResourceOrThrow, getApiResponseResourcesOrThrow } from 'utils/apiHelpers'
 import { capitalizeFirstLetter } from 'utils/string'
 import { getConfig } from 'config'
+import { getReferences } from 'data/valueSets'
 import { LOW_TOLERANCE_TAG } from './callApi'
 import { sortArray } from 'utils/arrays'
 import { FhirItem, ValueSetSorting } from 'types/valueSet'
@@ -251,10 +252,22 @@ const getChildrenFromCodesBatch = async (
       }
     ]
   }
-  const res = await apiFhir.post<FHIR_API_Response<ValueSet>>(`/ValueSet/$expand`, JSON.stringify(json), {
+  const res = await apiFhir.post<FHIR_API_Response<ValueSet>>('/ValueSet/$expand', JSON.stringify(json), {
     signal: signal
   })
-  return formatValuesetExpansion(getApiResponseResourceOrThrow(res).expansion, valueSetUrl)
+  type ValueSetExpandResponse =
+    | ValueSet
+    | {
+        resourceType: 'Parameters'
+        parameter?: Array<{ name?: string; resource?: ValueSet }>
+      }
+
+  const responseResource = getApiResponseResourceOrThrow(res) as ValueSetExpandResponse
+  const valueSetResponse =
+    responseResource.resourceType === 'Parameters'
+      ? responseResource.parameter?.find((param) => param.name === 'valueSet')?.resource
+      : responseResource
+  return formatValuesetExpansion(valueSetResponse?.expansion, valueSetUrl)
 }
 
 /**
@@ -354,14 +367,8 @@ export const getCodeList = async (
 export { getValueSetFromCodeSystem } from 'utils/valueSets'
 
 export const getCodeSystemFromValueSet = (valueSetUrl: string): string[] | undefined => {
-  // Import locally to avoid circular dependency
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const { getReferences } = require('data/valueSets')
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const { getConfig } = require('config')
   const references = getReferences(getConfig())
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const reference = references.find((ref: any) => ref.url === valueSetUrl)
+  const reference = references.find((ref) => ref.url === valueSetUrl)
   return reference?.codeSystemUrls
 }
 

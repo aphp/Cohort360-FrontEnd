@@ -10,6 +10,7 @@ import {
   buildMultipleTrees,
   buildTree,
   groupBySystem,
+  groupByValueSet,
   getDisplayFromTree,
   getDisplayFromTrees,
   updateBranchStatus,
@@ -18,7 +19,7 @@ import {
   getSelectedCodesFromTrees,
   createHierarchyRoot
 } from 'utils/hierarchy' // Remplacez par le nom de votre fichier
-import { Codes, CodesCache, GroupedBySystem, Hierarchy, Mode, SelectedStatus } from 'types/hierarchy'
+import { Codes, CodesCache, Hierarchy, Mode, SelectedStatus } from 'types/hierarchy'
 import { vi } from 'vitest'
 
 describe('Utility Functions', () => {
@@ -589,6 +590,252 @@ describe('Utility Functions', () => {
           ]
         }
       ])
+    })
+  })
+
+  describe('groupByValueSet', () => {
+    it('should group hierarchies by valueSetUrl', () => {
+      const codes: Hierarchy<any>[] = [
+        {
+          id: 'code1',
+          label: 'Label1',
+          system: 'system1',
+          valueSetUrl: 'valueset1',
+          above_levels_ids: '',
+          inferior_levels_ids: ''
+        },
+        {
+          id: 'code2',
+          label: 'Label2',
+          system: 'system1',
+          valueSetUrl: 'valueset1',
+          above_levels_ids: '',
+          inferior_levels_ids: ''
+        },
+        {
+          id: 'code3',
+          label: 'Label3',
+          system: 'system2',
+          valueSetUrl: 'valueset2',
+          above_levels_ids: '',
+          inferior_levels_ids: ''
+        }
+      ]
+
+      const result = groupByValueSet(codes)
+
+      expect(result).toHaveLength(2)
+      expect(result[0].valueSetUrl).toBe('valueset1')
+      expect(result[0].codes).toHaveLength(2)
+      expect(result[1].valueSetUrl).toBe('valueset2')
+      expect(result[1].codes).toHaveLength(1)
+    })
+
+    it('should fallback to system when valueSetUrl is not available', () => {
+      const codes: Hierarchy<any>[] = [
+        {
+          id: 'code1',
+          label: 'Label1',
+          system: 'system1',
+          above_levels_ids: '',
+          inferior_levels_ids: ''
+        },
+        {
+          id: 'code2',
+          label: 'Label2',
+          system: 'system2',
+          above_levels_ids: '',
+          inferior_levels_ids: ''
+        }
+      ]
+
+      const result = groupByValueSet(codes)
+
+      expect(result).toHaveLength(2)
+      expect(result[0].valueSetUrl).toBe('system1')
+      expect(result[0].codes).toHaveLength(1)
+      expect(result[1].valueSetUrl).toBe('system2')
+      expect(result[1].codes).toHaveLength(1)
+    })
+
+    it('should handle mixed valueSetUrl and system grouping', () => {
+      const codes: Hierarchy<any>[] = [
+        {
+          id: 'code1',
+          label: 'Label1',
+          system: 'system1',
+          valueSetUrl: 'valueset1',
+          above_levels_ids: '',
+          inferior_levels_ids: ''
+        },
+        {
+          id: 'code2',
+          label: 'Label2',
+          system: 'system2',
+          above_levels_ids: '',
+          inferior_levels_ids: ''
+        }
+      ]
+
+      const result = groupByValueSet(codes)
+
+      expect(result).toHaveLength(2)
+      expect(result[0].valueSetUrl).toBe('valueset1')
+      expect(result[1].valueSetUrl).toBe('system2')
+    })
+
+    it('should handle empty array', () => {
+      const codes: Hierarchy<any>[] = []
+
+      const result = groupByValueSet(codes)
+
+      expect(result).toHaveLength(0)
+    })
+
+    it('should group all codes with same valueSetUrl together', () => {
+      const codes: Hierarchy<any>[] = [
+        {
+          id: 'code1',
+          label: 'Label1',
+          system: 'system1',
+          valueSetUrl: 'valueset1',
+          above_levels_ids: '',
+          inferior_levels_ids: ''
+        },
+        {
+          id: 'code2',
+          label: 'Label2',
+          system: 'system2',
+          valueSetUrl: 'valueset1',
+          above_levels_ids: '',
+          inferior_levels_ids: ''
+        },
+        {
+          id: 'code3',
+          label: 'Label3',
+          system: 'system3',
+          valueSetUrl: 'valueset1',
+          above_levels_ids: '',
+          inferior_levels_ids: ''
+        }
+      ]
+
+      const result = groupByValueSet(codes)
+
+      expect(result).toHaveLength(1)
+      expect(result[0].valueSetUrl).toBe('valueset1')
+      expect(result[0].codes).toHaveLength(3)
+    })
+  })
+
+  describe('getDisplayFromTrees', () => {
+    it('should get display from trees using valueSetUrl', () => {
+      const toDisplay: Hierarchy<any>[] = [
+        {
+          id: 'code1',
+          label: 'Label1',
+          system: 'system1',
+          valueSetUrl: 'valueset1',
+          above_levels_ids: '',
+          inferior_levels_ids: ''
+        }
+      ]
+      const trees = new Map<string, Hierarchy<any>[]>([
+        [
+          'valueset1',
+          [
+            {
+              id: 'code1',
+              label: 'Label1',
+              system: 'system1',
+              valueSetUrl: 'valueset1',
+              above_levels_ids: '',
+              inferior_levels_ids: '',
+              subItems: []
+            }
+          ]
+        ]
+      ])
+
+      const result = getDisplayFromTrees(toDisplay, trees)
+
+      expect(result).toHaveLength(1)
+      expect(result[0].id).toBe('code1')
+    })
+
+    it('should fallback to system when valueSetUrl is not available', () => {
+      const toDisplay: Hierarchy<any>[] = [
+        {
+          id: 'code1',
+          label: 'Label1',
+          system: 'system1',
+          above_levels_ids: '',
+          inferior_levels_ids: ''
+        }
+      ]
+      const trees = new Map<string, Hierarchy<any>[]>([
+        [
+          'system1',
+          [
+            {
+              id: 'code1',
+              label: 'Label1',
+              system: 'system1',
+              above_levels_ids: '',
+              inferior_levels_ids: '',
+              subItems: []
+            }
+          ]
+        ]
+      ])
+
+      const result = getDisplayFromTrees(toDisplay, trees)
+
+      expect(result).toHaveLength(1)
+      expect(result[0].id).toBe('code1')
+    })
+
+    it('should return node as-is when tree does not exist', () => {
+      const toDisplay: Hierarchy<any>[] = [
+        {
+          id: 'code1',
+          label: 'Label1',
+          system: 'system1',
+          valueSetUrl: 'valueset1',
+          above_levels_ids: '',
+          inferior_levels_ids: ''
+        }
+      ]
+      const trees = new Map<string, Hierarchy<any>[]>()
+
+      const result = getDisplayFromTrees(toDisplay, trees)
+
+      expect(result).toHaveLength(1)
+      expect(result[0].id).toBe('code1')
+    })
+  })
+
+  describe('createHierarchyRoot', () => {
+    it('should create hierarchy root with valueSetUrl', () => {
+      const valueSetUrl = 'http://test-valueset'
+      const result = createHierarchyRoot(valueSetUrl)
+
+      expect(result.id).toBe(HIERARCHY_ROOT)
+      expect(result.label).toBe('Toute la hiérarchie')
+      expect(result.system).toBe(valueSetUrl)
+      expect(result.valueSetUrl).toBe(valueSetUrl)
+      expect(result.above_levels_ids).toBe('')
+      expect(result.inferior_levels_ids).toBe('')
+    })
+
+    it('should create hierarchy root with status', () => {
+      const valueSetUrl = 'http://test-valueset'
+      const status = SelectedStatus.SELECTED
+      const result = createHierarchyRoot(valueSetUrl, status)
+
+      expect(result.id).toBe(HIERARCHY_ROOT)
+      expect(result.status).toBe(SelectedStatus.SELECTED)
+      expect(result.valueSetUrl).toBe(valueSetUrl)
     })
   })
 })
