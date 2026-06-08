@@ -817,7 +817,7 @@ describe('Utility Functions', () => {
 
   describe('createHierarchyRoot', () => {
     it('should create hierarchy root with valueSetUrl', () => {
-      const valueSetUrl = 'http://test-valueset'
+      const valueSetUrl = 'https://test-valueset'
       const result = createHierarchyRoot(valueSetUrl)
 
       expect(result.id).toBe(HIERARCHY_ROOT)
@@ -829,7 +829,7 @@ describe('Utility Functions', () => {
     })
 
     it('should create hierarchy root with status', () => {
-      const valueSetUrl = 'http://test-valueset'
+      const valueSetUrl = 'https://test-valueset'
       const status = SelectedStatus.SELECTED
       const result = createHierarchyRoot(valueSetUrl, status)
 

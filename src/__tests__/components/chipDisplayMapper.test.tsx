@@ -8,11 +8,11 @@ vi.mock('config', () => ({
       medication: {
         valueSets: {
           medicationAtc: {
-            url: 'http://terminology.hl7.org/ValueSet/medication-atc',
+            url: 'https://terminology.hl7.org/ValueSet/medication-atc',
             title: 'ATC'
           },
           medicationUcd: {
-            url: 'http://terminology.hl7.org/ValueSet/medication-ucd',
+            url: 'https://terminology.hl7.org/ValueSet/medication-ucd',
             title: 'UCD'
           }
         }
@@ -20,11 +20,11 @@ vi.mock('config', () => ({
       observation: {
         valueSets: {
           biologyHierarchyAnabio: {
-            url: 'http://terminology.hl7.org/ValueSet/biology-anabio',
+            url: 'https://terminology.hl7.org/ValueSet/biology-anabio',
             title: 'Anabio'
           },
           biologyHierarchyLoinc: {
-            url: 'http://terminology.hl7.org/ValueSet/biology-loinc',
+            url: 'https://terminology.hl7.org/ValueSet/biology-loinc',
             title: 'LOINC'
           }
         }
@@ -36,10 +36,10 @@ vi.mock('config', () => ({
 vi.mock('utils/valueSets', () => ({
   getValueSetFromCodeSystem: vi.fn((codeSystemUrl: string) => {
     const mapping: Record<string, string> = {
-      'http://terminology.hl7.org/CodeSystem/medication-atc': 'http://terminology.hl7.org/ValueSet/medication-atc',
-      'http://terminology.hl7.org/CodeSystem/medication-ucd': 'http://terminology.hl7.org/ValueSet/medication-ucd',
-      'http://terminology.hl7.org/CodeSystem/biology-anabio': 'http://terminology.hl7.org/ValueSet/biology-anabio',
-      'http://terminology.hl7.org/CodeSystem/biology-loinc': 'http://terminology.hl7.org/ValueSet/biology-loinc'
+      'https://terminology.hl7.org/CodeSystem/medication-atc': 'https://terminology.hl7.org/ValueSet/medication-atc',
+      'https://terminology.hl7.org/CodeSystem/medication-ucd': 'https://terminology.hl7.org/ValueSet/medication-ucd',
+      'https://terminology.hl7.org/CodeSystem/biology-anabio': 'https://terminology.hl7.org/ValueSet/biology-anabio',
+      'https://terminology.hl7.org/CodeSystem/biology-loinc': 'https://terminology.hl7.org/ValueSet/biology-loinc'
     }
     return mapping[codeSystemUrl]
   })
@@ -56,21 +56,21 @@ describe('chipDisplayMapper', () => {
 
   describe('getLabelsForCodeSearchItem logic', () => {
     it('should use getValueSetFromCodeSystem to find correct ValueSet URL from CodeSystem URL', () => {
-      const codeSystemUrl = 'http://terminology.hl7.org/CodeSystem/medication-atc'
+      const codeSystemUrl = 'https://terminology.hl7.org/CodeSystem/medication-atc'
       const result = getValueSetFromCodeSystem(codeSystemUrl)
 
-      expect(result).toBe('http://terminology.hl7.org/ValueSet/medication-atc')
+      expect(result).toBe('https://terminology.hl7.org/ValueSet/medication-atc')
     })
 
     it('should handle CodeSystem URL for biology codes', () => {
-      const codeSystemUrl = 'http://terminology.hl7.org/CodeSystem/biology-anabio'
+      const codeSystemUrl = 'https://terminology.hl7.org/CodeSystem/biology-anabio'
       const result = getValueSetFromCodeSystem(codeSystemUrl)
 
-      expect(result).toBe('http://terminology.hl7.org/ValueSet/biology-anabio')
+      expect(result).toBe('https://terminology.hl7.org/ValueSet/biology-anabio')
     })
 
     it('should return undefined for unknown CodeSystem URL', () => {
-      const codeSystemUrl = 'http://unknown-codesystem'
+      const codeSystemUrl = 'https://unknown-codesystem'
       const result = getValueSetFromCodeSystem(codeSystemUrl)
 
       expect(result).toBeUndefined()
@@ -79,10 +79,10 @@ describe('chipDisplayMapper', () => {
 
   describe('displaySystem logic', () => {
     it('should map CodeSystem URL to ValueSet URL before checking config', () => {
-      const codeSystemUrl = 'http://terminology.hl7.org/CodeSystem/medication-atc'
+      const codeSystemUrl = 'https://terminology.hl7.org/CodeSystem/medication-atc'
       const valueSetUrl = getValueSetFromCodeSystem(codeSystemUrl)
 
-      expect(valueSetUrl).toBe('http://terminology.hl7.org/ValueSet/medication-atc')
+      expect(valueSetUrl).toBe('https://terminology.hl7.org/ValueSet/medication-atc')
 
       // Verify it matches the config
       const config = getConfig()
@@ -90,30 +90,30 @@ describe('chipDisplayMapper', () => {
     })
 
     it('should handle UCD medication codes', () => {
-      const codeSystemUrl = 'http://terminology.hl7.org/CodeSystem/medication-ucd'
+      const codeSystemUrl = 'https://terminology.hl7.org/CodeSystem/medication-ucd'
       const valueSetUrl = getValueSetFromCodeSystem(codeSystemUrl)
 
-      expect(valueSetUrl).toBe('http://terminology.hl7.org/ValueSet/medication-ucd')
+      expect(valueSetUrl).toBe('https://terminology.hl7.org/ValueSet/medication-ucd')
 
       const config = getConfig()
       expect(valueSetUrl).toBe(config.features.medication.valueSets.medicationUcd.url)
     })
 
     it('should handle Anabio biology codes', () => {
-      const codeSystemUrl = 'http://terminology.hl7.org/CodeSystem/biology-anabio'
+      const codeSystemUrl = 'https://terminology.hl7.org/CodeSystem/biology-anabio'
       const valueSetUrl = getValueSetFromCodeSystem(codeSystemUrl)
 
-      expect(valueSetUrl).toBe('http://terminology.hl7.org/ValueSet/biology-anabio')
+      expect(valueSetUrl).toBe('https://terminology.hl7.org/ValueSet/biology-anabio')
 
       const config = getConfig()
       expect(valueSetUrl).toBe(config.features.observation.valueSets.biologyHierarchyAnabio.url)
     })
 
     it('should handle LOINC biology codes', () => {
-      const codeSystemUrl = 'http://terminology.hl7.org/CodeSystem/biology-loinc'
+      const codeSystemUrl = 'https://terminology.hl7.org/CodeSystem/biology-loinc'
       const valueSetUrl = getValueSetFromCodeSystem(codeSystemUrl)
 
-      expect(valueSetUrl).toBe('http://terminology.hl7.org/ValueSet/biology-loinc')
+      expect(valueSetUrl).toBe('https://terminology.hl7.org/ValueSet/biology-loinc')
 
       const config = getConfig()
       expect(valueSetUrl).toBe(config.features.observation.valueSets.biologyHierarchyLoinc.url)
@@ -126,7 +126,7 @@ describe('chipDisplayMapper', () => {
     })
 
     it('should fallback to original system when no mapping exists', () => {
-      const unknownSystem = 'http://unknown-system'
+      const unknownSystem = 'https://unknown-system'
       const result = getValueSetFromCodeSystem(unknownSystem)
 
       expect(result).toBeUndefined()
@@ -135,15 +135,15 @@ describe('chipDisplayMapper', () => {
 
   describe('cache key resolution', () => {
     it('should prioritize ValueSet URL from CodeSystem mapping', () => {
-      const codeSystemUrl = 'http://terminology.hl7.org/CodeSystem/medication-atc'
+      const codeSystemUrl = 'https://terminology.hl7.org/CodeSystem/medication-atc'
       const valueSetUrl = getValueSetFromCodeSystem(codeSystemUrl)
 
       expect(valueSetUrl).toBeDefined()
-      expect(valueSetUrl).toBe('http://terminology.hl7.org/ValueSet/medication-atc')
+      expect(valueSetUrl).toBe('https://terminology.hl7.org/ValueSet/medication-atc')
     })
 
     it('should handle case where CodeSystem has no ValueSet mapping', () => {
-      const unknownCodeSystem = 'http://unknown-codesystem'
+      const unknownCodeSystem = 'https://unknown-codesystem'
       const result = getValueSetFromCodeSystem(unknownCodeSystem)
 
       expect(result).toBeUndefined()
@@ -153,8 +153,8 @@ describe('chipDisplayMapper', () => {
   describe('integration with config', () => {
     it('should correctly map all medication ValueSets', () => {
       const config = getConfig()
-      const atcCodeSystem = 'http://terminology.hl7.org/CodeSystem/medication-atc'
-      const ucdCodeSystem = 'http://terminology.hl7.org/CodeSystem/medication-ucd'
+      const atcCodeSystem = 'https://terminology.hl7.org/CodeSystem/medication-atc'
+      const ucdCodeSystem = 'https://terminology.hl7.org/CodeSystem/medication-ucd'
 
       const atcValueSet = getValueSetFromCodeSystem(atcCodeSystem)
       const ucdValueSet = getValueSetFromCodeSystem(ucdCodeSystem)
@@ -165,8 +165,8 @@ describe('chipDisplayMapper', () => {
 
     it('should correctly map all biology ValueSets', () => {
       const config = getConfig()
-      const anabioCodeSystem = 'http://terminology.hl7.org/CodeSystem/biology-anabio'
-      const loincCodeSystem = 'http://terminology.hl7.org/CodeSystem/biology-loinc'
+      const anabioCodeSystem = 'https://terminology.hl7.org/CodeSystem/biology-anabio'
+      const loincCodeSystem = 'https://terminology.hl7.org/CodeSystem/biology-loinc'
 
       const anabioValueSet = getValueSetFromCodeSystem(anabioCodeSystem)
       const loincValueSet = getValueSetFromCodeSystem(loincCodeSystem)
@@ -190,7 +190,7 @@ describe('chipDisplayMapper', () => {
     })
 
     it('should handle system with special characters', () => {
-      const specialSystem = 'http://test.com/system?param=value&other=test'
+      const specialSystem = 'https://test.com/system?param=value&other=test'
       const result = getValueSetFromCodeSystem(specialSystem)
 
       expect(result).toBeUndefined()
