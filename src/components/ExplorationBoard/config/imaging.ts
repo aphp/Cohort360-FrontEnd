@@ -3,6 +3,7 @@ import { plural } from 'utils/string'
 import { ImagingStudy, ImagingStudySeries } from 'fhir/r4'
 import { mapToDate } from 'mappers/dates'
 import { fetchImaging } from 'services/aphp/callApi'
+import { linkToDiagnosticReport } from 'services/aphp/serviceImaging'
 import { getCodeList } from 'services/aphp/serviceValueSets'
 import { CohortImaging } from 'types'
 import {
@@ -128,6 +129,12 @@ const mapImagingSeries = (series: ImagingStudySeries[]): Table => {
   }
 }
 
+const extractBinaryIdFromUrl = (url?: string) => {
+  if (!url) return undefined
+  const sanitizedUrl = url.split('?')[0].split('#')[0]
+  return sanitizedUrl.split('/').pop()
+}
+
 const mapToTable = (data: Data, deidentified: boolean, isPatient: boolean, groupId: string[]): Table => {
   const rows: Row[] = []
   const columns: Column[] = [
@@ -151,12 +158,10 @@ const mapToTable = (data: Data, deidentified: boolean, isPatient: boolean, group
     const nbSeries = elem.numberOfSeries ?? '-'
     const accessNumber =
       elem.identifier?.find((identifier) => identifier.system?.includes('accessNumber'))?.value ?? '-'
-    // TODO remove the fetch by extension when fhir drop it (expected in 2.21.0 or 2.22.0)
     const documentId = elem.diagnosticReport
-      ? elem.diagnosticReport.presentedForm
-          ?.find((el) => el.contentType === 'application/pdf')
-          ?.url?.split('/')
-          .pop()
+      ? extractBinaryIdFromUrl(
+          elem.diagnosticReport.presentedForm?.find((el) => el.contentType === 'application/pdf')?.url
+        )
       : getExtension(elem, 'docId')?.valueString
     const ippGroupQuery = groupId ? `?groupId=${groupId}` : ''
     const row: Row = [
@@ -268,7 +273,10 @@ const fetchList = (
     () => fetchImaging(params),
     () => fetchImaging(paramsFetchAll),
     { ...fetchParams, filters, deidentified, patient, groupId }
-  )
+  ).then(async (results) => ({
+    ...results,
+    list: (await linkToDiagnosticReport(results.list as ImagingStudy[], signal)) as ImagingStudy[]
+  }))
 }
 
 export const imagingConfig = (
