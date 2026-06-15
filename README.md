@@ -69,3 +69,22 @@ Coming soon...
 ## License
 
 Cohort360 is licensed under Apache License 2.
+
+## FHIR Terminology Loading Strategy
+
+To avoid ambiguity between FHIR terminology resources, Cohort360 uses the following rules:
+
+- Use `CodeSystem?url=` when a full, non-hierarchical code system is expected.
+- Use `ValueSet?url=` when a business subset must be retrieved.
+- Use `ValueSet/$expand` for hierarchical browsing or hierarchy-aware search.
+
+Practical guidance:
+
+- Maternity sub-domains should remain modeled as dedicated `ValueSet` URLs.
+- Hierarchical terminologies (for example ATC, CIM-10, ANABIO, CCAM) should keep using `$expand` flows.
+- Flat referentials should be loaded directly from `CodeSystem` when all codes are needed.
+
+Main implementation entry points:
+
+- `src/services/aphp/serviceValueSets.ts` for terminology loading strategy.
+- `public/config.dev.json` for configured terminology URLs.

@@ -10,8 +10,9 @@ export const getReferences = (config: Readonly<AppConfig>) => [
     standard: true,
     url: config.features.medication.valueSets.medicationAtc.url,
     codeSystemUrls: config.features.medication.valueSets.medicationAtc.codeSystemUrls,
+    resourceType: config.features.medication.valueSets.medicationAtc.resourceType,
+    loadingMode: config.features.medication.valueSets.medicationAtc.loadingMode,
     checked: true,
-    isHierarchy: true,
     joinDisplayWithCode: true,
     joinDisplayWithSystem: true,
     filterRoots: <T>(code: LabelObject) => /^[A-WZ]$/.test(code.id)
@@ -23,10 +24,11 @@ export const getReferences = (config: Readonly<AppConfig>) => [
     standard: true,
     url: config.features.medication.valueSets.medicationUcd.url,
     codeSystemUrls: config.features.medication.valueSets.medicationUcd.codeSystemUrls,
+    resourceType: config.features.medication.valueSets.medicationUcd.resourceType,
+    loadingMode: config.features.medication.valueSets.medicationUcd.loadingMode,
     checked: true,
     joinDisplayWithCode: true,
     joinDisplayWithSystem: true,
-    isHierarchy: false,
     filterRoots: () => true
   },
   {
@@ -36,8 +38,9 @@ export const getReferences = (config: Readonly<AppConfig>) => [
     standard: true,
     url: config.features.observation.valueSets.biologyHierarchyAnabio.url,
     codeSystemUrls: config.features.observation.valueSets.biologyHierarchyAnabio.codeSystemUrls,
+    resourceType: config.features.observation.valueSets.biologyHierarchyAnabio.resourceType,
+    loadingMode: config.features.observation.valueSets.biologyHierarchyAnabio.loadingMode,
     checked: true,
-    isHierarchy: true,
     joinDisplayWithCode: false,
     joinDisplayWithSystem: true,
     filterRoots: <T>(biologyItem: LabelObject) =>
@@ -58,8 +61,9 @@ export const getReferences = (config: Readonly<AppConfig>) => [
     standard: true,
     url: config.features.observation.valueSets.biologyHierarchyLoinc.url,
     codeSystemUrls: config.features.observation.valueSets.biologyHierarchyLoinc.codeSystemUrls,
+    resourceType: config.features.observation.valueSets.biologyHierarchyLoinc.resourceType,
+    loadingMode: config.features.observation.valueSets.biologyHierarchyLoinc.loadingMode,
     checked: true,
-    isHierarchy: false,
     joinDisplayWithCode: true,
     joinDisplayWithSystem: true,
     filterRoots: () => true
@@ -71,8 +75,9 @@ export const getReferences = (config: Readonly<AppConfig>) => [
     standard: true,
     url: config.features.procedure.valueSets.procedureHierarchy.url,
     codeSystemUrls: config.features.procedure.valueSets.procedureHierarchy.codeSystemUrls,
+    resourceType: config.features.procedure.valueSets.procedureHierarchy.resourceType,
+    loadingMode: config.features.procedure.valueSets.procedureHierarchy.loadingMode,
     checked: true,
-    isHierarchy: true,
     joinDisplayWithCode: true,
     joinDisplayWithSystem: false,
     filterRoots: () => true
@@ -84,8 +89,9 @@ export const getReferences = (config: Readonly<AppConfig>) => [
     standard: true,
     url: config.features.condition.valueSets.conditionHierarchy.url,
     codeSystemUrls: config.features.condition.valueSets.conditionHierarchy.codeSystemUrls,
+    resourceType: config.features.condition.valueSets.conditionHierarchy.resourceType,
+    loadingMode: config.features.condition.valueSets.conditionHierarchy.loadingMode,
     checked: true,
-    isHierarchy: true,
     joinDisplayWithSystem: false,
     joinDisplayWithCode: true,
     filterRoots: () => true
@@ -97,8 +103,9 @@ export const getReferences = (config: Readonly<AppConfig>) => [
     standard: true,
     url: config.features.claim.valueSets.claimHierarchy.url,
     codeSystemUrls: config.features.claim.valueSets.claimHierarchy.codeSystemUrls,
+    resourceType: config.features.claim.valueSets.claimHierarchy.resourceType,
+    loadingMode: config.features.claim.valueSets.claimHierarchy.loadingMode,
     checked: true,
-    isHierarchy: true,
     joinDisplayWithCode: true,
     joinDisplayWithSystem: false,
     filterRoots: () => true

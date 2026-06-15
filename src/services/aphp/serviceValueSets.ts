@@ -5,6 +5,7 @@ import { Hierarchy } from 'types/hierarchy'
 import { getApiResponseResourceOrThrow, getApiResponseResourcesOrThrow } from 'utils/apiHelpers'
 import { capitalizeFirstLetter } from 'utils/string'
 import { getConfig } from 'config'
+import type { TerminologyResourceType } from 'config'
 import { getReferences } from 'data/valueSets'
 import { LOW_TOLERANCE_TAG } from './callApi'
 import { sortArray } from 'utils/arrays'
@@ -15,6 +16,31 @@ import { getValueSetFromCodeSystem } from 'utils/valueSets'
 
 export const UNKOWN_HIERARCHY_CHAPTER = 'UNKNOWN'
 export const HIERARCHY_ROOT = '*'
+const isCodeSystemUrl = (url: string) => url.includes('/CodeSystem/')
+
+const getConfiguredTerminologyResourceType = (url: string): TerminologyResourceType | undefined => {
+  const appConfig = getConfig() as any
+
+  const valueSetGroups: Array<Record<string, { url?: string; resourceType?: TerminologyResourceType }>> = [
+    appConfig?.core?.valueSets || {}
+  ]
+
+  Object.values(appConfig?.features || {}).forEach((feature: any) => {
+    if (feature?.valueSets) valueSetGroups.push(feature.valueSets)
+  })
+
+  for (const group of valueSetGroups) {
+    for (const entry of Object.values(group)) {
+      if (entry?.url === url) return entry.resourceType
+    }
+  }
+
+  return undefined
+}
+
+const shouldUseCodeSystemLoading = (url: string) => {
+  return getConfiguredTerminologyResourceType(url) === 'CodeSystem' || isCodeSystemUrl(url)
+}
 
 const isDataNonQuali = (system: string) => {
   switch (system) {
@@ -147,7 +173,7 @@ const formatCodesFromValueSetReponse = (valueSetBundle: ValueSet[]) => {
  * @returns the list of codes from the codesystem
  */
 export const fetchCodeSystem = async (codeSystem: string, signal?: AbortSignal): Promise<FhirItem[]> => {
-  const res = await apiFhir.get<FHIR_Bundle_Response<CodeSystem>>(`/CodeSystem?system=${codeSystem}`, {
+  const res = await apiFhir.get<FHIR_Bundle_Response<CodeSystem>>(`/CodeSystem?url=${codeSystem}`, {
     signal: signal
   })
   const codeSystemBundle = getApiResponseResourcesOrThrow(res)
@@ -335,6 +361,14 @@ export const getCodeList = async (
   codeInLabel = false,
   signal?: AbortSignal
 ): Promise<Back_API_Response<FhirItem>> => {
+  if (shouldUseCodeSystemLoading(valueSetUrl)) {
+    const codeSystemItems = await fetchCodeSystem(valueSetUrl, signal)
+    return {
+      results: codeSystemItems,
+      count: codeSystemItems.length
+    }
+  }
+
   const res = await apiFhir.get<FHIR_Bundle_Response<ValueSet>>(`/ValueSet?url=${valueSetUrl}`, {
     signal: signal
   })

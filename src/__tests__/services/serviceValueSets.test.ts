@@ -56,8 +56,7 @@ vi.mock('data/valueSets', () => ({
       label: 'Test ValueSet',
       title: 'Test ValueSet Title',
       standard: true,
-      checked: false,
-      isHierarchy: true,
+      checked: false,
       joinDisplayWithCode: true,
       joinDisplayWithSystem: true,
       codeSystemUrls: ['https://terminology.hl7.org/CodeSystem/test-codesystem']
@@ -67,8 +66,7 @@ vi.mock('data/valueSets', () => ({
       label: 'Biology Anabio',
       title: 'Biology Anabio Title',
       standard: true,
-      checked: false,
-      isHierarchy: true,
+      checked: false,
       joinDisplayWithCode: true,
       joinDisplayWithSystem: false,
       codeSystemUrls: ['https://terminology.hl7.org/CodeSystem/biology-anabio']
@@ -458,6 +456,42 @@ describe('serviceValueSets', () => {
 
       expect(apiFhir.get).toHaveBeenCalledWith(
         expect.stringContaining('url=https://terminology.hl7.org/ValueSet/test-valueset'),
+        expect.any(Object)
+      )
+    })
+    it('should fetch complete code list for a CodeSystem URL', async () => {
+      const mockResponse = {
+        data: {
+          entry: [
+            {
+              resource: {
+                resourceType: 'CodeSystem',
+                url: 'https://terminology.hl7.org/CodeSystem/test-codesystem',
+                concept: [
+                  {
+                    code: 'code1',
+                    display: 'Code 1'
+                  },
+                  {
+                    code: 'code2',
+                    display: 'Code 2'
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      }
+
+      vi.mocked(apiFhir.get).mockResolvedValue(mockResponse)
+
+      const result = await getCodeList('https://terminology.hl7.org/CodeSystem/test-codesystem', false)
+
+      expect(result.results).toHaveLength(2)
+      expect(result.results[0].system).toBe('https://terminology.hl7.org/CodeSystem/test-codesystem')
+      expect(result.count).toBe(2)
+      expect(apiFhir.get).toHaveBeenCalledWith(
+        expect.stringContaining('/CodeSystem?url=https://terminology.hl7.org/CodeSystem/test-codesystem'),
         expect.any(Object)
       )
     })

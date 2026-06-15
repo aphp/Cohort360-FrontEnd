@@ -37,8 +37,7 @@ vi.mock('data/valueSets', () => ({
       label: 'Test ValueSet',
       title: 'Test ValueSet Title',
       standard: true,
-      checked: false,
-      isHierarchy: true,
+      checked: false,
       joinDisplayWithCode: true,
       joinDisplayWithSystem: true,
       codeSystemUrls: ['https://terminology.hl7.org/CodeSystem/test-codesystem']
@@ -48,8 +47,7 @@ vi.mock('data/valueSets', () => ({
       label: 'Another ValueSet',
       title: 'Another ValueSet Title',
       standard: false,
-      checked: false,
-      isHierarchy: false,
+      checked: false,
       joinDisplayWithCode: false,
       joinDisplayWithSystem: false,
       codeSystemUrls: ['https://terminology.hl7.org/CodeSystem/another-codesystem']
@@ -59,8 +57,7 @@ vi.mock('data/valueSets', () => ({
       label: 'Biology Anabio',
       title: 'Biology Anabio Title',
       standard: true,
-      checked: false,
-      isHierarchy: true,
+      checked: false,
       joinDisplayWithCode: true,
       joinDisplayWithSystem: false,
       codeSystemUrls: ['https://terminology.hl7.org/CodeSystem/biology-anabio']

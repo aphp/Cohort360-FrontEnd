@@ -38,7 +38,7 @@ type ValueSetRowProps = {
   isSelectionDisabled: (node: Hierarchy<FhirItem>) => boolean
   path: string[]
   mode: SearchMode
-  isHierarchy: boolean
+  loadingMode?: 'list' | 'expand'
   onExpand: (node: Hierarchy<FhirItem>) => void
   onSelect: (nodes: Hierarchy<FhirItem>[], toAdd: boolean, mode: SearchMode) => void
   isHeader?: boolean
@@ -50,13 +50,14 @@ const ValueSetRow = ({
   isSelectionDisabled,
   path,
   mode,
-  isHierarchy,
+  loadingMode,
   onSelect,
   onExpand,
   isHeader = false
 }: ValueSetRowProps) => {
   const [open, setOpen] = useState(false)
   const [internalLoading, setInternalLoading] = useState(false)
+  const isExpandMode = loadingMode === 'expand'
   const { label, subItems, status, id } = item
 
   const handleOpen = () => {
@@ -70,7 +71,7 @@ const ValueSetRow = ({
   }, [loading.expand])
 
   const displayStat = (stat: number | undefined, headerName: string) => {
-    if (isHierarchy && isHeader) {
+    if (isExpandMode && isHeader) {
       return (
         <Typography variant="body2" fontWeight={600} color="#4f4f4f">
           {headerName}
@@ -90,7 +91,7 @@ const ValueSetRow = ({
           style={{ paddingRight: 10, width: '100%' }}
         >
           <CellWrapper size={1} cursor>
-            {mode === SearchMode.EXPLORATION && isHierarchy && (
+            {mode === SearchMode.EXPLORATION && isExpandMode && (
               <>
                 {internalLoading && <CircularProgress size={'15px'} color="info" />}
                 {!internalLoading && (
@@ -134,12 +135,12 @@ const ValueSetRow = ({
       </RowContainerWrapper>
       {!internalLoading &&
         open &&
-        isHierarchy &&
+        isExpandMode &&
         sortArray(subItems || [], isDisplayedWithCode(item.system) ? 'id' : 'label').map((subItem) => {
           return (
             <ValueSetRow
               mode={mode}
-              isHierarchy={isHierarchy}
+              loadingMode={loadingMode}
               isSelectionDisabled={isSelectionDisabled}
               loading={loading}
               path={[...path, id]}
@@ -158,7 +159,7 @@ type ValueSetTableProps = {
   hierarchy: HierarchyInfo<FhirItem>
   selectAllStatus: SelectedStatus
   loading: { expand: LoadingStatus; list: LoadingStatus }
-  isHierarchy?: boolean
+  loadingMode?: 'list' | 'expand'
   mode: SearchMode
   isSelectionDisabled?: (node: Hierarchy<FhirItem>) => boolean
   onExpand: (node: Hierarchy<FhirItem>) => void
@@ -173,7 +174,7 @@ const ValueSetTable = ({
   selectAllStatus,
   loading,
   mode,
-  isHierarchy = true,
+  loadingMode,
   isSelectionDisabled = () => false,
   onSelect,
   onSelectAll,
@@ -182,6 +183,7 @@ const ValueSetTable = ({
   onSort
 }: ValueSetTableProps) => {
   const [currentSort, setCurrentSort] = useState<ValueSetSorting | null>(null)
+  const isExpandMode = loadingMode === 'expand'
 
   const handleSelect = (checked: boolean) => {
     if (mode === SearchMode.RESEARCH) {
@@ -221,7 +223,7 @@ const ValueSetTable = ({
         <TableContainer style={{ background: 'white' }}>
           <Table>
             <TableHead>
-              {loading.list === LoadingStatus.SUCCESS && !isHierarchy && (
+              {loading.list === LoadingStatus.SUCCESS && !isExpandMode && (
                 <RowContainerWrapper container>
                   <RowWrapper
                     container
@@ -297,14 +299,14 @@ const ValueSetTable = ({
                       <ValueSetRow
                         mode={mode}
                         loading={loading}
-                        isHierarchy={isHierarchy}
+                        loadingMode={loadingMode}
                         path={[item.id]}
                         key={item.id}
                         item={item}
                         isSelectionDisabled={isSelectionDisabled}
                         onExpand={onExpand}
                         onSelect={onSelect}
-                        isHeader={isHierarchy && index === 0}
+                        isHeader={isExpandMode && index === 0}
                       />
                     ) : (
                       <h1 key={uuidv4()}>Missing</h1>
@@ -322,7 +324,7 @@ const ValueSetTable = ({
         </TableContainer>
       </Grid>
       <Grid container>
-        {!isHierarchy && loading.list === LoadingStatus.SUCCESS && Math.ceil(hierarchy.count / LIMIT_PER_PAGE) > 1 && (
+        {!isExpandMode && loading.list === LoadingStatus.SUCCESS && Math.ceil(hierarchy.count / LIMIT_PER_PAGE) > 1 && (
           <Pagination
             count={Math.ceil(hierarchy.count / LIMIT_PER_PAGE)}
             currentPage={hierarchy.page}
