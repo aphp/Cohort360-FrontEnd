@@ -285,7 +285,7 @@ let config: AppConfig = {
       useNDA: true
     },
     diagnosticReport: {
-      enabled: false,
+      enabled: true,
       useStudyParam: false
     },
     export: {

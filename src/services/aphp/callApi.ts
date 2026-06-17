@@ -397,15 +397,16 @@ export const fetchDocumentReference = async (
     options = [...options, `${DocumentsParamsKeys.DOC_TYPES}=${typeCodesWithParents.join(',')}`]
   }
   if (_text)
-    if (highlight_search_results)
-      options = [
-        ...options,
-        `${
-          searchBy === SearchByTypes.TEXT
-            ? `_tag=${encodeURIComponent('https://terminology.eds.aphp.fr/misc|HIGHLIGHT_RESULTS')}`
-            : ''
-        }`
-      ]
+    options = [...options, `${searchBy === SearchByTypes.TEXT ? '_text' : 'description'}=${encodeURIComponent(_text)}`]
+  if (_text && highlight_search_results)
+    options = [
+      ...options,
+      `${
+        searchBy === SearchByTypes.TEXT
+          ? `_tag=${encodeURIComponent('https://terminology.eds.aphp.fr/misc|HIGHLIGHT_RESULTS')}`
+          : ''
+      }`
+    ]
   if (docStatuses && docStatuses.length > 0) {
     const docStatusesUrl = docStatusCodeSystem
     const urlString = docStatuses
