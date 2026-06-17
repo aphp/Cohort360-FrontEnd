@@ -66,6 +66,7 @@ import { AppConfig } from 'config'
 import { setRequestDetailedMode } from 'state/preferences'
 import { hasStageDetails } from '../DiagramView/components/CriteriaCount'
 import { isRequestFinished } from './utils'
+import { useCountReconciliation } from './useCountReconciliation'
 import { CriteriaType } from 'types/requestCriterias'
 
 const ControlPanel: React.FC<{
@@ -242,6 +243,8 @@ const ControlPanel: React.FC<{
       setReportError(true)
     }
   }
+
+  useCountReconciliation(count)
 
   const isLoading = loading || countLoading === LoadingStatus.FETCHING || saveLoading
   const errorCriteria = selectedCriteria.filter((criteria) => criteria.error)
