@@ -211,32 +211,28 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
           <ListItem>
             {!open && (
               <Tooltip title="Nouvelle requête">
-                
-                  <IconButton
-                    onClick={handleNewRequest}
-                    className={cx(classes.button, classes.miniButton)}
-                    disabled={maintenanceIsActive}
-                  >
-                    <AddIcon />
-                  </IconButton>
-                
+                <IconButton
+                  onClick={handleNewRequest}
+                  className={cx(classes.button, classes.miniButton)}
+                  disabled={maintenanceIsActive}
+                >
+                  <AddIcon />
+                </IconButton>
               </Tooltip>
             )}
             {zoomed(
               <div className={classes.divNewRequest}>
-                
-                  <Button
-                    onClick={handleNewRequest}
-                    className={cx(classes.newCohortButton, classes.linkHover, {
-                      [classes.hide]: !open
-                    })}
-                    disabled={maintenanceIsActive}
-                  >
-                    <Typography variant={maintenanceIsActive ? 'h6' : 'h5'}>
-                      {maintenanceIsActive ? 'Nouvelle requête désactivée' : 'Nouvelle requête'}
-                    </Typography>
-                  </Button>
-                
+                <Button
+                  onClick={handleNewRequest}
+                  className={cx(classes.newCohortButton, classes.linkHover, {
+                    [classes.hide]: !open
+                  })}
+                  disabled={maintenanceIsActive}
+                >
+                  <Typography variant={maintenanceIsActive ? 'h6' : 'h5'}>
+                    {maintenanceIsActive ? 'Nouvelle requête désactivée' : 'Nouvelle requête'}
+                  </Typography>
+                </Button>
               </div>
             )}
           </ListItem>
@@ -311,16 +307,14 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
                 </ListItem>
               )}
               <ListItem>
-                
-                  <Link
-                    id="myPatient-link"
-                    onClick={() => navigate('/my-patients')}
-                    underline="hover"
-                    className={classes.nestedTitle}
-                  >
-                    Tous mes patients
-                  </Link>
-                
+                <Link
+                  id="myPatient-link"
+                  onClick={() => navigate('/my-patients')}
+                  underline="hover"
+                  className={classes.nestedTitle}
+                >
+                  Tous mes patients
+                </Link>
               </ListItem>
               <ListItem>
                 <Link
