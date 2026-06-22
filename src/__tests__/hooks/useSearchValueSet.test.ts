@@ -1,130 +1,144 @@
-import { describe, it, expect } from 'vitest'
-import { HIERARCHY_ROOT } from 'services/aphp/serviceValueSets'
-import { Hierarchy } from 'types/hierarchy'
-import { FhirItem } from 'types/valueSet'
+import { act, renderHook } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { SearchMode, type Hierarchy } from 'types/hierarchy'
+import type { FhirItem, Reference } from 'types/valueSet'
 
-describe('useSearchValueSet - valueSetUrl handling', () => {
-  it('should use valueSetUrl when checking if selection is disabled', () => {
-    const node: Hierarchy<FhirItem> = {
-      id: 'code1',
-      label: 'Code 1',
-      system: 'https://system1',
-      valueSetUrl: 'https://valueset1',
-      above_levels_ids: '',
-      inferior_levels_ids: ''
-    }
+const HIERARCHY_ROOT = '*'
 
-    const selectedCodes = new Map([
-      ['https://valueset1', new Map([[HIERARCHY_ROOT, { id: HIERARCHY_ROOT } as any]])]
-    ])
+// useHierarchy is stubbed so we can drive `selectedCodes` and assert how the hook
+// keys into it / which actions it triggers — i.e. the real valueSetUrl logic of useSearchValueSet.
+const hierarchyStub = vi.hoisted(() => ({
+  selectedCodes: new Map<string, Map<string, Hierarchy<FhirItem>>>(),
+  select: vi.fn(),
+  selectAll: vi.fn()
+}))
 
-    const nodeKey = node.valueSetUrl || node.system
-    const isAll = selectedCodes.get(nodeKey)?.get(HIERARCHY_ROOT)
+vi.mock('services/aphp/serviceValueSets', () => ({
+  HIERARCHY_ROOT: '*',
+  UNKOWN_HIERARCHY_CHAPTER: 'UNKNOWN',
+  getChildrenFromCodes: vi.fn(async () => ({ results: [], count: 0 })),
+  getHierarchyRoots: vi.fn(async () => ({ results: [], count: 0 })),
+  searchInValueSets: vi.fn(async () => ({ results: [], count: 0 }))
+}))
 
-    expect(nodeKey).toBe('https://valueset1')
-    expect(isAll).toBeDefined()
+vi.mock('state', () => ({
+  useAppDispatch: () => vi.fn(),
+  useAppSelector: () => new Map()
+}))
+
+vi.mock('state/valueSets', () => ({
+  saveValueSets: vi.fn(),
+  selectValueSetCodes: vi.fn(() => new Map())
+}))
+
+vi.mock('hooks/hierarchy/useHierarchy', () => ({
+  useHierarchy: () => ({
+    hierarchies: new Map(),
+    searchResults: { tree: [], count: 0, page: 1, system: '' },
+    selectedCodes: hierarchyStub.selectedCodes,
+    loadingStatus: { search: 'success', expand: 'success' },
+    hasError: false,
+    initTrees: vi.fn(),
+    fetchMore: vi.fn(),
+    expand: vi.fn(),
+    select: hierarchyStub.select,
+    selectAll: hierarchyStub.selectAll
+  })
+}))
+
+import { useSearchValueSet } from 'hooks/valueSet/useSearchValueSet'
+
+const VALUESET_URL = 'https://terminology.hl7.org/ValueSet/biology-anabio'
+const CODESYSTEM_URL = 'https://terminology.hl7.org/CodeSystem/biology-anabio'
+
+const mkRef = (overrides: Partial<Reference> = {}): Reference => ({
+  id: 'ref',
+  url: VALUESET_URL,
+  label: 'Anabio',
+  title: 'Anabio',
+  standard: true,
+  checked: true,
+  isHierarchy: true,
+  joinDisplayWithCode: false,
+  joinDisplayWithSystem: false,
+  ...overrides
+})
+
+const mkNode = (overrides: Partial<Hierarchy<FhirItem>> = {}): Hierarchy<FhirItem> => ({
+  id: 'code1',
+  label: 'Code 1',
+  system: CODESYSTEM_URL,
+  above_levels_ids: '',
+  inferior_levels_ids: '',
+  ...overrides
+})
+
+const rootSelected = (key: string) => new Map([[key, new Map([[HIERARCHY_ROOT, mkNode({ id: HIERARCHY_ROOT })]])]])
+
+const renderUseSearchValueSet = () => renderHook(() => useSearchValueSet([mkRef()], []))
+
+beforeEach(() => {
+  vi.clearAllMocks()
+  hierarchyStub.selectedCodes = new Map()
+})
+
+describe('useSearchValueSet - isSelectionDisabled', () => {
+  it('disables selection in RESEARCH mode when the node valueSet has "select all" active', () => {
+    hierarchyStub.selectedCodes = rootSelected(VALUESET_URL)
+    const { result } = renderUseSearchValueSet()
+
+    act(() => result.current.onChangeMode(SearchMode.RESEARCH))
+
+    expect(result.current.isSelectionDisabled(mkNode({ valueSetUrl: VALUESET_URL }))).toBe(true)
   })
 
-  it('should fallback to system when valueSetUrl is not available', () => {
-    const node: Hierarchy<FhirItem> = {
-      id: 'code1',
-      label: 'Code 1',
-      system: 'https://system1',
-      above_levels_ids: '',
-      inferior_levels_ids: ''
-    }
+  it('keys into selectedCodes by valueSetUrl, not by system', () => {
+    // "select all" is registered under the ValueSet URL; the node also carries a different CodeSystem URL.
+    hierarchyStub.selectedCodes = rootSelected(VALUESET_URL)
+    const { result } = renderUseSearchValueSet()
 
-    const selectedCodes = new Map([['https://system1', new Map([[HIERARCHY_ROOT, { id: HIERARCHY_ROOT } as any]])]])
+    act(() => result.current.onChangeMode(SearchMode.RESEARCH))
 
-    const nodeKey = node.valueSetUrl || node.system
-    const isAll = selectedCodes.get(nodeKey)?.get(HIERARCHY_ROOT)
-
-    expect(nodeKey).toBe('https://system1')
-    expect(isAll).toBeDefined()
+    expect(result.current.isSelectionDisabled(mkNode({ valueSetUrl: VALUESET_URL, system: CODESYSTEM_URL }))).toBe(true)
+    // Same node without valueSetUrl falls back to system, which has no "select all" registered.
+    expect(result.current.isSelectionDisabled(mkNode({ system: CODESYSTEM_URL }))).toBe(false)
   })
 
-  it('should use valueSetUrl in handleDeleteSelectedCodes for root', () => {
-    const code: Hierarchy<FhirItem> = {
-      id: HIERARCHY_ROOT,
-      label: 'Toute la hiérarchie',
-      system: 'https://system1',
-      valueSetUrl: 'https://valueset1',
-      above_levels_ids: '',
-      inferior_levels_ids: ''
-    }
+  it('falls back to system when the node has no valueSetUrl', () => {
+    hierarchyStub.selectedCodes = rootSelected(CODESYSTEM_URL)
+    const { result } = renderUseSearchValueSet()
 
-    const isRoot = code.id === HIERARCHY_ROOT
-    const codeKey = code.valueSetUrl || code.system
+    act(() => result.current.onChangeMode(SearchMode.RESEARCH))
 
-    expect(isRoot).toBe(true)
-    expect(codeKey).toBe('https://valueset1')
+    expect(result.current.isSelectionDisabled(mkNode({ system: CODESYSTEM_URL }))).toBe(true)
   })
 
-  it('should use valueSetUrl in handleDeleteSelectedCodes for non-root', () => {
-    const code: Hierarchy<FhirItem> = {
-      id: 'code1',
-      label: 'Code 1',
-      system: 'https://system1',
-      valueSetUrl: 'https://valueset1',
-      above_levels_ids: '',
-      inferior_levels_ids: ''
-    }
+  it('does not disable selection when no "select all" is active', () => {
+    const { result } = renderUseSearchValueSet()
 
-    const isRoot = code.id === HIERARCHY_ROOT
-    const codeKey = code.valueSetUrl || code.system
+    act(() => result.current.onChangeMode(SearchMode.RESEARCH))
 
-    expect(isRoot).toBe(false)
-    expect(codeKey).toBe('https://valueset1')
+    expect(result.current.isSelectionDisabled(mkNode({ valueSetUrl: VALUESET_URL }))).toBe(false)
+  })
+})
+
+describe('useSearchValueSet - onDelete', () => {
+  it('unselects all using the valueSetUrl (not the system) for a root code', () => {
+    const { result } = renderUseSearchValueSet()
+
+    act(() => result.current.onDelete(mkNode({ id: HIERARCHY_ROOT, valueSetUrl: VALUESET_URL, system: CODESYSTEM_URL })))
+
+    expect(hierarchyStub.selectAll).toHaveBeenCalledWith(VALUESET_URL, false)
+    expect(hierarchyStub.select).not.toHaveBeenCalled()
   })
 
-  it('should use valueSetUrl in initExploration', () => {
-    const reference = {
-      id: 'ref1',
-      url: 'https://valueset1',
-      label: 'ValueSet 1',
-      title: 'ValueSet 1 Title',
-      standard: true,
-      checked: false,
-      isHierarchy: true,
-      joinDisplayWithCode: false,
-      joinDisplayWithSystem: false
-    }
+  it('unselects a single non-root code via select()', () => {
+    const node = mkNode({ valueSetUrl: VALUESET_URL })
+    const { result } = renderUseSearchValueSet()
 
-    const initHandler = {
-      valueSetUrl: reference.url,
-      fetchBaseTree: () => Promise.resolve({ results: [], count: 0 })
-    }
+    act(() => result.current.onDelete(node))
 
-    expect(initHandler.valueSetUrl).toBe('https://valueset1')
-  })
-
-  it('should prioritize valueSetUrl over system', () => {
-    const node: Hierarchy<FhirItem> = {
-      id: 'code1',
-      label: 'Code 1',
-      system: 'https://system1',
-      valueSetUrl: 'https://valueset1',
-      above_levels_ids: '',
-      inferior_levels_ids: ''
-    }
-
-    const nodeKey = node.valueSetUrl || node.system
-
-    expect(nodeKey).toBe('https://valueset1')
-    expect(nodeKey).not.toBe('https://system1')
-  })
-
-  it('should handle empty valueSetUrl and system', () => {
-    const node: Hierarchy<FhirItem> = {
-      id: 'code1',
-      label: 'Code 1',
-      system: '',
-      above_levels_ids: '',
-      inferior_levels_ids: ''
-    }
-
-    const nodeKey = node.valueSetUrl || node.system
-
-    expect(nodeKey).toBe('')
+    expect(hierarchyStub.select).toHaveBeenCalledWith([node], false, SearchMode.EXPLORATION)
+    expect(hierarchyStub.selectAll).not.toHaveBeenCalled()
   })
 })

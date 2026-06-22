@@ -50,17 +50,16 @@ const mapAbandonedChildren = (children: Hierarchy<FhirItem>[]) => {
  * @returns
  */
 const mapFhirHierarchyToHierarchyWithLabelAndSystem = (fhirItem: FhirItem): Hierarchy<FhirItem> => {
-  const result = {
+  return {
     id: fhirItem.id,
     label: fhirItem.label,
     system: fhirItem.system,
-    valueSetUrl: fhirItem.valueSetUrl, // Preserve ValueSet URL
+    valueSetUrl: fhirItem.valueSetUrl,
     above_levels_ids: fhirItem.parentIds?.join(',') ?? '',
     inferior_levels_ids: fhirItem.childrenIds?.join(',') ?? '',
     statTotal: fhirItem.statTotal,
     statTotalUnique: fhirItem.statTotalUnique
   }
-  return result
 }
 
 const mapCodesToFhirItems = (
@@ -76,7 +75,7 @@ const mapCodesToFhirItems = (
         ? `${code.code} - ${capitalizeFirstLetter(code.display)}`
         : capitalizeFirstLetter(code.display),
       system: codeSystem,
-      valueSetUrl // Populate ValueSet URL for proper grouping
+      valueSetUrl
     })),
     'label'
   )
@@ -116,18 +115,16 @@ const formatValuesetExpansion = (
         ? extractStats(code.extension)
         : { statTotal: undefined, statTotalUnique: undefined }
 
-      // Find the correct ValueSet URL from the code's system (CodeSystem URL)
       const codeSystem = code.system as string
-      // Try to get ValueSet from CodeSystem mapping, fallback to provided valueSetUrl, then to system itself
       const correctValueSetUrl = getValueSetFromCodeSystem(codeSystem) || valueSetUrl || codeSystem
 
       return {
-        id: code.code as string, // it will always be defined
-        system: codeSystem, // it will always be defined
-        label: code.display as string, // it will always be defined
+        id: code.code as string,
+        system: codeSystem,
+        label: code.display as string,
         childrenIds: code.contains?.map((child) => child.code as string) || [],
         parentIds: getParentIds(code.extension, code.code),
-        valueSetUrl: correctValueSetUrl, // Use the correct ValueSet URL based on the code's system
+        valueSetUrl: correctValueSetUrl,
         statTotal: stats?.statTotal,
         statTotalUnique: stats?.statTotalUnique
       }
@@ -394,7 +391,7 @@ export const getHierarchyRoots = async (
         id: code.code,
         label: capitalizeFirstLetter(code.display),
         system: codeSystemUrl,
-        valueSetUrl // Populate ValueSet URL for proper grouping
+        valueSetUrl
       })) as Hierarchy<FhirItem>[]
   ).filter((code) => !filterOut(code))
 
@@ -411,7 +408,7 @@ export const getHierarchyRoots = async (
       id: UNKOWN_HIERARCHY_CHAPTER,
       label: `${UNKOWN_HIERARCHY_CHAPTER}`,
       system: codeSystemUrl,
-      valueSetUrl, // Populate ValueSet URL for proper grouping
+      valueSetUrl,
       above_levels_ids: HIERARCHY_ROOT,
       inferior_levels_ids: unknownChapters.map((code) => code.id).join(','),
       subItems: unknownChapters
@@ -425,7 +422,7 @@ export const getHierarchyRoots = async (
       id: HIERARCHY_ROOT,
       label: valueSetTitle,
       system: codeSystemUrl,
-      valueSetUrl, // Populate ValueSet URL for proper grouping
+      valueSetUrl,
       childrenIds,
       parentIds: []
     }

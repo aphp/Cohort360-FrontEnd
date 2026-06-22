@@ -1,57 +1,62 @@
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 
-describe('CCAMForm - ValueSet URL usage', () => {
-  it('should use ValueSet URLs for valueSetsInfo', () => {
-    // Simulate the logic in CCAMForm
-    const procedureHierarchyUrl = 'https://terminology.hl7.org/ValueSet/procedure-ccam'
-    const urls = [procedureHierarchyUrl]
-    
-    // Simulate getValueSetsByUrls returning references
-    const valueSetsInfo = urls.map((url) => ({
-      url,
+const { PROCEDURE_VALUESET_URL, PROCEDURE_CODESYSTEM_URL } = vi.hoisted(() => ({
+  PROCEDURE_VALUESET_URL: 'https://terminology.hl7.org/ValueSet/procedure-ccam',
+  PROCEDURE_CODESYSTEM_URL: 'https://terminology.hl7.org/CodeSystem/procedure-ccam'
+}))
+
+vi.mock('config', () => ({
+  getConfig: vi.fn(() => ({
+    system: { fhirUrl: 'https://localhost/fhir' },
+    core: {
+      fhir: { filterActive: true },
+      valueSets: { encounterStatus: { url: 'https://terminology.hl7.org/ValueSet/encounter-status' } }
+    },
+    features: {
+      procedure: {
+        valueSets: {
+          procedureHierarchy: { url: PROCEDURE_VALUESET_URL, codeSystemUrls: [PROCEDURE_CODESYSTEM_URL] }
+        },
+        filters: { sources: { arem: 'AREM', orbis: 'ORBIS' } }
+      }
+    }
+  })),
+  onUpdateConfig: vi.fn()
+}))
+
+vi.mock('data/valueSets', () => ({
+  getReferences: vi.fn(() => [
+    {
+      url: PROCEDURE_VALUESET_URL,
+      codeSystemUrls: [PROCEDURE_CODESYSTEM_URL],
       label: 'CCAM',
-      title: 'CCAM Title'
-    }))
-    
-    expect(valueSetsInfo).toHaveLength(1)
-    expect(valueSetsInfo[0].url).toBe('https://terminology.hl7.org/ValueSet/procedure-ccam')
+      title: 'CCAM',
+      standard: true,
+      checked: true,
+      isHierarchy: true,
+      joinDisplayWithCode: true,
+      joinDisplayWithSystem: false
+    }
+  ])
+}))
+
+import { form } from 'components/CreationCohort/DiagramView/components/LogicalOperator/components/CriteriaRightPanel/forms/CCAMForm'
+
+const getCodeSearchItem = () => {
+  const items = form().itemSections.flatMap((section) => section.items)
+  const codeSearch = items.find((item) => item.type === 'codeSearch')
+  if (!codeSearch) throw new Error('codeSearch item not found in CCAMForm')
+  return codeSearch as Extract<typeof codeSearch, { type: 'codeSearch' }>
+}
+
+describe('CCAMForm', () => {
+  it('exposes the ValueSet URL in valueSetsInfo (for searching/listing)', () => {
+    const item = getCodeSearchItem()
+    expect(item.valueSetsInfo.map((ref) => ref.url)).toEqual([PROCEDURE_VALUESET_URL])
   })
 
-  it('should extract codeSystemUrl from config for buildMethodExtraArgs', () => {
-    // Simulate the logic in CCAMForm
-    const codeSystemUrls = ['https://terminology.hl7.org/CodeSystem/procedure-ccam']
-    const codeSystemUrl = codeSystemUrls.at(0) || ''
-    
-    expect(codeSystemUrl).toBe('https://terminology.hl7.org/CodeSystem/procedure-ccam')
-  })
-
-  it('should handle empty codeSystemUrls array', () => {
-    const codeSystemUrls: string[] = []
-    const codeSystemUrl = codeSystemUrls.at(0) || ''
-    
-    expect(codeSystemUrl).toBe('')
-  })
-
-  it('should handle undefined codeSystemUrls', () => {
-    const codeSystemUrls: any = undefined
-    const codeSystemUrl = codeSystemUrls?.at(0) || ''
-    
-    expect(codeSystemUrl).toBe('')
-  })
-
-  it('should use ValueSet URL not CodeSystem URL for valueSetsInfo', () => {
-    const valueSetUrl = 'https://terminology.hl7.org/ValueSet/procedure-ccam'
-    const codeSystemUrl = 'https://terminology.hl7.org/CodeSystem/procedure-ccam'
-    
-    // valueSetsInfo should use ValueSet URL
-    const valueSetsInfo = [{ url: valueSetUrl }]
-    
-    // buildMethodExtraArgs should use CodeSystem URL
-    const buildMethodExtraArgs = [{ type: 'string', value: codeSystemUrl }]
-    
-    expect(valueSetsInfo[0].url).toContain('ValueSet')
-    expect(valueSetsInfo[0].url).not.toContain('CodeSystem')
-    expect(buildMethodExtraArgs[0].value).toContain('CodeSystem')
-    expect(buildMethodExtraArgs[0].value).not.toContain('ValueSet')
+  it('uses the CodeSystem URL in buildMethodExtraArgs (for individual codes)', () => {
+    const item = getCodeSearchItem()
+    expect(item.buildInfo?.buildMethodExtraArgs?.[0].value).toBe(PROCEDURE_CODESYSTEM_URL)
   })
 })

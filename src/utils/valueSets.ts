@@ -27,15 +27,15 @@ export const getValueSetReferenceFromCodeSystem = (codeSystemUrl: string) => {
   return references.find((ref) => ref.codeSystemUrls?.includes(codeSystemUrl))
 }
 
+const getReference = (systemOrValueSetUrl: string) => {
+  return (
+    getValueSetReferenceFromCodeSystem(systemOrValueSetUrl) ||
+    getReferences(getConfig()).find((ref) => ref.url === systemOrValueSetUrl)
+  )
+}
+
 export const isDisplayedWithCode = (systemOrValueSetUrl: string) => {
-  // First try to find by CodeSystem URL
-  let isFound = getValueSetReferenceFromCodeSystem(systemOrValueSetUrl)
-  // If not found, try to find by ValueSet URL
-  if (!isFound) {
-    const references = getReferences(getConfig())
-    isFound = references.find((ref) => ref.url === systemOrValueSetUrl)
-  }
-  return isFound?.joinDisplayWithCode
+  return getReference(systemOrValueSetUrl)?.joinDisplayWithCode
 }
 
 /**
@@ -50,14 +50,7 @@ export const isDisplayedWithCode = (systemOrValueSetUrl: string) => {
  * ```
  */
 export const isDisplayedWithSystem = (systemOrValueSetUrl: string) => {
-  // First try to find by CodeSystem URL
-  let isFound = getValueSetReferenceFromCodeSystem(systemOrValueSetUrl)
-  // If not found, try to find by ValueSet URL
-  if (!isFound) {
-    const references = getReferences(getConfig())
-    isFound = references.find((ref) => ref.url === systemOrValueSetUrl)
-  }
-  return isFound?.joinDisplayWithSystem
+  return getReference(systemOrValueSetUrl)?.joinDisplayWithSystem
 }
 
 /**
@@ -73,7 +66,6 @@ export const isDisplayedWithSystem = (systemOrValueSetUrl: string) => {
  * ```
  */
 export const getLabelFromCode = <T>(code: Hierarchy<T>) => {
-  // Use valueSetUrl if available, otherwise fallback to system
   const urlToCheck = code.valueSetUrl || code.system
   if (isDisplayedWithCode(urlToCheck) && code.id !== HIERARCHY_ROOT) return `${code.id} - ${code.label}`
   return code.label
@@ -113,14 +105,7 @@ export const getFullLabelFromCode = (code: LabelObject) => {
  * ```
  */
 export const getLabelFromSystem = (systemOrValueSetUrl: string) => {
-  // First try to find by CodeSystem URL
-  let isFound = getValueSetReferenceFromCodeSystem(systemOrValueSetUrl)
-  // If not found, try to find by ValueSet URL
-  if (!isFound) {
-    const references = getReferences(getConfig())
-    isFound = references.find((ref) => ref.url === systemOrValueSetUrl)
-  }
-  return isFound?.label || ''
+  return getReference(systemOrValueSetUrl)?.label || ''
 }
 
 /**
