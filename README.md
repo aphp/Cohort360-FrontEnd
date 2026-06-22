@@ -86,5 +86,4 @@ Practical guidance:
 
 Main implementation entry points:
 
-- `src/services/aphp/serviceValueSets.ts` for terminology loading strategy.
-- `public/config.dev.json` for configured terminology URLs.
+- `src/services/aphp/serviceValueSets.ts` for terminology loading
