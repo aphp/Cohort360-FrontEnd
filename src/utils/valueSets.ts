@@ -34,6 +34,12 @@ const getReference = (systemOrValueSetUrl: string) => {
   )
 }
 
+// Resolve the configured FHIR resource type for a ValueSet/CodeSystem URL
+// from the single reference source of truth (getReferences).
+export const getResourceTypeFromUrl = (systemOrValueSetUrl: string) => {
+  return getReference(systemOrValueSetUrl)?.resourceType
+}
+
 export const isDisplayedWithCode = (systemOrValueSetUrl: string) => {
   return getReference(systemOrValueSetUrl)?.joinDisplayWithCode
 }

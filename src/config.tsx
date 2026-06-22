@@ -18,6 +18,10 @@ type DeepPartial<T> = {
 export type TerminologyResourceType = 'ValueSet' | 'CodeSystem'
 export type TerminologyLoadingMode = 'list' | 'expand'
 
+// Single source of truth for the "expand" loading strategy check,
+// used by both the search hook and the ValueSet table component.
+export const isExpandLoadingMode = (loadingMode?: TerminologyLoadingMode) => loadingMode === 'expand'
+
 export type ValueSetConfig = {
   url: string // ValueSet URL (for searching/listing valuesets)
   codeSystemUrls?: string[] // Array of CodeSystem URLs (for individual codes within valuesets)

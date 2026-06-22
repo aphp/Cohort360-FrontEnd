@@ -83,7 +83,8 @@ vi.mock('utils/valueSets', () => ({
       return 'https://terminology.hl7.org/ValueSet/biology-anabio'
     }
     return undefined
-  })
+  }),
+  getResourceTypeFromUrl: vi.fn((url: string) => (url.includes('/CodeSystem/') ? 'CodeSystem' : 'ValueSet'))
 }))
 
 describe('serviceValueSets', () => {

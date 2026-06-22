@@ -5,41 +5,20 @@ import { Hierarchy } from 'types/hierarchy'
 import { getApiResponseResourceOrThrow, getApiResponseResourcesOrThrow } from 'utils/apiHelpers'
 import { capitalizeFirstLetter } from 'utils/string'
 import { getConfig } from 'config'
-import type { TerminologyResourceType } from 'config'
 import { getReferences } from 'data/valueSets'
 import { LOW_TOLERANCE_TAG } from './callApi'
 import { sortArray } from 'utils/arrays'
 import { FhirItem, ValueSetSorting } from 'types/valueSet'
 import axios from 'axios'
 import { getExtension, getExtensionIntegerValue } from 'utils/fhir'
-import { getValueSetFromCodeSystem } from 'utils/valueSets'
+import { getResourceTypeFromUrl, getValueSetFromCodeSystem } from 'utils/valueSets'
 
 export const UNKOWN_HIERARCHY_CHAPTER = 'UNKNOWN'
 export const HIERARCHY_ROOT = '*'
 const isCodeSystemUrl = (url: string) => url.includes('/CodeSystem/')
 
-const getConfiguredTerminologyResourceType = (url: string): TerminologyResourceType | undefined => {
-  const appConfig = getConfig() as any
-
-  const valueSetGroups: Array<Record<string, { url?: string; resourceType?: TerminologyResourceType }>> = [
-    appConfig?.core?.valueSets || {}
-  ]
-
-  Object.values(appConfig?.features || {}).forEach((feature: any) => {
-    if (feature?.valueSets) valueSetGroups.push(feature.valueSets)
-  })
-
-  for (const group of valueSetGroups) {
-    for (const entry of Object.values(group)) {
-      if (entry?.url === url) return entry.resourceType
-    }
-  }
-
-  return undefined
-}
-
 const shouldUseCodeSystemLoading = (url: string) => {
-  return getConfiguredTerminologyResourceType(url) === 'CodeSystem' || isCodeSystemUrl(url)
+  return getResourceTypeFromUrl(url) === 'CodeSystem' || isCodeSystemUrl(url)
 }
 
 const isDataNonQuali = (system: string) => {
@@ -76,7 +55,7 @@ const mapAbandonedChildren = (children: Hierarchy<FhirItem>[]) => {
  * @returns
  */
 const mapFhirHierarchyToHierarchyWithLabelAndSystem = (fhirItem: FhirItem): Hierarchy<FhirItem> => {
-  const result = {
+  return {
     id: fhirItem.id,
     label: fhirItem.label,
     system: fhirItem.system,
@@ -86,7 +65,6 @@ const mapFhirHierarchyToHierarchyWithLabelAndSystem = (fhirItem: FhirItem): Hier
     statTotal: fhirItem.statTotal,
     statTotalUnique: fhirItem.statTotalUnique
   }
-  return result
 }
 
 const mapCodesToFhirItems = (

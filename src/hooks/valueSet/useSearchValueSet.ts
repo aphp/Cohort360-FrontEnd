@@ -15,6 +15,7 @@ import { useAppDispatch, useAppSelector } from 'state'
 import { DEFAULT_HIERARCHY_INFO, getItemSelectedStatus, mapCodesToCache } from 'utils/hierarchy'
 import { LoadingStatus } from 'types'
 import { cancelPendingRequest } from 'utils/abortController'
+import { isExpandLoadingMode } from 'config'
 
 export const useSearchValueSet = (references: Reference[], selectedNodes: Hierarchy<FhirItem, string>[]) => {
   const researchParameters = useSearchParameters()
@@ -26,7 +27,7 @@ export const useSearchValueSet = (references: Reference[], selectedNodes: Hierar
   const dispatch = useAppDispatch()
   const controllerRef = useRef<AbortController | null>(null)
 
-  const shouldUseExpandLoading = useCallback((ref: Reference) => ref.loadingMode === 'expand', [])
+  const shouldUseExpandLoading = useCallback((ref: Reference) => isExpandLoadingMode(ref.loadingMode), [])
 
   const fetchChildren = useCallback(
     async (ids: string, valueSetUrl: string) => (await getChildrenFromCodes(valueSetUrl, ids.split(','))).results,

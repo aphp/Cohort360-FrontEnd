@@ -28,6 +28,7 @@ import { Pagination } from 'components/ui/Pagination'
 import { getLabelFromCode, isDisplayedWithCode } from 'utils/valueSets'
 import { FhirItem, ValueSetSortField, ValueSetSorting } from 'types/valueSet'
 import TruncatedText from 'components/ui/TruncatedText'
+import { isExpandLoadingMode, TerminologyLoadingMode } from 'config'
 
 const HEADER_NB_PATIENTS = 'Nb Patients'
 const HEADER_FREQUENCY = 'Fréquence'
@@ -38,7 +39,7 @@ type ValueSetRowProps = {
   isSelectionDisabled: (node: Hierarchy<FhirItem>) => boolean
   path: string[]
   mode: SearchMode
-  loadingMode?: 'list' | 'expand'
+  loadingMode?: TerminologyLoadingMode
   onExpand: (node: Hierarchy<FhirItem>) => void
   onSelect: (nodes: Hierarchy<FhirItem>[], toAdd: boolean, mode: SearchMode) => void
   isHeader?: boolean
@@ -57,7 +58,7 @@ const ValueSetRow = ({
 }: ValueSetRowProps) => {
   const [open, setOpen] = useState(false)
   const [internalLoading, setInternalLoading] = useState(false)
-  const isExpandMode = loadingMode === 'expand'
+  const isExpandMode = isExpandLoadingMode(loadingMode)
   const { label, subItems, status, id } = item
 
   const handleOpen = () => {
@@ -159,7 +160,7 @@ type ValueSetTableProps = {
   hierarchy: HierarchyInfo<FhirItem>
   selectAllStatus: SelectedStatus
   loading: { expand: LoadingStatus; list: LoadingStatus }
-  loadingMode?: 'list' | 'expand'
+  loadingMode?: TerminologyLoadingMode
   mode: SearchMode
   isSelectionDisabled?: (node: Hierarchy<FhirItem>) => boolean
   onExpand: (node: Hierarchy<FhirItem>) => void
@@ -183,7 +184,7 @@ const ValueSetTable = ({
   onSort
 }: ValueSetTableProps) => {
   const [currentSort, setCurrentSort] = useState<ValueSetSorting | null>(null)
-  const isExpandMode = loadingMode === 'expand'
+  const isExpandMode = isExpandLoadingMode(loadingMode)
 
   const handleSelect = (checked: boolean) => {
     if (mode === SearchMode.RESEARCH) {
