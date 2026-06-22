@@ -8,7 +8,7 @@ import { store } from 'state/store'
 import { Comparators, ConditionParamsKeys, CriteriaType, ResourceType } from 'types/requestCriterias'
 import { getConfig } from 'config'
 import { SourceType } from 'types/scope'
-import { fn } from '@storybook/test'
+import { fn } from 'storybook/test'
 
 const meta = {
   title: 'CriteriaForm',
