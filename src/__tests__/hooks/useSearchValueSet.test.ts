@@ -1,7 +1,7 @@
 import { act, renderHook } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { SearchMode, type Hierarchy } from 'types/hierarchy'
-import type { FhirItem, Reference } from 'types/valueSet'
+import { References, type FhirItem, type Reference } from 'types/valueSet'
 
 const HIERARCHY_ROOT = '*'
 
@@ -52,7 +52,7 @@ const VALUESET_URL = 'https://terminology.hl7.org/ValueSet/biology-anabio'
 const CODESYSTEM_URL = 'https://terminology.hl7.org/CodeSystem/biology-anabio'
 
 const mkRef = (overrides: Partial<Reference> = {}): Reference => ({
-  id: 'ref',
+  id: References.ANABIO,
   url: VALUESET_URL,
   label: 'Anabio',
   title: 'Anabio',
