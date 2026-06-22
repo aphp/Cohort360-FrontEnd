@@ -1,66 +1,67 @@
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 
-describe('BiologyForm - ValueSet URL usage', () => {
-  it('should use ValueSet URLs for valueSetsInfo', () => {
-    // Simulate the logic in BiologyForm
-    const biologyAnabioUrl = 'https://terminology.hl7.org/ValueSet/biology-anabio'
-    const biologyLoincUrl = 'https://terminology.hl7.org/ValueSet/biology-loinc'
-    const urls = [biologyAnabioUrl, biologyLoincUrl]
-    
-    // Simulate getValueSetsByUrls returning references
-    const valueSetsInfo = urls.map((url) => ({
-      url,
-      label: url.includes('anabio') ? 'Anabio' : 'LOINC',
-      title: url.includes('anabio') ? 'Anabio Title' : 'LOINC Title'
+const { ANABIO_VALUESET_URL, ANABIO_CODESYSTEM_URL, LOINC_VALUESET_URL, LOINC_CODESYSTEM_URL } = vi.hoisted(() => ({
+  ANABIO_VALUESET_URL: 'https://terminology.hl7.org/ValueSet/biology-anabio',
+  ANABIO_CODESYSTEM_URL: 'https://terminology.hl7.org/CodeSystem/biology-anabio',
+  LOINC_VALUESET_URL: 'https://terminology.hl7.org/ValueSet/biology-loinc',
+  LOINC_CODESYSTEM_URL: 'https://terminology.hl7.org/CodeSystem/biology-loinc'
+}))
+
+vi.mock('config', () => ({
+  getConfig: vi.fn(() => ({
+    system: { fhirUrl: 'https://localhost/fhir' },
+    core: {
+      fhir: { filterActive: true },
+      valueSets: { encounterStatus: { url: 'https://terminology.hl7.org/ValueSet/encounter-status' } }
+    },
+    features: {
+      observation: {
+        useObservationDefaultValidated: true,
+        useObservationValueRestriction: false,
+        valueSets: {
+          biologyHierarchyAnabio: { url: ANABIO_VALUESET_URL, codeSystemUrls: [ANABIO_CODESYSTEM_URL] },
+          biologyHierarchyLoinc: { url: LOINC_VALUESET_URL, codeSystemUrls: [LOINC_CODESYSTEM_URL] }
+        }
+      }
+    }
+  })),
+  onUpdateConfig: vi.fn()
+}))
+
+vi.mock('data/valueSets', () => ({
+  getReferences: vi.fn(() =>
+    [
+      { url: ANABIO_VALUESET_URL, codeSystemUrls: [ANABIO_CODESYSTEM_URL], label: 'ANABIO' },
+      { url: LOINC_VALUESET_URL, codeSystemUrls: [LOINC_CODESYSTEM_URL], label: 'LOINC' }
+    ].map((ref) => ({
+      ...ref,
+      title: ref.label,
+      standard: true,
+      checked: true,
+      isHierarchy: true,
+      joinDisplayWithCode: false,
+      joinDisplayWithSystem: false
     }))
-    
-    expect(valueSetsInfo).toHaveLength(2)
-    expect(valueSetsInfo[0].url).toBe('https://terminology.hl7.org/ValueSet/biology-anabio')
-    expect(valueSetsInfo[1].url).toBe('https://terminology.hl7.org/ValueSet/biology-loinc')
+  )
+}))
+
+import { form } from 'components/CreationCohort/DiagramView/components/LogicalOperator/components/CriteriaRightPanel/forms/BiologyForm'
+
+const getCodeSearchItem = () => {
+  const items = form().itemSections.flatMap((section) => section.items)
+  const codeSearch = items.find((item) => item.type === 'codeSearch')
+  if (!codeSearch) throw new Error('codeSearch item not found in BiologyForm')
+  return codeSearch as Extract<typeof codeSearch, { type: 'codeSearch' }>
+}
+
+describe('BiologyForm', () => {
+  it('exposes both ValueSet URLs in valueSetsInfo (for searching/listing)', () => {
+    const item = getCodeSearchItem()
+    expect(item.valueSetsInfo.map((ref) => ref.url)).toEqual([ANABIO_VALUESET_URL, LOINC_VALUESET_URL])
   })
 
-  it('should extract codeSystemUrl from config for buildMethodExtraArgs', () => {
-    // Simulate the logic in BiologyForm
-    const codeSystemUrls = ['https://terminology.hl7.org/CodeSystem/biology-anabio']
-    const codeSystemUrl = codeSystemUrls.at(0) || ''
-    
-    expect(codeSystemUrl).toBe('https://terminology.hl7.org/CodeSystem/biology-anabio')
-  })
-
-  it('should handle empty codeSystemUrls array', () => {
-    const codeSystemUrls: string[] = []
-    const codeSystemUrl = codeSystemUrls.at(0) || ''
-    
-    expect(codeSystemUrl).toBe('')
-  })
-
-  it('should handle undefined codeSystemUrls', () => {
-    const codeSystemUrls: any = undefined
-    const codeSystemUrl = codeSystemUrls?.at(0) || ''
-    
-    expect(codeSystemUrl).toBe('')
-  })
-
-  it('should use ValueSet URLs not CodeSystem URLs for valueSetsInfo', () => {
-    const valueSetUrls = [
-      'https://terminology.hl7.org/ValueSet/biology-anabio',
-      'https://terminology.hl7.org/ValueSet/biology-loinc'
-    ]
-    
-    const valueSetsInfo = valueSetUrls.map((url) => ({ url }))
-    
-    expect(valueSetsInfo.every((info) => info.url.includes('ValueSet'))).toBe(true)
-    expect(valueSetsInfo.every((info) => !info.url.includes('CodeSystem'))).toBe(true)
-  })
-
-  it('should use CodeSystem URL for buildMethodExtraArgs', () => {
-    const codeSystemUrl = 'https://terminology.hl7.org/CodeSystem/biology-anabio'
-    const buildMethodExtraArgs = [
-      { type: 'string', value: codeSystemUrl },
-      { type: 'boolean', value: true }
-    ]
-    
-    expect(buildMethodExtraArgs[0].value).toContain('CodeSystem')
-    expect(buildMethodExtraArgs[0].value).not.toContain('ValueSet')
+  it('uses the ANABIO CodeSystem URL in buildMethodExtraArgs (for individual codes)', () => {
+    const item = getCodeSearchItem()
+    expect(item.buildInfo?.buildMethodExtraArgs?.[0].value).toBe(ANABIO_CODESYSTEM_URL)
   })
 })

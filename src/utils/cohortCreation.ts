@@ -827,17 +827,7 @@ export const fetchCriteriasCodes = async (
             const labelValues = criterion[dataKey] as unknown as LabelObject[]
             if (labelValues && labelValues.length > 0) {
               for (const code of labelValues) {
-                // code.system is a CodeSystem URL, we need to find the corresponding ValueSet URL
-                let valueSetUrl = defaultValueSet
-                if (code.system) {
-                  // Try to find the ValueSet URL from the CodeSystem URL
-                  const foundValueSetUrl = getValueSetFromCodeSystem(code.system)
-                  if (foundValueSetUrl) {
-                    valueSetUrl = foundValueSetUrl
-                  } else {
-                    valueSetUrl = defaultValueSet
-                  }
-                }
+                const valueSetUrl = (code.system && getValueSetFromCodeSystem(code.system)) || defaultValueSet
                 const valueSetCodeCache = [...(updatedCriteriaData[valueSetUrl] ?? [])]
                 if (!valueSetCodeCache.find((data) => data.id === code.id)) {
                   try {
@@ -848,7 +838,6 @@ export const fetchCriteriasCodes = async (
                       console.warn(`Code ${code.id} not found in valueSet ${valueSetUrl}`)
                     }
                   } catch (e) {
-                    // fail silently
                     console.error(`Error fetching code ${code.id} from valueSet ${valueSetUrl}`, e)
                   }
                 }

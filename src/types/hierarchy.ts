@@ -55,6 +55,11 @@ export type GroupedBySystem<T> = {
   codes: Hierarchy<T>[]
 }
 
+export type GroupedByValueSet<T> = {
+  valueSetUrl: string
+  codes: Hierarchy<T>[]
+}
+
 export type Codes<T> = Map<string, Map<string, Hierarchy<T>>>
 
 export type CodesCache<T> = {

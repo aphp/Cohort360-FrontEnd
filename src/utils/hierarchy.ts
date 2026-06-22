@@ -1,4 +1,13 @@
-import { Codes, CodesCache, GroupedBySystem, Hierarchy, InfiniteMap, Mode, SelectedStatus } from 'types/hierarchy'
+import {
+  Codes,
+  CodesCache,
+  GroupedBySystem,
+  GroupedByValueSet,
+  Hierarchy,
+  InfiniteMap,
+  Mode,
+  SelectedStatus
+} from 'types/hierarchy'
 import { arrayToMap } from './arrays'
 import { HIERARCHY_ROOT, UNKOWN_HIERARCHY_CHAPTER } from 'services/aphp/serviceValueSets'
 
@@ -72,7 +81,7 @@ const addAllFetchedIds = <T>(codes: Map<string, Hierarchy<T, string>>, results: 
 
 export const getMissingCodesWithValueSets = async <T>(
   trees: Map<string, Hierarchy<T, string>[]>,
-  groupByValueSet: Array<{ valueSetUrl: string; codes: Hierarchy<T, string>[] }>,
+  groupByValueSet: GroupedByValueSet<T>[],
   codes: Codes<Hierarchy<T>>,
   fetchHandler: (ids: string, valueSetUrl: string) => Promise<Hierarchy<T, string>[]>
 ) => {
@@ -112,7 +121,6 @@ export const getMissingCodes = async <T>(
   }
   if (missingIds.length) {
     const ids = missingIds.join(',')
-    console.log('debug: getMissingCodes calling fetchHandler with ids:', ids, 'valueSetUrl:', valueSetUrl)
     const fetched = await fetchHandler(ids, valueSetUrl)
     allCodes = addAllFetchedIds(allCodes, fetched)
   }
@@ -121,7 +129,6 @@ export const getMissingCodes = async <T>(
     missingIds = getMissingIds(allCodes, arrayToMap(children, null))
     if (missingIds.length) {
       const ids = missingIds.join(',')
-      console.log('debug: getMissingCodes (children) calling fetchHandler with ids:', ids, 'valueSetUrl:', valueSetUrl)
       const childrenResponse = await fetchHandler(ids, valueSetUrl)
       allCodes = addAllFetchedIds(allCodes, childrenResponse)
     }
@@ -147,7 +154,7 @@ const getMissingSubItems = <T>(node: Hierarchy<T, string>, codes: Map<string, Hi
 
 export const buildMultipleTrees = <T>(
   trees: Map<string, Hierarchy<T, string>[]>,
-  groupByValueSet: Array<{ valueSetUrl: string; codes: Hierarchy<T, string>[] }>,
+  groupByValueSet: GroupedByValueSet<T>[],
   codes: Codes<Hierarchy<T>>,
   selected: Codes<Hierarchy<T>>,
   mode: Mode
@@ -245,14 +252,13 @@ export const groupBySystem = <T>(codes: Hierarchy<T, string>[]) => {
 export const groupByValueSet = <T>(codes: Hierarchy<T, string>[]) => {
   const valueSetMap = new Map<string, Hierarchy<T, string>[]>()
   for (const hierarchy of codes) {
-    // Use valueSetUrl if available, otherwise fallback to system (which should now rarely happen after the fix)
     const valueSetUrl = hierarchy.valueSetUrl || hierarchy.system
     if (!valueSetMap.has(valueSetUrl)) {
       valueSetMap.set(valueSetUrl, [])
     }
     valueSetMap.get(valueSetUrl)!.push(hierarchy)
   }
-  const groupedHierarchies: Array<{ valueSetUrl: string; codes: Hierarchy<T, string>[] }> = []
+  const groupedHierarchies: GroupedByValueSet<T>[] = []
   valueSetMap.forEach((codes, valueSetUrl) => {
     groupedHierarchies.push({ valueSetUrl, codes })
   })
