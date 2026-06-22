@@ -3,7 +3,7 @@
  * @module utils/valueSets
  */
 
-import { getConfig } from 'config'
+import { getConfig, TerminologyResourceType, ValueSetConfig } from 'config'
 import { getReferences } from 'data/valueSets'
 import { HIERARCHY_ROOT, getChildrenFromCodes } from 'services/aphp/serviceValueSets'
 import { Codes, Hierarchy } from 'types/hierarchy'
@@ -34,8 +34,27 @@ const getReference = (systemOrValueSetUrl: string) => {
   )
 }
 
-export const getResourceTypeFromUrl = (systemOrValueSetUrl: string) => {
-  return getReference(systemOrValueSetUrl)?.resourceType
+const findValueSetConfigByUrl = (url: string): ValueSetConfig | undefined => {
+  const config = getConfig()
+  const valueSetGroups: Array<Record<string, ValueSetConfig>> = [config.core.valueSets]
+  for (const feature of Object.values(config.features)) {
+    const valueSets = (feature as { valueSets?: Record<string, ValueSetConfig> })?.valueSets
+    if (valueSets) valueSetGroups.push(valueSets)
+  }
+  for (const group of valueSetGroups) {
+    for (const entry of Object.values(group)) {
+      if (entry?.url === url) return entry
+    }
+  }
+  return undefined
+}
+
+export const getResourceTypeFromUrl = (url: string): TerminologyResourceType | undefined => {
+  return findValueSetConfigByUrl(url)?.resourceType
+}
+
+export const getCodeSystemUrlFromValueSetUrl = (url: string): string => {
+  return findValueSetConfigByUrl(url)?.codeSystemUrls?.[0] ?? url
 }
 
 export const isDisplayedWithCode = (systemOrValueSetUrl: string) => {

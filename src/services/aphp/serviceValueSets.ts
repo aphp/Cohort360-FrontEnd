@@ -11,7 +11,7 @@ import { sortArray } from 'utils/arrays'
 import { FhirItem, ValueSetSorting } from 'types/valueSet'
 import axios from 'axios'
 import { getExtension, getExtensionIntegerValue } from 'utils/fhir'
-import { getResourceTypeFromUrl, getValueSetFromCodeSystem } from 'utils/valueSets'
+import { getCodeSystemUrlFromValueSetUrl, getResourceTypeFromUrl, getValueSetFromCodeSystem } from 'utils/valueSets'
 
 export const UNKOWN_HIERARCHY_CHAPTER = 'UNKNOWN'
 export const HIERARCHY_ROOT = '*'
@@ -340,7 +340,8 @@ export const getCodeList = async (
   signal?: AbortSignal
 ): Promise<Back_API_Response<FhirItem>> => {
   if (shouldUseCodeSystemLoading(valueSetUrl)) {
-    const codeSystemItems = await fetchCodeSystem(valueSetUrl, signal)
+    const codeSystemUrl = getCodeSystemUrlFromValueSetUrl(valueSetUrl)
+    const codeSystemItems = await fetchCodeSystem(codeSystemUrl, signal)
     return {
       results: codeSystemItems,
       count: codeSystemItems.length

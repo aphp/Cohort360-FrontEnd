@@ -56,7 +56,8 @@ vi.mock('data/valueSets', () => ({
       label: 'Test ValueSet',
       title: 'Test ValueSet Title',
       standard: true,
-      checked: false,
+      checked: false,
+
       joinDisplayWithCode: true,
       joinDisplayWithSystem: true,
       codeSystemUrls: ['https://terminology.hl7.org/CodeSystem/test-codesystem']
@@ -66,7 +67,8 @@ vi.mock('data/valueSets', () => ({
       label: 'Biology Anabio',
       title: 'Biology Anabio Title',
       standard: true,
-      checked: false,
+      checked: false,
+
       joinDisplayWithCode: true,
       joinDisplayWithSystem: false,
       codeSystemUrls: ['https://terminology.hl7.org/CodeSystem/biology-anabio']
@@ -84,7 +86,12 @@ vi.mock('utils/valueSets', () => ({
     }
     return undefined
   }),
-  getResourceTypeFromUrl: vi.fn((url: string) => (url.includes('/CodeSystem/') ? 'CodeSystem' : 'ValueSet'))
+  getResourceTypeFromUrl: vi.fn((url: string) =>
+    url.includes('/CodeSystem/') || url === 'https://terminology.hl7.org/ValueSet/gender-as-codesystem'
+      ? 'CodeSystem'
+      : 'ValueSet'
+  ),
+  getCodeSystemUrlFromValueSetUrl: vi.fn((url: string) => url.replace('/ValueSet/', '/CodeSystem/'))
 }))
 
 describe('serviceValueSets', () => {
@@ -493,6 +500,35 @@ describe('serviceValueSets', () => {
       expect(result.count).toBe(2)
       expect(apiFhir.get).toHaveBeenCalledWith(
         expect.stringContaining('/CodeSystem?url=https://terminology.hl7.org/CodeSystem/test-codesystem'),
+        expect.any(Object)
+      )
+    })
+
+    it('should load via CodeSystem using the resolved CodeSystem URL when a ValueSet URL is configured as CodeSystem', async () => {
+      const mockResponse = {
+        data: {
+          entry: [
+            {
+              resource: {
+                resourceType: 'CodeSystem',
+                url: 'https://terminology.hl7.org/CodeSystem/test-codesystem',
+                concept: [{ code: 'code1', display: 'Code 1' }]
+              }
+            }
+          ]
+        }
+      }
+
+      vi.mocked(apiFhir.get).mockResolvedValue(mockResponse)
+
+      await getCodeList('https://terminology.hl7.org/ValueSet/gender-as-codesystem', false)
+
+      expect(apiFhir.get).toHaveBeenCalledWith(
+        expect.stringContaining('/CodeSystem?url=https://terminology.hl7.org/CodeSystem/gender-as-codesystem'),
+        expect.any(Object)
+      )
+      expect(apiFhir.get).not.toHaveBeenCalledWith(
+        expect.stringContaining('/ValueSet?url='),
         expect.any(Object)
       )
     })
