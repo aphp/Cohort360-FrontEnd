@@ -8,6 +8,8 @@ import {
   getLabelFromCode,
   getFullLabelFromCode,
   getLabelFromSystem,
+  getResourceTypeFromUrl,
+  getCodeSystemUrlFromValueSetUrl,
   checkIsLeaf
 } from 'utils/valueSets'
 import { HIERARCHY_ROOT } from 'services/aphp/serviceValueSets'
@@ -17,12 +19,22 @@ import { FhirItem } from 'types/valueSet'
 // Mock dependencies
 vi.mock('config', () => ({
   getConfig: vi.fn(() => ({
+    core: {
+      valueSets: {
+        demographicGender: {
+          url: 'https://terminology.eds.aphp.fr/fhir/ValueSet/aphp-orbis-patient-genre',
+          codeSystemUrls: ['https://terminology.eds.aphp.fr/fhir/CodeSystem/aphp-orbis-patient-genre'],
+          resourceType: 'CodeSystem'
+        }
+      }
+    },
     features: {
       observation: {
         valueSets: {
           biologyHierarchyAnabio: {
             url: 'https://terminology.hl7.org/ValueSet/biology-anabio',
-            codeSystemUrls: ['https://terminology.hl7.org/CodeSystem/biology-anabio']
+            codeSystemUrls: ['https://terminology.hl7.org/CodeSystem/biology-anabio'],
+            resourceType: 'ValueSet'
           }
         }
       }
@@ -507,6 +519,35 @@ describe('valueSets utilities', () => {
         ['child1']
       )
       expect(result).toBe(true)
+    })
+  })
+
+  describe('getResourceTypeFromUrl', () => {
+    it('resolves resourceType for a core.valueSets entry not exposed by getReferences', () => {
+      expect(getResourceTypeFromUrl('https://terminology.eds.aphp.fr/fhir/ValueSet/aphp-orbis-patient-genre')).toBe(
+        'CodeSystem'
+      )
+    })
+
+    it('resolves resourceType for a feature valueSet entry', () => {
+      expect(getResourceTypeFromUrl('https://terminology.hl7.org/ValueSet/biology-anabio')).toBe('ValueSet')
+    })
+
+    it('returns undefined for an unknown url', () => {
+      expect(getResourceTypeFromUrl('https://terminology.hl7.org/ValueSet/does-not-exist')).toBeUndefined()
+    })
+  })
+
+  describe('getCodeSystemUrlFromValueSetUrl', () => {
+    it('returns the configured CodeSystem URL for a ValueSet URL', () => {
+      expect(
+        getCodeSystemUrlFromValueSetUrl('https://terminology.eds.aphp.fr/fhir/ValueSet/aphp-orbis-patient-genre')
+      ).toBe('https://terminology.eds.aphp.fr/fhir/CodeSystem/aphp-orbis-patient-genre')
+    })
+
+    it('falls back to the input url when no CodeSystem mapping is configured', () => {
+      const unknownUrl = 'https://terminology.hl7.org/ValueSet/does-not-exist'
+      expect(getCodeSystemUrlFromValueSetUrl(unknownUrl)).toBe(unknownUrl)
     })
   })
 })
