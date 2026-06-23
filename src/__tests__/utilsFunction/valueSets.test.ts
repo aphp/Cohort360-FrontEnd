@@ -10,6 +10,7 @@ import {
   getLabelFromSystem,
   getResourceTypeFromUrl,
   getCodeSystemUrlFromValueSetUrl,
+  getSearchSystemUrl,
   checkIsLeaf
 } from 'utils/valueSets'
 import { HIERARCHY_ROOT } from 'services/aphp/serviceValueSets'
@@ -548,6 +549,53 @@ describe('valueSets utilities', () => {
     it('falls back to the input url when no CodeSystem mapping is configured', () => {
       const unknownUrl = 'https://terminology.hl7.org/ValueSet/does-not-exist'
       expect(getCodeSystemUrlFromValueSetUrl(unknownUrl)).toBe(unknownUrl)
+    })
+  })
+
+  describe('getSearchSystemUrl', () => {
+    it('returns the first CodeSystem URL when resourceType is CodeSystem', () => {
+      const config = {
+        url: 'https://terminology.eds.aphp.fr/fhir/ValueSet/aphp-medicament-type-prescription',
+        codeSystemUrls: ['https://terminology.eds.aphp.fr/fhir/CodeSystem/aphp-medicament-type-prescription'],
+        resourceType: 'CodeSystem' as const
+      }
+      expect(getSearchSystemUrl(config)).toBe(
+        'https://terminology.eds.aphp.fr/fhir/CodeSystem/aphp-medicament-type-prescription'
+      )
+    })
+
+    it('returns the ValueSet url when resourceType is ValueSet', () => {
+      const config = {
+        url: 'https://aphp.fr/ig/fhir/eds/ValueSet/aphp-eds-aph-mat-type-anesth-vs',
+        codeSystemUrls: ['https://aphp.fr/ig/fhir/eds/CodeSystem/aphp-eds-aph-mat-type-anesth-cs'],
+        resourceType: 'ValueSet' as const
+      }
+      expect(getSearchSystemUrl(config)).toBe('https://aphp.fr/ig/fhir/eds/ValueSet/aphp-eds-aph-mat-type-anesth-vs')
+    })
+
+    it('returns the url when resourceType is not set', () => {
+      const config = {
+        url: 'https://terminology.hl7.org/ValueSet/no-resource-type',
+        codeSystemUrls: ['https://terminology.hl7.org/CodeSystem/no-resource-type']
+      }
+      expect(getSearchSystemUrl(config)).toBe('https://terminology.hl7.org/ValueSet/no-resource-type')
+    })
+
+    it('falls back to url when resourceType is CodeSystem but codeSystemUrls is missing', () => {
+      const config = {
+        url: 'https://terminology.hl7.org/CodeSystem/inline-codesystem',
+        resourceType: 'CodeSystem' as const
+      }
+      expect(getSearchSystemUrl(config)).toBe('https://terminology.hl7.org/CodeSystem/inline-codesystem')
+    })
+
+    it('falls back to url when resourceType is CodeSystem but codeSystemUrls is empty', () => {
+      const config = {
+        url: 'https://terminology.hl7.org/CodeSystem/empty-codesystem',
+        codeSystemUrls: [],
+        resourceType: 'CodeSystem' as const
+      }
+      expect(getSearchSystemUrl(config)).toBe('https://terminology.hl7.org/CodeSystem/empty-codesystem')
     })
   })
 })
