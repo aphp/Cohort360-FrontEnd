@@ -57,6 +57,11 @@ export const getCodeSystemUrlFromValueSetUrl = (url: string): string => {
   return findValueSetConfigByUrl(url)?.codeSystemUrls?.[0] ?? url
 }
 
+export const getSearchSystemUrl = (config: ValueSetConfig): string => {
+  if (config.resourceType === 'CodeSystem') return config.codeSystemUrls?.[0] ?? config.url
+  return config.url
+}
+
 export const isDisplayedWithCode = (systemOrValueSetUrl: string) => {
   return getReference(systemOrValueSetUrl)?.joinDisplayWithCode
 }
