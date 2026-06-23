@@ -49,16 +49,30 @@ const findValueSetConfigByUrl = (url: string): ValueSetConfig | undefined => {
   return undefined
 }
 
+const resolveCodeSystemUrl = (url: string, codeSystemUrls?: string[]): string => {
+  const codeSystemUrl = codeSystemUrls?.[0]
+  if (!codeSystemUrl) {
+    console.error(
+      `[valueSets] Terminology "${url}" is declared as CodeSystem but has no codeSystemUrls; ` +
+        `falling back to the ValueSet url. This usually yields an empty result. Check the config.`
+    )
+    return url
+  }
+  return codeSystemUrl
+}
+
 export const getResourceTypeFromUrl = (url: string): TerminologyResourceType | undefined => {
   return findValueSetConfigByUrl(url)?.resourceType
 }
 
 export const getCodeSystemUrlFromValueSetUrl = (url: string): string => {
-  return findValueSetConfigByUrl(url)?.codeSystemUrls?.[0] ?? url
+  const config = findValueSetConfigByUrl(url)
+  if (config?.resourceType === 'CodeSystem') return resolveCodeSystemUrl(url, config.codeSystemUrls)
+  return config?.codeSystemUrls?.[0] ?? url
 }
 
 export const getSearchSystemUrl = (config: ValueSetConfig): string => {
-  if (config.resourceType === 'CodeSystem') return config.codeSystemUrls?.[0] ?? config.url
+  if (config.resourceType === 'CodeSystem') return resolveCodeSystemUrl(config.url, config.codeSystemUrls)
   return config.url
 }
 

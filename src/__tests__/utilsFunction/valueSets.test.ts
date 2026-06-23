@@ -38,6 +38,14 @@ vi.mock('config', () => ({
             resourceType: 'ValueSet'
           }
         }
+      },
+      condition: {
+        valueSets: {
+          conditionStatus: {
+            url: 'https://terminology.hl7.org/ValueSet/malformed-codesystem',
+            resourceType: 'CodeSystem'
+          }
+        }
       }
     }
   }))
@@ -550,6 +558,14 @@ describe('valueSets utilities', () => {
       const unknownUrl = 'https://terminology.hl7.org/ValueSet/does-not-exist'
       expect(getCodeSystemUrlFromValueSetUrl(unknownUrl)).toBe(unknownUrl)
     })
+
+    it('falls back to the ValueSet url and logs an error for a CodeSystem entry missing codeSystemUrls', () => {
+      const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
+      const malformedUrl = 'https://terminology.hl7.org/ValueSet/malformed-codesystem'
+      expect(getCodeSystemUrlFromValueSetUrl(malformedUrl)).toBe(malformedUrl)
+      expect(errorSpy).toHaveBeenCalledOnce()
+      errorSpy.mockRestore()
+    })
   })
 
   describe('getSearchSystemUrl', () => {
@@ -581,21 +597,27 @@ describe('valueSets utilities', () => {
       expect(getSearchSystemUrl(config)).toBe('https://terminology.hl7.org/ValueSet/no-resource-type')
     })
 
-    it('falls back to url when resourceType is CodeSystem but codeSystemUrls is missing', () => {
+    it('falls back to url and logs an error when resourceType is CodeSystem but codeSystemUrls is missing', () => {
+      const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
       const config = {
         url: 'https://terminology.hl7.org/CodeSystem/inline-codesystem',
         resourceType: 'CodeSystem' as const
       }
       expect(getSearchSystemUrl(config)).toBe('https://terminology.hl7.org/CodeSystem/inline-codesystem')
+      expect(errorSpy).toHaveBeenCalledOnce()
+      errorSpy.mockRestore()
     })
 
-    it('falls back to url when resourceType is CodeSystem but codeSystemUrls is empty', () => {
+    it('falls back to url and logs an error when resourceType is CodeSystem but codeSystemUrls is empty', () => {
+      const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
       const config = {
         url: 'https://terminology.hl7.org/CodeSystem/empty-codesystem',
         codeSystemUrls: [],
         resourceType: 'CodeSystem' as const
       }
       expect(getSearchSystemUrl(config)).toBe('https://terminology.hl7.org/CodeSystem/empty-codesystem')
+      expect(errorSpy).toHaveBeenCalledOnce()
+      errorSpy.mockRestore()
     })
   })
 })

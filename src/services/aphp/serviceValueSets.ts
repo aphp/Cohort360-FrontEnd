@@ -15,10 +15,8 @@ import { getCodeSystemUrlFromValueSetUrl, getResourceTypeFromUrl, getValueSetFro
 
 export const UNKOWN_HIERARCHY_CHAPTER = 'UNKNOWN'
 export const HIERARCHY_ROOT = '*'
-const isCodeSystemUrl = (url: string) => url.includes('/CodeSystem/')
-
 const shouldUseCodeSystemLoading = (url: string) => {
-  return getResourceTypeFromUrl(url) === 'CodeSystem' || isCodeSystemUrl(url)
+  return getResourceTypeFromUrl(url) === 'CodeSystem'
 }
 
 const isDataNonQuali = (system: string) => {
