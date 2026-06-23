@@ -15,6 +15,7 @@ import { useAppDispatch, useAppSelector } from 'state'
 import { DEFAULT_HIERARCHY_INFO, getItemSelectedStatus, mapCodesToCache } from 'utils/hierarchy'
 import { LoadingStatus } from 'types'
 import { cancelPendingRequest } from 'utils/abortController'
+import { isExpandLoadingMode } from 'config'
 
 export const useSearchValueSet = (references: Reference[], selectedNodes: Hierarchy<FhirItem, string>[]) => {
   const researchParameters = useSearchParameters()
@@ -25,6 +26,8 @@ export const useSearchValueSet = (references: Reference[], selectedNodes: Hierar
   const [currentSorting, setCurrentSorting] = useState<ValueSetSorting | undefined>(undefined)
   const dispatch = useAppDispatch()
   const controllerRef = useRef<AbortController | null>(null)
+
+  const shouldUseExpandLoading = useCallback((ref: Reference) => isExpandLoadingMode(ref.loadingMode), [])
 
   const fetchChildren = useCallback(
     async (ids: string, valueSetUrl: string) => (await getChildrenFromCodes(valueSetUrl, ids.split(','))).results,
@@ -75,11 +78,11 @@ export const useSearchValueSet = (references: Reference[], selectedNodes: Hierar
       if (mode === SearchMode.RESEARCH && isAll) return true
       else {
         const ref = explorationParameters.options.references.find((ref) => ref.checked)
-        if (ref && !ref.isHierarchy && isAll) return true
+        if (ref && !shouldUseExpandLoading(ref) && isAll) return true
       }
       return false
     },
-    [explorationParameters.options.references, mode, selectedCodes]
+    [explorationParameters.options.references, mode, selectedCodes, shouldUseExpandLoading]
   )
 
   const selected = useMemo(() => {
@@ -102,7 +105,7 @@ export const useSearchValueSet = (references: Reference[], selectedNodes: Hierar
   }
 
   const fetchBaseTree = async (ref: Reference) => {
-    const fetch = ref.isHierarchy
+    const fetch = shouldUseExpandLoading(ref)
       ? () => getHierarchyRoots(ref.url, ref.title, ref.filterRoots)
       : () => searchInValueSets([ref.url], '', 0, LIMIT_PER_PAGE, undefined)
     try {

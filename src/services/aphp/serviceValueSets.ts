@@ -11,10 +11,13 @@ import { sortArray } from 'utils/arrays'
 import { FhirItem, ValueSetSorting } from 'types/valueSet'
 import axios from 'axios'
 import { getExtension, getExtensionIntegerValue } from 'utils/fhir'
-import { getValueSetFromCodeSystem } from 'utils/valueSets'
+import { getCodeSystemUrlFromValueSetUrl, getResourceTypeFromUrl, getValueSetFromCodeSystem } from 'utils/valueSets'
 
 export const UNKOWN_HIERARCHY_CHAPTER = 'UNKNOWN'
 export const HIERARCHY_ROOT = '*'
+const shouldUseCodeSystemLoading = (url: string) => {
+  return getResourceTypeFromUrl(url) === 'CodeSystem'
+}
 
 const isDataNonQuali = (system: string) => {
   switch (system) {
@@ -146,7 +149,7 @@ const formatCodesFromValueSetReponse = (valueSetBundle: ValueSet[]) => {
  * @returns the list of codes from the codesystem
  */
 export const fetchCodeSystem = async (codeSystem: string, signal?: AbortSignal): Promise<FhirItem[]> => {
-  const res = await apiFhir.get<FHIR_Bundle_Response<CodeSystem>>(`/CodeSystem?system=${codeSystem}`, {
+  const res = await apiFhir.get<FHIR_Bundle_Response<CodeSystem>>(`/CodeSystem?url=${codeSystem}`, {
     signal: signal
   })
   const codeSystemBundle = getApiResponseResourcesOrThrow(res)
@@ -334,6 +337,15 @@ export const getCodeList = async (
   codeInLabel = false,
   signal?: AbortSignal
 ): Promise<Back_API_Response<FhirItem>> => {
+  if (shouldUseCodeSystemLoading(valueSetUrl)) {
+    const codeSystemUrl = getCodeSystemUrlFromValueSetUrl(valueSetUrl)
+    const codeSystemItems = await fetchCodeSystem(codeSystemUrl, signal)
+    return {
+      results: codeSystemItems,
+      count: codeSystemItems.length
+    }
+  }
+
   const res = await apiFhir.get<FHIR_Bundle_Response<ValueSet>>(`/ValueSet?url=${valueSetUrl}`, {
     signal: signal
   })

@@ -114,7 +114,7 @@ const SearchValueSet = ({ references, selectedNodes, onSelect }: SearchValueSetP
         <Displayer isDisplayed={mode === SearchMode.EXPLORATION} height="100%" className="ValueSetExploration">
           <ValueSetTable
             mode={SearchMode.EXPLORATION}
-            isHierarchy={refs.find((ref) => ref.checked)?.isHierarchy}
+            loadingMode={refs.find((ref) => ref.checked)?.loadingMode}
             loading={{ list: loadingStatus.init, expand: loadingStatus.expand }}
             hierarchy={exploration}
             selectAllStatus={selectAllStatus}
@@ -129,7 +129,7 @@ const SearchValueSet = ({ references, selectedNodes, onSelect }: SearchValueSetP
           <ValueSetTable
             mode={SearchMode.RESEARCH}
             selectAllStatus={selectAllStatus}
-            isHierarchy={false}
+            loadingMode="list"
             loading={{ list: loadingStatus.search, expand: loadingStatus.expand }}
             hierarchy={research}
             isSelectionDisabled={isSelectionDisabled}

@@ -38,7 +38,7 @@ vi.mock('data/valueSets', () => ({
       title: ref.label,
       standard: true,
       checked: true,
-      isHierarchy: true,
+      loadingMode: 'expand',
       joinDisplayWithCode: false,
       joinDisplayWithSystem: false
     }))

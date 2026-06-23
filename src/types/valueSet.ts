@@ -27,13 +27,14 @@ export type Reference = {
   label: string
   title: string
   standard: boolean
-  url: string // ValueSet URL (for searching/listing valuesets)
-  codeSystemUrls?: string[] // Array of CodeSystem URLs (for individual codes within valuesets)
+  url: string
+  codeSystemUrls?: string[]
   checked: boolean
-  isHierarchy: boolean
   joinDisplayWithCode: boolean
   joinDisplayWithSystem: boolean
   filterRoots?: <T>(code: Hierarchy<T>) => boolean
+  resourceType?: 'ValueSet' | 'CodeSystem'
+  loadingMode?: 'list' | 'expand'
 }
 
 export type ValueSetSortField = 'statTotalUnique' | 'statTotal'

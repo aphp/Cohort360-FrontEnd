@@ -65,6 +65,7 @@ import {
   ResourceType
 } from 'types/requestCriterias'
 import { getConfig } from 'config'
+import { getSearchSystemUrl } from 'utils/valueSets'
 import { hasSearchParam } from './serviceFhirConfig'
 
 const paramValuesReducer = (accumulator: string, currentValue: string): string => {
@@ -909,7 +910,8 @@ export const fetchMedicationRequest = async (
   if (encounter) options = [...options, `${PrescriptionParamsKeys.NDA}=${encounter}`]
   if (_text) options = [...options, `_text=${encodeURIComponent(_text)}&_tag=${LOW_TOLERANCE_TAG}`]
   if (type && type.length > 0) {
-    const routeUrl = `${getConfig().features.medication.valueSets.medicationPrescriptionTypes.url}|`
+    const systemUrl = getSearchSystemUrl(getConfig().features.medication.valueSets.medicationPrescriptionTypes)
+    const routeUrl = `${systemUrl}|`
     const urlString = type.map((id) => routeUrl + id).join(',')
     options = [...options, `${PrescriptionParamsKeys.PRESCRIPTION_TYPES}=${encodeURIComponent(urlString)}`]
   }
@@ -988,7 +990,8 @@ export const fetchMedicationAdministration = async (
   if (encounter) options = [...options, `${AdministrationParamsKeys.NDA}=${encounter}`]
   if (_text) options = [...options, `_text=${encodeURIComponent(_text)}&_tag=${LOW_TOLERANCE_TAG}`]
   if (route && route.length > 0) {
-    const routeUrl = `${getConfig().features.medication.valueSets.medicationAdministrations.url}|`
+    const systemUrl = getSearchSystemUrl(getConfig().features.medication.valueSets.medicationAdministrations)
+    const routeUrl = `${systemUrl}|`
     const urlString = route.map((id) => routeUrl + id).join(',')
     options = [...options, `${AdministrationParamsKeys.ADMINISTRATION_ROUTES}=${encodeURIComponent(urlString)}`]
   }
@@ -1069,7 +1072,8 @@ export const fetchImaging = async (args: fetchImagingProps): FHIR_Bundle_Promise
   if (minDate) options = [...options, `${ImagingParamsKeys.DATE}=ge${minDate}`]
   if (maxDate) options = [...options, `${ImagingParamsKeys.DATE}=le${maxDate}`]
   if (modalities && modalities.length > 0) {
-    const modalitiesUrl = `${getConfig().features.imaging.valueSets.imagingModalities.url}|`
+    const systemUrl = getSearchSystemUrl(getConfig().features.imaging.valueSets.imagingModalities)
+    const modalitiesUrl = `${systemUrl}|`
     const urlString = modalities.map((id) => modalitiesUrl + id).join(',')
     options = [...options, `${ImagingParamsKeys.MODALITY}=${encodeURIComponent(urlString)}`]
   }
