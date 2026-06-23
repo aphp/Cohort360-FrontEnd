@@ -8,6 +8,9 @@ import {
   getLabelFromCode,
   getFullLabelFromCode,
   getLabelFromSystem,
+  getResourceTypeFromUrl,
+  getCodeSystemUrlFromValueSetUrl,
+  getSearchSystemUrl,
   checkIsLeaf
 } from 'utils/valueSets'
 import { HIERARCHY_ROOT } from 'services/aphp/serviceValueSets'
@@ -17,12 +20,30 @@ import { FhirItem } from 'types/valueSet'
 // Mock dependencies
 vi.mock('config', () => ({
   getConfig: vi.fn(() => ({
+    core: {
+      valueSets: {
+        demographicGender: {
+          url: 'https://terminology.eds.aphp.fr/fhir/ValueSet/aphp-orbis-patient-genre',
+          codeSystemUrls: ['https://terminology.eds.aphp.fr/fhir/CodeSystem/aphp-orbis-patient-genre'],
+          resourceType: 'CodeSystem'
+        }
+      }
+    },
     features: {
       observation: {
         valueSets: {
           biologyHierarchyAnabio: {
             url: 'https://terminology.hl7.org/ValueSet/biology-anabio',
-            codeSystemUrls: ['https://terminology.hl7.org/CodeSystem/biology-anabio']
+            codeSystemUrls: ['https://terminology.hl7.org/CodeSystem/biology-anabio'],
+            resourceType: 'ValueSet'
+          }
+        }
+      },
+      condition: {
+        valueSets: {
+          conditionStatus: {
+            url: 'https://terminology.hl7.org/ValueSet/malformed-codesystem',
+            resourceType: 'CodeSystem'
           }
         }
       }
@@ -37,8 +58,7 @@ vi.mock('data/valueSets', () => ({
       label: 'Test ValueSet',
       title: 'Test ValueSet Title',
       standard: true,
-      checked: false,
-      isHierarchy: true,
+      checked: false,
       joinDisplayWithCode: true,
       joinDisplayWithSystem: true,
       codeSystemUrls: ['https://terminology.hl7.org/CodeSystem/test-codesystem']
@@ -48,8 +68,7 @@ vi.mock('data/valueSets', () => ({
       label: 'Another ValueSet',
       title: 'Another ValueSet Title',
       standard: false,
-      checked: false,
-      isHierarchy: false,
+      checked: false,
       joinDisplayWithCode: false,
       joinDisplayWithSystem: false,
       codeSystemUrls: ['https://terminology.hl7.org/CodeSystem/another-codesystem']
@@ -59,8 +78,7 @@ vi.mock('data/valueSets', () => ({
       label: 'Biology Anabio',
       title: 'Biology Anabio Title',
       standard: true,
-      checked: false,
-      isHierarchy: true,
+      checked: false,
       joinDisplayWithCode: true,
       joinDisplayWithSystem: false,
       codeSystemUrls: ['https://terminology.hl7.org/CodeSystem/biology-anabio']
@@ -510,6 +528,96 @@ describe('valueSets utilities', () => {
         ['child1']
       )
       expect(result).toBe(true)
+    })
+  })
+
+  describe('getResourceTypeFromUrl', () => {
+    it('resolves resourceType for a core.valueSets entry not exposed by getReferences', () => {
+      expect(getResourceTypeFromUrl('https://terminology.eds.aphp.fr/fhir/ValueSet/aphp-orbis-patient-genre')).toBe(
+        'CodeSystem'
+      )
+    })
+
+    it('resolves resourceType for a feature valueSet entry', () => {
+      expect(getResourceTypeFromUrl('https://terminology.hl7.org/ValueSet/biology-anabio')).toBe('ValueSet')
+    })
+
+    it('returns undefined for an unknown url', () => {
+      expect(getResourceTypeFromUrl('https://terminology.hl7.org/ValueSet/does-not-exist')).toBeUndefined()
+    })
+  })
+
+  describe('getCodeSystemUrlFromValueSetUrl', () => {
+    it('returns the configured CodeSystem URL for a ValueSet URL', () => {
+      expect(
+        getCodeSystemUrlFromValueSetUrl('https://terminology.eds.aphp.fr/fhir/ValueSet/aphp-orbis-patient-genre')
+      ).toBe('https://terminology.eds.aphp.fr/fhir/CodeSystem/aphp-orbis-patient-genre')
+    })
+
+    it('falls back to the input url when no CodeSystem mapping is configured', () => {
+      const unknownUrl = 'https://terminology.hl7.org/ValueSet/does-not-exist'
+      expect(getCodeSystemUrlFromValueSetUrl(unknownUrl)).toBe(unknownUrl)
+    })
+
+    it('falls back to the ValueSet url and logs an error for a CodeSystem entry missing codeSystemUrls', () => {
+      const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
+      const malformedUrl = 'https://terminology.hl7.org/ValueSet/malformed-codesystem'
+      expect(getCodeSystemUrlFromValueSetUrl(malformedUrl)).toBe(malformedUrl)
+      expect(errorSpy).toHaveBeenCalledOnce()
+      errorSpy.mockRestore()
+    })
+  })
+
+  describe('getSearchSystemUrl', () => {
+    it('returns the first CodeSystem URL when resourceType is CodeSystem', () => {
+      const config = {
+        url: 'https://terminology.eds.aphp.fr/fhir/ValueSet/aphp-medicament-type-prescription',
+        codeSystemUrls: ['https://terminology.eds.aphp.fr/fhir/CodeSystem/aphp-medicament-type-prescription'],
+        resourceType: 'CodeSystem' as const
+      }
+      expect(getSearchSystemUrl(config)).toBe(
+        'https://terminology.eds.aphp.fr/fhir/CodeSystem/aphp-medicament-type-prescription'
+      )
+    })
+
+    it('returns the ValueSet url when resourceType is ValueSet', () => {
+      const config = {
+        url: 'https://aphp.fr/ig/fhir/eds/ValueSet/aphp-eds-aph-mat-type-anesth-vs',
+        codeSystemUrls: ['https://aphp.fr/ig/fhir/eds/CodeSystem/aphp-eds-aph-mat-type-anesth-cs'],
+        resourceType: 'ValueSet' as const
+      }
+      expect(getSearchSystemUrl(config)).toBe('https://aphp.fr/ig/fhir/eds/ValueSet/aphp-eds-aph-mat-type-anesth-vs')
+    })
+
+    it('returns the url when resourceType is not set', () => {
+      const config = {
+        url: 'https://terminology.hl7.org/ValueSet/no-resource-type',
+        codeSystemUrls: ['https://terminology.hl7.org/CodeSystem/no-resource-type']
+      }
+      expect(getSearchSystemUrl(config)).toBe('https://terminology.hl7.org/ValueSet/no-resource-type')
+    })
+
+    it('falls back to url and logs an error when resourceType is CodeSystem but codeSystemUrls is missing', () => {
+      const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
+      const config = {
+        url: 'https://terminology.hl7.org/CodeSystem/inline-codesystem',
+        resourceType: 'CodeSystem' as const
+      }
+      expect(getSearchSystemUrl(config)).toBe('https://terminology.hl7.org/CodeSystem/inline-codesystem')
+      expect(errorSpy).toHaveBeenCalledOnce()
+      errorSpy.mockRestore()
+    })
+
+    it('falls back to url and logs an error when resourceType is CodeSystem but codeSystemUrls is empty', () => {
+      const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
+      const config = {
+        url: 'https://terminology.hl7.org/CodeSystem/empty-codesystem',
+        codeSystemUrls: [],
+        resourceType: 'CodeSystem' as const
+      }
+      expect(getSearchSystemUrl(config)).toBe('https://terminology.hl7.org/CodeSystem/empty-codesystem')
+      expect(errorSpy).toHaveBeenCalledOnce()
+      errorSpy.mockRestore()
     })
   })
 })

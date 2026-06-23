@@ -33,7 +33,7 @@ vi.mock('data/valueSets', () => ({
       title: 'CCAM',
       standard: true,
       checked: true,
-      isHierarchy: true,
+      loadingMode: 'expand',
       joinDisplayWithCode: true,
       joinDisplayWithSystem: false
     }

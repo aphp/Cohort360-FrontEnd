@@ -3,7 +3,7 @@
  * @module utils/valueSets
  */
 
-import { getConfig } from 'config'
+import { getConfig, TerminologyResourceType, ValueSetConfig } from 'config'
 import { getReferences } from 'data/valueSets'
 import { HIERARCHY_ROOT, getChildrenFromCodes } from 'services/aphp/serviceValueSets'
 import { Codes, Hierarchy } from 'types/hierarchy'
@@ -32,6 +32,48 @@ const getReference = (systemOrValueSetUrl: string) => {
     getValueSetReferenceFromCodeSystem(systemOrValueSetUrl) ||
     getReferences(getConfig()).find((ref) => ref.url === systemOrValueSetUrl)
   )
+}
+
+const findValueSetConfigByUrl = (url: string): ValueSetConfig | undefined => {
+  const config = getConfig()
+  const valueSetGroups: Array<Record<string, ValueSetConfig>> = [config.core.valueSets]
+  for (const feature of Object.values(config.features)) {
+    const valueSets = (feature as { valueSets?: Record<string, ValueSetConfig> })?.valueSets
+    if (valueSets) valueSetGroups.push(valueSets)
+  }
+  for (const group of valueSetGroups) {
+    for (const entry of Object.values(group)) {
+      if (entry?.url === url) return entry
+    }
+  }
+  return undefined
+}
+
+const resolveCodeSystemUrl = (url: string, codeSystemUrls?: string[]): string => {
+  const codeSystemUrl = codeSystemUrls?.[0]
+  if (!codeSystemUrl) {
+    console.error(
+      `[valueSets] Terminology "${url}" is declared as CodeSystem but has no codeSystemUrls; ` +
+        `falling back to the ValueSet url. This usually yields an empty result. Check the config.`
+    )
+    return url
+  }
+  return codeSystemUrl
+}
+
+export const getResourceTypeFromUrl = (url: string): TerminologyResourceType | undefined => {
+  return findValueSetConfigByUrl(url)?.resourceType
+}
+
+export const getCodeSystemUrlFromValueSetUrl = (url: string): string => {
+  const config = findValueSetConfigByUrl(url)
+  if (config?.resourceType === 'CodeSystem') return resolveCodeSystemUrl(url, config.codeSystemUrls)
+  return config?.codeSystemUrls?.[0] ?? url
+}
+
+export const getSearchSystemUrl = (config: ValueSetConfig): string => {
+  if (config.resourceType === 'CodeSystem') return resolveCodeSystemUrl(config.url, config.codeSystemUrls)
+  return config.url
 }
 
 export const isDisplayedWithCode = (systemOrValueSetUrl: string) => {

@@ -46,6 +46,7 @@ import {
 import servicesPerimeters from 'services/aphp/servicePerimeters'
 import { Hierarchy } from 'types/hierarchy'
 import { getConfig } from 'config'
+import { getSearchSystemUrl } from 'utils/valueSets'
 import { HIERARCHY_ROOT, getChildrenFromCodes, getCodeList, getHierarchyRoots } from 'services/aphp/serviceValueSets'
 import { ScopeElement } from 'types/scope'
 
@@ -374,7 +375,7 @@ const mapGenericToRequestParams = (filters: GenericFilter, type: ResourceType) =
       `${getGenericKeyFromResourceType(type, 'EXECUTIVE_UNITS')}=${executiveUnits.map((unit) => unit.id)}`
     )
   if (encounterStatus && encounterStatus.length > 0) {
-    const encounterStatusUrl = `${getConfig().core.valueSets.encounterStatus.url}|`
+    const encounterStatusUrl = `${getSearchSystemUrl(getConfig().core.valueSets.encounterStatus)}|`
     const urlString = encounterStatus.map((elem) => encounterStatusUrl + elem.id).join(',')
     requestParams.push(`${getGenericKeyFromResourceType(type, 'ENCOUNTER_STATUS')}=${encodeURIComponent(urlString)}`)
   }
@@ -474,7 +475,8 @@ const mapPrescriptionToRequestParams = (filters: MedicationFilters) => {
   const { code, prescriptionTypes, ipp, nda, durationRange, executiveUnits, encounterStatus } = filters
   const requestParams: string[] = []
   if (prescriptionTypes && prescriptionTypes.length > 0) {
-    const prescriptionTypesUrl = `${getConfig().features.medication.valueSets.medicationPrescriptionTypes.url}|`
+    const systemUrl = getSearchSystemUrl(getConfig().features.medication.valueSets.medicationPrescriptionTypes)
+    const prescriptionTypesUrl = `${systemUrl}|`
     const urlString = prescriptionTypes.map((elem) => prescriptionTypesUrl + elem.id).join(',')
     requestParams.push(`${PrescriptionParamsKeys.PRESCRIPTION_TYPES}=${encodeURIComponent(urlString)}`)
   }
@@ -496,7 +498,8 @@ const mapAdministrationToRequestParams = (filters: MedicationFilters) => {
   const { code, administrationRoutes, nda, ipp, durationRange, executiveUnits, encounterStatus } = filters
   const requestParams: string[] = []
   if (administrationRoutes && administrationRoutes.length > 0) {
-    const administrationRoutesUrl = `${getConfig().features.medication.valueSets.medicationAdministrations.url}|`
+    const systemUrl = getSearchSystemUrl(getConfig().features.medication.valueSets.medicationAdministrations)
+    const administrationRoutesUrl = `${systemUrl}|`
     const urlString = administrationRoutes.map((elem) => administrationRoutesUrl + elem.id).join(',')
     requestParams.push(`${AdministrationParamsKeys.ADMINISTRATION_ROUTES}=${encodeURIComponent(urlString)}`)
   }
@@ -555,7 +558,10 @@ const mapImagingToRequestParams = (filters: ImagingFilters) => {
     requestParams.push(
       `${ImagingParamsKeys.MODALITY}=${encodeURIComponent(
         modality
-          .map((labelObject) => `${getConfig().features.imaging.valueSets.imagingModalities.url}|${labelObject.id}`)
+          .map(
+            (labelObject) =>
+              `${getSearchSystemUrl(getConfig().features.imaging.valueSets.imagingModalities)}|${labelObject.id}`
+          )
           .join(',')
       )}`
     )

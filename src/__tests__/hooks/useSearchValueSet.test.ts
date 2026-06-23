@@ -58,7 +58,7 @@ const mkRef = (overrides: Partial<Reference> = {}): Reference => ({
   title: 'Anabio',
   standard: true,
   checked: true,
-  isHierarchy: true,
+  loadingMode: 'expand',
   joinDisplayWithCode: false,
   joinDisplayWithSystem: false,
   ...overrides

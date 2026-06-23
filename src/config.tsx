@@ -15,9 +15,16 @@ type DeepPartial<T> = {
   [P in keyof T]?: T[P] extends object ? DeepPartial<T[P]> : T[P]
 }
 
-type ValueSetConfig = {
+export type TerminologyResourceType = 'ValueSet' | 'CodeSystem'
+export type TerminologyLoadingMode = 'list' | 'expand'
+
+export const isExpandLoadingMode = (loadingMode?: TerminologyLoadingMode) => loadingMode === 'expand'
+
+export type ValueSetConfig = {
   url: string // ValueSet URL (for searching/listing valuesets)
   codeSystemUrls?: string[] // Array of CodeSystem URLs (for individual codes within valuesets)
+  resourceType?: TerminologyResourceType
+  loadingMode?: TerminologyLoadingMode
   title?: string
   data?: LabelObject[]
 }

@@ -57,7 +57,7 @@ vi.mock('data/valueSets', () => ({
       title: 'Test ValueSet Title',
       standard: true,
       checked: false,
-      isHierarchy: true,
+
       joinDisplayWithCode: true,
       joinDisplayWithSystem: true,
       codeSystemUrls: ['https://terminology.hl7.org/CodeSystem/test-codesystem']
@@ -68,7 +68,7 @@ vi.mock('data/valueSets', () => ({
       title: 'Biology Anabio Title',
       standard: true,
       checked: false,
-      isHierarchy: true,
+
       joinDisplayWithCode: true,
       joinDisplayWithSystem: false,
       codeSystemUrls: ['https://terminology.hl7.org/CodeSystem/biology-anabio']
@@ -85,7 +85,13 @@ vi.mock('utils/valueSets', () => ({
       return 'https://terminology.hl7.org/ValueSet/biology-anabio'
     }
     return undefined
-  })
+  }),
+  getResourceTypeFromUrl: vi.fn((url: string) =>
+    url.includes('/CodeSystem/') || url === 'https://terminology.hl7.org/ValueSet/gender-as-codesystem'
+      ? 'CodeSystem'
+      : 'ValueSet'
+  ),
+  getCodeSystemUrlFromValueSetUrl: vi.fn((url: string) => url.replace('/ValueSet/', '/CodeSystem/'))
 }))
 
 describe('serviceValueSets', () => {
@@ -458,6 +464,71 @@ describe('serviceValueSets', () => {
 
       expect(apiFhir.get).toHaveBeenCalledWith(
         expect.stringContaining('url=https://terminology.hl7.org/ValueSet/test-valueset'),
+        expect.any(Object)
+      )
+    })
+    it('should fetch complete code list for a CodeSystem URL', async () => {
+      const mockResponse = {
+        data: {
+          entry: [
+            {
+              resource: {
+                resourceType: 'CodeSystem',
+                url: 'https://terminology.hl7.org/CodeSystem/test-codesystem',
+                concept: [
+                  {
+                    code: 'code1',
+                    display: 'Code 1'
+                  },
+                  {
+                    code: 'code2',
+                    display: 'Code 2'
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      }
+
+      vi.mocked(apiFhir.get).mockResolvedValue(mockResponse)
+
+      const result = await getCodeList('https://terminology.hl7.org/CodeSystem/test-codesystem', false)
+
+      expect(result.results).toHaveLength(2)
+      expect(result.results[0].system).toBe('https://terminology.hl7.org/CodeSystem/test-codesystem')
+      expect(result.count).toBe(2)
+      expect(apiFhir.get).toHaveBeenCalledWith(
+        expect.stringContaining('/CodeSystem?url=https://terminology.hl7.org/CodeSystem/test-codesystem'),
+        expect.any(Object)
+      )
+    })
+
+    it('should load via CodeSystem using the resolved CodeSystem URL when a ValueSet URL is configured as CodeSystem', async () => {
+      const mockResponse = {
+        data: {
+          entry: [
+            {
+              resource: {
+                resourceType: 'CodeSystem',
+                url: 'https://terminology.hl7.org/CodeSystem/test-codesystem',
+                concept: [{ code: 'code1', display: 'Code 1' }]
+              }
+            }
+          ]
+        }
+      }
+
+      vi.mocked(apiFhir.get).mockResolvedValue(mockResponse)
+
+      await getCodeList('https://terminology.hl7.org/ValueSet/gender-as-codesystem', false)
+
+      expect(apiFhir.get).toHaveBeenCalledWith(
+        expect.stringContaining('/CodeSystem?url=https://terminology.hl7.org/CodeSystem/gender-as-codesystem'),
+        expect.any(Object)
+      )
+      expect(apiFhir.get).not.toHaveBeenCalledWith(
+        expect.stringContaining('/ValueSet?url='),
         expect.any(Object)
       )
     })
