@@ -43,8 +43,6 @@ import { resetCohortCreation } from 'state/cohortCreation'
 import useStyles from './styles'
 import versionInfo from 'data/version.json'
 import Impersonation from 'components/Impersonation'
-import { Egg1, Egg2 } from 'components/Impersonation/Eggs'
-import JToolEggWrapper from 'components/Impersonation/JTool'
 import ShimmerBadge from 'components/ui/ShimmerBadge'
 import { AppConfig } from 'config'
 
@@ -213,32 +211,28 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
           <ListItem>
             {!open && (
               <Tooltip title="Nouvelle requête">
-                <JToolEggWrapper Egg={Egg2}>
-                  <IconButton
-                    onClick={handleNewRequest}
-                    className={cx(classes.button, classes.miniButton)}
-                    disabled={maintenanceIsActive}
-                  >
-                    <AddIcon />
-                  </IconButton>
-                </JToolEggWrapper>
+                <IconButton
+                  onClick={handleNewRequest}
+                  className={cx(classes.button, classes.miniButton)}
+                  disabled={maintenanceIsActive}
+                >
+                  <AddIcon />
+                </IconButton>
               </Tooltip>
             )}
             {zoomed(
               <div className={classes.divNewRequest}>
-                <JToolEggWrapper Egg={Egg2}>
-                  <Button
-                    onClick={handleNewRequest}
-                    className={cx(classes.newCohortButton, classes.linkHover, {
-                      [classes.hide]: !open
-                    })}
-                    disabled={maintenanceIsActive}
-                  >
-                    <Typography variant={maintenanceIsActive ? 'h6' : 'h5'}>
-                      {maintenanceIsActive ? 'Nouvelle requête désactivée' : 'Nouvelle requête'}
-                    </Typography>
-                  </Button>
-                </JToolEggWrapper>
+                <Button
+                  onClick={handleNewRequest}
+                  className={cx(classes.newCohortButton, classes.linkHover, {
+                    [classes.hide]: !open
+                  })}
+                  disabled={maintenanceIsActive}
+                >
+                  <Typography variant={maintenanceIsActive ? 'h6' : 'h5'}>
+                    {maintenanceIsActive ? 'Nouvelle requête désactivée' : 'Nouvelle requête'}
+                  </Typography>
+                </Button>
               </div>
             )}
           </ListItem>
@@ -313,16 +307,14 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
                 </ListItem>
               )}
               <ListItem>
-                <JToolEggWrapper Egg={Egg1}>
-                  <Link
-                    id="myPatient-link"
-                    onClick={() => navigate('/my-patients')}
-                    underline="hover"
-                    className={classes.nestedTitle}
-                  >
-                    Tous mes patients
-                  </Link>
-                </JToolEggWrapper>
+                <Link
+                  id="myPatient-link"
+                  onClick={() => navigate('/my-patients')}
+                  underline="hover"
+                  className={classes.nestedTitle}
+                >
+                  Tous mes patients
+                </Link>
               </ListItem>
               <ListItem>
                 <Link

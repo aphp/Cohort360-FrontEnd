@@ -43,6 +43,7 @@ import { getChildrenFromCodes, HIERARCHY_ROOT } from 'services/aphp/serviceValue
 import { createHierarchyRoot } from './hierarchy'
 import { FhirItem } from 'types/valueSet'
 import { ScopeElement } from 'types/scope'
+import { getValueSetFromCodeSystem } from './valueSets'
 import { formatAge } from './age'
 
 /** Current version of the Requeteur format used for cohort requests */
@@ -764,20 +765,14 @@ export async function unbuildRequest(_json: string): Promise<UnbuildRequestRetur
   }
 }
 
-/**
- * Fetches hierarchical code data for a given code and value set systems.
- *
- * @param code - The code to fetch (or HIERARCHY_ROOT for root level)
- * @param systems - Array of value set system URLs to search
- * @returns Promise resolving to hierarchical code data, or undefined if not found
- *
- * @internal
- */
-const getCodesForValueSet = async (code: string, systems: string[]): Promise<Hierarchy<FhirItem>[] | undefined> => {
-  if (code === HIERARCHY_ROOT && systems.length) return [createHierarchyRoot(systems[0])]
-  for (const system of systems) {
+const getCodesForValueSet = async (
+  code: string,
+  valueSetUrls: string[]
+): Promise<Hierarchy<FhirItem>[] | undefined> => {
+  if (code === HIERARCHY_ROOT && valueSetUrls.length) return [createHierarchyRoot(valueSetUrls[0])]
+  for (const valueSetUrl of valueSetUrls) {
     try {
-      return (await getChildrenFromCodes(system, [code])).results
+      return (await getChildrenFromCodes(valueSetUrl, [code])).results
     } catch {
       console.error("Ce n'est pas une erreur.")
     }
@@ -832,21 +827,21 @@ export const fetchCriteriasCodes = async (
             const labelValues = criterion[dataKey] as unknown as LabelObject[]
             if (labelValues && labelValues.length > 0) {
               for (const code of labelValues) {
-                const codeSystem = code.system ?? defaultValueSet
-                const valueSetCodeCache = [...(updatedCriteriaData[codeSystem] ?? [])]
+                const valueSetUrl = (code.system && getValueSetFromCodeSystem(code.system)) || defaultValueSet
+                const valueSetCodeCache = [...(updatedCriteriaData[valueSetUrl] ?? [])]
                 if (!valueSetCodeCache.find((data) => data.id === code.id)) {
                   try {
-                    const fetchedCode = await getCodesForValueSet(code.id, [codeSystem])
+                    const fetchedCode = await getCodesForValueSet(code.id, [valueSetUrl])
                     if (fetchedCode) {
                       valueSetCodeCache.push(...fetchedCode)
                     } else {
-                      console.warn(`Code ${code.id} not found in system ${codeSystem}`)
+                      console.warn(`Code ${code.id} not found in valueSet ${valueSetUrl}`)
                     }
                   } catch (e) {
-                    console.error(`Error fetching code ${code.id} from system ${codeSystem}`, e)
+                    console.error(`Error fetching code ${code.id} from valueSet ${valueSetUrl}`, e)
                   }
                 }
-                updatedCriteriaData[codeSystem] = valueSetCodeCache
+                updatedCriteriaData[valueSetUrl] = valueSetCodeCache
               }
             }
           }

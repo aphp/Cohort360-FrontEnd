@@ -10,35 +10,32 @@ import { Codes, Hierarchy } from 'types/hierarchy'
 import { LabelObject } from 'types/searchCriterias'
 import { FhirItem } from 'types/valueSet'
 
-/**
- * Gets value set references that match the provided systems
- *
- * @param systems - Array of system URLs to filter by
- * @returns Array of matching value set references
- *
- * @example
- * ```typescript
- * const valueSets = getValueSetsFromSystems(['http://loinc.org', 'http://snomed.info/sct'])
- * ```
- */
-export const getValueSetsFromSystems = (systems: string[]) => {
-  return getReferences(getConfig()).filter((reference) => systems.includes(reference.url))
+export const getValueSetsByUrls = (urls: string[]) => {
+  return getReferences(getConfig()).filter((reference) => urls.includes(reference.url))
 }
 
-/**
- * Checks if a system should display codes alongside labels
- *
- * @param system - The system URL to check
- * @returns True if codes should be displayed with labels, false otherwise
- *
- * @example
- * ```typescript
- * isDisplayedWithCode('http://loinc.org') // returns true/false based on configuration
- * ```
- */
-export const isDisplayedWithCode = (system: string) => {
-  const isFound = getValueSetsFromSystems([system])?.[0]
-  return isFound?.joinDisplayWithCode
+// Reverse lookup function: given a CodeSystem URL, find the corresponding ValueSet URL
+export const getValueSetFromCodeSystem = (codeSystemUrl: string): string | undefined => {
+  const references = getReferences(getConfig())
+  const reference = references.find((ref) => ref.codeSystemUrls?.includes(codeSystemUrl))
+  return reference?.url
+}
+
+// Helper function to get ValueSet Reference from CodeSystem URL
+export const getValueSetReferenceFromCodeSystem = (codeSystemUrl: string) => {
+  const references = getReferences(getConfig())
+  return references.find((ref) => ref.codeSystemUrls?.includes(codeSystemUrl))
+}
+
+const getReference = (systemOrValueSetUrl: string) => {
+  return (
+    getValueSetReferenceFromCodeSystem(systemOrValueSetUrl) ||
+    getReferences(getConfig()).find((ref) => ref.url === systemOrValueSetUrl)
+  )
+}
+
+export const isDisplayedWithCode = (systemOrValueSetUrl: string) => {
+  return getReference(systemOrValueSetUrl)?.joinDisplayWithCode
 }
 
 /**
@@ -52,9 +49,8 @@ export const isDisplayedWithCode = (system: string) => {
  * isDisplayedWithSystem('http://loinc.org') // returns true/false based on configuration
  * ```
  */
-export const isDisplayedWithSystem = (system: string) => {
-  const isFound = getValueSetsFromSystems([system])?.[0]
-  return isFound?.joinDisplayWithSystem
+export const isDisplayedWithSystem = (systemOrValueSetUrl: string) => {
+  return getReference(systemOrValueSetUrl)?.joinDisplayWithSystem
 }
 
 /**
@@ -70,7 +66,8 @@ export const isDisplayedWithSystem = (system: string) => {
  * ```
  */
 export const getLabelFromCode = <T>(code: Hierarchy<T>) => {
-  if (isDisplayedWithCode(code.system) && code.id !== HIERARCHY_ROOT) return `${code.id} - ${code.label}`
+  const urlToCheck = code.valueSetUrl || code.system
+  if (isDisplayedWithCode(urlToCheck) && code.id !== HIERARCHY_ROOT) return `${code.id} - ${code.label}`
   return code.label
 }
 
@@ -107,9 +104,8 @@ export const getFullLabelFromCode = (code: LabelObject) => {
  * getLabelFromSystem('http://loinc.org') // returns 'LOINC'
  * ```
  */
-export const getLabelFromSystem = (system: string) => {
-  const isFound = getValueSetsFromSystems([system])?.[0]
-  return isFound?.label || ''
+export const getLabelFromSystem = (systemOrValueSetUrl: string) => {
+  return getReference(systemOrValueSetUrl)?.label || ''
 }
 
 /**
@@ -130,8 +126,14 @@ export const checkIsLeaf = async <T>(codes: Hierarchy<T>[], cache: Codes<Hierarc
   if (codes.length !== 1 || codes?.[0]?.id === HIERARCHY_ROOT || children.length > 1) return false
   if (!children[0]) return true
   const code = codes[0]
-  const found = cache.get(code.system)?.get(children[0])
+  const cacheKey = code.valueSetUrl || code.system
+  const found = cache.get(cacheKey)?.get(children[0])
   let childCode: Hierarchy<FhirItem>[] = found ? [found] : []
-  if (!childCode.length) childCode = (await getChildrenFromCodes(code.system, children)).results
+  if (!childCode.length) {
+    // If we only have system (CodeSystem URL), try to find the corresponding ValueSet URL
+    const actualValueSetUrl = code.valueSetUrl || getValueSetFromCodeSystem(code.system) || code.system
+
+    childCode = (await getChildrenFromCodes(actualValueSetUrl, children)).results
+  }
   return checkIsLeaf(childCode, cache)
 }

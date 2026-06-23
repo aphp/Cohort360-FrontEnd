@@ -59,13 +59,12 @@ import useStyle from './styles'
 import { format } from 'utils/numbers'
 import services from 'services/aphp'
 import ValidationDialog from 'components/ui/ValidationDialog'
-import { JToolComponentEggWrapper } from 'components/Impersonation/JTool'
-import { Egg3 } from 'components/Impersonation/Eggs'
 import { WebSocketContext } from 'components/WebSocket/WebSocketProvider'
 import { AppConfig } from 'config'
 import { setRequestDetailedMode } from 'state/preferences'
 import { hasStageDetails } from '../DiagramView/components/CriteriaCount'
 import { isRequestFinished } from './utils'
+import { useCountReconciliation } from './useCountReconciliation'
 import { CriteriaType } from 'types/requestCriterias'
 
 const ControlPanel: React.FC<{
@@ -243,6 +242,8 @@ const ControlPanel: React.FC<{
     }
   }
 
+  useCountReconciliation(count)
+
   const isLoading = loading || countLoading === LoadingStatus.FETCHING || saveLoading
   const errorCriteria = selectedCriteria.filter((criteria) => criteria.error)
   const lastUpdated = moment(count.date)
@@ -415,12 +416,6 @@ const ControlPanel: React.FC<{
             </Typography>
           </Grid>
         </Grid>
-
-        <JToolComponentEggWrapper>
-          {!isLoading && (count.date ? moment(count.date).diff(moment.now()) > -100000 : false) && (
-            <Egg3 count={includePatient} />
-          )}
-        </JToolComponentEggWrapper>
 
         <Grid container className={classes.container}>
           <Grid container size={12} justifyContent="space-between">

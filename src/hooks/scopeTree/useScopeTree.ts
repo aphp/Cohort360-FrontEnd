@@ -49,7 +49,7 @@ export const useScopeTree = (
 
   useEffect(() => {
     initTrees([
-      { system: System.ScopeTree, fetchBaseTree: async () => ({ results: baseTree, count: baseTree.length }) }
+      { valueSetUrl: System.ScopeTree, fetchBaseTree: async () => ({ results: baseTree, count: baseTree.length }) }
     ])
   }, [baseTree])
 
