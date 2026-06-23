@@ -85,7 +85,7 @@ describe('callApi search filters - CodeSystem vs ValueSet system url', () => {
   })
 
   it('fetchImaging builds modality with the CodeSystem url', async () => {
-    await fetchImaging({ modalities: ['CT'], minDate: null, maxDate: null })
+    await fetchImaging({ modalities: ['CT'] })
     const params = getParams()
     expect(params).toContain(`modality=${encodeURIComponent(`${MODALITY_CS}|CT`)}`)
     expect(params.join('&')).not.toContain(encodeURIComponent(MODALITY_VS))
