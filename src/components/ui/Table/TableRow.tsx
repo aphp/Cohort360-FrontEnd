@@ -53,6 +53,37 @@ const renderIcon = (IconComponent: ReactElement | undefined) => {
   return <Component style={{ width: 15, height: 15, fill: 'white' }} />
 }
 
+const DocumentViewerCell = ({ document }: { document: Document }) => {
+  const [isOpen, setIsOpen] = useState(false)
+  return (
+    <>
+      <IconButton onClick={() => setIsOpen(true)} disabled={!document.id} id={`docViewer-${document.id}`}>
+        <Visibility height="30px" />
+      </IconButton>
+      <DocumentViewer
+        open={isOpen}
+        documentId={document.id ?? ''}
+        deidentified={document.deidentified}
+        handleClose={() => setIsOpen(false)}
+      />
+    </>
+  )
+}
+
+const ModalCell = ({ value }: { value: Paragraph[] }) => {
+  const [open, setOpen] = useState(false)
+  return (
+    <>
+      <IconButton onClick={() => setOpen(true)}>
+        <Comment height="15px" fill="#ED6D91" />
+      </IconButton>
+      <Modal open={open} title="Commentaires" onClose={() => setOpen(false)} cancelText="Fermer" readonly={true}>
+        <Paragraphs value={value} />
+      </Modal>
+    </>
+  )
+}
+
 const TableRow = ({ row, sx }: RowProps) => {
   const [subitemIndex, setSubitemIndex] = useState<number | null>(null)
   const docContentIndex = row.findIndex((cell) => cell.type === CellType.DOCUMENT_CONTENT)
@@ -177,47 +208,8 @@ const TableRow = ({ row, sx }: RowProps) => {
                   </IconButton>
                 </div>
               )}
-              {cell.type === CellType.DOCUMENT_VIEWER &&
-                (() => {
-                  const [isOpen, setIsOpen] = React.useState(false)
-                  return (
-                    <>
-                      <IconButton
-                        onClick={() => setIsOpen(true)}
-                        disabled={!(cell.value as Document).id}
-                        id={`docViewer-${(cell.value as Document).id}`}
-                      >
-                        <Visibility height="30px" />
-                      </IconButton>
-                      <DocumentViewer
-                        open={isOpen}
-                        documentId={(cell.value as Document).id ?? ''}
-                        deidentified={(cell.value as Document).deidentified}
-                        handleClose={() => setIsOpen(false)}
-                      />
-                    </>
-                  )
-                })()}
-              {cell.type === CellType.MODAL &&
-                (() => {
-                  const [open, setOpen] = useState(false)
-                  return (
-                    <>
-                      <IconButton onClick={() => setOpen(true)}>
-                        <Comment height="15px" fill="#ED6D91" />
-                      </IconButton>
-                      <Modal
-                        open={open}
-                        title="Commentaires"
-                        onClose={() => setOpen(false)}
-                        cancelText="Fermer"
-                        readonly={true}
-                      >
-                        <Paragraphs value={cell.value as Paragraph[]} />
-                      </Modal>
-                    </>
-                  )
-                })()}
+              {cell.type === CellType.DOCUMENT_VIEWER && <DocumentViewerCell document={cell.value as Document} />}
+              {cell.type === CellType.MODAL && <ModalCell value={cell.value as Paragraph[]} />}
               {(cell.type === CellType.SUBARRAY || cell.type === CellType.LINES) && (
                 <IconButton
                   aria-label="expand row"
