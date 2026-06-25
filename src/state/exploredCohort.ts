@@ -1,7 +1,7 @@
 import { CohortData } from 'types'
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { impersonate, login, logout } from './me'
-import { RootState } from 'state'
+import type { RootState } from 'state'
 
 import services from 'services/aphp'
 import servicesPerimeters from '../services/aphp/servicePerimeters'
