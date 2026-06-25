@@ -1,4 +1,13 @@
-import { Codes, CodesCache, GroupedBySystem, Hierarchy, InfiniteMap, Mode, SelectedStatus } from 'types/hierarchy'
+import {
+  Codes,
+  CodesCache,
+  GroupedBySystem,
+  GroupedByValueSet,
+  Hierarchy,
+  InfiniteMap,
+  Mode,
+  SelectedStatus
+} from 'types/hierarchy'
 import { arrayToMap } from './arrays'
 import { HIERARCHY_ROOT, UNKOWN_HIERARCHY_CHAPTER } from 'services/aphp/serviceValueSets'
 
@@ -70,18 +79,25 @@ const addAllFetchedIds = <T>(codes: Map<string, Hierarchy<T, string>>, results: 
   return new Map([...codes, ...resultsMap])
 }
 
-export const getMissingCodesWithSystems = async <T>(
+export const getMissingCodesWithValueSets = async <T>(
   trees: Map<string, Hierarchy<T, string>[]>,
-  groupBySystem: GroupedBySystem<T>[],
+  groupByValueSet: GroupedByValueSet<T>[],
   codes: Codes<Hierarchy<T>>,
-  fetchHandler: (ids: string, system: string) => Promise<Hierarchy<T, string>[]>
+  fetchHandler: (ids: string, valueSetUrl: string) => Promise<Hierarchy<T, string>[]>
 ) => {
   const allCodes: Codes<Hierarchy<T>> = new Map(codes)
-  for (const group of groupBySystem) {
-    const tree = trees.get(group.system) || []
-    const codesBySystem = codes.get(group.system) || new Map()
-    const newCodes = await getMissingCodes(tree, codesBySystem, group.codes, group.system, Mode.SEARCH, fetchHandler)
-    allCodes.set(group.system, newCodes)
+  for (const group of groupByValueSet) {
+    const tree = trees.get(group.valueSetUrl) || []
+    const codesByValueSet = codes.get(group.valueSetUrl) || new Map()
+    const newCodes = await getMissingCodes(
+      tree,
+      codesByValueSet,
+      group.codes,
+      group.valueSetUrl,
+      Mode.SEARCH,
+      fetchHandler
+    )
+    allCodes.set(group.valueSetUrl, newCodes)
   }
   return allCodes
 }
@@ -90,9 +106,9 @@ export const getMissingCodes = async <T>(
   baseTree: Hierarchy<T, string>[],
   prevCodes: Map<string, Hierarchy<T, string>>,
   newCodes: Hierarchy<T, string>[],
-  system: string,
+  valueSetUrl: string,
   mode: Mode,
-  fetchHandler: (ids: string, system: string) => Promise<Hierarchy<T, string>[]>
+  fetchHandler: (ids: string, valueSetUrl: string) => Promise<Hierarchy<T, string>[]>
 ) => {
   const newCodesMap = mapHierarchyToMap(newCodes)
   let allCodes = new Map([...prevCodes, ...newCodesMap])
@@ -105,7 +121,7 @@ export const getMissingCodes = async <T>(
   }
   if (missingIds.length) {
     const ids = missingIds.join(',')
-    const fetched = await fetchHandler(ids, system)
+    const fetched = await fetchHandler(ids, valueSetUrl)
     allCodes = addAllFetchedIds(allCodes, fetched)
   }
   if (mode !== Mode.EXPAND) {
@@ -113,7 +129,7 @@ export const getMissingCodes = async <T>(
     missingIds = getMissingIds(allCodes, arrayToMap(children, null))
     if (missingIds.length) {
       const ids = missingIds.join(',')
-      const childrenResponse = await fetchHandler(ids, system)
+      const childrenResponse = await fetchHandler(ids, valueSetUrl)
       allCodes = addAllFetchedIds(allCodes, childrenResponse)
     }
   }
@@ -138,17 +154,17 @@ const getMissingSubItems = <T>(node: Hierarchy<T, string>, codes: Map<string, Hi
 
 export const buildMultipleTrees = <T>(
   trees: Map<string, Hierarchy<T, string>[]>,
-  groupBySystem: GroupedBySystem<T>[],
+  groupByValueSet: GroupedByValueSet<T>[],
   codes: Codes<Hierarchy<T>>,
   selected: Codes<Hierarchy<T>>,
   mode: Mode
 ) => {
-  for (const group of groupBySystem) {
-    const tree = trees.get(group.system) || []
-    const codesBySystem = codes.get(group.system) || new Map()
-    const selectedBySystem = selected.get(group.system) || new Map()
-    const newTree = buildTree([...tree], group.system, group.codes, codesBySystem, selectedBySystem, mode)
-    trees.set(group.system, newTree)
+  for (const group of groupByValueSet) {
+    const tree = trees.get(group.valueSetUrl) || []
+    const codesByValueSet = codes.get(group.valueSetUrl) || new Map()
+    const selectedByValueSet = selected.get(group.valueSetUrl) || new Map()
+    const newTree = buildTree([...tree], group.valueSetUrl, group.codes, codesByValueSet, selectedByValueSet, mode)
+    trees.set(group.valueSetUrl, newTree)
   }
   return new Map(trees)
 }
@@ -164,7 +180,7 @@ export const buildMultipleTrees = <T>(
  */
 export const buildTree = <T>(
   baseTree: Hierarchy<T, string>[],
-  system: string,
+  valueSetUrl: string,
   endCodes: Hierarchy<T, string>[],
   codes: Map<string, Hierarchy<T, string>>,
   selected: Map<string, Hierarchy<T, string>>,
@@ -172,7 +188,7 @@ export const buildTree = <T>(
 ) => {
   const buildBranch = <T>(
     node: Hierarchy<T, string>,
-    system: string,
+    valueSetUrl: string,
     path: [string, InfiniteMap],
     codes: Map<string, Hierarchy<T, string>>,
     selected: Map<string, Hierarchy<T, string>>,
@@ -185,7 +201,7 @@ export const buildTree = <T>(
       for (const [nextKey, nextValue] of nextPath) {
         const index = node.subItems.findIndex((elem) => elem.id === nextKey)
         if (index > -1) {
-          const item = buildBranch(node.subItems[index], system, [nextKey, nextValue], codes, selected, mode)
+          const item = buildBranch(node.subItems[index], valueSetUrl, [nextKey, nextValue], codes, selected, mode)
           node.subItems[index] = item
         }
         node.status = getItemSelectedStatus(node)
@@ -210,7 +226,7 @@ export const buildTree = <T>(
   if (mode === Mode.UNSELECT_ALL) mode = Mode.UNSELECT
   for (const [key, value] of uniquePaths) {
     const index = baseTree.findIndex((elem) => elem.id === key)
-    const branch = buildBranch(baseTree[index] || null, system, [key, value], codes, selected, mode)
+    const branch = buildBranch(baseTree[index] || null, valueSetUrl, [key, value], codes, selected, mode)
     if (branch && index > -1) baseTree[index] = branch
     else if (index === -1) baseTree.push(branch)
   }
@@ -233,6 +249,22 @@ export const groupBySystem = <T>(codes: Hierarchy<T, string>[]) => {
   return groupedHierarchies
 }
 
+export const groupByValueSet = <T>(codes: Hierarchy<T, string>[]) => {
+  const valueSetMap = new Map<string, Hierarchy<T, string>[]>()
+  for (const hierarchy of codes) {
+    const valueSetUrl = hierarchy.valueSetUrl || hierarchy.system
+    if (!valueSetMap.has(valueSetUrl)) {
+      valueSetMap.set(valueSetUrl, [])
+    }
+    valueSetMap.get(valueSetUrl)!.push(hierarchy)
+  }
+  const groupedHierarchies: GroupedByValueSet<T>[] = []
+  valueSetMap.forEach((codes, valueSetUrl) => {
+    groupedHierarchies.push({ valueSetUrl, codes })
+  })
+  return groupedHierarchies
+}
+
 export const getDisplayFromTree = <T>(toDisplay: Hierarchy<T>[], tree: Hierarchy<T>[]) => {
   let branches: Hierarchy<T, string>[] = []
   if (toDisplay.length && tree.length)
@@ -250,10 +282,14 @@ export const getDisplayFromTrees = <T>(
 ) => {
   const branches: Hierarchy<T, string>[] = []
   toDisplay.forEach((node) => {
-    const currentTree = trees.get(node.system)
+    const treeKey = node.valueSetUrl || node.system
+    const currentTree = trees.get(treeKey)
     if (currentTree) {
       const foundNode = getDisplayFromTree([node], currentTree)[0]
       branches.push(foundNode)
+    } else {
+      // If tree doesn't exist yet, return the node as-is so it can be displayed
+      branches.push(node)
     }
   })
   return branches
@@ -377,13 +413,14 @@ const getInferiorLevels = <T>(hierarchy: Hierarchy<T, string>[]) => {
   )
 }
 
-export const createHierarchyRoot = (system: string, status?: SelectedStatus) => {
+export const createHierarchyRoot = (valueSetUrl: string, status?: SelectedStatus) => {
   return {
     id: HIERARCHY_ROOT,
     label: 'Toute la hiérarchie',
     above_levels_ids: '',
     inferior_levels_ids: '',
-    system,
+    system: valueSetUrl,
+    valueSetUrl,
     status
   }
 }

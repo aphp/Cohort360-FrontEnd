@@ -35,6 +35,7 @@ export type Hierarchy<T = object, S = string> = AbstractTree<
     above_levels_ids: string
     inferior_levels_ids: string
     system: string
+    valueSetUrl?: string // ValueSet URL (for grouping and API calls)
     status?: SelectedStatus
     statTotal?: number
     statTotalUnique?: number
@@ -51,6 +52,11 @@ export type HierarchyLoadingStatus = {
 
 export type GroupedBySystem<T> = {
   system: string
+  codes: Hierarchy<T>[]
+}
+
+export type GroupedByValueSet<T> = {
+  valueSetUrl: string
   codes: Hierarchy<T>[]
 }
 
