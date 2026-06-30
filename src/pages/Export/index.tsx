@@ -153,7 +153,7 @@ const Export = () => {
         },
         maintenanceIsActive
       ),
-    [exportList]
+    [exportList, maintenanceIsActive]
   )
 
   return (
