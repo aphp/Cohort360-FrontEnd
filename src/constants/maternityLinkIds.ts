@@ -1,16 +1,3 @@
-/**
- * Source de vérité unique des `linkId` FHIR des champs des formulaires de maternité
- * (Fiche d'hospitalisation et Fiche de grossesse).
- *
- * Ces identifiants étaient auparavant dupliqués dans plusieurs fichiers (affichage timeline,
- * tableau d'exploration, formulaires du requêteur), avec un risque de dérive. Ils sont désormais
- * centralisés ici et consommés partout via `HOSPIT_LINK_IDS` / `PREGNANCY_LINK_IDS`.
- *
- * Remarque : toutes les clés ne sont pas utilisées par tous les écrans — l'affichage et le
- * requêteur n'exposent pas exactement les mêmes champs. C'est volontaire.
- */
-
-/** linkId des champs de la Fiche d'hospitalisation. */
 export const HOSPIT_LINK_IDS = {
   hospitReason: 'F_MATER_004052',
   inUteroTransfer: 'F_MATER_007001',
@@ -42,6 +29,12 @@ export const HOSPIT_LINK_IDS = {
   gender: 'F_MATER_005032',
   birthMensurationsGrams: 'F_MATER_005033',
   birthMensurationsPercentil: 'F_MATER_005034',
+  apgar1: 'F_MATER_005051',
+  apgar3: 'F_MATER_005052',
+  apgar5: 'F_MATER_005053',
+  apgar10: 'F_MATER_005054',
+  arterialPhCord: 'F_MATER_005060',
+  arterialCordLactates: 'F_MATER_005061',
   birthStatus: 'F_MATER_007030',
   postpartumHemorrhage: 'F_MATER_007031',
   conditionPerineum: 'F_MATER_005151',
@@ -62,10 +55,13 @@ export const PREGNANCY_LINK_IDS = {
   twinPregnancyType: 'F_MATER_001025',
   parity: 'F_MATER_001192',
   maternalRisks: 'F_MATER_001361',
+  maternalRisksPrecision: 'F_MATER_001362',
   risksRelatedToObstetricHistory: 'F_MATER_001363',
+  risksRelatedToObstetricHistoryPrecision: 'F_MATER_001364',
   ultrasoundMonitoring: 'F_MATER_003026',
   corticotherapie: 'F_MATER_001597',
   risksOrComplicationsOfPregnancy: 'F_MATER_001631',
+  risksOrComplicationsOfPregnancyPrecision: 'F_MATER_001632',
   prenatalDiagnosis: 'F_MATER_001661',
   reasonsOfPrenatalDiagnosticMonitoring: 'F_MATER_001662'
 } as const

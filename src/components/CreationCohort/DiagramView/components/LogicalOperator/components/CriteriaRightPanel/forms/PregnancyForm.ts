@@ -10,7 +10,7 @@ import {
 import { FormNames } from 'types/searchCriterias'
 import { SourceType } from 'types/scope'
 import { getConfig } from 'config'
-import { configValueSetFallback, getFormItemValueSetMeta } from './questionnaireFormMeta'
+import { configValueSetFallback, getFormItemTitle, getFormItemValueSetMeta } from './questionnaireFormMeta'
 import { PREGNANCY_LINK_IDS } from 'constants/maternityLinkIds'
 
 export type PregnancyDataType = CommonCriteriaData &
@@ -148,7 +148,7 @@ export const form: () => CriteriaForm<PregnancyDataType> = () => {
             errorType: 'INCOHERENT_VALUE_ERROR',
             buildInfo: {
               fhirKey: {
-                id: 'F_MATER_001010',
+                id: PREGNANCY_LINK_IDS.pregnancyStartDate,
                 type: 'valueDate'
               },
               chipDisplayMethodExtraArgs: [{ type: 'string', value: 'Date de début de grossesse : ' }]
@@ -157,7 +157,7 @@ export const form: () => CriteriaForm<PregnancyDataType> = () => {
           {
             valueKey: 'pregnancyMode',
             type: 'autocomplete',
-            label: "Mode d'obtention de la grossesse",
+            label: getFormItemTitle(FormNames.PREGNANCY, PREGNANCY_LINK_IDS.pregnancyMode),
             valueSetId: pregnancyModeMeta.valueSetId,
             valueSetData: pregnancyModeMeta.valueSetData,
             noOptionsText: "Veuillez entrer un mode d'obtention de la grossesse",
@@ -172,10 +172,10 @@ export const form: () => CriteriaForm<PregnancyDataType> = () => {
           {
             valueKey: 'foetus',
             type: 'numberAndComparator',
-            label: 'Nombre de fœtus',
+            label: getFormItemTitle(FormNames.PREGNANCY, PREGNANCY_LINK_IDS.foetus),
             buildInfo: {
               fhirKey: {
-                id: 'F_MATER_001017',
+                id: PREGNANCY_LINK_IDS.foetus,
                 type: 'valueInteger'
               },
               chipDisplayMethodExtraArgs: [{ type: 'string', value: 'Nombre de fœtus' }]
@@ -184,10 +184,10 @@ export const form: () => CriteriaForm<PregnancyDataType> = () => {
           {
             valueKey: 'parity',
             type: 'numberAndComparator',
-            label: 'Parité',
+            label: getFormItemTitle(FormNames.PREGNANCY, PREGNANCY_LINK_IDS.parity),
             buildInfo: {
               fhirKey: {
-                id: 'F_MATER_001192',
+                id: PREGNANCY_LINK_IDS.parity,
                 type: 'valueInteger'
               },
               chipDisplayMethodExtraArgs: [{ type: 'string', value: 'Parité' }]
@@ -197,7 +197,7 @@ export const form: () => CriteriaForm<PregnancyDataType> = () => {
             valueKey: 'maternalRisks',
             type: 'autocomplete',
             extraLabel: () => 'Risques',
-            label: 'Risques liés aux antécédents maternels',
+            label: getFormItemTitle(FormNames.PREGNANCY, PREGNANCY_LINK_IDS.maternalRisks),
             valueSetId: maternalRisksMeta.valueSetId,
             valueSetData: maternalRisksMeta.valueSetData,
             noOptionsText: 'Veuillez entrer un risque lié aux antécédents maternels',
@@ -212,12 +212,12 @@ export const form: () => CriteriaForm<PregnancyDataType> = () => {
           {
             valueKey: 'maternalRisksPrecision',
             type: 'textWithCheck',
-            label: 'Risques liés aux antécédents maternels - Précision autre',
+            label: getFormItemTitle(FormNames.PREGNANCY, PREGNANCY_LINK_IDS.maternalRisksPrecision),
             placeholder: 'Risques liés aux antécédents maternels - Précision autre',
             errorType: 'SEARCHINPUT_ERROR',
             buildInfo: {
               fhirKey: {
-                id: 'F_MATER_001362',
+                id: PREGNANCY_LINK_IDS.maternalRisksPrecision,
                 type: 'valueString'
               },
               chipDisplayMethodExtraArgs: [{ type: 'string', value: 'Précision sur les risques maternels :' }]
@@ -226,7 +226,7 @@ export const form: () => CriteriaForm<PregnancyDataType> = () => {
           {
             valueKey: 'risksRelatedToObstetricHistory',
             type: 'autocomplete',
-            label: 'Risques liés aux antécédents obstétricaux',
+            label: getFormItemTitle(FormNames.PREGNANCY, PREGNANCY_LINK_IDS.risksRelatedToObstetricHistory),
             valueSetId: risksRelatedToObstetricHistoryMeta.valueSetId,
             valueSetData: risksRelatedToObstetricHistoryMeta.valueSetData,
             noOptionsText: 'Veuillez entrer un risque lié aux antécédents obstétricaux',
@@ -241,12 +241,12 @@ export const form: () => CriteriaForm<PregnancyDataType> = () => {
           {
             valueKey: 'risksRelatedToObstetricHistoryPrecision',
             type: 'textWithCheck',
-            label: 'Risques liés aux antécédents obstétricaux - précision autre',
+            label: getFormItemTitle(FormNames.PREGNANCY, PREGNANCY_LINK_IDS.risksRelatedToObstetricHistoryPrecision),
             placeholder: 'Risques liés aux antécédents obstétricaux - Précision autre',
             errorType: 'SEARCHINPUT_ERROR',
             buildInfo: {
               fhirKey: {
-                id: 'F_MATER_001364',
+                id: PREGNANCY_LINK_IDS.risksRelatedToObstetricHistoryPrecision,
                 type: 'valueString'
               },
               chipDisplayMethodExtraArgs: [
@@ -262,7 +262,7 @@ export const form: () => CriteriaForm<PregnancyDataType> = () => {
           {
             valueKey: 'ultrasoundMonitoring',
             type: 'autocomplete',
-            label: 'Suivi échographique',
+            label: getFormItemTitle(FormNames.PREGNANCY, PREGNANCY_LINK_IDS.ultrasoundMonitoring),
             extraLabel: () => 'Suivi échographique',
             valueSetId: ultrasoundMonitoringMeta.valueSetId,
             valueSetData: ultrasoundMonitoringMeta.valueSetData,
@@ -278,7 +278,7 @@ export const form: () => CriteriaForm<PregnancyDataType> = () => {
           {
             valueKey: 'corticotherapie',
             type: 'autocomplete',
-            label: 'Corticothérapie pour maturation pulmonaire fœtale',
+            label: getFormItemTitle(FormNames.PREGNANCY, PREGNANCY_LINK_IDS.corticotherapie),
             extraLabel: () => 'Corticothéraphie pour maturation pulmonaire fœtale',
             valueSetId: corticotherapieMeta.valueSetId,
             valueSetData: corticotherapieMeta.valueSetData,
@@ -295,7 +295,7 @@ export const form: () => CriteriaForm<PregnancyDataType> = () => {
             valueKey: 'risksOrComplicationsOfPregnancy',
             type: 'autocomplete',
             extraLabel: () => 'Risques',
-            label: 'Risques ou complications de la grossesse',
+            label: getFormItemTitle(FormNames.PREGNANCY, PREGNANCY_LINK_IDS.risksOrComplicationsOfPregnancy),
             valueSetId: risksOrComplicationsOfPregnancyMeta.valueSetId,
             valueSetData: risksOrComplicationsOfPregnancyMeta.valueSetData,
             noOptionsText: 'Veuillez entrer un risque ou complication de la grossesse',
@@ -310,12 +310,12 @@ export const form: () => CriteriaForm<PregnancyDataType> = () => {
           {
             valueKey: 'risksOrComplicationsOfPregnancyPrecision',
             type: 'textWithCheck',
-            label: 'Risques ou complications de la grossesse - Précision autre',
+            label: getFormItemTitle(FormNames.PREGNANCY, PREGNANCY_LINK_IDS.risksOrComplicationsOfPregnancyPrecision),
             placeholder: 'Risques ou complications de la grossesse - Précision autre',
             errorType: 'SEARCHINPUT_ERROR',
             buildInfo: {
               fhirKey: {
-                id: 'F_MATER_001632',
+                id: PREGNANCY_LINK_IDS.risksOrComplicationsOfPregnancyPrecision,
                 type: 'valueString'
               },
               chipDisplayMethodExtraArgs: [
@@ -326,7 +326,7 @@ export const form: () => CriteriaForm<PregnancyDataType> = () => {
           {
             valueKey: 'prenatalDiagnosis',
             type: 'autocomplete',
-            label: 'Grossesse suivie au diagnostic prénatal',
+            label: getFormItemTitle(FormNames.PREGNANCY, PREGNANCY_LINK_IDS.prenatalDiagnosis),
             extraLabel: () => 'Grossesse suivie au diagnostic prénatal',
             valueSetId: prenatalDiagnosisMeta.valueSetId,
             valueSetData: prenatalDiagnosisMeta.valueSetData,

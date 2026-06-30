@@ -10,7 +10,7 @@ import {
 import { FormNames } from 'types/searchCriterias'
 import { SourceType } from 'types/scope'
 import { getConfig } from 'config'
-import { configValueSetFallback, getFormItemValueSetMeta } from './questionnaireFormMeta'
+import { configValueSetFallback, getFormItemTitle, getFormItemValueSetMeta } from './questionnaireFormMeta'
 import { HOSPIT_LINK_IDS } from 'constants/maternityLinkIds'
 
 export type HospitDataType = CommonCriteriaData &
@@ -201,7 +201,7 @@ export const form: () => CriteriaForm<HospitDataType> = () => {
           {
             valueKey: 'hospitReason',
             type: 'autocomplete',
-            label: "Motif(s) d'hospitalisation",
+            label: getFormItemTitle(FormNames.HOSPIT, HOSPIT_LINK_IDS.hospitReason),
             noOptionsText: "Veuillez entrer un motif d'hospitalisation",
             valueSetId: metas.hospitReason.valueSetId,
             valueSetData: metas.hospitReason.valueSetData,
@@ -216,7 +216,7 @@ export const form: () => CriteriaForm<HospitDataType> = () => {
           {
             valueKey: 'inUteroTransfer',
             type: 'autocomplete',
-            label: 'Transfert in utero',
+            label: getFormItemTitle(FormNames.HOSPIT, HOSPIT_LINK_IDS.inUteroTransfer),
             noOptionsText: 'Veuillez entrer "oui" ou "non"',
             valueSetId: metas.inUteroTransfer.valueSetId,
             valueSetData: metas.inUteroTransfer.valueSetData,
@@ -231,7 +231,7 @@ export const form: () => CriteriaForm<HospitDataType> = () => {
           {
             valueKey: 'pregnancyMonitoring',
             type: 'autocomplete',
-            label: 'Grossesse peu ou pas suivie',
+            label: getFormItemTitle(FormNames.HOSPIT, HOSPIT_LINK_IDS.pregnancyMonitoring),
             noOptionsText: 'Veuillez entrer "oui" ou "non"',
             valueSetId: metas.pregnancyMonitoring.valueSetId,
             valueSetData: metas.pregnancyMonitoring.valueSetData,
@@ -246,7 +246,7 @@ export const form: () => CriteriaForm<HospitDataType> = () => {
           {
             valueKey: 'vme',
             type: 'autocomplete',
-            label: 'VME',
+            label: getFormItemTitle(FormNames.HOSPIT, HOSPIT_LINK_IDS.vme),
             noOptionsText: 'Veuillez entrer des valeurs de VME',
             valueSetId: metas.vme.valueSetId,
             valueSetData: metas.vme.valueSetData,
@@ -261,7 +261,7 @@ export const form: () => CriteriaForm<HospitDataType> = () => {
           {
             valueKey: 'maturationCorticotherapie',
             type: 'autocomplete',
-            label: 'Corticothérapie pour maturation fœtale faite',
+            label: getFormItemTitle(FormNames.HOSPIT, HOSPIT_LINK_IDS.maturationCorticotherapie),
             noOptionsText: 'Veuillez entrer "oui" ou "non"',
             valueSetId: metas.maturationCorticotherapie.valueSetId,
             valueSetData: metas.maturationCorticotherapie.valueSetData,
@@ -276,7 +276,7 @@ export const form: () => CriteriaForm<HospitDataType> = () => {
           {
             valueKey: 'chirurgicalGesture',
             type: 'autocomplete',
-            label: 'Type de geste ou de chirurgie',
+            label: getFormItemTitle(FormNames.HOSPIT, HOSPIT_LINK_IDS.chirurgicalGesture),
             noOptionsText: 'Veuillez entrer un type de geste ou de chirurgie',
             valueSetId: metas.chirurgicalGesture.valueSetId,
             valueSetData: metas.chirurgicalGesture.valueSetData,
@@ -297,7 +297,7 @@ export const form: () => CriteriaForm<HospitDataType> = () => {
           {
             valueKey: 'childbirth',
             type: 'autocomplete',
-            label: 'Accouchement',
+            label: getFormItemTitle(FormNames.HOSPIT, HOSPIT_LINK_IDS.childbirth),
             noOptionsText: 'Veuillez entrer "oui" ou "non"',
             valueSetId: metas.childbirth.valueSetId,
             valueSetData: metas.childbirth.valueSetData,
@@ -312,7 +312,7 @@ export const form: () => CriteriaForm<HospitDataType> = () => {
           {
             valueKey: 'hospitalChildBirthPlace',
             type: 'autocomplete',
-            label: "Accouchement à la maternité de l'hospitalisation",
+            label: getFormItemTitle(FormNames.HOSPIT, HOSPIT_LINK_IDS.hospitalChildBirthPlace),
             noOptionsText: 'Veuillez entrer "oui" ou "non"',
             valueSetId: metas.hospitalChildBirthPlace.valueSetId,
             valueSetData: metas.hospitalChildBirthPlace.valueSetData,
@@ -329,7 +329,7 @@ export const form: () => CriteriaForm<HospitDataType> = () => {
           {
             valueKey: 'otherHospitalChildBirthPlace',
             type: 'autocomplete',
-            label: 'Accouchement dans un autre hôpital',
+            label: getFormItemTitle(FormNames.HOSPIT, HOSPIT_LINK_IDS.otherHospitalChildBirthPlace),
             noOptionsText: 'Veuillez entrer "oui" ou "non"',
             valueSetId: metas.otherHospitalChildBirthPlace.valueSetId,
             valueSetData: metas.otherHospitalChildBirthPlace.valueSetData,
@@ -344,7 +344,7 @@ export const form: () => CriteriaForm<HospitDataType> = () => {
           {
             valueKey: 'homeChildBirthPlace',
             type: 'autocomplete',
-            label: 'Accouchement à domicile',
+            label: getFormItemTitle(FormNames.HOSPIT, HOSPIT_LINK_IDS.homeChildBirthPlace),
             noOptionsText: 'Veuillez entrer "oui" ou "non"',
             valueSetId: metas.homeChildBirthPlace.valueSetId,
             valueSetData: metas.homeChildBirthPlace.valueSetData,
@@ -359,7 +359,7 @@ export const form: () => CriteriaForm<HospitDataType> = () => {
           {
             valueKey: 'childbirthMode',
             type: 'autocomplete',
-            label: 'Mode de mise en travail',
+            label: getFormItemTitle(FormNames.HOSPIT, HOSPIT_LINK_IDS.childbirthMode),
             noOptionsText: 'Veuillez entrer un mode de mise en travail',
             valueSetId: metas.childbirthMode.valueSetId,
             valueSetData: metas.childbirthMode.valueSetData,
@@ -374,7 +374,7 @@ export const form: () => CriteriaForm<HospitDataType> = () => {
           {
             valueKey: 'maturationReason',
             type: 'autocomplete',
-            label: 'Motif(s) de maturation / déclenchement',
+            label: getFormItemTitle(FormNames.HOSPIT, HOSPIT_LINK_IDS.maturationReason),
             noOptionsText: 'Veuillez entrer un motif de maturation / déclenchement',
             valueSetId: metas.maturationReason.valueSetId,
             valueSetData: metas.maturationReason.valueSetData,
@@ -389,7 +389,7 @@ export const form: () => CriteriaForm<HospitDataType> = () => {
           {
             valueKey: 'maturationModality',
             type: 'autocomplete',
-            label: 'Modalités de maturation cervicale initiale',
+            label: getFormItemTitle(FormNames.HOSPIT, HOSPIT_LINK_IDS.maturationModality),
             noOptionsText: 'Veuillez entrer une modalité de maturation cervicale initiale',
             valueSetId: metas.maturationModality.valueSetId,
             valueSetData: metas.maturationModality.valueSetData,
@@ -404,7 +404,7 @@ export const form: () => CriteriaForm<HospitDataType> = () => {
           {
             valueKey: 'imgIndication',
             type: 'autocomplete',
-            label: "Indication de l'IMG",
+            label: getFormItemTitle(FormNames.HOSPIT, HOSPIT_LINK_IDS.imgIndication),
             noOptionsText: "Veuillez entrer une indication de l'IMG",
             valueSetId: metas.imgIndication.valueSetId,
             valueSetData: metas.imgIndication.valueSetData,
@@ -419,7 +419,9 @@ export const form: () => CriteriaForm<HospitDataType> = () => {
           {
             valueKey: 'laborOrCesareanEntry',
             type: 'autocomplete',
-            label: "Présentation à l'entrée en travail ou en début de césarienne - données jusqu'au 09/11/2023",
+            label:
+              getFormItemTitle(FormNames.HOSPIT, HOSPIT_LINK_IDS.laborOrCesareanEntry) +
+              " - données jusqu'au 09/11/2023",
             noOptionsText: "Veuillez entrer une présentation à l'entrée en travail ou en début de césarienne",
             valueSetId: metas.laborOrCesareanEntry.valueSetId,
             valueSetData: metas.laborOrCesareanEntry.valueSetData,
@@ -436,7 +438,7 @@ export const form: () => CriteriaForm<HospitDataType> = () => {
           {
             valueKey: 'pathologyDuringLabor',
             type: 'autocomplete',
-            label: 'Pathologie pendant le travail',
+            label: getFormItemTitle(FormNames.HOSPIT, HOSPIT_LINK_IDS.pathologyDuringLabor),
             noOptionsText: 'Veuillez entrer une pathologie pendant le travail',
             valueSetId: metas.pathologyDuringLabor.valueSetId,
             valueSetData: metas.pathologyDuringLabor.valueSetData,
@@ -451,7 +453,7 @@ export const form: () => CriteriaForm<HospitDataType> = () => {
           {
             valueKey: 'obstetricalGestureDuringLabor',
             type: 'autocomplete',
-            label: 'Geste ou manoeuvre obstétricale pendant le travail',
+            label: getFormItemTitle(FormNames.HOSPIT, HOSPIT_LINK_IDS.obstetricalGestureDuringLabor),
             noOptionsText: 'Veuillez entrer un geste ou manoeuvre obstétricale pendant le travail',
             valueSetId: metas.obstetricalGestureDuringLabor.valueSetId,
             valueSetData: metas.obstetricalGestureDuringLabor.valueSetData,
@@ -474,7 +476,7 @@ export const form: () => CriteriaForm<HospitDataType> = () => {
           {
             valueKey: 'analgesieType',
             type: 'autocomplete',
-            label: 'Analgésie / Anesthésie - Type',
+            label: getFormItemTitle(FormNames.HOSPIT, HOSPIT_LINK_IDS.analgesieType),
             noOptionsText: "Veuillez entrer un type d'Analgésie / Anesthésie - Type",
             valueSetId: metas.analgesieType.valueSetId,
             valueSetData: metas.analgesieType.valueSetData,
@@ -499,7 +501,7 @@ export const form: () => CriteriaForm<HospitDataType> = () => {
             errorType: 'INCOHERENT_AGE_ERROR',
             buildInfo: {
               fhirKey: {
-                id: 'F_MATER_004961',
+                id: HOSPIT_LINK_IDS.birthDeliveryStartDate,
                 type: 'valueDateTime'
               },
               chipDisplayMethodExtraArgs: [{ type: 'string', value: "Date/heure de l'accouchement :" }]
@@ -508,10 +510,10 @@ export const form: () => CriteriaForm<HospitDataType> = () => {
           {
             valueKey: 'birthDeliveryWeeks',
             type: 'numberAndComparator',
-            label: 'Accouchement - Terme - Semaines',
+            label: getFormItemTitle(FormNames.HOSPIT, HOSPIT_LINK_IDS.birthDeliveryWeeks),
             buildInfo: {
               fhirKey: {
-                id: 'F_MATER_004962',
+                id: HOSPIT_LINK_IDS.birthDeliveryWeeks,
                 type: 'valueInteger'
               },
               chipDisplayMethodExtraArgs: [{ type: 'string', value: 'Nombre de semaines (Accouchement - Terme)' }]
@@ -520,10 +522,10 @@ export const form: () => CriteriaForm<HospitDataType> = () => {
           {
             valueKey: 'birthDeliveryDays',
             type: 'numberAndComparator',
-            label: 'Accouchement - Terme - Jours',
+            label: getFormItemTitle(FormNames.HOSPIT, HOSPIT_LINK_IDS.birthDeliveryDays),
             buildInfo: {
               fhirKey: {
-                id: 'F_MATER_004963',
+                id: HOSPIT_LINK_IDS.birthDeliveryDays,
                 type: 'valueInteger'
               },
               chipDisplayMethodExtraArgs: [{ type: 'string', value: 'Nombre de jours (Accouchement - Terme)' }]
@@ -532,7 +534,7 @@ export const form: () => CriteriaForm<HospitDataType> = () => {
           {
             valueKey: 'birthDeliveryWay',
             type: 'autocomplete',
-            label: 'Voie d’accouchement',
+            label: getFormItemTitle(FormNames.HOSPIT, HOSPIT_LINK_IDS.birthDeliveryWay),
             noOptionsText: 'Veuillez entrer une voie d’accouchement',
             valueSetId: metas.birthDeliveryWay.valueSetId,
             valueSetData: metas.birthDeliveryWay.valueSetData,
@@ -547,7 +549,7 @@ export const form: () => CriteriaForm<HospitDataType> = () => {
           {
             valueKey: 'instrumentType',
             type: 'autocomplete',
-            label: "Type d'instrument",
+            label: getFormItemTitle(FormNames.HOSPIT, HOSPIT_LINK_IDS.instrumentType),
             noOptionsText: "Veuillez entrer un type d'instrument",
             valueSetId: metas.instrumentType.valueSetId,
             valueSetData: metas.instrumentType.valueSetData,
@@ -562,7 +564,7 @@ export const form: () => CriteriaForm<HospitDataType> = () => {
           {
             valueKey: 'cSectionModality',
             type: 'autocomplete',
-            label: 'Modalités de la césarienne',
+            label: getFormItemTitle(FormNames.HOSPIT, HOSPIT_LINK_IDS.cSectionModality),
             noOptionsText: 'Veuillez entrer une modalité de la césarienne',
             valueSetId: metas.cSectionModality.valueSetId,
             valueSetData: metas.cSectionModality.valueSetData,
@@ -577,7 +579,7 @@ export const form: () => CriteriaForm<HospitDataType> = () => {
           {
             valueKey: 'presentationAtDelivery',
             type: 'autocomplete',
-            label: "Présentation à l'accouchement",
+            label: getFormItemTitle(FormNames.HOSPIT, HOSPIT_LINK_IDS.presentationAtDelivery),
             noOptionsText: "Veuillez entrer une présentation à l'accouchement",
             valueSetId: metas.presentationAtDelivery.valueSetId,
             valueSetData: metas.presentationAtDelivery.valueSetData,
@@ -592,10 +594,10 @@ export const form: () => CriteriaForm<HospitDataType> = () => {
           {
             valueKey: 'birthMensurationsGrams',
             type: 'numberAndComparator',
-            label: 'Mensurations naissance - Poids (g)',
+            label: getFormItemTitle(FormNames.HOSPIT, HOSPIT_LINK_IDS.birthMensurationsGrams),
             buildInfo: {
               fhirKey: {
-                id: 'F_MATER_005033',
+                id: HOSPIT_LINK_IDS.birthMensurationsGrams,
                 type: 'valueInteger'
               },
               chipDisplayMethodExtraArgs: [{ type: 'string', value: 'Mensurations naissance - Poids (g) :' }]
@@ -605,10 +607,10 @@ export const form: () => CriteriaForm<HospitDataType> = () => {
             valueKey: 'birthMensurationsPercentil',
             type: 'numberAndComparator',
             floatValues: true,
-            label: 'Mensurations naissance - Poids (percentile)',
+            label: getFormItemTitle(FormNames.HOSPIT, HOSPIT_LINK_IDS.birthMensurationsPercentil),
             buildInfo: {
               fhirKey: {
-                id: 'F_MATER_005034',
+                id: HOSPIT_LINK_IDS.birthMensurationsPercentil,
                 type: 'valueDecimal'
               },
               chipDisplayMethodExtraArgs: [{ type: 'string', value: 'Mensurations naissance - Poids (percentile) :' }]
@@ -617,10 +619,10 @@ export const form: () => CriteriaForm<HospitDataType> = () => {
           {
             valueKey: 'apgar1',
             type: 'numberAndComparator',
-            label: 'Score Apgar - 1 min',
+            label: getFormItemTitle(FormNames.HOSPIT, HOSPIT_LINK_IDS.apgar1),
             buildInfo: {
               fhirKey: {
-                id: 'F_MATER_005051',
+                id: HOSPIT_LINK_IDS.apgar1,
                 type: 'valueInteger'
               },
               chipDisplayMethodExtraArgs: [{ type: 'string', value: 'Score Apgar - 1 min :' }]
@@ -629,10 +631,10 @@ export const form: () => CriteriaForm<HospitDataType> = () => {
           {
             valueKey: 'apgar3',
             type: 'numberAndComparator',
-            label: 'Score Apgar - 3 min',
+            label: getFormItemTitle(FormNames.HOSPIT, HOSPIT_LINK_IDS.apgar3),
             buildInfo: {
               fhirKey: {
-                id: 'F_MATER_005052',
+                id: HOSPIT_LINK_IDS.apgar3,
                 type: 'valueInteger'
               },
               chipDisplayMethodExtraArgs: [{ type: 'string', value: 'Score Apgar - 3 min :' }]
@@ -641,10 +643,10 @@ export const form: () => CriteriaForm<HospitDataType> = () => {
           {
             valueKey: 'apgar5',
             type: 'numberAndComparator',
-            label: 'Score Apgar - 5 min',
+            label: getFormItemTitle(FormNames.HOSPIT, HOSPIT_LINK_IDS.apgar5),
             buildInfo: {
               fhirKey: {
-                id: 'F_MATER_005053',
+                id: HOSPIT_LINK_IDS.apgar5,
                 type: 'valueInteger'
               },
               chipDisplayMethodExtraArgs: [{ type: 'string', value: 'Score Apgar - 5 min :' }]
@@ -653,10 +655,10 @@ export const form: () => CriteriaForm<HospitDataType> = () => {
           {
             valueKey: 'apgar10',
             type: 'numberAndComparator',
-            label: 'Score Apgar - 10 min',
+            label: getFormItemTitle(FormNames.HOSPIT, HOSPIT_LINK_IDS.apgar10),
             buildInfo: {
               fhirKey: {
-                id: 'F_MATER_005054',
+                id: HOSPIT_LINK_IDS.apgar10,
                 type: 'valueInteger'
               },
               chipDisplayMethodExtraArgs: [{ type: 'string', value: 'Score Apgar - 10 min :' }]
@@ -666,10 +668,10 @@ export const form: () => CriteriaForm<HospitDataType> = () => {
             valueKey: 'arterialPhCord',
             type: 'numberAndComparator',
             floatValues: true,
-            label: 'pH artériel au cordon',
+            label: getFormItemTitle(FormNames.HOSPIT, HOSPIT_LINK_IDS.arterialPhCord),
             buildInfo: {
               fhirKey: {
-                id: 'F_MATER_005060',
+                id: HOSPIT_LINK_IDS.arterialPhCord,
                 type: 'valueDecimal'
               },
               chipDisplayMethodExtraArgs: [{ type: 'string', value: 'pH artériel au cordon :' }]
@@ -679,10 +681,10 @@ export const form: () => CriteriaForm<HospitDataType> = () => {
             valueKey: 'arterialCordLactates',
             type: 'numberAndComparator',
             floatValues: true,
-            label: 'Lactate artériel au cordon (mmol/L)',
+            label: getFormItemTitle(FormNames.HOSPIT, HOSPIT_LINK_IDS.arterialCordLactates),
             buildInfo: {
               fhirKey: {
-                id: 'F_MATER_005061',
+                id: HOSPIT_LINK_IDS.arterialCordLactates,
                 type: 'valueDecimal'
               },
               chipDisplayMethodExtraArgs: [{ type: 'string', value: 'Lactate artériel au cordon (mmol/L) :' }]
@@ -691,7 +693,7 @@ export const form: () => CriteriaForm<HospitDataType> = () => {
           {
             valueKey: 'birthStatus',
             type: 'autocomplete',
-            label: 'Statut vital à la naissance',
+            label: getFormItemTitle(FormNames.HOSPIT, HOSPIT_LINK_IDS.birthStatus),
             noOptionsText: 'Veuillez entrer un statut vital à la naissance',
             valueSetId: metas.birthStatus.valueSetId,
             valueSetData: metas.birthStatus.valueSetData,
@@ -706,7 +708,7 @@ export const form: () => CriteriaForm<HospitDataType> = () => {
           {
             valueKey: 'postpartumHemorrhage',
             type: 'autocomplete',
-            label: 'Hémorragie du post-partum',
+            label: getFormItemTitle(FormNames.HOSPIT, HOSPIT_LINK_IDS.postpartumHemorrhage),
             noOptionsText: 'Veuillez entrer "oui" ou "non"',
             valueSetId: metas.postpartumHemorrhage.valueSetId,
             valueSetData: metas.postpartumHemorrhage.valueSetData,
@@ -721,7 +723,7 @@ export const form: () => CriteriaForm<HospitDataType> = () => {
           {
             valueKey: 'conditionPerineum',
             type: 'autocomplete',
-            label: 'État du périnée',
+            label: getFormItemTitle(FormNames.HOSPIT, HOSPIT_LINK_IDS.conditionPerineum),
             noOptionsText: 'Veuillez entrer un état du périnée',
             valueSetId: metas.conditionPerineum.valueSetId,
             valueSetData: metas.conditionPerineum.valueSetData,
@@ -736,7 +738,7 @@ export const form: () => CriteriaForm<HospitDataType> = () => {
           {
             valueKey: 'exitPlaceType',
             type: 'autocomplete',
-            label: 'Type de lieu de sortie',
+            label: getFormItemTitle(FormNames.HOSPIT, HOSPIT_LINK_IDS.exitPlaceType),
             noOptionsText: 'Veuillez entrer un type de lieu de sortie',
             valueSetId: metas.exitPlaceType.valueSetId,
             valueSetData: metas.exitPlaceType.valueSetData,
@@ -757,7 +759,7 @@ export const form: () => CriteriaForm<HospitDataType> = () => {
           {
             valueKey: 'feedingType',
             type: 'autocomplete',
-            label: "Type d'allaitement",
+            label: getFormItemTitle(FormNames.HOSPIT, HOSPIT_LINK_IDS.feedingType),
             noOptionsText: "Veuillez entrer un type d'allaitement",
             valueSetId: metas.feedingType.valueSetId,
             valueSetData: metas.feedingType.valueSetData,
@@ -772,7 +774,7 @@ export const form: () => CriteriaForm<HospitDataType> = () => {
           {
             valueKey: 'complication',
             type: 'autocomplete',
-            label: 'Aucune complication',
+            label: getFormItemTitle(FormNames.HOSPIT, HOSPIT_LINK_IDS.complication),
             noOptionsText: 'Veuillez entrer "oui" ou "non"',
             valueSetId: metas.complication.valueSetId,
             valueSetData: metas.complication.valueSetData,
@@ -793,7 +795,7 @@ export const form: () => CriteriaForm<HospitDataType> = () => {
           {
             valueKey: 'exitFeedingMode',
             type: 'autocomplete',
-            label: "Mode d'allaitement à la sortie",
+            label: getFormItemTitle(FormNames.HOSPIT, HOSPIT_LINK_IDS.exitFeedingMode),
             noOptionsText: "Veuillez entrer un mode d'allaitement à la sortie",
             valueSetId: metas.exitFeedingMode.valueSetId,
             valueSetData: metas.exitFeedingMode.valueSetData,
@@ -808,7 +810,7 @@ export const form: () => CriteriaForm<HospitDataType> = () => {
           {
             valueKey: 'exitDiagnostic',
             type: 'autocomplete',
-            label: 'Diagnostic de sortie',
+            label: getFormItemTitle(FormNames.HOSPIT, HOSPIT_LINK_IDS.exitDiagnostic),
             noOptionsText: 'Veuillez entrer un diagnostic de sortie',
             valueSetId: metas.exitDiagnostic.valueSetId,
             valueSetData: metas.exitDiagnostic.valueSetData,

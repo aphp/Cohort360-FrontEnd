@@ -32,3 +32,7 @@ export const configValueSetFallback = (
   const entry = getConfig().features.questionnaires.valueSets[key]
   return { valueSetId: entry?.url ?? '', valueSetData: entry?.data }
 }
+
+export const getFormItemTitle = (formName: string, linkId: string): string => {
+  return selectFormItemByName(store.getState(), formName, linkId)?.title ?? ''
+}

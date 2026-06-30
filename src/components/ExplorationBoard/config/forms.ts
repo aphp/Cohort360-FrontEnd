@@ -1,6 +1,6 @@
 import { getConfig } from 'config'
 import { plural } from 'utils/string'
-import { QuestionnaireResponse } from 'fhir/r4'
+import { QuestionnaireResponse, Questionnaire } from 'fhir/r4'
 import { mapToDate } from 'mappers/dates'
 import services from 'services/aphp'
 import { fetchForms } from 'services/aphp/callApi'
@@ -30,22 +30,13 @@ import {
 import { getFormDetails, getFormLabel, getFormName, buildFormItemsByLinkId, FormItemsByLinkId } from 'utils/formUtils'
 import { extractFormItems } from 'utils/questionnaireFormData'
 import { SourceType } from 'types/scope'
-import { Questionnaire } from 'fhir/r4'
 
-/**
- * Cache module-level des `Questionnaire` de maternité : évite de re-fetcher (et re-extraire) à
- * chaque pagination/tri du tableau, et de dupliquer l'appel entre `fetchAdditionalInfos`,
- * `fetchList` et `mapToTimeline`. Les définitions de formulaire ne changent pas en cours de session.
- */
 let cachedQuestionnaires: Promise<Questionnaire[]> | undefined
 const fetchQuestionnairesCached = (): Promise<Questionnaire[]> => {
-  if (!cachedQuestionnaires) {
-    cachedQuestionnaires = services.patients.fetchQuestionnaires().catch((error) => {
-      // En cas d'échec, ne pas mémoriser l'échec : on pourra réessayer au prochain appel.
-      cachedQuestionnaires = undefined
-      throw error
-    })
-  }
+  cachedQuestionnaires ??= services.patients.fetchQuestionnaires().catch((error) => {
+    cachedQuestionnaires = undefined
+    throw error
+  })
   return cachedQuestionnaires
 }
 
@@ -93,7 +84,7 @@ const mapToTable = (data: Data, groupId: string[], formItemsByLinkId: FormItemsB
     { label: `IPP` },
     { label: 'Unité exécutrice' },
     { label: 'Aperçu', align: 'center' }
-  ].filter((elem) => elem) as Column[]
+  ].filter(Boolean) as Column[]
   ;(data as ExplorationResults<CohortQuestionnaireResponse>).list.forEach((elem) => {
     const formName = elem.formName as FormNames
     const date = elem.authored
@@ -130,7 +121,7 @@ const mapToTable = (data: Data, groupId: string[], formItemsByLinkId: FormItemsB
         type: CellType.LINES,
         align: 'center'
       }
-    ].filter((elem) => elem) as Row
+    ].filter(Boolean) as Row
     rows.push(row)
   })
   return { columns, rows }
@@ -218,7 +209,7 @@ export const formsConfig = (
     mapToTimeline: patient
       ? async (data: Data) => {
           const questionnaires = await fetchQuestionnairesCached()
-          return { data: (data.list ?? []) as CohortQuestionnaireResponse[], questionnaires: questionnaires ?? [] }
+          return { data: (data.list ?? []) as CohortQuestionnaireResponse[], questionnaires }
         }
       : undefined,
     narrowSearchCriterias: (searchCriterias) =>
