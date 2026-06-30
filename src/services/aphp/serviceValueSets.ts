@@ -148,7 +148,11 @@ const formatCodesFromValueSetReponse = (valueSetBundle: ValueSet[]) => {
  * @param signal the abort signal to cancel the request
  * @returns the list of codes from the codesystem
  */
-export const fetchCodeSystem = async (codeSystem: string, signal?: AbortSignal): Promise<FhirItem[]> => {
+export const fetchCodeSystem = async (
+  codeSystem: string,
+  signal?: AbortSignal,
+  codeInLabel = false
+): Promise<FhirItem[]> => {
   const res = await apiFhir.get<FHIR_Bundle_Response<CodeSystem>>(`/CodeSystem?url=${codeSystem}`, {
     signal: signal
   })
@@ -156,7 +160,9 @@ export const fetchCodeSystem = async (codeSystem: string, signal?: AbortSignal):
   return (
     codeSystemBundle.at(0)?.concept?.map((concept) => ({
       id: concept.code as string,
-      label: concept.display as string,
+      label: codeInLabel
+        ? `${concept.code} - ${capitalizeFirstLetter(concept.display ?? '')}`
+        : capitalizeFirstLetter(concept.display ?? ''),
       system: codeSystem
     })) ?? []
   )
@@ -339,7 +345,7 @@ export const getCodeList = async (
 ): Promise<Back_API_Response<FhirItem>> => {
   if (shouldUseCodeSystemLoading(valueSetUrl)) {
     const codeSystemUrl = getCodeSystemUrlFromValueSetUrl(valueSetUrl)
-    const codeSystemItems = await fetchCodeSystem(codeSystemUrl, signal)
+    const codeSystemItems = await fetchCodeSystem(codeSystemUrl, signal, codeInLabel)
     return {
       results: codeSystemItems,
       count: codeSystemItems.length
@@ -354,7 +360,11 @@ export const getCodeList = async (
     valueSetBundle.at(0)?.compose?.include[0].concept === undefined &&
     !!valueSetBundle.at(0)?.compose?.include[0].system
   ) {
-    const codeSystemItems = await fetchCodeSystem(valueSetBundle.at(0)?.compose?.include[0].system as string, signal)
+    const codeSystemItems = await fetchCodeSystem(
+      valueSetBundle.at(0)?.compose?.include[0].system as string,
+      signal,
+      codeInLabel
+    )
     return {
       results: codeSystemItems,
       count: codeSystemItems.length
