@@ -32,6 +32,7 @@ import Keycloak from 'assets/icones/keycloak.svg?react'
 
 import { useAppDispatch, useAppSelector } from 'state'
 import { MeState, login as loginAction } from 'state/me'
+import { hydrateOnboarding } from 'state/onboarding'
 import { ACCESS_TOKEN, REFRESH_TOKEN } from 'constants.js'
 import { isAccessTokenValid } from 'utils/tokens'
 
@@ -186,6 +187,12 @@ const Login = () => {
           accessExpirations
         }
         dispatch(loginAction(loginState))
+        dispatch(
+          hydrateOnboarding({
+            step: practitionerData.onboarding_step ?? 0,
+            completedAt: practitionerData.onboarding_completed_at ?? null
+          })
+        )
         dispatch(saveRights({ rights: practitionerPerimeters }))
         const oldPath = localStorage.getItem('old-path')
         localStorage.removeItem('old-path')

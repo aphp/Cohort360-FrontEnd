@@ -16,6 +16,7 @@ import request from './request'
 import drawer from './drawer'
 import scope from './scope'
 import me from './me'
+import onboarding from './onboarding'
 import warningDialog from './warningDialog'
 import valueSets from './valueSets'
 import preferences from './preferences'
@@ -24,6 +25,7 @@ import { temporalConstraintsMiddleware } from './middlewares'
 // Combine reducers
 export const rootReducer = combineReducers({
   me,
+  onboarding,
   preferences,
   cohortCreation: combineReducers({
     criteria,

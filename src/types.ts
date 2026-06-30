@@ -111,6 +111,8 @@ export type User = {
   firstname?: string
   lastname?: string
   display_name?: string
+  onboarding_step?: number
+  onboarding_completed_at?: string | null
 }
 
 export type CohortComposition = DocumentReference & {

@@ -2,6 +2,8 @@ import React from 'react'
 import { RouteObject } from 'react-router'
 
 import Login from 'views/Login/Login'
+import Onboarding from 'views/Onboarding/Onboarding'
+import { ONBOARDING_ROUTE } from 'views/Onboarding/route'
 import HealthCheck from 'views/HealthCheck/HealthCheck'
 import Welcome from 'views/Welcome/Welcome'
 import SearchPatient from 'views/SearchPatient'
@@ -265,6 +267,17 @@ const configRoutes = (): ConfigRoute[] => {
       isPrivate: true,
       element: <DownloadPopup />,
       exact: false,
+      displaySideBar: false
+    },
+    /**
+     * Cohort360: Onboarding journey
+     */
+    {
+      exact: true,
+      path: ONBOARDING_ROUTE,
+      name: 'onboarding',
+      isPrivate: true,
+      element: <Onboarding />,
       displaySideBar: false
     },
     /**

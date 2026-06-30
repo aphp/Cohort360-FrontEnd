@@ -18,7 +18,8 @@
  * @since 1.0.0
  */
 
-import React, { useContext, useEffect, useState } from 'react'
+import type React from 'react'
+import { useContext, useEffect, useState } from 'react'
 import { Outlet, Navigate, useLocation } from 'react-router-dom'
 
 import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button } from '@mui/material'
@@ -26,6 +27,8 @@ import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, B
 import { isAccessTokenValid } from 'utils/tokens'
 
 import { useAppSelector, useAppDispatch } from '../../state'
+import { selectOnboardingCompleted } from 'state/onboarding'
+import { ONBOARDING_ROUTE } from 'views/Onboarding/route'
 import { AppConfig } from 'config'
 import { throttle } from 'lodash'
 import { updateConfigFromFhirMetadata } from 'services/aphp/serviceFhirConfig'
@@ -73,6 +76,7 @@ declare const window: any
  */
 const PrivateRoute: React.FC = () => {
   const me = useAppSelector((state) => state.me)
+  const onboardingCompleted = useAppSelector(selectOnboardingCompleted)
   const dispatch = useAppDispatch()
   const appConfig = useContext(AppConfig)
   const location = useLocation()
@@ -152,6 +156,9 @@ const PrivateRoute: React.FC = () => {
         </DialogActions>
       </Dialog>
     )
+  } else if (!onboardingCompleted && !location.pathname.startsWith(ONBOARDING_ROUTE)) {
+    // Authenticated but onboarding not completed: gate the app behind the journey
+    return <Navigate to={ONBOARDING_ROUTE} replace />
   } else {
     // User is authenticated, render the protected route content
     return <Outlet />
