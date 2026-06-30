@@ -18,20 +18,17 @@
  * @since 1.0.0
  */
 
-import type React from 'react'
-import { useContext, useEffect, useState } from 'react'
-import { Outlet, Navigate, useLocation } from 'react-router-dom'
-
-import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button } from '@mui/material'
-
-import { isAccessTokenValid } from 'utils/tokens'
-
-import { useAppSelector, useAppDispatch } from '../../state'
-import { selectOnboardingCompleted } from 'state/onboarding'
-import { ONBOARDING_ROUTE } from 'views/Onboarding/route'
+import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material'
 import { AppConfig } from 'config'
 import { throttle } from 'lodash'
+import type React from 'react'
+import { useContext, useEffect, useState } from 'react'
+import { Navigate, Outlet, useLocation } from 'react-router-dom'
 import { updateConfigFromFhirMetadata } from 'services/aphp/serviceFhirConfig'
+import { selectOnboardingCompleted } from 'state/onboarding'
+import { isAccessTokenValid } from 'utils/tokens'
+import { ONBOARDING_ROUTE } from 'views/Onboarding/route'
+import { useAppDispatch, useAppSelector } from '../../state'
 
 /**
  * Global window object type declaration to access Microsoft Clarity tracking.

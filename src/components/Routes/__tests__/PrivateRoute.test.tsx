@@ -1,6 +1,6 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 vi.mock('state', () => ({
   useAppSelector: vi.fn(),
@@ -16,9 +16,9 @@ vi.mock('lodash', () => ({
 }))
 
 import { AppConfig, type AppConfig as AppConfigType } from 'config'
+import { ACCESS_TOKEN } from 'constants.js'
 import { useAppSelector } from 'state'
 import PrivateRoute from '../PrivateRoute'
-import { ACCESS_TOKEN } from 'constants.js'
 
 const mockedUseAppSelector = vi.mocked(useAppSelector)
 

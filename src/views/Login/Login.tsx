@@ -1,12 +1,3 @@
-import React, {
-  KeyboardEvent as ReactKeyboardEvent,
-  SyntheticEvent,
-  UIEvent,
-  useContext,
-  useEffect,
-  useState
-} from 'react'
-import { useNavigate } from 'react-router-dom'
 import {
   Alert,
   Box,
@@ -23,28 +14,32 @@ import {
   TextField,
   Typography
 } from '@mui/material'
-
-import NoRights from 'components/ErrorView/NoRights'
-
-import logo from 'assets/images/logo-login.png'
-import logoAPHP from 'assets/images/logo-aphp.png'
 import Keycloak from 'assets/icones/keycloak.svg?react'
-
-import { useAppDispatch, useAppSelector } from 'state'
-import { MeState, login as loginAction } from 'state/me'
-import { hydrateOnboarding } from 'state/onboarding'
-import { ACCESS_TOKEN, REFRESH_TOKEN } from 'constants.js'
-import { isAccessTokenValid } from 'utils/tokens'
-
-import services from 'services/aphp'
-
-import useStyles from './styles'
-import { getDaysLeft } from 'utils/dates'
-import { AccessExpiration, User } from 'types'
+import logoAPHP from 'assets/images/logo-aphp.png'
+import logo from 'assets/images/logo-login.png'
 import { isAxiosError } from 'axios'
-import { saveRights } from 'state/scope'
-import { updatePerimeters } from './utils'
+import NoRights from 'components/ErrorView/NoRights'
 import { AppConfig } from 'config'
+import { ACCESS_TOKEN, REFRESH_TOKEN } from 'constants.js'
+import React, {
+  type KeyboardEvent as ReactKeyboardEvent,
+  type SyntheticEvent,
+  type UIEvent,
+  useContext,
+  useEffect,
+  useState
+} from 'react'
+import { useNavigate } from 'react-router-dom'
+import services from 'services/aphp'
+import { useAppDispatch, useAppSelector } from 'state'
+import { login as loginAction, type MeState } from 'state/me'
+import { hydrateOnboarding } from 'state/onboarding'
+import { saveRights } from 'state/scope'
+import type { AccessExpiration, User } from 'types'
+import { getDaysLeft } from 'utils/dates'
+import { isAccessTokenValid } from 'utils/tokens'
+import useStyles from './styles'
+import { updatePerimeters } from './utils'
 
 type ErrorSnackBarAlertProps = {
   open?: boolean

@@ -1,5 +1,6 @@
-import { ReactElement, ReactNode } from 'react'
-import {
+import type { AxiosResponse } from 'axios'
+import type { CriteriaForm } from 'components/CreationCohort/DiagramView/components/LogicalOperator/components/CriteriaRightPanel/CriteriaForm/types'
+import type {
   Bundle,
   Claim,
   Condition,
@@ -22,10 +23,9 @@ import {
   Reference,
   Resource
 } from 'fhir/r4'
-import { AxiosResponse } from 'axios'
-import { Comparators, CriteriaType, ResourceType, SelectedCriteriaType } from 'types/requestCriterias'
-import { CriteriaForm } from 'components/CreationCohort/DiagramView/components/LogicalOperator/components/CriteriaRightPanel/CriteriaForm/types'
-import { ScopeElement } from 'types/scope'
+import type { ReactElement, ReactNode } from 'react'
+import type { Comparators, CriteriaType, ResourceType, SelectedCriteriaType } from 'types/requestCriterias'
+import type { ScopeElement } from 'types/scope'
 
 export type PartialBy<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>
 
