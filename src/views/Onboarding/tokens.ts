@@ -3,7 +3,7 @@ export const onboardingTokens = {
   muted: '#5B6472',
   pageBg: '#E7EEFB',
   surface: '#FFFFFF',
-  cardBorder: '#D1E2F4',
+  cardBorder: '#9BBBF9',
   cardShadow: '0 2px 16px rgba(21, 61, 138, 0.06)',
   stepIconBg: '#FBE7D5',
   stepIconFg: '#C77B3B',

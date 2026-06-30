@@ -82,7 +82,7 @@ const useStyles = makeStyles()((theme: Theme) => ({
   card: {
     width: '100%',
     padding: theme.spacing(5),
-    borderRadius: 16,
+    borderRadius: 6,
     border: `1px solid ${T.cardBorder}`,
     backgroundColor: T.surface,
     boxShadow: T.cardShadow,
