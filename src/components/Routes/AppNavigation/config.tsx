@@ -1,25 +1,26 @@
-import React from 'react'
-import { RouteObject } from 'react-router'
-
-import Login from 'views/Login/Login'
-import HealthCheck from 'views/HealthCheck/HealthCheck'
-import Welcome from 'views/Welcome/Welcome'
-import SearchPatient from 'views/SearchPatient'
-import Patient from 'views/Patient'
-import Dashboard from 'views/Dashboard'
-import CohortCreation from 'views/CohortCreation/CohortCreation'
-import PageNotFound from 'views/PageNotFound/PageNotFound'
-import CareSiteView from 'views/Scope/CareSiteView'
-import DownloadPopup from 'views/DownloadPopup/DownloadPopup'
-import Export from 'pages/Export'
-import ExportRequest from 'pages/ExportRequest'
-import MyResearches from 'views/MyResearches'
+import CohortsList from 'components/Researches/CohortsList'
 import ProjectsList from 'components/Researches/ProjectsList'
 import RequestsList from 'components/Researches/RequestsList'
-import CohortsList from 'components/Researches/CohortsList'
 import SamplesList from 'components/Researches/SamplesList'
-import { URLS } from 'types/exploration'
 import { getConfig } from 'config'
+import Export from 'pages/Export'
+import ExportRequest from 'pages/ExportRequest'
+import React from 'react'
+import type { RouteObject } from 'react-router'
+import { URLS } from 'types/exploration'
+import CohortCreation from 'views/CohortCreation/CohortCreation'
+import Dashboard from 'views/Dashboard'
+import DownloadPopup from 'views/DownloadPopup/DownloadPopup'
+import HealthCheck from 'views/HealthCheck/HealthCheck'
+import Login from 'views/Login/Login'
+import MyResearches from 'views/MyResearches'
+import Onboarding from 'views/Onboarding/Onboarding'
+import { ONBOARDING_ROUTE } from 'views/Onboarding/route'
+import PageNotFound from 'views/PageNotFound/PageNotFound'
+import Patient from 'views/Patient'
+import CareSiteView from 'views/Scope/CareSiteView'
+import SearchPatient from 'views/SearchPatient'
+import Welcome from 'views/Welcome/Welcome'
 
 // import { ODD_CONTACT } from '../../../constants'
 
@@ -255,6 +256,17 @@ const configRoutes = (): ConfigRoute[] => {
       isPrivate: true,
       element: <DownloadPopup />,
       exact: false,
+      displaySideBar: false
+    },
+    /**
+     * Cohort360: Onboarding journey
+     */
+    {
+      exact: true,
+      path: ONBOARDING_ROUTE,
+      name: 'onboarding',
+      isPrivate: true,
+      element: <Onboarding />,
       displaySideBar: false
     },
     /**
