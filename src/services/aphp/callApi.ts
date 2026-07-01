@@ -161,6 +161,14 @@ const addFacetParams = (options: string[], facet?: string[], uniqueFacet?: strin
   return result
 }
 
+const addIncludeParams = (options: string[], _include?: string[]): string[] => {
+  const includes = uniqueValues(_include)
+  if (includes.length > 0) {
+    return [...options, ...includes.map((include) => `_include=${encodeURIComponent(include)}`)]
+  }
+  return options
+}
+
 /**
  * Patient Resource
  *
@@ -374,7 +382,6 @@ export const fetchDocumentReference = async (
   const encounterIdentifier = args['encounter-identifier']
   const patientIdentifier = args['patient-identifier']
   const appConfig = getConfig()
-  const includes = uniqueValues(_include)
 
   _list = uniqueValues(_list)
   facet = uniqueValues(facet)
@@ -433,8 +440,7 @@ export const fetchDocumentReference = async (
   if (appConfig.core.fhir.facetsExtensions && uniqueFacet && uniqueFacet.length > 0)
     options = [...options, `unique-facet=${reduceParamValues(uniqueFacet)}`]
   if (_elements && _elements.length > 0) options = [...options, `_elements=${reduceParamValues(_elements)}`]
-  if (includes.length > 0)
-    options = [...options, ...includes.map((include) => `_include=${encodeURIComponent(include)}`)]
+  options = addIncludeParams(options, _include)
 
   const response = await fhirSearch<FHIR_Bundle_Response<DocumentReference>>('DocumentReference', options, {
     signal: signal
@@ -567,6 +573,7 @@ type fetchProcedureProps = {
   executiveUnits?: string[]
   encounterStatus?: string[]
   uniqueFacet?: string[]
+  _include?: ('Encounter:encounter' | 'Patient:subject')[]
 }
 export const fetchProcedure = async (args: fetchProcedureProps): FHIR_Bundle_Promise_Response<Procedure> => {
   const {
@@ -582,7 +589,8 @@ export const fetchProcedure = async (args: fetchProcedureProps): FHIR_Bundle_Pro
     minDate,
     maxDate,
     executiveUnits,
-    encounterStatus
+    encounterStatus,
+    _include
   } = args
   const docStatusCodeSystem = getConfig().core.codeSystems.docStatus
   let { _list, uniqueFacet } = args
@@ -618,6 +626,7 @@ export const fetchProcedure = async (args: fetchProcedureProps): FHIR_Bundle_Pro
   if (encounterStatus && encounterStatus.length > 0)
     options = [...options, `${ProcedureParamsKeys.ENCOUNTER_STATUS}=${encounterStatus}`]
   options = addFacetParams(options, undefined, uniqueFacet)
+  options = addIncludeParams(options, _include)
 
   const response = await fhirSearch<FHIR_Bundle_Response<Procedure>>('Procedure', options, {
     signal: args.signal
@@ -647,6 +656,7 @@ type fetchClaimProps = {
   executiveUnits?: string[]
   encounterStatus?: string[]
   uniqueFacet?: string[]
+  _include?: ('Encounter:encounter' | 'Patient:patient')[]
 }
 export const fetchClaim = async (args: fetchClaimProps): FHIR_Bundle_Promise_Response<Claim> => {
   const {
@@ -660,7 +670,8 @@ export const fetchClaim = async (args: fetchClaimProps): FHIR_Bundle_Promise_Res
     minCreated,
     maxCreated,
     executiveUnits,
-    encounterStatus
+    encounterStatus,
+    _include
   } = args
   const sortPrefix = getSortPrefix(sortDirection)
   let { _list, uniqueFacet } = args
@@ -692,6 +703,7 @@ export const fetchClaim = async (args: fetchClaimProps): FHIR_Bundle_Promise_Res
     options = [...options, `unique-facet=${reduceParamValues(uniqueFacet)}`]
 
   if (!patient && _list && _list.length > 0) options = [...options, `_list=${reduceParamValues(_list)}`]
+  options = addIncludeParams(options, _include)
 
   const response = await fhirSearch<FHIR_Bundle_Response<Claim>>('Claim', options, {
     signal: args.signal
@@ -724,10 +736,23 @@ type fetchConditionProps = {
   executiveUnits?: string[]
   encounterStatus?: string[]
   uniqueFacet?: string[]
+  _include?: ('Encounter:encounter' | 'Patient:subject')[]
 }
 // eslint-disable-next-line max-statements
 export const fetchCondition = async (args: fetchConditionProps): FHIR_Bundle_Promise_Response<Condition> => {
-  const { size, offset, _sort, sortDirection, subject, code, source, _text, executiveUnits, encounterStatus } = args
+  const {
+    size,
+    offset,
+    _sort,
+    sortDirection,
+    subject,
+    code,
+    source,
+    _text,
+    executiveUnits,
+    encounterStatus,
+    _include
+  } = args
   const sortPrefix = getSortPrefix(sortDirection)
   let { _list, type, uniqueFacet } = args
   const encounterIdentifier = args['encounter-identifier']
@@ -765,6 +790,7 @@ export const fetchCondition = async (args: fetchConditionProps): FHIR_Bundle_Pro
     const urlString = type.map((id) => id).join(',')
     options = [...options, `${ConditionParamsKeys.DIAGNOSTIC_TYPES}=${encodeURIComponent(urlString)}`]
   }
+  options = addIncludeParams(options, _include)
 
   const response = await fhirSearch<FHIR_Bundle_Response<Condition>>('Condition', options, {
     signal: args.signal
@@ -792,6 +818,7 @@ type fetchObservationProps = {
   encounterStatus?: string[]
   uniqueFacet?: 'subject'[]
   'patient-identifier'?: string
+  _include?: ('Encounter:encounter' | 'Patient:patient' | 'Patient:subject')[]
 }
 export const fetchObservation = async (args: fetchObservationProps): FHIR_Bundle_Promise_Response<Observation> => {
   const {
@@ -809,7 +836,8 @@ export const fetchObservation = async (args: fetchObservationProps): FHIR_Bundle
     rowStatus,
     signal,
     executiveUnits,
-    encounterStatus
+    encounterStatus,
+    _include
   } = args
   let { _list, uniqueFacet } = args
   const patientIdentifier = args['patient-identifier']
@@ -843,6 +871,7 @@ export const fetchObservation = async (args: fetchObservationProps): FHIR_Bundle
   if (patientIdentifier) options = [...options, `${ObservationParamsKeys.IPP}=${patientIdentifier}`]
   options = addFacetParams(options, undefined, uniqueFacet)
   options = addListParams(options, _list, !subject)
+  options = addIncludeParams(options, _include)
 
   const response = await fhirSearch<FHIR_Bundle_Response<Observation>>('Observation', options, {
     signal: signal
@@ -871,6 +900,7 @@ type fetchMedicationRequestProps = {
   executiveUnits?: string[]
   encounterStatus?: string[]
   uniqueFacet?: string[]
+  _include?: ('Encounter:encounter' | 'Patient:subject')[]
 }
 export const fetchMedicationRequest = async (
   args: fetchMedicationRequestProps
@@ -891,7 +921,8 @@ export const fetchMedicationRequest = async (
     maxDate,
     signal,
     executiveUnits,
-    encounterStatus
+    encounterStatus,
+    _include
   } = args
   let { _list, uniqueFacet } = args
 
@@ -924,6 +955,7 @@ export const fetchMedicationRequest = async (
     options = [...options, `${PrescriptionParamsKeys.ENCOUNTER_STATUS}=${encounterStatus}`]
   options = addFacetParams(options, undefined, uniqueFacet)
   options = addListParams(options, _list, !subject)
+  options = addIncludeParams(options, _include)
 
   const response = await fhirSearch<FHIR_Bundle_Response<MedicationRequest>>('MedicationRequest', options, {
     signal: signal
@@ -951,6 +983,7 @@ type fetchMedicationAdministrationProps = {
   executiveUnits?: string[]
   encounterStatus?: string[]
   uniqueFacet?: string[]
+  _include?: ('Encounter:context' | 'Patient:subject')[]
 }
 export const fetchMedicationAdministration = async (
   args: fetchMedicationAdministrationProps
@@ -971,7 +1004,8 @@ export const fetchMedicationAdministration = async (
     maxDate,
     signal,
     executiveUnits,
-    encounterStatus
+    encounterStatus,
+    _include
   } = args
   let { _list, uniqueFacet } = args
 
@@ -1004,6 +1038,7 @@ export const fetchMedicationAdministration = async (
     options = [...options, `${AdministrationParamsKeys.ENCOUNTER_STATUS}=${encounterStatus}`]
   options = addFacetParams(options, undefined, uniqueFacet)
   options = addListParams(options, _list, !subject)
+  options = addIncludeParams(options, _include)
 
   const response = await fhirSearch<FHIR_Bundle_Response<MedicationAdministration>>(
     'MedicationAdministration',
@@ -1034,6 +1069,7 @@ type fetchImagingProps = {
   executiveUnits?: string[]
   encounterStatus?: string[]
   uniqueFacet?: string[]
+  _include?: ('Encounter:encounter' | 'Patient:patient')[]
 }
 export const fetchImaging = async (args: fetchImagingProps): FHIR_Bundle_Promise_Response<ImagingStudy> => {
   const {
@@ -1051,7 +1087,8 @@ export const fetchImaging = async (args: fetchImagingProps): FHIR_Bundle_Promise
     signal,
     modalities,
     executiveUnits,
-    encounterStatus
+    encounterStatus,
+    _include
   } = args
   let { _list, uniqueFacet } = args
 
@@ -1083,6 +1120,7 @@ export const fetchImaging = async (args: fetchImagingProps): FHIR_Bundle_Promise
     options = [...options, `${ImagingParamsKeys.ENCOUNTER_STATUS}=${encounterStatus}`]
   options = addListParams(options, _list)
   options = addFacetParams(options, undefined, uniqueFacet)
+  options = addIncludeParams(options, _include)
 
   const response = await fhirSearch<FHIR_Bundle_Response<ImagingStudy>>('ImagingStudy', options, {
     signal: signal
@@ -1106,6 +1144,7 @@ type fetchFormsProps = {
   ipp?: string
   signal?: AbortSignal
   uniqueFacet?: string[]
+  _include?: ('Encounter:encounter' | 'Patient:subject')[]
 }
 export const fetchForms = async (args: fetchFormsProps) => {
   const {
@@ -1121,7 +1160,8 @@ export const fetchForms = async (args: fetchFormsProps) => {
     _sort,
     sortDirection,
     ipp,
-    signal
+    signal,
+    _include
   } = args
   let { uniqueFacet } = args
   uniqueFacet = uniqueValues(uniqueFacet)
@@ -1145,6 +1185,7 @@ export const fetchForms = async (args: fetchFormsProps) => {
     options = [...options, `${QuestionnaireResponseParamsKeys.ENCOUNTER_STATUS}=${encounterStatus}`]
   if (ipp) options = [...options, `${QuestionnaireResponseParamsKeys.IPP}=${ipp}`]
   options = addFacetParams(options, undefined, uniqueFacet)
+  options = addIncludeParams(options, _include)
 
   const response = await fhirSearch<FHIR_Bundle_Response<QuestionnaireResponse>>('QuestionnaireResponse', options, {
     signal: signal

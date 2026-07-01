@@ -17,7 +17,13 @@ import { FHIR_Bundle_Promise_Response, FHIR_API_Response } from 'types'
 import { ExplorationResults, FetchOptions, FetchParams, Patient as PatientType } from 'types/exploration'
 import { getCodeList } from 'services/aphp/serviceValueSets'
 import { getApiResponseResources } from './apiHelpers'
-import { getResourceInfos } from './fillElement'
+import {
+  getBundleResources,
+  getResourceInfos,
+  getResourceInfosFromBundle,
+  isEncounterResource,
+  isPatientResource
+} from './fillElement'
 import { atLeastOneSearchCriteria } from './filters'
 import { AxiosResponse } from 'axios'
 import { getExtension } from './fhir'
@@ -132,11 +138,28 @@ export const fetcherWithParams = async <T extends Patient | NonPatientResource, 
   if (isPatientData) {
     results.list = bundle
   } else {
-    results.list = (
-      patient
-        ? await linkElementWithEncounter(bundle as NonPatientResource[], patient?.infos.hospits, deidentified)
-        : await getResourceInfos(bundle as NonPatientResource[], deidentified, groupId?.[0])
-    ) as T[]
+    const includedResources = getBundleResources(list)
+    const includedPatients = includedResources.filter(isPatientResource)
+    const includedEncounters = includedResources.filter(isEncounterResource)
+
+    const mainResources = (
+      includedPatients.length > 0 || includedEncounters.length > 0
+        ? bundle.filter((resource) => !isPatientResource(resource) && !isEncounterResource(resource))
+        : bundle
+    ) as NonPatientResource[]
+
+    if (patient) {
+      results.list = (await linkElementWithEncounter(mainResources, patient?.infos.hospits, deidentified)) as T[]
+    } else if (includedEncounters.length > 0 && (deidentified || includedPatients.length > 0)) {
+      results.list = (await getResourceInfosFromBundle(
+        mainResources,
+        deidentified,
+        includedPatients,
+        includedEncounters
+      )) as T[]
+    } else {
+      results.list = (await getResourceInfos(mainResources, deidentified, groupId?.[0])) as T[]
+    }
   }
   results.total = list?.data?.resourceType === 'Bundle' ? (list.data.total ?? 0) : 0
   results.totalAllResults = all && all?.data?.resourceType === 'Bundle' ? (all.data.total ?? 0) : results.total

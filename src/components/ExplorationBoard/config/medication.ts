@@ -225,6 +225,7 @@ const fetchAdministrationList = (
   const { administrationRoutes } = filters
   const params = {
     route: administrationRoutes?.map((type) => type.id),
+    _include: ['Encounter:context', 'Patient:subject'] as ('Encounter:context' | 'Patient:subject')[],
     ...getMedicationFilters(filters, fetchParams, patient, groupId),
     signal
   }
@@ -254,6 +255,7 @@ const fetchRequestList = (
   const { prescriptionTypes } = filters
   const params = {
     type: prescriptionTypes?.map((type) => type.id),
+    _include: ['Encounter:encounter', 'Patient:subject'] as ('Encounter:encounter' | 'Patient:subject')[],
     ...getMedicationFilters(filters, fetchParams, patient, groupId),
     signal
   }

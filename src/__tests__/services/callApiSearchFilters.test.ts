@@ -38,6 +38,10 @@ vi.mock('config', async (importOriginal) => {
             }
           }
         },
+        observation: {
+          useObservationValueRestriction: false,
+          useObservationDefaultValidated: false
+        },
         imaging: {
           valueSets: {
             imagingModalities: { url: MODALITY_VS, codeSystemUrls: [MODALITY_CS], resourceType: 'CodeSystem' }
@@ -61,7 +65,7 @@ vi.mock('./serviceFhirConfig', () => ({
   hasSearchParam: vi.fn(() => true)
 }))
 
-import { fetchMedicationRequest, fetchMedicationAdministration, fetchImaging } from 'services/aphp/callApi'
+import { fetchMedicationRequest, fetchMedicationAdministration, fetchImaging, fetchObservation } from 'services/aphp/callApi'
 
 const getParams = (): string[] => fhirSearchMock.mock.calls[0][1] as string[]
 
@@ -89,5 +93,51 @@ describe('callApi search filters - CodeSystem vs ValueSet system url', () => {
     const params = getParams()
     expect(params).toContain(`modality=${encodeURIComponent(`${MODALITY_CS}|CT`)}`)
     expect(params.join('&')).not.toContain(encodeURIComponent(MODALITY_VS))
+  })
+})
+
+describe('callApi _include parameter', () => {
+  beforeEach(() => {
+    fhirSearchMock.mockClear()
+  })
+
+  it('fetchImaging adds encoded _include params when provided', async () => {
+    await fetchImaging({ _include: ['Encounter:encounter', 'Patient:patient'] })
+    const params = getParams()
+    expect(params).toContain(`_include=${encodeURIComponent('Encounter:encounter')}`)
+    expect(params).toContain(`_include=${encodeURIComponent('Patient:patient')}`)
+  })
+
+  it('fetchImaging does not add any _include param when omitted', async () => {
+    await fetchImaging({ modalities: ['CT'] })
+    const params = getParams()
+    expect(params.some((p) => p.startsWith('_include='))).toBe(false)
+  })
+
+  it('fetchObservation supports Patient:subject include', async () => {
+    await fetchObservation({ rowStatus: false, _include: ['Encounter:encounter', 'Patient:subject'] })
+    const params = getParams()
+    expect(params).toContain(`_include=${encodeURIComponent('Encounter:encounter')}`)
+    expect(params).toContain(`_include=${encodeURIComponent('Patient:subject')}`)
+  })
+
+  it('fetchMedicationAdministration supports Encounter:context include', async () => {
+    await fetchMedicationAdministration({
+      minDate: null,
+      maxDate: null,
+      _include: ['Encounter:context', 'Patient:subject']
+    })
+    const params = getParams()
+    expect(params).toContain(`_include=${encodeURIComponent('Encounter:context')}`)
+    expect(params).toContain(`_include=${encodeURIComponent('Patient:subject')}`)
+  })
+
+  it('deduplicates repeated _include values', async () => {
+    await fetchImaging({
+      _include: ['Encounter:encounter', 'Encounter:encounter', 'Patient:patient'] as never
+    })
+    const params = getParams()
+    const includeParams = params.filter((p) => p.startsWith('_include='))
+    expect(includeParams).toHaveLength(2)
   })
 })

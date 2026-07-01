@@ -185,6 +185,7 @@ const fetchList = (
     code: code.map((code) => encodeURI(`${code.system}|${code.id}`)).join(','),
     rowStatus: validatedStatus,
     subject: patient?.id,
+    _include: ['Encounter:encounter', 'Patient:subject'] as ('Encounter:encounter' | 'Patient:subject')[],
     ...getCommonParamsList(fetchParams, groupId),
     signal
   }

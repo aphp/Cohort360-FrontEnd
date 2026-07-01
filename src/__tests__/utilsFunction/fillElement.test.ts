@@ -1,10 +1,13 @@
 import { form } from '__tests__/data/explorationData/questionnaires'
-import { Encounter, Patient } from 'fhir/r4'
+import { Bundle, Encounter, Patient } from 'fhir/r4'
 import {
+  getBundleResources,
   getEncounterIdPath,
   getLinkedEncounter,
   getLinkedPatient,
   getPatientIdPath,
+  isEncounterResource,
+  isPatientResource,
   retrieveEncounterIds,
   retrievePatientIds
 } from 'utils/fillElement'
@@ -80,5 +83,64 @@ describe('test of getLinkedEncounter function', () => {
   })
   it("should return undefined if no encounter id matches the entry's", () => {
     expect(getLinkedEncounter([], _form)).toBeUndefined()
+  })
+})
+
+describe('test of isPatientResource function', () => {
+  it('should return true for a Patient resource', () => {
+    expect(isPatientResource({ resourceType: 'Patient', id: '1' })).toBe(true)
+  })
+  it('should return false for a non-Patient resource', () => {
+    expect(isPatientResource({ resourceType: 'Encounter', id: '1', status: 'finished', class: {} })).toBe(false)
+  })
+  it('should return false for undefined', () => {
+    expect(isPatientResource(undefined)).toBe(false)
+  })
+})
+
+describe('test of isEncounterResource function', () => {
+  it('should return true for an Encounter resource', () => {
+    expect(isEncounterResource({ resourceType: 'Encounter', id: '1', status: 'finished', class: {} })).toBe(true)
+  })
+  it('should return false for a non-Encounter resource', () => {
+    expect(isEncounterResource({ resourceType: 'Patient', id: '1' })).toBe(false)
+  })
+  it('should return false for undefined', () => {
+    expect(isEncounterResource(undefined)).toBe(false)
+  })
+})
+
+describe('test of getBundleResources function', () => {
+  const makeBundleResponse = (bundle: Partial<Bundle>) => ({ data: bundle as never })
+
+  it('should return an empty array when data is not a Bundle', () => {
+    expect(getBundleResources({ data: { resourceType: 'OperationOutcome' } as never })).toEqual([])
+  })
+
+  it('should return an empty array when the Bundle has no entry', () => {
+    expect(getBundleResources(makeBundleResponse({ resourceType: 'Bundle' }))).toEqual([])
+  })
+
+  it('should extract the resources from the Bundle entries', () => {
+    const patient: Patient = { resourceType: 'Patient', id: 'p1' }
+    const encounter: Encounter = { resourceType: 'Encounter', id: 'e1', status: 'finished', class: {} }
+    const response = makeBundleResponse({
+      resourceType: 'Bundle',
+      entry: [{ resource: patient }, { resource: encounter }]
+    })
+    const resources = getBundleResources(response)
+    expect(resources).toHaveLength(2)
+    expect(resources).toEqual([patient, encounter])
+  })
+
+  it('should filter out entries without a resource', () => {
+    const patient: Patient = { resourceType: 'Patient', id: 'p1' }
+    const response = makeBundleResponse({
+      resourceType: 'Bundle',
+      entry: [{ resource: patient }, {}]
+    })
+    const resources = getBundleResources(response)
+    expect(resources).toHaveLength(1)
+    expect(resources[0]).toBe(patient)
   })
 })
