@@ -18,17 +18,17 @@
  * @since 1.0.0
  */
 
-import React, { useContext, useEffect, useState } from 'react'
-import { Outlet, Navigate, useLocation } from 'react-router-dom'
-
-import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button } from '@mui/material'
-
-import { isAccessTokenValid } from 'utils/tokens'
-
-import { useAppSelector, useAppDispatch } from '../../state'
+import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material'
 import { AppConfig } from 'config'
 import { throttle } from 'lodash'
+import type React from 'react'
+import { useContext, useEffect, useState } from 'react'
+import { Navigate, Outlet, useLocation } from 'react-router-dom'
 import { updateConfigFromFhirMetadata } from 'services/aphp/serviceFhirConfig'
+import { selectOnboardingCompleted } from 'state/onboarding'
+import { isAccessTokenValid } from 'utils/tokens'
+import { ONBOARDING_ROUTE } from 'views/Onboarding/route'
+import { useAppDispatch, useAppSelector } from '../../state'
 
 /**
  * Global window object type declaration to access Microsoft Clarity tracking.
@@ -73,6 +73,7 @@ declare const window: any
  */
 const PrivateRoute: React.FC = () => {
   const me = useAppSelector((state) => state.me)
+  const onboardingCompleted = useAppSelector(selectOnboardingCompleted)
   const dispatch = useAppDispatch()
   const appConfig = useContext(AppConfig)
   const location = useLocation()
@@ -152,6 +153,9 @@ const PrivateRoute: React.FC = () => {
         </DialogActions>
       </Dialog>
     )
+  } else if (!onboardingCompleted && !location.pathname.startsWith(ONBOARDING_ROUTE)) {
+    // Authenticated but onboarding not completed: gate the app behind the journey
+    return <Navigate to={ONBOARDING_ROUTE} replace />
   } else {
     // User is authenticated, render the protected route content
     return <Outlet />
