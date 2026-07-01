@@ -5,6 +5,7 @@ import {
   Condition,
   DocumentReference,
   Encounter,
+  FhirResource,
   Identifier,
   ImagingStudy,
   MedicationAdministration,
@@ -205,7 +206,7 @@ export const isPatientResource = (resource: Resource | undefined): resource is P
   return resource?.resourceType === 'Patient'
 }
 
-export const getBundleResources = <T>(response: { data: FHIR_Bundle_Response<T> }): Resource[] => {
+export const getBundleResources = <T extends FhirResource>(response: { data: FHIR_Bundle_Response<T> }): Resource[] => {
   if (response.data.resourceType !== 'Bundle') return []
 
   return (

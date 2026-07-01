@@ -87,11 +87,13 @@ describe('test of getLinkedEncounter function', () => {
 })
 
 describe('test of isPatientResource function', () => {
+  const patient: Patient = { resourceType: 'Patient', id: '1' }
+  const encounter: Encounter = { resourceType: 'Encounter', id: '1', status: 'finished', class: {} }
   it('should return true for a Patient resource', () => {
-    expect(isPatientResource({ resourceType: 'Patient', id: '1' })).toBe(true)
+    expect(isPatientResource(patient)).toBe(true)
   })
   it('should return false for a non-Patient resource', () => {
-    expect(isPatientResource({ resourceType: 'Encounter', id: '1', status: 'finished', class: {} })).toBe(false)
+    expect(isPatientResource(encounter)).toBe(false)
   })
   it('should return false for undefined', () => {
     expect(isPatientResource(undefined)).toBe(false)
@@ -99,11 +101,13 @@ describe('test of isPatientResource function', () => {
 })
 
 describe('test of isEncounterResource function', () => {
+  const patient: Patient = { resourceType: 'Patient', id: '1' }
+  const encounter: Encounter = { resourceType: 'Encounter', id: '1', status: 'finished', class: {} }
   it('should return true for an Encounter resource', () => {
-    expect(isEncounterResource({ resourceType: 'Encounter', id: '1', status: 'finished', class: {} })).toBe(true)
+    expect(isEncounterResource(encounter)).toBe(true)
   })
   it('should return false for a non-Encounter resource', () => {
-    expect(isEncounterResource({ resourceType: 'Patient', id: '1' })).toBe(false)
+    expect(isEncounterResource(patient)).toBe(false)
   })
   it('should return false for undefined', () => {
     expect(isEncounterResource(undefined)).toBe(false)
