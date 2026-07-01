@@ -1,11 +1,12 @@
 import { form } from '__tests__/data/explorationData/questionnaires'
-import { Bundle, Encounter, Patient } from 'fhir/r4'
+import { Bundle, Condition, Encounter, Patient } from 'fhir/r4'
 import {
   getBundleResources,
   getEncounterIdPath,
   getLinkedEncounter,
   getLinkedPatient,
   getPatientIdPath,
+  getResourceInfosFromBundle,
   isEncounterResource,
   isPatientResource,
   retrieveEncounterIds,
@@ -146,5 +147,42 @@ describe('test of getBundleResources function', () => {
     const resources = getBundleResources(response)
     expect(resources).toHaveLength(1)
     expect(resources[0]).toBe(patient)
+  })
+})
+
+describe('test of getResourceInfosFromBundle function (deidentified)', () => {
+  const makeCondition = (id: string, patientId: string, encounterId: string): Condition => ({
+    resourceType: 'Condition',
+    id,
+    subject: { reference: `Patient/${patientId}` },
+    encounter: { reference: `Encounter/${encounterId}` }
+  })
+
+  it('enriches entries from the included Patient/Encounter without extra fetch', async () => {
+    const condition = makeCondition('c1', 'p1', 'e1')
+    const encounter: Encounter = {
+      resourceType: 'Encounter',
+      id: 'e1',
+      status: 'finished',
+      class: {},
+      serviceProvider: { display: 'UF Test' }
+    }
+
+    const result = await getResourceInfosFromBundle([condition], true, [], [encounter])
+
+    expect(result).toHaveLength(1)
+    const enriched = result[0] as unknown as { idPatient: string; NDA: string; serviceProvider: string }
+    expect(enriched.idPatient).toBe('p1')
+    expect(enriched.NDA).toBe('e1')
+    expect(enriched.serviceProvider).toBe('UF Test')
+  })
+
+  it('defaults serviceProvider when no matching encounter is included', async () => {
+    const condition = makeCondition('c1', 'p1', 'e1')
+
+    const result = await getResourceInfosFromBundle([condition], true, [], [])
+
+    const enriched = result[0] as unknown as { serviceProvider: string }
+    expect(enriched.serviceProvider).toBe('Non renseigné')
   })
 })

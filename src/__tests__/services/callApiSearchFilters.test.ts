@@ -22,7 +22,11 @@ vi.mock('config', async (importOriginal) => {
     ...actual,
     getConfig: vi.fn(() => ({
       system: { fhirUrl: 'http://localhost/fhir' },
-      core: { fhir: { filterActive: false, facetsExtensions: false }, valueSets: {} },
+      core: {
+        fhir: { filterActive: false, facetsExtensions: false },
+        valueSets: {},
+        codeSystems: { docStatus: 'doc-status-cs' }
+      },
       features: {
         medication: {
           valueSets: {
@@ -41,6 +45,9 @@ vi.mock('config', async (importOriginal) => {
         observation: {
           useObservationValueRestriction: false,
           useObservationDefaultValidated: false
+        },
+        questionnaires: {
+          defaultFilterFormNames: []
         },
         imaging: {
           valueSets: {
@@ -61,11 +68,21 @@ vi.mock('services/apiFhir', () => ({
   getAuthorizationMethod: vi.fn()
 }))
 
-vi.mock('./serviceFhirConfig', () => ({
+vi.mock('services/aphp/serviceFhirConfig', () => ({
   hasSearchParam: vi.fn(() => true)
 }))
 
-import { fetchMedicationRequest, fetchMedicationAdministration, fetchImaging, fetchObservation } from 'services/aphp/callApi'
+import {
+  fetchMedicationRequest,
+  fetchMedicationAdministration,
+  fetchImaging,
+  fetchObservation,
+  fetchCondition,
+  fetchProcedure,
+  fetchClaim,
+  fetchForms,
+  fetchDocumentReference
+} from 'services/aphp/callApi'
 
 const getParams = (): string[] => fhirSearchMock.mock.calls[0][1] as string[]
 
@@ -139,5 +156,51 @@ describe('callApi _include parameter', () => {
     const params = getParams()
     const includeParams = params.filter((p) => p.startsWith('_include='))
     expect(includeParams).toHaveLength(2)
+  })
+
+  it('fetchCondition adds _include params when provided', async () => {
+    await fetchCondition({ _include: ['Encounter:encounter', 'Patient:subject'] })
+    const params = getParams()
+    expect(params).toContain(`_include=${encodeURIComponent('Encounter:encounter')}`)
+    expect(params).toContain(`_include=${encodeURIComponent('Patient:subject')}`)
+  })
+
+  it('fetchProcedure adds _include params when provided', async () => {
+    await fetchProcedure({ _include: ['Encounter:encounter', 'Patient:subject'] })
+    const params = getParams()
+    expect(params).toContain(`_include=${encodeURIComponent('Encounter:encounter')}`)
+    expect(params).toContain(`_include=${encodeURIComponent('Patient:subject')}`)
+  })
+
+  it('fetchClaim adds _include params when provided', async () => {
+    await fetchClaim({ _include: ['Encounter:encounter', 'Patient:patient'] })
+    const params = getParams()
+    expect(params).toContain(`_include=${encodeURIComponent('Encounter:encounter')}`)
+    expect(params).toContain(`_include=${encodeURIComponent('Patient:patient')}`)
+  })
+
+  it('fetchMedicationRequest adds _include params when provided', async () => {
+    await fetchMedicationRequest({
+      minDate: null,
+      maxDate: null,
+      _include: ['Encounter:encounter', 'Patient:subject']
+    })
+    const params = getParams()
+    expect(params).toContain(`_include=${encodeURIComponent('Encounter:encounter')}`)
+    expect(params).toContain(`_include=${encodeURIComponent('Patient:subject')}`)
+  })
+
+  it('fetchForms adds _include params when provided', async () => {
+    await fetchForms({ _include: ['Encounter:encounter', 'Patient:subject'] })
+    const params = getParams()
+    expect(params).toContain(`_include=${encodeURIComponent('Encounter:encounter')}`)
+    expect(params).toContain(`_include=${encodeURIComponent('Patient:subject')}`)
+  })
+
+  it('fetchDocumentReference adds _include params via the shared helper', async () => {
+    await fetchDocumentReference({ _include: ['Encounter:encounter', 'Patient:patient'] })
+    const params = getParams()
+    expect(params).toContain(`_include=${encodeURIComponent('Encounter:encounter')}`)
+    expect(params).toContain(`_include=${encodeURIComponent('Patient:patient')}`)
   })
 })
