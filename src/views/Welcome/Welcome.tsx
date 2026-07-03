@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useContext, useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router'
 import moment from 'moment'
 
@@ -12,6 +12,7 @@ import PageContainer from 'components/ui/PageContainer'
 import PatientsCard from 'components/Welcome/PatientsCard/PatientsCard'
 import SearchPatientCard from 'components/Welcome/SearchPatientCard/SearchPatientCard'
 import TutorialsCard from 'components/Welcome/TutorialsCard/TutorialsCard'
+import MaintenancePopup from 'components/Welcome/MaintenancePopup/MaintenancePopup'
 import PreviewCard from 'components/ui/Cards/PreviewCard'
 import RequestsList from 'components/Researches/RequestsList'
 
@@ -25,6 +26,7 @@ import { listStaticContents, WebContent } from 'services/aphp/callApi'
 import Markdown from 'react-markdown'
 import { getBannerMessageLevel, sortContent } from 'data/infoMessage'
 import { plural } from 'utils/string'
+import { AppConfig } from 'config'
 
 const Welcome = () => {
   const { classes } = useStyles()
@@ -33,6 +35,14 @@ const Welcome = () => {
   const practitioner = useAppSelector((state) => state.me)
   const meState = useAppSelector((state) => state.me)
   const [bannerMessages, setBannerMessages] = useState<WebContent[]>([])
+
+  const appConfig = useContext(AppConfig)
+  const maintenancePopupConfig = appConfig.features.maintenancePopup
+  const userAphCode = practitioner?.userName
+  const maintenancePopupIsActive =
+    maintenancePopupConfig.enabled && !!userAphCode && !maintenancePopupConfig.exceptionAphCodes.includes(userAphCode)
+  const [maintenancePopupOpen, setMaintenancePopupOpen] = useState(false)
+  const maintenancePopupInitialized = useRef(false)
 
   const accessExpirations: AccessExpiration[] = meState?.accessExpirations ?? []
   const maintenanceIsActive = meState?.maintenance?.active
@@ -52,8 +62,16 @@ const Welcome = () => {
     fetchBannerMessages()
   }, [])
 
+  useEffect(() => {
+    if (!maintenancePopupInitialized.current && userAphCode) {
+      maintenancePopupInitialized.current = true
+      setMaintenancePopupOpen(maintenancePopupIsActive)
+    }
+  }, [userAphCode, maintenancePopupIsActive])
+
   return practitioner ? (
     <PageContainer alignItems={'center'}>
+      <MaintenancePopup open={maintenancePopupOpen} onClose={() => setMaintenancePopupOpen(false)} />
       <HeaderLayout
         title={`Bienvenue ${
           practitioner.impersonation
