@@ -33,6 +33,6 @@ export const configValueSetFallback = (
   return { valueSetId: entry?.url ?? '', valueSetData: entry?.data }
 }
 
-export const getFormItemTitle = (formName: string, linkId: string): string => {
-  return selectFormItemByName(store.getState(), formName, linkId)?.title ?? ''
+export const getFormItemTitle = (formName: string, linkId: string, fallback = ''): string => {
+  return selectFormItemByName(store.getState(), formName, linkId)?.title || fallback
 }
