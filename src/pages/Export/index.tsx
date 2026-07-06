@@ -141,15 +141,19 @@ const Export = () => {
 
   const table = useMemo(
     () =>
-      mapExportListToTable(exportList?.results ?? [], {
-        onDownload: (id) => {
-          void onDownload(id)
+      mapExportListToTable(
+        exportList?.results ?? [],
+        {
+          onDownload: (id) => {
+            void onDownload(id)
+          },
+          onRetry: (id) => {
+            void onRetry(id)
+          }
         },
-        onRetry: (id) => {
-          void onRetry(id)
-        }
-      }),
-    [exportList]
+        maintenanceIsActive
+      ),
+    [exportList, maintenanceIsActive]
   )
 
   return (
