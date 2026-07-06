@@ -100,7 +100,7 @@ const fetchList = (
   }
   const paramsWithInclude = {
     ...params,
-    _include: ['Encounter:encounter', 'Patient:patient'] as ('Encounter:encounter' | 'Patient:patient')[]
+    _include: ['Encounter:encounter', 'Patient:patient'] satisfies ('Encounter:encounter' | 'Patient:patient')[]
   }
   const paramsFetchAll = {
     patient: patient?.id,
