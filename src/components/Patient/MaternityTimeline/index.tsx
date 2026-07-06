@@ -56,31 +56,43 @@ const Timeline = ({ questionnaireResponses, questionnaires }: TimelineProps) => 
 
   const generateFormInfo = (form: CohortQuestionnaireResponse) => {
     const isPregnancy = form.questionnaire?.includes(pregnancyFormId)
-    const pregnancyTypeItem = pregnancyItemsByLinkId[PREGNANCY_LINK_IDS.pregnancyType]
-    const twinPregnancyTypeItem = pregnancyItemsByLinkId[PREGNANCY_LINK_IDS.twinPregnancyType]
-    const pregnancyStartDateItem = pregnancyItemsByLinkId[PREGNANCY_LINK_IDS.pregnancyStartDate]
-
-    const chipsInfo = isPregnancy
-      ? ([
-          (pregnancyTypeItem && getDataFromForm(form, pregnancyTypeItem)) ||
-            (twinPregnancyTypeItem ? getDataFromForm(form, twinPregnancyTypeItem) : undefined) ||
-            'N/A',
-          `Début de grossesse : ${pregnancyStartDateItem ? getDataFromForm(form, pregnancyStartDateItem) : 'N/A'}`,
-          `Unité exécutrice : ${form.serviceProvider}`
-        ].filter(Boolean) as string[])
-      : ([
-          getBirthDeliveryDate(form, hospitItemsByLinkId),
-          formatHospitalisationDates(form.hospitDates?.start, form.hospitDates?.end),
-          `Unité exécutrice : ${form.serviceProvider}`
-        ].filter(Boolean) as string[])
-
-    const formDetails = isPregnancy
-      ? generatePregnancyDetails(form, pregnancyItemsByLinkId)
-      : generateHospitDetails(form, hospitItemsByLinkId)
     const cardColor = isPregnancy ? '#f194b4' : '#A8D178'
     const avatar = isPregnancy ? <PregnantWoman htmlColor="#F194B4" /> : <DomainAdd htmlColor="#A8D178" />
     const title = isPregnancy ? labels.formNames.pregnancy : labels.formNames.hospit
-    return { chipsInfo, formDetails, cardColor, avatar, title }
+
+    try {
+      const pregnancyTypeItem = pregnancyItemsByLinkId[PREGNANCY_LINK_IDS.pregnancyType]
+      const twinPregnancyTypeItem = pregnancyItemsByLinkId[PREGNANCY_LINK_IDS.twinPregnancyType]
+      const pregnancyStartDateItem = pregnancyItemsByLinkId[PREGNANCY_LINK_IDS.pregnancyStartDate]
+
+      const chipsInfo = isPregnancy
+        ? [
+            (pregnancyTypeItem && getDataFromForm(form, pregnancyTypeItem)) ||
+              (twinPregnancyTypeItem ? getDataFromForm(form, twinPregnancyTypeItem) : undefined) ||
+              'N/A',
+            `Début de grossesse : ${pregnancyStartDateItem ? getDataFromForm(form, pregnancyStartDateItem) : 'N/A'}`,
+            `Unité exécutrice : ${form.serviceProvider}`
+          ].filter(Boolean)
+        : ([
+            getBirthDeliveryDate(form, hospitItemsByLinkId),
+            formatHospitalisationDates(form.hospitDates?.start, form.hospitDates?.end),
+            `Unité exécutrice : ${form.serviceProvider}`
+          ].filter(Boolean) as string[])
+
+      const formDetails = isPregnancy
+        ? generatePregnancyDetails(form, pregnancyItemsByLinkId)
+        : generateHospitDetails(form, hospitItemsByLinkId)
+      return { chipsInfo, formDetails, cardColor, avatar, title }
+    } catch (error) {
+      console.error(`Erreur lors du rendu du formulaire maternité ${form.id}`, error)
+      return {
+        chipsInfo: [`Unité exécutrice : ${form.serviceProvider ?? 'N/A'}`],
+        formDetails: [],
+        cardColor,
+        avatar,
+        title
+      }
+    }
   }
 
   return (
