@@ -26,9 +26,12 @@ const getInitials = (name?: string) =>
 const OnboardingLayout = () => {
   const { classes } = useStyles()
   const displayName = useAppSelector((state) => state.me?.displayName)
-  const { screen, currentStep, isLastStep, saving, error, goNext, goBack } = useOnboarding()
+  const { screen, currentStep, subStep, isLastStep, saving, error, goNext, goBack } = useOnboarding()
 
   const nextLabel = screen === 'welcome' ? 'Commencer' : isLastStep ? 'Terminer' : 'Continuer'
+
+  const activeStepConfig = ONBOARDING_STEPS[currentStep]
+  const ActiveScreen = activeStepConfig.screens?.[subStep]
 
   const header = (
     <>
@@ -62,7 +65,13 @@ const OnboardingLayout = () => {
       activeStep={screen === 'welcome' ? -1 : currentStep}
       footer={footer}
     >
-      {screen === 'welcome' ? <WelcomeScreen /> : <StepPlaceholder step={ONBOARDING_STEPS[currentStep]} />}
+      {screen === 'welcome' ? (
+        <WelcomeScreen />
+      ) : ActiveScreen ? (
+        <ActiveScreen />
+      ) : (
+        <StepPlaceholder step={activeStepConfig} />
+      )}
       {error && (
         <Typography role="alert" className={classes.error}>
           Une erreur est survenue lors de l'enregistrement de votre progression. Veuillez réessayer.
