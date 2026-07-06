@@ -42,6 +42,13 @@ const documentsStatusOptions = [
   }
 ]
 
+const excludeImportedDocumentsOptions = [
+  {
+    id: 'excludeImportedDocuments',
+    label: 'Exclure les documents importés'
+  }
+]
+
 const docStatusesList = [
   { id: FilterByDocumentStatus.VALIDATED, label: FilterByDocumentStatus.VALIDATED },
   { id: FilterByDocumentStatus.NOT_VALIDATED, label: FilterByDocumentStatus.NOT_VALIDATED }
@@ -109,6 +116,13 @@ const ExplorationFilters = ({ filters, infos, onChange, onError, hasChanged }: E
           onChange={(newValue) => field.onChange(newValue.includes('onlyPdfAvailable'))}
           value={field.value ? ['onlyPdfAvailable'] : []}
           options={documentsStatusOptions}
+        />
+      ),
+      [FilterKeys.EXCLUDE_IMPORTED_DOCUMENTS]: ({ field }) => (
+        <CheckboxGroup
+          onChange={(newValue) => field.onChange(newValue.includes('excludeImportedDocuments'))}
+          value={field.value ? ['excludeImportedDocuments'] : []}
+          options={excludeImportedDocumentsOptions}
         />
       ),
       [FilterKeys.GENDERS]: ({ field }) => <CheckboxGroup {...field} label="Genre :" options={genderOptions} />,

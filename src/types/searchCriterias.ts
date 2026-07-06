@@ -249,6 +249,7 @@ export enum FilterKeys {
   END_DATE = 'endDate',
   DURATION_RANGE = 'durationRange',
   ONLY_PDF_AVAILABLE = 'onlyPdfAvailable',
+  EXCLUDE_IMPORTED_DOCUMENTS = 'excludeImportedDocuments',
   SOURCE = 'source',
   EXECUTIVE_UNITS = 'executiveUnits',
   DOC_TYPES = 'docTypes',
@@ -386,6 +387,7 @@ export type DocumentsFilters = GenericFilter & {
   docTypes: SimpleCodeType[]
   docStatuses: LabelObject[]
   onlyPdfAvailable: boolean
+  excludeImportedDocuments: boolean
 }
 
 export interface CohortsFilters {

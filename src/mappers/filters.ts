@@ -186,11 +186,22 @@ const mapDocumentsFromRequestParams = async (parameters: URLSearchParams) => {
       }))
   }
   const onlyPdfAvailable = true
+  const excludeImportedDocuments = parameters.has(`${DocumentsParamsKeys.DOC_TYPES}:not`)
   const { nda, durationRange, executiveUnits, encounterStatus } = await mapGenericFromRequestParams(
     parameters,
     ResourceType.DOCUMENTS
   )
-  return { docStatuses, docTypes, ipp, onlyPdfAvailable, nda, durationRange, executiveUnits, encounterStatus }
+  return {
+    docStatuses,
+    docTypes,
+    ipp,
+    onlyPdfAvailable,
+    excludeImportedDocuments,
+    nda,
+    durationRange,
+    executiveUnits,
+    encounterStatus
+  }
 }
 
 const mapConditionFromRequestParams = async (parameters: URLSearchParams) => {
@@ -401,9 +412,16 @@ const mapPatientToRequestParams = (filters: PatientsFilters, deidentified: boole
 }
 
 const mapDocumentsToRequestParams = (filters: DocumentsFilters) => {
-  const { ipp, docStatuses, docTypes, nda, durationRange, executiveUnits, encounterStatus } = filters
+  const { ipp, docStatuses, docTypes, nda, durationRange, executiveUnits, encounterStatus, excludeImportedDocuments } =
+    filters
   const docStatusCodeSystem = getConfig().core.codeSystems.docStatus
   const requestParams: string[] = []
+  if (excludeImportedDocuments)
+    requestParams.push(
+      `${DocumentsParamsKeys.DOC_TYPES}:not=${encodeURIComponent(
+        'https://terminology.eds.aphp.fr/fhir/CodeSystem/aphp-document-class|doc-impor'
+      )}`
+    )
   if (ipp) requestParams.push(`${DocumentsParamsKeys.IPP}=${encodeURIComponent(ipp)}`)
   if (docStatuses && docStatuses.length > 0) {
     requestParams.push(

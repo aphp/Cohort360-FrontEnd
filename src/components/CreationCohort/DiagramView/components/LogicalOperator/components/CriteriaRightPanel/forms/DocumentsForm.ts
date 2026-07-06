@@ -21,6 +21,7 @@ export type DocumentDataType = CommonCriteriaData &
     searchBy: string | null
     docType: string[] | null
     docStatuses: string[] | null
+    excludeImportedDocuments: boolean
   }
 
 export const form: () => CriteriaForm<DocumentDataType> = () => ({
@@ -40,13 +41,13 @@ export const form: () => CriteriaForm<DocumentDataType> = () => ({
     search: '',
     searchBy: SearchByTypes.TEXT,
     docType: null,
-    docStatuses: null
+    docStatuses: null,
+    excludeImportedDocuments: true
   },
   infoAlert: ['Tous les éléments des champs multiples sont liés par une contrainte OU'],
   buildInfo: {
     type: { [ResourceType.DOCUMENTS]: CriteriaType.DOCUMENTS },
-    defaultFilter:
-      'type:not=doc-impor&contenttype=text/plain' + (getConfig().core.fhir.filterActive ? '&subject.active=true' : '')
+    defaultFilter: 'contenttype=text/plain' + (getConfig().core.fhir.filterActive ? '&subject.active=true' : '')
   },
   itemSections: [
     {
@@ -152,6 +153,18 @@ export const form: () => CriteriaForm<DocumentDataType> = () => ({
           buildInfo: {
             fhirKey: DocumentsParamsKeys.ENCOUNTER_STATUS,
             chipDisplayMethodExtraArgs: [{ type: 'string', value: 'Statut de la visite associée :' }]
+          }
+        },
+        {
+          valueKey: 'excludeImportedDocuments',
+          type: 'boolean',
+          label: 'Exclure les documents importés',
+          buildInfo: {
+            fhirKey: `${DocumentsParamsKeys.DOC_TYPES}:not`,
+            buildMethod: 'buildBooleanConstant',
+            buildMethodExtraArgs: [{ type: 'string', value: 'doc-impor' }],
+            unbuildMethod: 'unbuildBooleanFromDataNonNullStatus',
+            chipDisplayMethod: 'getDocumentImportedExclusionLabel'
           }
         }
       ]

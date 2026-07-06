@@ -349,6 +349,12 @@ export const CHIPS_DISPLAY_METHODS = {
     valueSets: ValueSetStore,
     args: Array<ChipDisplayMethod | DataTypes>
   ) => getDocumentStatusLabel(val as LabelObject[]),
+  getDocumentImportedExclusionLabel: (
+    val: DataTypes,
+    item: GenericCriteriaItem,
+    valueSets: ValueSetStore,
+    args: Array<ChipDisplayMethod | DataTypes>
+  ) => (val ? 'Documents importés exclus' : null),
   altArgs: (
     val: DataTypes,
     item: GenericCriteriaItem,
