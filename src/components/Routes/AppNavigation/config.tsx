@@ -118,28 +118,18 @@ const configRoutes = (): ConfigRoute[] => {
     },
     /**
      * Cohort360: Cohorts Creation Page
+     *
+     * gestion-de-projet: a single route with optional params keeps CohortCreation
+     * (Requeteur/DiagramView) mounted when the app navigates from /cohort/new to
+     * /cohort/new/:requestId after the request is created. Separate routes remount
+     * the tree, which re-ran the auto-build effect and produced a second
+     * POST /request-query-snapshots/.
      */
     {
       exact: true,
       displaySideBar: true,
-      path: '/cohort/new',
+      path: '/cohort/new/:requestId?/:snapshotId?',
       name: 'cohort/new',
-      isPrivate: true,
-      element: <CohortCreation />
-    },
-    {
-      exact: true,
-      displaySideBar: true,
-      path: '/cohort/new/:requestId',
-      name: 'cohort/new/:requestId',
-      isPrivate: true,
-      element: <CohortCreation />
-    },
-    {
-      exact: true,
-      displaySideBar: true,
-      path: '/cohort/new/:requestId/:snapshotId',
-      name: 'cohort/new/:requestId/:snapshotId',
       isPrivate: true,
       element: <CohortCreation />
     },

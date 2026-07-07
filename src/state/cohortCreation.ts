@@ -31,6 +31,16 @@ import { ScopeElement } from 'types/scope'
 const isThunkConditionAbort = (e: unknown): boolean =>
   typeof e === 'object' && e !== null && (e as { name?: unknown }).name === 'ConditionError'
 
+// gestion-de-projet: module-scoped guard for saveJson. The Redux `saveLoading`
+// flag alone does not stop every duplicate POST /request-query-snapshots/,
+// because two buildCohortCreation dispatches can each start a saveJson in
+// separate async ticks where the first has already settled (saveLoading back to
+// false) yet the second still creates another snapshot. This latch is claimed
+// synchronously in saveJson's `condition` and released in the thunk body's
+// `finally`, so a second overlapping save is aborted rather than issuing a
+// second POST.
+let saveJsonInFlight = false
+
 /**
  * State interface for cohort creation functionality.
  * Contains all data needed for building and managing cohort requests.
@@ -346,12 +356,25 @@ const saveJson = createAsyncThunk<SaveJsonReturn, SaveJsonParams, { state: RootS
     } catch (error) {
       console.error(error)
       throw error
+    } finally {
+      // Release the latch so subsequent (distinct) saves can run.
+      saveJsonInFlight = false
     }
   },
   {
     // gestion-de-projet#3259: concurrent saveJson dispatches race and both POST
     // as firstTime=true, producing snapshots with duplicate version numbers.
-    condition: (_, { getState }) => !getState().cohortCreation.request.saveLoading
+    // saveLoading is not enough on its own (two dispatches in separate ticks can
+    // both observe it false), so we also claim saveJsonInFlight synchronously here
+    // and release it in the thunk body's finally.
+    // Note: no caller aborts saveJson, so the payload creator (and its finally)
+    // always runs once this returns true. If an abort-before-body path is ever
+    // introduced, the latch would also need a reset on that path.
+    condition: (_, { getState }) => {
+      if (saveJsonInFlight || getState().cohortCreation.request.saveLoading) return false
+      saveJsonInFlight = true
+      return true
+    }
   }
 )
 
