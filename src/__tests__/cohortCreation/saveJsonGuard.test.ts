@@ -1,4 +1,4 @@
-import { configureStore, combineReducers } from '@reduxjs/toolkit'
+import { configureStore } from '@reduxjs/toolkit'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 // createSnapshot is the only path that POSTs /cohort/request-query-snapshots/.
@@ -14,19 +14,18 @@ vi.mock('services/aphp', () => ({
   }
 }))
 
-import cohortCreation, {
+import { rootReducer } from 'state/store'
+import {
   saveJson,
   resetCohortCreation,
   fetchRequestCohortCreation
 } from 'state/cohortCreation'
 
+// Use the full rootReducer so the store's state matches the RootState type the
+// saveJson thunk is typed against (createAsyncThunk<..., { state: RootState }>).
 const makeStore = () =>
   configureStore({
-    reducer: combineReducers({
-      cohortCreation: combineReducers({
-        request: cohortCreation
-      })
-    }),
+    reducer: rootReducer,
     middleware: (getDefaultMiddleware) => getDefaultMiddleware({ serializableCheck: false })
   })
 
