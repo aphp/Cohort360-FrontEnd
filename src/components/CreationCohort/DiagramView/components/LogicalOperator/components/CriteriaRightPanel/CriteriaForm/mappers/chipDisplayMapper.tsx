@@ -24,7 +24,7 @@ import allDocTypes from 'assets/docTypes.json'
 import moment from 'moment'
 import { getDurationRangeLabel } from 'utils/age'
 import { getConfig } from 'config'
-import { getValueSetFromCodeSystem } from 'utils/valueSets'
+import { getValueSetFromCodeSystem, findCodeByIdOrPrefix } from 'utils/valueSets'
 
 /************************************************************************************/
 /*                        Criteria Form Item Chip Display                           */
@@ -143,6 +143,8 @@ const getLabelsForCodeSearchItem = (
   item: CodeSearchItem,
   valueSets: ValueSetStore
 ): LabelObject[] => {
+  const ccamHierarchyUrl = getConfig().features.procedure.valueSets.procedureHierarchy?.url
+  const allowPrefixMatch = !!ccamHierarchyUrl && item.valueSetsInfo.some((ref) => ref.url === ccamHierarchyUrl)
   return val
     .map((value) => {
       let cacheKey: string | undefined
@@ -158,11 +160,10 @@ const getLabelsForCodeSearchItem = (
         }
       }
 
-      return (
-        (cacheKey
-          ? valueSets.cache[cacheKey]
-          : item.valueSetsInfo.flatMap((valueset) => valueSets.cache[valueset.url])) || []
-      ).find((code) => code?.id === value.id) as LabelObject
+      const codeList = cacheKey
+        ? valueSets.cache[cacheKey]
+        : item.valueSetsInfo.flatMap((valueset) => valueSets.cache[valueset.url])
+      return findCodeByIdOrPrefix(codeList || [], value.id, allowPrefixMatch) as LabelObject
     })
     .filter((code) => code !== undefined)
 }

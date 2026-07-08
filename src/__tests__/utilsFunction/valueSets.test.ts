@@ -11,7 +11,9 @@ import {
   getResourceTypeFromUrl,
   getCodeSystemUrlFromValueSetUrl,
   getSearchSystemUrl,
-  checkIsLeaf
+  checkIsLeaf,
+  matchStoredCodeInCache,
+  findCodeByIdOrPrefix
 } from 'utils/valueSets'
 import { HIERARCHY_ROOT } from 'services/aphp/serviceValueSets'
 import { Hierarchy } from 'types/hierarchy'
@@ -58,7 +60,7 @@ vi.mock('data/valueSets', () => ({
       label: 'Test ValueSet',
       title: 'Test ValueSet Title',
       standard: true,
-      checked: false,
+      checked: false,
       joinDisplayWithCode: true,
       joinDisplayWithSystem: true,
       codeSystemUrls: ['https://terminology.hl7.org/CodeSystem/test-codesystem']
@@ -68,7 +70,7 @@ vi.mock('data/valueSets', () => ({
       label: 'Another ValueSet',
       title: 'Another ValueSet Title',
       standard: false,
-      checked: false,
+      checked: false,
       joinDisplayWithCode: false,
       joinDisplayWithSystem: false,
       codeSystemUrls: ['https://terminology.hl7.org/CodeSystem/another-codesystem']
@@ -78,7 +80,7 @@ vi.mock('data/valueSets', () => ({
       label: 'Biology Anabio',
       title: 'Biology Anabio Title',
       standard: true,
-      checked: false,
+      checked: false,
       joinDisplayWithCode: true,
       joinDisplayWithSystem: false,
       codeSystemUrls: ['https://terminology.hl7.org/CodeSystem/biology-anabio']
@@ -100,7 +102,7 @@ describe('valueSets utilities', () => {
     it('should return value sets matching the provided URLs', () => {
       const urls = ['https://terminology.hl7.org/ValueSet/test-valueset']
       const result = getValueSetsByUrls(urls)
-      
+
       expect(result).toHaveLength(1)
       expect(result[0].url).toBe('https://terminology.hl7.org/ValueSet/test-valueset')
       expect(result[0].label).toBe('Test ValueSet')
@@ -112,20 +114,20 @@ describe('valueSets utilities', () => {
         'https://terminology.hl7.org/ValueSet/another-valueset'
       ]
       const result = getValueSetsByUrls(urls)
-      
+
       expect(result).toHaveLength(2)
     })
 
     it('should return empty array when no URLs match', () => {
       const urls = ['https://terminology.hl7.org/ValueSet/non-existent']
       const result = getValueSetsByUrls(urls)
-      
+
       expect(result).toHaveLength(0)
     })
 
     it('should handle empty URL array', () => {
       const result = getValueSetsByUrls([])
-      
+
       expect(result).toHaveLength(0)
     })
   })
@@ -134,21 +136,21 @@ describe('valueSets utilities', () => {
     it('should return ValueSet URL for a given CodeSystem URL', () => {
       const codeSystemUrl = 'https://terminology.hl7.org/CodeSystem/test-codesystem'
       const result = getValueSetFromCodeSystem(codeSystemUrl)
-      
+
       expect(result).toBe('https://terminology.hl7.org/ValueSet/test-valueset')
     })
 
     it('should return undefined for non-existent CodeSystem URL', () => {
       const codeSystemUrl = 'https://terminology.hl7.org/CodeSystem/non-existent'
       const result = getValueSetFromCodeSystem(codeSystemUrl)
-      
+
       expect(result).toBeUndefined()
     })
 
     it('should handle multiple CodeSystem URLs in a ValueSet', () => {
       const codeSystemUrl = 'https://terminology.hl7.org/CodeSystem/biology-anabio'
       const result = getValueSetFromCodeSystem(codeSystemUrl)
-      
+
       expect(result).toBe('https://terminology.hl7.org/ValueSet/biology-anabio')
     })
   })
@@ -157,7 +159,7 @@ describe('valueSets utilities', () => {
     it('should return full reference object for a given CodeSystem URL', () => {
       const codeSystemUrl = 'https://terminology.hl7.org/CodeSystem/test-codesystem'
       const result = getValueSetReferenceFromCodeSystem(codeSystemUrl)
-      
+
       expect(result).toBeDefined()
       expect(result?.url).toBe('https://terminology.hl7.org/ValueSet/test-valueset')
       expect(result?.label).toBe('Test ValueSet')
@@ -166,7 +168,7 @@ describe('valueSets utilities', () => {
     it('should return undefined for non-existent CodeSystem URL', () => {
       const codeSystemUrl = 'https://terminology.hl7.org/CodeSystem/non-existent'
       const result = getValueSetReferenceFromCodeSystem(codeSystemUrl)
-      
+
       expect(result).toBeUndefined()
     })
   })
@@ -175,34 +177,34 @@ describe('valueSets utilities', () => {
     it('should return true when joinDisplayWithCode is true for CodeSystem URL', () => {
       const codeSystemUrl = 'https://terminology.hl7.org/CodeSystem/test-codesystem'
       const result = isDisplayedWithCode(codeSystemUrl)
-      
+
       expect(result).toBe(true)
     })
 
     it('should return false when joinDisplayWithCode is false for CodeSystem URL', () => {
       const codeSystemUrl = 'https://terminology.hl7.org/CodeSystem/another-codesystem'
       const result = isDisplayedWithCode(codeSystemUrl)
-      
+
       expect(result).toBe(false)
     })
 
     it('should return true when joinDisplayWithCode is true for ValueSet URL', () => {
       const valueSetUrl = 'https://terminology.hl7.org/ValueSet/test-valueset'
       const result = isDisplayedWithCode(valueSetUrl)
-      
+
       expect(result).toBe(true)
     })
 
     it('should return false when joinDisplayWithCode is false for ValueSet URL', () => {
       const valueSetUrl = 'https://terminology.hl7.org/ValueSet/another-valueset'
       const result = isDisplayedWithCode(valueSetUrl)
-      
+
       expect(result).toBe(false)
     })
 
     it('should return undefined for non-existent URL', () => {
       const result = isDisplayedWithCode('https://non-existent')
-      
+
       expect(result).toBeUndefined()
     })
   })
@@ -211,28 +213,28 @@ describe('valueSets utilities', () => {
     it('should return true when joinDisplayWithSystem is true for CodeSystem URL', () => {
       const codeSystemUrl = 'https://terminology.hl7.org/CodeSystem/test-codesystem'
       const result = isDisplayedWithSystem(codeSystemUrl)
-      
+
       expect(result).toBe(true)
     })
 
     it('should return false when joinDisplayWithSystem is false for CodeSystem URL', () => {
       const codeSystemUrl = 'https://terminology.hl7.org/CodeSystem/another-codesystem'
       const result = isDisplayedWithSystem(codeSystemUrl)
-      
+
       expect(result).toBe(false)
     })
 
     it('should return true when joinDisplayWithSystem is true for ValueSet URL', () => {
       const valueSetUrl = 'https://terminology.hl7.org/ValueSet/test-valueset'
       const result = isDisplayedWithSystem(valueSetUrl)
-      
+
       expect(result).toBe(true)
     })
 
     it('should return false when joinDisplayWithSystem is false for ValueSet URL', () => {
       const valueSetUrl = 'https://terminology.hl7.org/ValueSet/another-valueset'
       const result = isDisplayedWithSystem(valueSetUrl)
-      
+
       expect(result).toBe(false)
     })
   })
@@ -247,7 +249,7 @@ describe('valueSets utilities', () => {
         inferior_levels_ids: ''
       }
       const result = getLabelFromCode(code)
-      
+
       expect(result).toBe('CODE123 - Test Label')
     })
 
@@ -260,7 +262,7 @@ describe('valueSets utilities', () => {
         inferior_levels_ids: ''
       }
       const result = getLabelFromCode(code)
-      
+
       expect(result).toBe('Another Label')
     })
 
@@ -273,7 +275,7 @@ describe('valueSets utilities', () => {
         inferior_levels_ids: ''
       }
       const result = getLabelFromCode(code)
-      
+
       expect(result).toBe('Root Label')
     })
 
@@ -287,7 +289,7 @@ describe('valueSets utilities', () => {
         inferior_levels_ids: ''
       }
       const result = getLabelFromCode(code)
-      
+
       expect(result).toBe('CODE789 - ValueSet Label')
     })
   })
@@ -300,7 +302,7 @@ describe('valueSets utilities', () => {
         system: 'https://terminology.hl7.org/CodeSystem/test-codesystem'
       }
       const result = getFullLabelFromCode(code)
-      
+
       expect(result).toBe('Test ValueSet - CODE123 - Test Label')
     })
 
@@ -311,7 +313,7 @@ describe('valueSets utilities', () => {
         system: 'https://terminology.hl7.org/CodeSystem/another-codesystem'
       }
       const result = getFullLabelFromCode(code)
-      
+
       expect(result).toBe('Another Label')
     })
 
@@ -322,7 +324,7 @@ describe('valueSets utilities', () => {
         system: 'https://terminology.hl7.org/CodeSystem/test-codesystem'
       }
       const result = getFullLabelFromCode(code)
-      
+
       expect(result).toBe('Test ValueSet - Root Label')
     })
 
@@ -333,7 +335,7 @@ describe('valueSets utilities', () => {
         system: undefined
       }
       const result = getFullLabelFromCode(code)
-      
+
       expect(result).toBe('No System Label')
     })
   })
@@ -342,20 +344,20 @@ describe('valueSets utilities', () => {
     it('should return label for CodeSystem URL', () => {
       const codeSystemUrl = 'https://terminology.hl7.org/CodeSystem/test-codesystem'
       const result = getLabelFromSystem(codeSystemUrl)
-      
+
       expect(result).toBe('Test ValueSet')
     })
 
     it('should return label for ValueSet URL', () => {
       const valueSetUrl = 'https://terminology.hl7.org/ValueSet/test-valueset'
       const result = getLabelFromSystem(valueSetUrl)
-      
+
       expect(result).toBe('Test ValueSet')
     })
 
     it('should return empty string for non-existent URL', () => {
       const result = getLabelFromSystem('https://non-existent')
-      
+
       expect(result).toBe('')
     })
   })
@@ -379,9 +381,9 @@ describe('valueSets utilities', () => {
         }
       ]
       const cache = new Map()
-      
+
       const result = await checkIsLeaf(codes, cache)
-      
+
       expect(result).toBe(false)
     })
 
@@ -396,9 +398,9 @@ describe('valueSets utilities', () => {
         }
       ]
       const cache = new Map()
-      
+
       const result = await checkIsLeaf(codes, cache)
-      
+
       expect(result).toBe(false)
     })
 
@@ -413,9 +415,9 @@ describe('valueSets utilities', () => {
         }
       ]
       const cache = new Map()
-      
+
       const result = await checkIsLeaf(codes, cache)
-      
+
       expect(result).toBe(true)
     })
 
@@ -430,9 +432,9 @@ describe('valueSets utilities', () => {
         }
       ]
       const cache = new Map()
-      
+
       const result = await checkIsLeaf(codes, cache)
-      
+
       expect(result).toBe(false)
     })
 
@@ -454,19 +456,17 @@ describe('valueSets utilities', () => {
         above_levels_ids: 'code1',
         inferior_levels_ids: ''
       }
-      const cache = new Map([
-        ['https://terminology.hl7.org/ValueSet/test-valueset', new Map([['child1', childCode]])]
-      ])
-      
+      const cache = new Map([['https://terminology.hl7.org/ValueSet/test-valueset', new Map([['child1', childCode]])]])
+
       const result = await checkIsLeaf(codes, cache)
-      
+
       expect(result).toBe(true)
     })
 
     it('should fetch child code when not in cache', async () => {
       const { getChildrenFromCodes } = await import('services/aphp/serviceValueSets')
       const mockGetChildrenFromCodes = getChildrenFromCodes as any
-      
+
       const codes: Hierarchy<FhirItem>[] = [
         {
           id: 'code1',
@@ -484,23 +484,22 @@ describe('valueSets utilities', () => {
         above_levels_ids: 'code1',
         inferior_levels_ids: ''
       }
-      
+
       mockGetChildrenFromCodes.mockResolvedValue({ results: [childCode] })
-      
+
       const cache = new Map()
       const result = await checkIsLeaf(codes, cache)
-      
-      expect(mockGetChildrenFromCodes).toHaveBeenCalledWith(
-        'https://terminology.hl7.org/ValueSet/test-valueset',
-        ['child1']
-      )
+
+      expect(mockGetChildrenFromCodes).toHaveBeenCalledWith('https://terminology.hl7.org/ValueSet/test-valueset', [
+        'child1'
+      ])
       expect(result).toBe(true)
     })
 
     it('should use getValueSetFromCodeSystem when valueSetUrl is not available', async () => {
       const { getChildrenFromCodes } = await import('services/aphp/serviceValueSets')
       const mockGetChildrenFromCodes = getChildrenFromCodes as any
-      
+
       const codes: Hierarchy<FhirItem>[] = [
         {
           id: 'code1',
@@ -517,16 +516,15 @@ describe('valueSets utilities', () => {
         above_levels_ids: 'code1',
         inferior_levels_ids: ''
       }
-      
+
       mockGetChildrenFromCodes.mockResolvedValue({ results: [childCode] })
-      
+
       const cache = new Map()
       const result = await checkIsLeaf(codes, cache)
-      
-      expect(mockGetChildrenFromCodes).toHaveBeenCalledWith(
-        'https://terminology.hl7.org/ValueSet/test-valueset',
-        ['child1']
-      )
+
+      expect(mockGetChildrenFromCodes).toHaveBeenCalledWith('https://terminology.hl7.org/ValueSet/test-valueset', [
+        'child1'
+      ])
       expect(result).toBe(true)
     })
   })
@@ -618,6 +616,75 @@ describe('valueSets utilities', () => {
       expect(getSearchSystemUrl(config)).toBe('https://terminology.hl7.org/CodeSystem/empty-codesystem')
       expect(errorSpy).toHaveBeenCalledOnce()
       errorSpy.mockRestore()
+    })
+  })
+
+  describe('matchStoredCodeInCache', () => {
+    const CCAM = 'https://ccam'
+    const item = (id: string, label: string, system = CCAM): Hierarchy<FhirItem> =>
+      ({ id, label, system }) as Hierarchy<FhirItem>
+    const cache = {
+      [CCAM]: [
+        item('001472.....', 'Noeud 001472'),
+        item('001472.001', 'Enfant 001472'),
+        item('JQGA004....1', 'Acte JQGA004')
+      ]
+    }
+
+    it('returns the exact match when the stored code still exists', () => {
+      const cacheExact = { [CCAM]: [item('001472', 'Exact 001472'), item('001472.....', 'Noeud')] }
+      const stored = { id: '001472', label: '', system: CCAM }
+      expect((matchStoredCodeInCache(stored, cacheExact, true) as Hierarchy<FhirItem>).label).toBe('Exact 001472')
+    })
+
+    it('prefers the padding node over a descendant for a re-encoded CCAM code', () => {
+      // Le noeud `001472.....` (suffixe tout en points) doit gagner sur son enfant `001472.001`.
+      const stored = { id: '001472', label: '', system: CCAM }
+      expect((matchStoredCodeInCache(stored, cache, true) as Hierarchy<FhirItem>).label).toBe('Noeud 001472')
+    })
+
+    it('does not prefix-match when disabled (avoids CIM10 E11 -> E110)', () => {
+      const cim = 'https://cim10'
+      const cimCache = { [cim]: [item('E110', 'Diabète compliqué', cim)] }
+      const stored = { id: 'E11', system: cim }
+      expect(matchStoredCodeInCache(stored, cimCache, false)).toBe(stored)
+    })
+
+    it('returns the stored code untouched when nothing matches', () => {
+      const stored = { id: 'ZZZZ999', system: CCAM }
+      expect(matchStoredCodeInCache(stored, cache, true)).toBe(stored)
+    })
+  })
+
+  describe('findCodeByIdOrPrefix', () => {
+    const item = (id: string): Hierarchy<FhirItem> => ({ id, label: id, system: 'https://ccam' }) as Hierarchy<FhirItem>
+
+    it('returns the exact match first', () => {
+      const list = [item('001472'), item('001472.....')]
+      expect(findCodeByIdOrPrefix(list, '001472', true)?.id).toBe('001472')
+    })
+
+    it('returns undefined when no exact match and prefix is disabled', () => {
+      expect(findCodeByIdOrPrefix([item('001472.....')], '001472', false)).toBeUndefined()
+    })
+
+    it('returns undefined for an empty id', () => {
+      expect(findCodeByIdOrPrefix([item('001472.....')], '', true)).toBeUndefined()
+    })
+
+    it('prefers the padding node over a descendant', () => {
+      const list = [item('001472.001'), item('001472.....'), item('001472.0012')]
+      expect(findCodeByIdOrPrefix(list, '001472', true)?.id).toBe('001472.....')
+    })
+
+    it('falls back to the shortest prefix match when there is no padding node', () => {
+      const list = [item('EPFA001...12'), item('EPFA001...1')]
+      expect(findCodeByIdOrPrefix(list, 'EPFA001', true)?.id).toBe('EPFA001...1')
+    })
+
+    it('ignores undefined entries in the list', () => {
+      const list = [undefined, item('001472.....')]
+      expect(findCodeByIdOrPrefix(list, '001472', true)?.id).toBe('001472.....')
     })
   })
 })
