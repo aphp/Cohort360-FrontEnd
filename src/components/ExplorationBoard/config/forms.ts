@@ -1,6 +1,6 @@
 import { getConfig } from 'config'
 import { plural } from 'utils/string'
-import { QuestionnaireResponse } from 'fhir/r4'
+import { QuestionnaireResponse, Questionnaire } from 'fhir/r4'
 import { mapToDate } from 'mappers/dates'
 import services from 'services/aphp'
 import { fetchForms } from 'services/aphp/callApi'
@@ -27,8 +27,18 @@ import {
   narrowSearchCriterias,
   resolveAdditionalInfos
 } from 'utils/exploration'
-import { getFormDetails, getFormLabel, getFormName } from 'utils/formUtils'
+import { getFormDetails, getFormLabel, getFormName, buildFormItemsByLinkId, FormItemsByLinkId } from 'utils/formUtils'
+import { extractFormItems } from 'utils/questionnaireFormData'
 import { SourceType } from 'types/scope'
+
+let cachedQuestionnaires: Promise<Questionnaire[]> | undefined
+const fetchQuestionnairesCached = (): Promise<Questionnaire[]> => {
+  cachedQuestionnaires ??= services.patients.fetchQuestionnaires().catch((error) => {
+    cachedQuestionnaires = undefined
+    throw error
+  })
+  return cachedQuestionnaires
+}
 
 export const fetchAdditionalInfos = async (additionalInfo: AdditionalInfo): Promise<AdditionalInfo> => {
   const fetchersMap: Record<string, () => Promise<FhirItem[] | LabelObject[] | undefined>> = {
@@ -39,7 +49,7 @@ export const fetchAdditionalInfos = async (additionalInfo: AdditionalInfo): Prom
     questionnaires: () =>
       additionalInfo.questionnaires
         ? Promise.resolve(undefined)
-        : services.patients.fetchQuestionnaires().then((resp) =>
+        : fetchQuestionnairesCached().then((resp) =>
             resp.map((elem) => ({
               id: elem.name ?? '',
               label: getFormLabel(elem.name as FormNames) ?? ''
@@ -66,7 +76,7 @@ export const initSearchCriterias = (search: string): SearchCriterias<MaternityFo
   }
 })
 
-const mapToTable = (data: Data, groupId: string[]): Table => {
+const mapToTable = (data: Data, groupId: string[], formItemsByLinkId: FormItemsByLinkId): Table => {
   const rows: Row[] = []
   const columns: Column[] = [
     { label: 'Type de dossier de spécialité' },
@@ -74,7 +84,7 @@ const mapToTable = (data: Data, groupId: string[]): Table => {
     { label: `IPP` },
     { label: 'Unité exécutrice' },
     { label: 'Aperçu', align: 'center' }
-  ].filter((elem) => elem) as Column[]
+  ].filter(Boolean) as Column[]
   ;(data as ExplorationResults<CohortQuestionnaireResponse>).list.forEach((elem) => {
     const formName = elem.formName as FormNames
     const date = elem.authored
@@ -107,11 +117,11 @@ const mapToTable = (data: Data, groupId: string[]): Table => {
       },
       {
         id: `${elem.id}-details`,
-        value: getFormDetails(elem, formName),
+        value: getFormDetails(elem, formName, formItemsByLinkId),
         type: CellType.LINES,
         align: 'center'
       }
-    ].filter((elem) => elem) as Row
+    ].filter(Boolean) as Row
     rows.push(row)
   })
   return { columns, rows }
@@ -123,6 +133,7 @@ const fetchList = async (
   patient: Patient | null,
   deidentified: boolean,
   groupId: string[],
+  onFormItems: (formItemsByLinkId: FormItemsByLinkId) => void,
   signal?: AbortSignal
 ): Promise<ExplorationResults<QuestionnaireResponse>> => {
   const { ipp, executiveUnits, encounterStatus, durationRange, formName } = filters
@@ -152,8 +163,14 @@ const fetchList = async (
       () => fetchForms(paramsFetchAll),
       { ...fetchParams, filters, deidentified, patient, groupId }
     ),
-    services.patients.fetchQuestionnaires()
+    fetchQuestionnairesCached()
   ])
+
+  const formItems = questionnaires.flatMap((questionnaire) =>
+    questionnaire.name ? extractFormItems(questionnaire, questionnaire.name) : []
+  )
+  onFormItems(buildFormItemsByLinkId(formItems))
+
   return {
     ...forms,
     list: forms.list.map((elem) => ({
@@ -169,26 +186,41 @@ export const formsConfig = (
   groupId: string[],
   displayOptions = DISPLAY_OPTIONS,
   search = ''
-): ExplorationConfig<MaternityFormFilters> => ({
-  type: ResourceType.QUESTIONNAIRE_RESPONSE,
-  deidentified,
-  displayOptions: { ...displayOptions, search: false },
-  initSearchCriterias: () => initSearchCriterias(search),
-  fetchList: (fetchParams, options, signal) => fetchList(fetchParams, options, patient, deidentified, groupId, signal),
-  mapToTable: (data) => mapToTable(data, groupId),
-  mapToTimeline: patient
-    ? async (data: Data) => {
-        const questionnaires = await services.patients.fetchQuestionnaires()
-        return { data: (data.list ?? []) as CohortQuestionnaireResponse[], questionnaires: questionnaires ?? [] }
-      }
-    : undefined,
-  narrowSearchCriterias: (searchCriterias) =>
-    narrowSearchCriterias(deidentified, searchCriterias, !!patient, [], ['searchBy', 'searchInput']),
-  fetchAdditionalInfos,
-  getCount: patient
-    ? undefined
-    : (counts) => [
-        { label: `résultat${plural(counts[0].total)}`, display: true, count: counts[0] },
-        { label: `patient${plural(counts[1].total)}`, display: true, count: counts[1] }
-      ]
-})
+): ExplorationConfig<MaternityFormFilters> => {
+  let formItemsByLinkId: FormItemsByLinkId = {}
+
+  return {
+    type: ResourceType.QUESTIONNAIRE_RESPONSE,
+    deidentified,
+    displayOptions: { ...displayOptions, search: false },
+    initSearchCriterias: () => initSearchCriterias(search),
+    fetchList: (fetchParams, options, signal) =>
+      fetchList(
+        fetchParams,
+        options,
+        patient,
+        deidentified,
+        groupId,
+        (items) => {
+          formItemsByLinkId = items
+        },
+        signal
+      ),
+    mapToTable: (data) => mapToTable(data, groupId, formItemsByLinkId),
+    mapToTimeline: patient
+      ? async (data: Data) => {
+          const questionnaires = await fetchQuestionnairesCached()
+          return { data: (data.list ?? []) as CohortQuestionnaireResponse[], questionnaires }
+        }
+      : undefined,
+    narrowSearchCriterias: (searchCriterias) =>
+      narrowSearchCriterias(deidentified, searchCriterias, !!patient, [], ['searchBy', 'searchInput']),
+    fetchAdditionalInfos,
+    getCount: patient
+      ? undefined
+      : (counts) => [
+          { label: `résultat${plural(counts[0].total)}`, display: true, count: counts[0] },
+          { label: `patient${plural(counts[1].total)}`, display: true, count: counts[1] }
+        ]
+  }
+}

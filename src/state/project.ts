@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
-import { RootState } from 'state'
+import type { RootState } from 'state'
 import { ProjectType } from 'types'
 
 import { logout, login, impersonate } from './me'

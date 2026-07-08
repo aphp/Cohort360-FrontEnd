@@ -18,6 +18,7 @@ import project from './project'
 import request from './request'
 import scope from './scope'
 import valueSets from './valueSets'
+import questionnairesFormData from './questionnairesFormData'
 import warningDialog from './warningDialog'
 
 // Combine reducers
@@ -30,6 +31,7 @@ export const rootReducer = combineReducers({
     request: cohortCreation
   }),
   valueSets,
+  questionnairesFormData,
   exploredCohort,
   drawer,
   message,
@@ -44,7 +46,7 @@ export const rootReducer = combineReducers({
 const persistConfig = {
   key: 'root',
   storage: localforage,
-  blacklist: ['message', 'warningDialog']
+  blacklist: ['message', 'warningDialog', 'questionnairesFormData']
 }
 
 /**
