@@ -773,8 +773,10 @@ const getCodesForValueSet = async (
   for (const valueSetUrl of valueSetUrls) {
     try {
       return (await getChildrenFromCodes(valueSetUrl, [code])).results
-    } catch {
-      console.error("Ce n'est pas une erreur.")
+    } catch (error) {
+      // Le code n'est pas résolu dans ce valueSet : on tente le suivant. Si tous échouent,
+      // getCodesForValueSet renvoie undefined et l'appelant loggue le code non trouvé.
+      console.warn(`Résolution du code ${code} dans le valueSet ${valueSetUrl} échouée, essai suivant`, error)
     }
   }
 }
