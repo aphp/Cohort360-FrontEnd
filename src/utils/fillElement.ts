@@ -5,6 +5,7 @@ import {
   Condition,
   DocumentReference,
   Encounter,
+  FhirResource,
   Identifier,
   ImagingStudy,
   MedicationAdministration,
@@ -12,7 +13,8 @@ import {
   Observation,
   Patient,
   Procedure,
-  QuestionnaireResponse
+  QuestionnaireResponse,
+  Resource
 } from 'fhir/r4'
 import { fetchPatient, fetchEncounter, fetchOrganization } from 'services/aphp/callApi'
 import {
@@ -22,7 +24,8 @@ import {
   CohortObservation,
   CohortPMSI,
   CohortQuestionnaireResponse,
-  FHIR_API_Response
+  FHIR_API_Response,
+  FHIR_Bundle_Response
 } from 'types'
 import { ResourceType } from 'types/requestCriterias'
 import { getApiResponseResources } from './apiHelpers'
@@ -193,6 +196,24 @@ const withDocumentOrganizations = async <U extends CohortResourceType>(filledEnt
   }
 
   return filledEntries
+}
+
+export const isEncounterResource = (resource: Resource | undefined): resource is Encounter => {
+  return resource?.resourceType === 'Encounter'
+}
+
+export const isPatientResource = (resource: Resource | undefined): resource is Patient => {
+  return resource?.resourceType === 'Patient'
+}
+
+export const getBundleResources = <T extends FhirResource>(response: { data: FHIR_Bundle_Response<T> }): Resource[] => {
+  if (response.data.resourceType !== 'Bundle') return []
+
+  return (
+    response.data.entry
+      ?.map((entry) => entry.resource as unknown as Resource | undefined)
+      .filter((resource): resource is Resource => !!resource) ?? []
+  )
 }
 
 export const getResourceInfosFromBundle = async <T extends ResourceToFill, U extends CohortResourceType>(
