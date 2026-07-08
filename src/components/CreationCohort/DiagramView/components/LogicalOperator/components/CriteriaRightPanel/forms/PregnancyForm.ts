@@ -292,9 +292,9 @@ export const form: () => CriteriaForm<PregnancyDataType> = () => ({
             fhirKey: {
               id: 'F_MATER_001661',
               type: 'valueBoolean'
-            }
-          },
-          chipDisplayMethodExtraArgs: [{ type: 'string', value: 'Diagnostic prénatal :' }]
+            },
+            chipDisplayMethodExtraArgs: [{ type: 'string', value: 'Diagnostic prénatal :' }]
+          }
         }
       ]
     }
