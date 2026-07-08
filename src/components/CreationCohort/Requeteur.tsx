@@ -9,7 +9,12 @@ import DiagramView from './DiagramView'
 import ModalCreateNewRequest from './Modals/ModalCreateNewRequest/ModalCreateNewRequest'
 
 import { useAppDispatch, useAppSelector } from 'state'
-import { editAllCriteria, fetchRequestCohortCreation, resetCohortCreation } from 'state/cohortCreation'
+import {
+  buildCohortCreation,
+  editAllCriteria,
+  fetchRequestCohortCreation,
+  resetCohortCreation
+} from 'state/cohortCreation'
 import { setSelectedRequest } from 'state/request'
 
 import { CurrentSnapshot } from 'types'
@@ -96,6 +101,7 @@ const Requeteur = () => {
       const healedCriteria = healCriteriaCodes(criteriaList(), selectedCriteria, criteriaCodesCache)
       if (healedCriteria !== selectedCriteria) {
         dispatch(editAllCriteria(healedCriteria))
+        dispatch(buildCohortCreation({ selectedPopulation: null }))
       }
 
       const allowMaternityForms = selectedPopulation?.every((population) => population?.access === 'Nominatif')
