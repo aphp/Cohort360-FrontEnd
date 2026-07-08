@@ -19,8 +19,6 @@ import request from './request'
 import scope from './scope'
 import valueSets from './valueSets'
 import questionnairesFormData from './questionnairesFormData'
-import preferences from './preferences'
-import { temporalConstraintsMiddleware } from './middlewares'
 import warningDialog from './warningDialog'
 
 // Combine reducers
