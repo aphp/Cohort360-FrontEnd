@@ -12,7 +12,8 @@ import {
   getCodeSystemUrlFromValueSetUrl,
   getSearchSystemUrl,
   checkIsLeaf,
-  matchStoredCodeInCache
+  matchStoredCodeInCache,
+  findCodeByIdOrPrefix
 } from 'utils/valueSets'
 import { HIERARCHY_ROOT } from 'services/aphp/serviceValueSets'
 import { Hierarchy } from 'types/hierarchy'
@@ -652,6 +653,38 @@ describe('valueSets utilities', () => {
     it('returns the stored code untouched when nothing matches', () => {
       const stored = { id: 'ZZZZ999', system: CCAM }
       expect(matchStoredCodeInCache(stored, cache, true)).toBe(stored)
+    })
+  })
+
+  describe('findCodeByIdOrPrefix', () => {
+    const item = (id: string): Hierarchy<FhirItem> => ({ id, label: id, system: 'https://ccam' }) as Hierarchy<FhirItem>
+
+    it('returns the exact match first', () => {
+      const list = [item('001472'), item('001472.....')]
+      expect(findCodeByIdOrPrefix(list, '001472', true)?.id).toBe('001472')
+    })
+
+    it('returns undefined when no exact match and prefix is disabled', () => {
+      expect(findCodeByIdOrPrefix([item('001472.....')], '001472', false)).toBeUndefined()
+    })
+
+    it('returns undefined for an empty id', () => {
+      expect(findCodeByIdOrPrefix([item('001472.....')], '', true)).toBeUndefined()
+    })
+
+    it('prefers the padding node over a descendant', () => {
+      const list = [item('001472.001'), item('001472.....'), item('001472.0012')]
+      expect(findCodeByIdOrPrefix(list, '001472', true)?.id).toBe('001472.....')
+    })
+
+    it('falls back to the shortest prefix match when there is no padding node', () => {
+      const list = [item('EPFA001...12'), item('EPFA001...1')]
+      expect(findCodeByIdOrPrefix(list, 'EPFA001', true)?.id).toBe('EPFA001...1')
+    })
+
+    it('ignores undefined entries in the list', () => {
+      const list = [undefined, item('001472.....')]
+      expect(findCodeByIdOrPrefix(list, '001472', true)?.id).toBe('001472.....')
     })
   })
 })
