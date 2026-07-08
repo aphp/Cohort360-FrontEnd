@@ -31,7 +31,7 @@ describe('healCriteriaCodes', () => {
   it('rewrites a re-encoded CCAM code and returns a new criteria array', () => {
     const selectedCriteria = [{ type: 'PROC', code: [{ id: '000742', system: 'https://atih' }] }] as any
 
-    const healed = healCriteriaCodes([] as any, selectedCriteria, {} as any)
+    const healed = healCriteriaCodes([] as any, selectedCriteria, {} as any) as any[]
 
     expect(healed).not.toBe(selectedCriteria)
     expect(healed[0].code[0].id).toBe('000742.....')

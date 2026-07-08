@@ -12,12 +12,15 @@ const item = { valueSetsInfo: [{ url: CCAM }] } as any
 
 describe('CHIPS_DISPLAY_METHODS.codeSearch', () => {
   it('builds a chip when the stored code resolves in cache', () => {
-    const chip = CHIPS_DISPLAY_METHODS.codeSearch([{ id: '000742', system: CCAM }], item, valueSets, ['', false])
+    const chip = CHIPS_DISPLAY_METHODS.codeSearch([{ id: '000742', system: CCAM }] as any, item, valueSets, ['', false])
     expect(chip).toBeTruthy()
   })
 
   it('does not throw when the code is absent from cache', () => {
-    const chip = CHIPS_DISPLAY_METHODS.codeSearch([{ id: 'ZZZ999', system: 'https://other' }], item, valueSets, ['', false])
+    const chip = CHIPS_DISPLAY_METHODS.codeSearch([{ id: 'ZZZ999', system: 'https://other' }] as any, item, valueSets, [
+      '',
+      false
+    ])
     expect(chip).toBeTruthy()
   })
 })
