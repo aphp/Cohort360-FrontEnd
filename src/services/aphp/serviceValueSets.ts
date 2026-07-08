@@ -228,10 +228,7 @@ const getChildrenFromCodesBatch = async (
   codes: string[],
   signal?: AbortSignal
 ): Promise<Back_API_Response<Hierarchy<FhirItem>>> => {
-  // Le référentiel CCAM a été ré-encodé (chapitres suffixés par des points, feuilles par `_001`) :
-  // un code enregistré avant ce ré-encodage ne matche plus à l'identique et se cherche en préfixe.
-  // Chapitres (6 chiffres) et feuilles (4 lettres + 3 chiffres) s'incrémentant par unité, le
-  // wildcard ne déborde pas sur un code voisin. Scopé au valueset CCAM, idempotent sur `*`.
+  // Codes CCAM ré-encodés : un code d'avant ré-encodage se cherche en préfixe. Scopé au valueset CCAM.
   const isCcamHierarchy = valueSetUrl === getConfig().features.procedure?.valueSets?.procedureHierarchy?.url
   const toFilterValue = (code: string) => (isCcamHierarchy && code && !code.endsWith('*') ? `${code}*` : code)
   const json = {

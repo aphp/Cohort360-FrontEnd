@@ -21,10 +21,8 @@ export const getValueSetFromCodeSystem = (codeSystemUrl: string): string | undef
   return reference?.url
 }
 
-// Trouve un code dans une liste plate : match exact, sinon (CCAM, allowPrefixMatch) match par
-// préfixe. Les codes CCAM ré-encodés gardent un suffixe de padding (que des points, ex. `001472.....`),
-// leurs descendants portent des chiffres (`001472.001`) : on préfère le noeud, sinon le plus court.
-// Hors CCAM le préfixe reste off pour ne pas confondre des voisins (CIM10 `E11`/`E110`).
+// Match exact, sinon (CCAM) par préfixe : le noeud ré-encodé a un suffixe tout en points (`001472.....`),
+// préféré à ses descendants (`001472.001`). Désactivé hors CCAM pour éviter CIM10 `E11`/`E110`.
 export const findCodeByIdOrPrefix = (
   codes: readonly (Hierarchy<FhirItem> | undefined)[],
   id: string,
