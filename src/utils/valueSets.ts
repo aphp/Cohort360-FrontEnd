@@ -21,29 +21,31 @@ export const getValueSetFromCodeSystem = (codeSystemUrl: string): string | undef
   return reference?.url
 }
 
-// Associe un code stocké au concept du cache : match exact d'abord. Pour le CCAM
-// (allowPrefixMatch), les codes ré-encodés (ex. `001472` -> `001472.....`) sont retrouvés par
-// préfixe. Le préfixe reste désactivé hors CCAM pour ne pas confondre des voisins (CIM10 `E11`/`E110`).
+// Match exact, sinon (CCAM) par préfixe : le noeud ré-encodé a un suffixe tout en points (`001472.....`),
+// préféré à ses descendants (`001472.001`). Désactivé hors CCAM pour éviter CIM10 `E11`/`E110`.
+export const findCodeByIdOrPrefix = (
+  codes: readonly (Hierarchy<FhirItem> | undefined)[],
+  id: string,
+  allowPrefixMatch: boolean
+): Hierarchy<FhirItem> | undefined => {
+  const exact = codes.find((c) => c?.id === id)
+  if (exact || !allowPrefixMatch || !id) return exact
+  const prefixMatches = codes.filter((c): c is Hierarchy<FhirItem> => typeof c?.id === 'string' && c.id.startsWith(id))
+  return (
+    prefixMatches.find((c) => /^\.*$/.test(c.id.slice(id.length))) ??
+    [...prefixMatches].sort((a, b) => a.id.length - b.id.length)[0]
+  )
+}
+
+// Associe un code stocké au concept du cache (exact puis préfixe CCAM), sinon renvoie le code tel quel.
 export const matchStoredCodeInCache = <T extends { id: string; system?: string }>(
   code: T,
   codeCaches: Record<string, Hierarchy<FhirItem>[]>,
   allowPrefixMatch: boolean
 ): Hierarchy<FhirItem> | T => {
   const allCodes = Object.values(codeCaches).flat()
-  const exact =
-    (code.system ? codeCaches[code.system]?.find((c) => c.id === code.id) : undefined) ??
-    allCodes.find((c) => c.id === code.id)
-  if (exact) return exact
-  if (allowPrefixMatch && code.id) {
-    const scope = (code.system ? codeCaches[code.system] : undefined) ?? allCodes
-    const prefixMatches = scope.filter((c) => typeof c.id === 'string' && c.id.startsWith(code.id))
-    // Le noeud ré-encodé garde un suffixe de padding (uniquement des points, ex. `001472.....`) ;
-    // ses descendants portent des chiffres (`001472.001`). On préfère le noeud, sinon le plus court.
-    const node = prefixMatches.find((c) => /^\.*$/.test(c.id.slice(code.id.length)))
-    const best = node ?? [...prefixMatches].sort((a, b) => a.id.length - b.id.length)[0]
-    if (best) return best
-  }
-  return code
+  const scope = (code.system ? codeCaches[code.system] : undefined) ?? allCodes
+  return findCodeByIdOrPrefix(scope, code.id, allowPrefixMatch) ?? allCodes.find((c) => c.id === code.id) ?? code
 }
 
 // Helper function to get ValueSet Reference from CodeSystem URL
