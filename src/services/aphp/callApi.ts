@@ -322,6 +322,7 @@ type fetchDocumentReferenceProps = {
   encounter?: string
   'encounter-identifier'?: string
   onlyPdfAvailable?: boolean
+  excludeImportedDocuments?: boolean
   'patient-identifier'?: string
   facet?: ('class' | 'visit-year-month-gender-facet')[]
   uniqueFacet?: 'subject'[]
@@ -363,6 +364,7 @@ export const fetchDocumentReference = async (
     patient,
     encounter,
     onlyPdfAvailable,
+    excludeImportedDocuments = true,
     minDate,
     maxDate,
     executiveUnits,
@@ -381,10 +383,13 @@ export const fetchDocumentReference = async (
   uniqueFacet = uniqueValues(uniqueFacet)
   _elements = uniqueValues(_elements)
 
-  // By default, all the calls to `/DocumentReference` will have `'type:not=https://terminology.eds.aphp.fr/fhir/CodeSystem/aphp-document-class|doc-impor'` and patient.active=true in parameter
-  let options: string[] = [
-    `type:not=${encodeURIComponent('https://terminology.eds.aphp.fr/fhir/CodeSystem/aphp-document-class|doc-impor')}`
-  ]
+  // By default, all the calls to `/DocumentReference` will exclude imported documents (`type:not=https://terminology.eds.aphp.fr/fhir/CodeSystem/aphp-document-class|doc-impor`) and have patient.active=true in parameter.
+  let options: string[] = []
+  if (excludeImportedDocuments)
+    options = [
+      ...options,
+      `type:not=${encodeURIComponent('https://terminology.eds.aphp.fr/fhir/CodeSystem/aphp-document-class|doc-impor')}`
+    ]
 
   if (appConfig.core.fhir.totalCount) options = [...options, '_total=accurate']
   if (appConfig.core.fhir.filterActive) options = [...options, 'patient.active=true']
