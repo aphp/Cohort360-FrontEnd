@@ -216,6 +216,10 @@ const buildRaw = (value: string) => {
   return value
 }
 
+const buildBooleanConstantFilter = (checked: boolean | null, constantValue?: string) => {
+  return checked && constantValue ? constantValue : ''
+}
+
 const buildSearchFilter = (criterion: string) => {
   return criterion ? `${encodeURIComponent(criterion)}` : ''
 }
@@ -383,5 +387,7 @@ export const BUILD_MAPPERS = {
     buildWithDocumentFilter(val as string, args[0] as number | null),
   buildRaw: (val: DataTypes, key: FhirKey, deidentified: boolean, args: Array<DataTypes | BuilderMethod>) =>
     buildRaw(val as string),
+  buildBooleanConstant: (val: DataTypes, key: FhirKey, deidentified: boolean, args: Array<DataTypes | BuilderMethod>) =>
+    buildBooleanConstantFilter(val as boolean, args[0] as string),
   noop: (val: DataTypes, key: FhirKey, deidentified: boolean, args: Array<DataTypes | BuilderMethod>) => undefined
 }

@@ -58,6 +58,7 @@ const initSearchCriterias = (search: string): SearchCriterias<DocumentsFilters> 
     docStatuses: [],
     docTypes: [],
     onlyPdfAvailable: true,
+    excludeImportedDocuments: true,
     durationRange: [null, null],
     executiveUnits: [],
     encounterStatus: []
@@ -72,7 +73,17 @@ const fetchList = (
   groupId: string[],
   signal?: AbortSignal
 ): Promise<ExplorationResults<DocumentReference>> => {
-  const { nda, ipp, executiveUnits, encounterStatus, durationRange, docStatuses, docTypes, onlyPdfAvailable } = filters
+  const {
+    nda,
+    ipp,
+    executiveUnits,
+    encounterStatus,
+    durationRange,
+    docStatuses,
+    docTypes,
+    onlyPdfAvailable,
+    excludeImportedDocuments
+  } = filters
   const { searchInput } = fetchParams
   const params = {
     searchBy: searchBy,
@@ -84,6 +95,7 @@ const fetchList = (
     'encounter-identifier': nda,
     'patient-identifier': ipp,
     onlyPdfAvailable,
+    excludeImportedDocuments,
     uniqueFacet: ['subject'] as 'subject'[],
     executiveUnits: executiveUnits.map((unit) => unit.id),
     encounterStatus: encounterStatus?.map(({ id }) => id),
@@ -98,6 +110,7 @@ const fetchList = (
   }
   const paramsFetchAll = {
     patient: patient?.id,
+    excludeImportedDocuments,
     uniqueFacet: ['subject'] as 'subject'[],
     ...getCommonParamsAll(groupId),
     signal
