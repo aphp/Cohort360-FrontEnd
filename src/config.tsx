@@ -3,13 +3,6 @@ import { Root } from 'react-dom/client'
 import * as R from 'ramda'
 import { CONFIG_URL } from 'constants.js'
 import { LabelObject } from 'types/searchCriterias'
-import {
-  birthStatusData,
-  booleanFieldsData,
-  booleanOpenChoiceFieldsData,
-  ultrasoundMonitoringData,
-  vmeData
-} from 'data/questionnaire_data'
 
 type DeepPartial<T> = {
   [P in keyof T]?: T[P] extends object ? DeepPartial<T[P]> : T[P]
@@ -401,26 +394,11 @@ let config: AppConfig = {
         presentationAtDelivery: { url: '' },
         risksOrComplicationsOfPregnancy: { url: '' },
         risksRelatedToObstetricHistory: { url: '' },
-        booleanOpenChoiceFields: {
-          url: 'booleanOpenChoiceFields',
-          data: booleanOpenChoiceFieldsData
-        },
-        booleanFields: {
-          url: 'booleanFields',
-          data: booleanFieldsData
-        },
-        ultrasoundMonitoring: {
-          url: 'ultrasoundMonitoring',
-          data: ultrasoundMonitoringData
-        },
-        vme: {
-          url: 'vme',
-          data: vmeData
-        },
-        birthStatus: {
-          url: 'birthStatus',
-          data: birthStatusData
-        }
+        booleanOpenChoiceFields: { url: '' },
+        booleanFields: { url: '' },
+        ultrasoundMonitoring: { url: '' },
+        vme: { url: '' },
+        birthStatus: { url: '' }
       }
     },
     locationMap: {

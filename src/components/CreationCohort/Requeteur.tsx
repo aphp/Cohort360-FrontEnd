@@ -23,6 +23,7 @@ import services from 'services/aphp'
 import { setCriteriaData } from 'state/criteria'
 import { AppConfig } from 'config'
 import { initValueSets, updateCache } from 'state/valueSets'
+import { initQuestionnairesFormData } from 'state/questionnairesFormData'
 
 const Requeteur = () => {
   const {
@@ -38,6 +39,7 @@ const Requeteur = () => {
     allowSearchIpp = false
   } = useAppSelector((state) => state.cohortCreation.request || {})
   const valueSets = useAppSelector((state) => state.valueSets)
+  const questionnairesFormData = useAppSelector((state) => state.questionnairesFormData)
   const config = useContext(AppConfig)
   const params = useParams<{
     requestId: string
@@ -173,12 +175,23 @@ const Requeteur = () => {
 
   useEffect(() => {
     ;(async () => {
-      if (!valueSets.loading && !valueSets.loaded) {
-        await dispatch(initValueSets(criteriaList())).unwrap()
+      try {
+        if (!questionnairesFormData.loading && !questionnairesFormData.loaded) {
+          try {
+            await dispatch(initQuestionnairesFormData()).unwrap()
+          } catch (error) {
+            // Non bloquant : les forms retombent sur le fallback config. On loggue pour le diagnostic.
+            console.error('Échec du chargement des métadonnées de formulaires (Questionnaire)', error)
+          }
+        }
+        if (!valueSets.loading && !valueSets.loaded) {
+          await dispatch(initValueSets(criteriaList())).unwrap()
+        }
+      } finally {
+        setValueSetsLoading(false)
       }
-      setValueSetsLoading(false)
     })()
-  }, [dispatch, valueSets])
+  }, [dispatch, valueSets.loading, valueSets.loaded, questionnairesFormData.loading, questionnairesFormData.loaded])
 
   useEffect(() => {
     _fetchRequest()

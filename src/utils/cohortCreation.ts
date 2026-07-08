@@ -38,7 +38,6 @@ import { AppDispatch } from 'state'
 import { Hierarchy } from 'types/hierarchy'
 import { CodeCache } from 'state/valueSets'
 import { NewDurationRangeType } from 'components/CreationCohort/DiagramView/components/LogicalOperator/components/CriteriaRightPanel/CriteriaForm/types'
-import criteriaList, { getAllCriteriaItems } from 'components/CreationCohort/DataList_Criteria'
 import { getChildrenFromCodes, HIERARCHY_ROOT } from 'services/aphp/serviceValueSets'
 import { createHierarchyRoot } from './hierarchy'
 import { FhirItem } from 'types/valueSet'
@@ -55,6 +54,11 @@ const DEFAULT_GROUP_ERROR: CriteriaGroup = {
   title: '',
   type: CriteriaGroupType.AND_GROUP,
   criteriaIds: []
+}
+
+const getCriteriaDefinitions = async (): Promise<CriteriaItemType[]> => {
+  const { default: criteriaList, getAllCriteriaItems } = await import('components/CreationCohort/DataList_Criteria')
+  return getAllCriteriaItems(criteriaList())
 }
 
 /**
@@ -435,13 +439,13 @@ export const unbuildCriteriaData = async (
  * // Can be sent to backend API
  * ```
  */
-export function buildRequest(
+export async function buildRequest(
   selectedPopulation: (Hierarchy<ScopeElement> | undefined)[] | null,
   selectedCriteria: SelectedCriteriaType[],
   criteriaGroup: CriteriaGroup[],
   temporalConstraints: TemporalConstraintsType[]
-): string {
-  const criteriaDefinitions = getAllCriteriaItems(criteriaList())
+): Promise<string> {
+  const criteriaDefinitions = await getCriteriaDefinitions()
   if (!selectedPopulation) return ''
   selectedPopulation = selectedPopulation.filter((elem) => elem !== undefined)
   const deidentified: boolean =
@@ -601,7 +605,7 @@ type UnbuildRequestReturnType = {
 
 // eslint-disable-next-line max-statements
 export async function unbuildRequest(_json: string): Promise<UnbuildRequestReturnType> {
-  const criteriaDefinitions = getAllCriteriaItems(criteriaList())
+  const criteriaDefinitions = await getCriteriaDefinitions()
   let criteriaItems: RequeteurCriteriaType[] = []
   let criteriaGroup: RequeteurGroupType[] = []
   let temporalConstraints: TemporalConstraintsType[] = []
@@ -813,6 +817,7 @@ export const fetchCriteriasCodes = async (
   oldCriteriaCache?: CodeCache
 ): Promise<CodeCache> => {
   const updatedCriteriaData: CodeCache = { ...oldCriteriaCache }
+  const { getAllCriteriaItems } = await import('components/CreationCohort/DataList_Criteria')
   const allCriterias = getAllCriteriaItems(criteriaList)
   for (const criteria of allCriterias) {
     const criteriaValues = selectedCriteria.filter(
@@ -965,7 +970,7 @@ export const joinRequest = async (
   const { population, criteria, criteriaGroup, idRemap } = await unbuildRequest(JSON.stringify(newJoinedRequest))
 
   return {
-    json: buildRequest(population, criteria, criteriaGroup, []),
+    json: await buildRequest(population, criteria, criteriaGroup, []),
     criteria,
     criteriaGroup,
     idRemap
