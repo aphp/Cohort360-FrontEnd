@@ -146,6 +146,7 @@ const fetchList = async (
     formName: formName.join(','),
     uniqueFacet: ['subject'],
     patient: patient?.id,
+    _include: ['Encounter:encounter', 'Patient:subject'] satisfies ('Encounter:encounter' | 'Patient:subject')[],
     ...getCommonParamsList(fetchParams, groupId),
     signal
   }
