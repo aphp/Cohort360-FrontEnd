@@ -11,7 +11,8 @@ import {
   getResourceTypeFromUrl,
   getCodeSystemUrlFromValueSetUrl,
   getSearchSystemUrl,
-  checkIsLeaf
+  checkIsLeaf,
+  matchStoredCodeInCache
 } from 'utils/valueSets'
 import { HIERARCHY_ROOT } from 'services/aphp/serviceValueSets'
 import { Hierarchy } from 'types/hierarchy'
@@ -58,7 +59,7 @@ vi.mock('data/valueSets', () => ({
       label: 'Test ValueSet',
       title: 'Test ValueSet Title',
       standard: true,
-      checked: false,
+      checked: false,
       joinDisplayWithCode: true,
       joinDisplayWithSystem: true,
       codeSystemUrls: ['https://terminology.hl7.org/CodeSystem/test-codesystem']
@@ -68,7 +69,7 @@ vi.mock('data/valueSets', () => ({
       label: 'Another ValueSet',
       title: 'Another ValueSet Title',
       standard: false,
-      checked: false,
+      checked: false,
       joinDisplayWithCode: false,
       joinDisplayWithSystem: false,
       codeSystemUrls: ['https://terminology.hl7.org/CodeSystem/another-codesystem']
@@ -78,7 +79,7 @@ vi.mock('data/valueSets', () => ({
       label: 'Biology Anabio',
       title: 'Biology Anabio Title',
       standard: true,
-      checked: false,
+      checked: false,
       joinDisplayWithCode: true,
       joinDisplayWithSystem: false,
       codeSystemUrls: ['https://terminology.hl7.org/CodeSystem/biology-anabio']
@@ -618,6 +619,39 @@ describe('valueSets utilities', () => {
       expect(getSearchSystemUrl(config)).toBe('https://terminology.hl7.org/CodeSystem/empty-codesystem')
       expect(errorSpy).toHaveBeenCalledOnce()
       errorSpy.mockRestore()
+    })
+  })
+
+  describe('matchStoredCodeInCache', () => {
+    const CCAM = 'https://ccam'
+    const item = (id: string, label: string, system = CCAM): Hierarchy<FhirItem> =>
+      ({ id, label, system }) as Hierarchy<FhirItem>
+    const cache = {
+      [CCAM]: [item('001472.....', 'Noeud 001472'), item('001472.001', 'Enfant 001472'), item('JQGA004....1', 'Acte JQGA004')]
+    }
+
+    it('returns the exact match when the stored code still exists', () => {
+      const cacheExact = { [CCAM]: [item('001472', 'Exact 001472'), item('001472.....', 'Noeud')] }
+      const stored = { id: '001472', label: '', system: CCAM }
+      expect((matchStoredCodeInCache(stored, cacheExact, true) as Hierarchy<FhirItem>).label).toBe('Exact 001472')
+    })
+
+    it('prefers the padding node over a descendant for a re-encoded CCAM code', () => {
+      // Le noeud `001472.....` (suffixe tout en points) doit gagner sur son enfant `001472.001`.
+      const stored = { id: '001472', label: '', system: CCAM }
+      expect((matchStoredCodeInCache(stored, cache, true) as Hierarchy<FhirItem>).label).toBe('Noeud 001472')
+    })
+
+    it('does not prefix-match when disabled (avoids CIM10 E11 -> E110)', () => {
+      const cim = 'https://cim10'
+      const cimCache = { [cim]: [item('E110', 'Diabète compliqué', cim)] }
+      const stored = { id: 'E11', system: cim }
+      expect(matchStoredCodeInCache(stored, cimCache, false)).toBe(stored)
+    })
+
+    it('returns the stored code untouched when nothing matches', () => {
+      const stored = { id: 'ZZZZ999', system: CCAM }
+      expect(matchStoredCodeInCache(stored, cache, true)).toBe(stored)
     })
   })
 })
