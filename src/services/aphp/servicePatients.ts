@@ -240,7 +240,10 @@ const servicesPatients: IServicePatients = {
 
   fetchQuestionnaires: async () => {
     const maternityQuestionnaires = `${FormNames.PREGNANCY},${FormNames.HOSPIT}`
-    const questionnaireList = await fetchQuestionnaires({ name: maternityQuestionnaires, _elements: ['id', 'name'] })
+    const questionnaireList = await fetchQuestionnaires({
+      name: maternityQuestionnaires,
+      _elements: ['id', 'name', 'item']
+    })
 
     return getApiResponseResources(questionnaireList) ?? []
   },

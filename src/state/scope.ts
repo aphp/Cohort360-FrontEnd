@@ -1,7 +1,7 @@
 import { createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit'
 import { impersonate, login, logout } from './me'
 import { CodesCache, Hierarchy } from 'types/hierarchy'
-import { RootState } from 'state'
+import type { RootState } from 'state'
 import { mapCacheToCodes } from 'utils/hierarchy'
 import { ScopeElement } from 'types/scope'
 

@@ -1,20 +1,22 @@
-import React, { useMemo } from 'react'
+import React, { useEffect, useMemo } from 'react'
 import { Grid, Typography } from '@mui/material'
 import { FormNames } from 'types/searchCriterias'
 import { CohortQuestionnaireResponse } from 'types'
 import { Questionnaire } from 'fhir/r4'
 import {
+  buildFormItemsByLinkId,
   formatHospitalisationDates,
   generateHospitDetails,
   generatePregnancyDetails,
   getBirthDeliveryDate,
   getDataFromForm
 } from 'utils/formUtils'
-import { pregnancyForm } from 'data/pregnancyData'
 import FormCards from 'components/ui/FormCard'
 import { DomainAdd, PregnantWoman } from '@mui/icons-material'
 import labels from 'labels.json'
-import { hospitForm } from 'data/hospitData'
+import { useAppDispatch, useAppSelector } from 'state'
+import { initQuestionnairesFormData, selectFormItemsByFormName } from 'state/questionnairesFormData'
+import { PREGNANCY_LINK_IDS } from 'constants/maternityLinkIds'
 
 interface TimelineProps {
   questionnaireResponses: CohortQuestionnaireResponse[]
@@ -31,6 +33,20 @@ const groupEventsByYear = (data: CohortQuestionnaireResponse[]) => {
 }
 
 const Timeline = ({ questionnaireResponses, questionnaires }: TimelineProps) => {
+  const dispatch = useAppDispatch()
+  const questionnairesFormData = useAppSelector((state) => state.questionnairesFormData)
+  const hospitFormItems = useAppSelector((state) => selectFormItemsByFormName(state, FormNames.HOSPIT))
+  const pregnancyFormItems = useAppSelector((state) => selectFormItemsByFormName(state, FormNames.PREGNANCY))
+
+  useEffect(() => {
+    if (!questionnairesFormData.loading && !questionnairesFormData.loaded) {
+      dispatch(initQuestionnairesFormData())
+    }
+  }, [dispatch, questionnairesFormData.loading, questionnairesFormData.loaded])
+
+  const hospitItemsByLinkId = useMemo(() => buildFormItemsByLinkId(hospitFormItems), [hospitFormItems])
+  const pregnancyItemsByLinkId = useMemo(() => buildFormItemsByLinkId(pregnancyFormItems), [pregnancyFormItems])
+
   const yearGroups = useMemo(() => groupEventsByYear(questionnaireResponses), [questionnaireResponses])
   const pregnancyFormId = useMemo(
     () => questionnaires.find((form) => form.name === FormNames.PREGNANCY)?.id ?? '',
@@ -40,23 +56,43 @@ const Timeline = ({ questionnaireResponses, questionnaires }: TimelineProps) => 
 
   const generateFormInfo = (form: CohortQuestionnaireResponse) => {
     const isPregnancy = form.questionnaire?.includes(pregnancyFormId)
-    const chipsInfo = isPregnancy
-      ? [
-          getDataFromForm(form, pregnancyForm.pregnancyType) ?? getDataFromForm(form, pregnancyForm.twinPregnancyType),
-          `Début de grossesse : ${getDataFromForm(form, pregnancyForm.pregnancyStartDate)}`,
-          `Unité exécutrice : ${form.serviceProvider}`
-        ]
-      : ([
-          getBirthDeliveryDate(form, hospitForm),
-          formatHospitalisationDates(form.hospitDates?.start, form.hospitDates?.end),
-          `Unité exécutrice : ${form.serviceProvider}`
-        ].filter(Boolean) as string[])
-
-    const formDetails = isPregnancy ? generatePregnancyDetails(form) : generateHospitDetails(form)
     const cardColor = isPregnancy ? '#f194b4' : '#A8D178'
     const avatar = isPregnancy ? <PregnantWoman htmlColor="#F194B4" /> : <DomainAdd htmlColor="#A8D178" />
     const title = isPregnancy ? labels.formNames.pregnancy : labels.formNames.hospit
-    return { chipsInfo, formDetails, cardColor, avatar, title }
+
+    try {
+      const pregnancyTypeItem = pregnancyItemsByLinkId[PREGNANCY_LINK_IDS.pregnancyType]
+      const twinPregnancyTypeItem = pregnancyItemsByLinkId[PREGNANCY_LINK_IDS.twinPregnancyType]
+      const pregnancyStartDateItem = pregnancyItemsByLinkId[PREGNANCY_LINK_IDS.pregnancyStartDate]
+
+      const chipsInfo = isPregnancy
+        ? [
+            (pregnancyTypeItem && getDataFromForm(form, pregnancyTypeItem)) ||
+              (twinPregnancyTypeItem ? getDataFromForm(form, twinPregnancyTypeItem) : undefined) ||
+              'N/A',
+            `Début de grossesse : ${pregnancyStartDateItem ? getDataFromForm(form, pregnancyStartDateItem) : 'N/A'}`,
+            `Unité exécutrice : ${form.serviceProvider}`
+          ].filter(Boolean)
+        : ([
+            getBirthDeliveryDate(form, hospitItemsByLinkId),
+            formatHospitalisationDates(form.hospitDates?.start, form.hospitDates?.end),
+            `Unité exécutrice : ${form.serviceProvider}`
+          ].filter(Boolean) as string[])
+
+      const formDetails = isPregnancy
+        ? generatePregnancyDetails(form, pregnancyItemsByLinkId)
+        : generateHospitDetails(form, hospitItemsByLinkId)
+      return { chipsInfo, formDetails, cardColor, avatar, title }
+    } catch (error) {
+      console.error(`Erreur lors du rendu du formulaire maternité ${form.id}`, error)
+      return {
+        chipsInfo: [`Unité exécutrice : ${form.serviceProvider ?? 'N/A'}`],
+        formDetails: [],
+        cardColor,
+        avatar,
+        title
+      }
+    }
   }
 
   return (
