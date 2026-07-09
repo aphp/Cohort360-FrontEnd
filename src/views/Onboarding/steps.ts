@@ -4,11 +4,17 @@ import MenuBookIcon from '@mui/icons-material/MenuBook'
 import type { SvgIconProps } from '@mui/material'
 import type { ComponentType } from 'react'
 
+import DataAccess from './screens/DataAccess'
+import UserRights from './screens/UserRights'
+import WhatIsCohort360 from './screens/WhatIsCohort360'
+import WhatIsEds from './screens/WhatIsEds'
+
 export type OnboardingStepConfig = {
   key: string
   label: string
   summary: string
   icon: ComponentType<SvgIconProps>
+  screens?: ComponentType[]
 }
 
 export const ONBOARDING_STEPS: OnboardingStepConfig[] = [
@@ -16,7 +22,8 @@ export const ONBOARDING_STEPS: OnboardingStepConfig[] = [
     key: 'environment',
     label: 'Découvrir votre environnement',
     summary: 'Apprenez-en plus sur ce qu’est Cohort360 et sur vos accès aux données dans l’outil.',
-    icon: MenuBookIcon
+    icon: MenuBookIcon,
+    screens: [WhatIsCohort360, WhatIsEds, DataAccess, UserRights]
   },
   {
     key: 'commitments',
@@ -31,3 +38,5 @@ export const ONBOARDING_STEPS: OnboardingStepConfig[] = [
     icon: FormatListBulletedIcon
   }
 ]
+
+export const getStepScreenCount = (stepIndex: number): number => ONBOARDING_STEPS[stepIndex]?.screens?.length ?? 1

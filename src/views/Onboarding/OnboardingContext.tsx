@@ -4,13 +4,14 @@ import { createContext, useContext, useMemo, useState } from 'react'
 import { useAppDispatch, useAppSelector } from 'state'
 import { advanceOnboarding, clearOnboardingError, ONBOARDING_TOTAL_STEPS } from 'state/onboarding'
 
-import { ONBOARDING_STEPS } from './steps'
+import { getStepScreenCount, ONBOARDING_STEPS } from './steps'
 
 type OnboardingScreen = 'welcome' | 'steps'
 
 type OnboardingContextValue = {
   screen: OnboardingScreen
   currentStep: number
+  subStep: number
   totalSteps: number
   saving: boolean
   error: boolean
@@ -34,11 +35,14 @@ export const OnboardingProvider = ({ initialStep, children }: ProviderProps) => 
   const { saving, error } = useAppSelector((state) => state.onboarding)
 
   const [currentStep, setCurrentStep] = useState(() => clampStep(initialStep))
+  const [subStep, setSubStep] = useState(0)
   const [screen, setScreen] = useState<OnboardingScreen>(() => (initialStep <= 0 ? 'welcome' : 'steps'))
 
   const value = useMemo<OnboardingContextValue>(() => {
-    const isFirstStep = currentStep === 0
-    const isLastStep = currentStep === ONBOARDING_STEPS.length - 1
+    const screenCount = getStepScreenCount(currentStep)
+    const isLastMacroStep = currentStep === ONBOARDING_STEPS.length - 1
+    const isFirstStep = currentStep === 0 && subStep === 0
+    const isLastStep = isLastMacroStep && subStep === screenCount - 1
 
     const goNext = () => {
       if (saving) {
@@ -48,9 +52,15 @@ export const OnboardingProvider = ({ initialStep, children }: ProviderProps) => 
         setScreen('steps')
         return
       }
+      // Progress is persisted per macro step, only once its last screen is left.
+      if (subStep < screenCount - 1) {
+        setSubStep((step) => step + 1)
+        return
+      }
       dispatch(advanceOnboarding(currentStep + 1))
-      if (!isLastStep) {
+      if (!isLastMacroStep) {
         setCurrentStep((step) => step + 1)
+        setSubStep(0)
       }
     }
 
@@ -61,16 +71,23 @@ export const OnboardingProvider = ({ initialStep, children }: ProviderProps) => 
       if (error) {
         dispatch(clearOnboardingError())
       }
-      if (isFirstStep) {
+      if (subStep > 0) {
+        setSubStep((step) => step - 1)
+        return
+      }
+      if (currentStep === 0) {
         setScreen('welcome')
         return
       }
-      setCurrentStep((step) => step - 1)
+      const previousStep = currentStep - 1
+      setCurrentStep(previousStep)
+      setSubStep(getStepScreenCount(previousStep) - 1)
     }
 
     return {
       screen,
       currentStep,
+      subStep,
       totalSteps: ONBOARDING_STEPS.length,
       saving,
       error,
@@ -79,7 +96,7 @@ export const OnboardingProvider = ({ initialStep, children }: ProviderProps) => 
       goNext,
       goBack
     }
-  }, [screen, currentStep, saving, error, dispatch])
+  }, [screen, currentStep, subStep, saving, error, dispatch])
 
   return <OnboardingContext.Provider value={value}>{children}</OnboardingContext.Provider>
 }
