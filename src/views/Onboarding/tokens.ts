@@ -9,5 +9,6 @@ export const onboardingTokens = {
   stepIconFg: '#C77B3B',
   avatarBg: '#5BC5F2',
   stepCircleBorder: '#C4D3E8',
-  stepCircleInactive: '#9AA7B8'
+  stepCircleInactive: '#9AA7B8',
+  tileBg: '#F5F8FE'
 } as const
