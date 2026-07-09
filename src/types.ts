@@ -574,6 +574,30 @@ export type AccessExpiration = {
   perimeter: string
 }
 
+// The role carries a boolean flag per right (right_*); the catalog below provides their labels.
+export type MyAccessRole = {
+  name: string | null
+} & Record<string, boolean | string | null>
+
+export type MyAccess = {
+  id: number
+  role: MyAccessRole
+  perimeter: { source_value: string; name: string } | null
+  end_datetime: string | null
+}
+
+export type RightCatalogItem = {
+  name: string
+  label: string
+  depends_on: string | null
+}
+
+export type RightCatalogCategory = {
+  name: string
+  is_global: boolean
+  rights: RightCatalogItem[]
+}
+
 // this is an incomplete type, it should be completed with the other fields
 export type UserAccesses = {
   role: {

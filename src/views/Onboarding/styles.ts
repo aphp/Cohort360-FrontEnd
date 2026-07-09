@@ -130,6 +130,99 @@ const useStyles = makeStyles()((theme: Theme) => ({
   error: {
     marginTop: theme.spacing(2),
     color: theme.palette.error.main
+  },
+  sectionText: {
+    color: T.muted,
+    marginTop: theme.spacing(2),
+    lineHeight: 1.6
+  },
+  subTitle: {
+    color: T.ink,
+    fontWeight: 700,
+    marginTop: theme.spacing(3)
+  },
+  list: {
+    color: T.muted,
+    marginTop: theme.spacing(1.5),
+    paddingLeft: theme.spacing(3),
+    lineHeight: 1.6,
+    '& li': {
+      marginTop: theme.spacing(0.5)
+    }
+  },
+  link: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: theme.spacing(0.5),
+    color: theme.palette.primary.main,
+    fontWeight: 600,
+    textDecoration: 'none',
+    '&:hover': {
+      textDecoration: 'underline'
+    }
+  },
+  linkIcon: {
+    fontSize: 16
+  },
+  linkRow: {
+    marginTop: theme.spacing(2)
+  },
+  divider: {
+    marginTop: theme.spacing(3)
+  },
+  infoRow: {
+    display: 'flex',
+    alignItems: 'flex-start',
+    gap: theme.spacing(1.5),
+    marginTop: theme.spacing(3)
+  },
+  infoBadge: {
+    marginTop: theme.spacing(0.25)
+  },
+  infoText: {
+    color: theme.palette.primary.main,
+    lineHeight: 1.6
+  },
+  loadingRow: {
+    display: 'flex',
+    justifyContent: 'center',
+    marginTop: theme.spacing(4)
+  },
+  fieldBlock: {
+    marginTop: theme.spacing(3)
+  },
+  fieldLabel: {
+    color: T.muted
+  },
+  fieldValue: {
+    color: T.ink,
+    fontWeight: 700
+  },
+  rightItem: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: theme.spacing(1.5),
+    marginTop: theme.spacing(1.5)
+  },
+  checkIcon: {
+    flexShrink: 0,
+    color: theme.palette.success.main
+  },
+  rightLabel: {
+    color: T.ink,
+    fontWeight: 700
+  },
+  tileGrid: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+    gap: theme.spacing(2),
+    marginTop: theme.spacing(2)
+  },
+  tile: {
+    border: `1px solid ${T.cardBorder}`,
+    borderRadius: 6,
+    padding: theme.spacing(1, 3, 3),
+    backgroundColor: T.tileBg
   }
 }))
 
