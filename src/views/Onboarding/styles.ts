@@ -223,6 +223,98 @@ const useStyles = makeStyles()((theme: Theme) => ({
     borderRadius: 6,
     padding: theme.spacing(1, 3, 3),
     backgroundColor: T.tileBg
+  },
+  warningNotice: {
+    display: 'flex',
+    alignItems: 'flex-start',
+    gap: theme.spacing(1.5)
+  },
+  warningNoticeBoxed: {
+    padding: theme.spacing(2),
+    marginBottom: theme.spacing(3),
+    borderRadius: 6,
+    border: `1px solid ${T.warning}`,
+    backgroundColor: T.surface
+  },
+  warningNoticeInline: {
+    marginTop: theme.spacing(3)
+  },
+  warningIcon: {
+    flexShrink: 0,
+    color: T.warning
+  },
+  warningText: {
+    color: T.warning,
+    fontWeight: 600,
+    lineHeight: 1.5
+  },
+  titleChip: {
+    alignSelf: 'flex-start',
+    marginTop: theme.spacing(-6.5),
+    marginLeft: theme.spacing(-2),
+    marginBottom: theme.spacing(2),
+    padding: theme.spacing(1, 2),
+    borderRadius: 6,
+    backgroundColor: T.chipBg,
+    color: T.surface,
+    fontWeight: 700
+  },
+  bareTitle: {
+    color: T.chipBg,
+    fontWeight: 700,
+    marginBottom: theme.spacing(4)
+  },
+  illustrationRow: {
+    display: 'flex',
+    justifyContent: 'center',
+    marginTop: theme.spacing(4)
+  },
+  illustrationPlaceholder: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '100%',
+    minHeight: 160,
+    padding: theme.spacing(2),
+    borderRadius: 6,
+    border: `1px dashed ${T.placeholderBorder}`,
+    color: T.placeholderFg,
+    textAlign: 'center'
+  },
+  deletionIcon: {
+    width: 56,
+    height: 56,
+    backgroundColor: T.chipBg
+  },
+  documentViewer: {
+    padding: theme.spacing(3),
+    borderRadius: 6,
+    backgroundColor: T.documentBg
+  },
+  documentFrame: {
+    display: 'block',
+    width: '100%',
+    height: 420,
+    border: 'none',
+    backgroundColor: T.surface
+  },
+  documentFallback: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    gap: theme.spacing(2),
+    padding: theme.spacing(6),
+    backgroundColor: T.surface
+  },
+  confirmationIcon: {
+    alignSelf: 'center',
+    fontSize: 72,
+    color: theme.palette.success.main
+  },
+  confirmationTitle: {
+    marginTop: theme.spacing(3),
+    color: T.ink,
+    fontWeight: 700
   }
 }))
 

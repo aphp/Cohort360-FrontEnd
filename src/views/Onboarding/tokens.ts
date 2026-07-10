@@ -10,5 +10,10 @@ export const onboardingTokens = {
   avatarBg: '#5BC5F2',
   stepCircleBorder: '#C4D3E8',
   stepCircleInactive: '#9AA7B8',
-  tileBg: '#F5F8FE'
+  tileBg: '#F5F8FE',
+  warning: '#E5007D',
+  chipBg: '#1D4F9B',
+  documentBg: '#7F7F7F',
+  placeholderBorder: '#B9CDF2',
+  placeholderFg: '#7B8CA6'
 } as const

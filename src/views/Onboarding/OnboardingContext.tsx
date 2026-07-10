@@ -4,7 +4,7 @@ import { createContext, useContext, useMemo, useState } from 'react'
 import { useAppDispatch, useAppSelector } from 'state'
 import { advanceOnboarding, clearOnboardingError, ONBOARDING_TOTAL_STEPS } from 'state/onboarding'
 
-import { getStepScreenCount, ONBOARDING_STEPS } from './steps'
+import { getScreenConfig, getStepScreenCount, ONBOARDING_STEPS, type OnboardingScreenConfig } from './steps'
 
 type OnboardingScreen = 'welcome' | 'steps'
 
@@ -17,6 +17,8 @@ type OnboardingContextValue = {
   error: boolean
   isFirstStep: boolean
   isLastStep: boolean
+  screenConfig?: OnboardingScreenConfig
+  primaryLabel: string
   goNext: () => void
   goBack: () => void
 }
@@ -43,15 +45,9 @@ export const OnboardingProvider = ({ initialStep, children }: ProviderProps) => 
     const isLastMacroStep = currentStep === ONBOARDING_STEPS.length - 1
     const isFirstStep = currentStep === 0 && subStep === 0
     const isLastStep = isLastMacroStep && subStep === screenCount - 1
+    const screenConfig = screen === 'steps' ? getScreenConfig(currentStep, subStep) : undefined
 
-    const goNext = () => {
-      if (saving) {
-        return
-      }
-      if (screen === 'welcome') {
-        setScreen('steps')
-        return
-      }
+    const advance = () => {
       // Progress is persisted per macro step, only once its last screen is left.
       if (subStep < screenCount - 1) {
         setSubStep((step) => step + 1)
@@ -62,6 +58,23 @@ export const OnboardingProvider = ({ initialStep, children }: ProviderProps) => 
         setCurrentStep((step) => step + 1)
         setSubStep(0)
       }
+    }
+
+    const goNext = () => {
+      if (saving) {
+        return
+      }
+      if (screen === 'welcome') {
+        setScreen('steps')
+        return
+      }
+      const primaryAction = screenConfig?.primaryAction
+      if (primaryAction) {
+        // On rejection the store raises the error message and the user stays on the screen.
+        primaryAction.run(dispatch).then(advance, () => undefined)
+        return
+      }
+      advance()
     }
 
     const goBack = () => {
@@ -84,6 +97,8 @@ export const OnboardingProvider = ({ initialStep, children }: ProviderProps) => 
       setSubStep(getStepScreenCount(previousStep) - 1)
     }
 
+    const defaultLabel = screen === 'welcome' ? 'Commencer' : isLastStep ? 'Terminer' : 'Continuer'
+
     return {
       screen,
       currentStep,
@@ -93,6 +108,8 @@ export const OnboardingProvider = ({ initialStep, children }: ProviderProps) => 
       error,
       isFirstStep,
       isLastStep,
+      screenConfig,
+      primaryLabel: screenConfig?.primaryAction?.label ?? defaultLabel,
       goNext,
       goBack
     }

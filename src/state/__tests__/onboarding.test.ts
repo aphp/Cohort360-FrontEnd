@@ -3,14 +3,18 @@ import { logout } from 'state/me'
 import onboardingReducer, {
   advanceOnboarding,
   hydrateOnboarding,
-  type OnboardingState, 
-  selectOnboardingCompleted
+  type OnboardingState,
+  selectOnboardingCompleted,
+  signCharter
 } from 'state/onboarding'
 import { describe, expect, it } from 'vitest'
+
+const SIGNED_AT = '2026-07-09T09:30:00Z'
 
 const initialState: OnboardingState = {
   step: 0,
   completedAt: null,
+  charterSignedAt: null,
   saving: false,
   error: false,
   previousStep: null
@@ -18,7 +22,10 @@ const initialState: OnboardingState = {
 
 describe('onboarding reducer', () => {
   it('hydrates progress from the server payload', () => {
-    const state = onboardingReducer(initialState, hydrateOnboarding({ step: 2, completedAt: '2026-06-29T10:00:00Z' }))
+    const state = onboardingReducer(
+      initialState,
+      hydrateOnboarding({ step: 2, completedAt: '2026-06-29T10:00:00Z', charterSignedAt: null })
+    )
     expect(state.step).toBe(2)
     expect(state.completedAt).toBe('2026-06-29T10:00:00Z')
   })
@@ -55,6 +62,31 @@ describe('onboarding reducer', () => {
     const completed: OnboardingState = { ...initialState, step: 3, completedAt: '2026-06-29T10:00:00Z' }
     const state = onboardingReducer(completed, logout.fulfilled(null, 'req'))
     expect(state).toEqual(initialState)
+  })
+
+  it('records the charter signature timestamp on success (RG3309.02)', () => {
+    const pending = onboardingReducer(initialState, signCharter.pending('req'))
+    expect(pending.saving).toBe(true)
+    const fulfilled = onboardingReducer(pending, signCharter.fulfilled({ charter_signed_at: SIGNED_AT }, 'req'))
+    expect(fulfilled.charterSignedAt).toBe(SIGNED_AT)
+    expect(fulfilled.saving).toBe(false)
+    expect(fulfilled.error).toBe(false)
+  })
+
+  it('flags an error and keeps the charter unsigned when the call fails', () => {
+    const pending = onboardingReducer(initialState, signCharter.pending('req'))
+    const rejected = onboardingReducer(pending, signCharter.rejected(new Error('boom'), 'req'))
+    expect(rejected.charterSignedAt).toBeNull()
+    expect(rejected.error).toBe(true)
+    expect(rejected.saving).toBe(false)
+  })
+
+  it('hydrates an already signed charter', () => {
+    const state = onboardingReducer(
+      initialState,
+      hydrateOnboarding({ step: 2, completedAt: null, charterSignedAt: SIGNED_AT })
+    )
+    expect(state.charterSignedAt).toBe(SIGNED_AT)
   })
 })
 

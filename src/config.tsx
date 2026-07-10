@@ -212,6 +212,7 @@ export type AppConfig = {
     jToolUsers: string[]
     userTrackingBlacklist: string[]
     mailSupport?: string
+    mailDataProtection: string
     urlDoc?: string
   }
 }
@@ -427,7 +428,8 @@ let config: AppConfig = {
     displayOidcLogin: true,
     codeDisplayJWT: 'ArrowUp,ArrowUp,ArrowDown,ArrowDown,ArrowLeft,ArrowRight,ArrowLeft,ArrowRight,b,a,Enter',
     jToolUsers: [],
-    userTrackingBlacklist: []
+    userTrackingBlacklist: [],
+    mailDataProtection: 'protection.donnees.dsi@aphp.fr'
   }
 }
 

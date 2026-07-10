@@ -9,8 +9,12 @@ import { OnboardingProvider, useOnboarding } from './OnboardingContext'
 import StepPlaceholder from './StepPlaceholder'
 import { ONBOARDING_STEPS } from './steps'
 import useStyles from './styles'
+import WarningNotice from './WarningNotice'
 import WelcomeScreen from './WelcomeScreen'
 import WizardShell from './WizardShell'
+
+const PROGRESS_ERROR_MESSAGE =
+  "Une erreur est survenue lors de l'enregistrement de votre progression. Veuillez réessayer."
 
 const getInitials = (name?: string) =>
   name
@@ -26,12 +30,10 @@ const getInitials = (name?: string) =>
 const OnboardingLayout = () => {
   const { classes } = useStyles()
   const displayName = useAppSelector((state) => state.me?.displayName)
-  const { screen, currentStep, subStep, isLastStep, saving, error, goNext, goBack } = useOnboarding()
-
-  const nextLabel = screen === 'welcome' ? 'Commencer' : isLastStep ? 'Terminer' : 'Continuer'
+  const { screen, currentStep, screenConfig, primaryLabel, saving, error, goNext, goBack } = useOnboarding()
 
   const activeStepConfig = ONBOARDING_STEPS[currentStep]
-  const ActiveScreen = activeStepConfig.screens?.[subStep]
+  const ActiveScreen = screenConfig?.component
 
   const header = (
     <>
@@ -53,7 +55,7 @@ const OnboardingLayout = () => {
         </Button>
       )}
       <Button variant="contained" onClick={goNext} disabled={saving} endIcon={<ArrowForwardIcon />}>
-        {nextLabel}
+        {primaryLabel}
       </Button>
     </>
   )
@@ -63,6 +65,8 @@ const OnboardingLayout = () => {
       header={header}
       steps={ONBOARDING_STEPS}
       activeStep={screen === 'welcome' ? -1 : currentStep}
+      banner={screenConfig?.showWarningBanner ? <WarningNotice variant="boxed" /> : undefined}
+      layout={screenConfig?.layout}
       footer={footer}
     >
       {screen === 'welcome' ? (
@@ -74,7 +78,7 @@ const OnboardingLayout = () => {
       )}
       {error && (
         <Typography role="alert" className={classes.error}>
-          Une erreur est survenue lors de l'enregistrement de votre progression. Veuillez réessayer.
+          {screenConfig?.primaryAction?.errorMessage ?? PROGRESS_ERROR_MESSAGE}
         </Typography>
       )}
     </WizardShell>

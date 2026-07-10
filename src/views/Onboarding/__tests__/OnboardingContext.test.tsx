@@ -5,13 +5,16 @@ import { Provider } from 'react-redux'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 const updateStep = vi.fn()
+const signCharterCall = vi.fn()
 
 vi.mock('services/aphp/serviceOnboarding', () => ({
-  default: { updateStep: (step: number) => updateStep(step) }
+  default: { updateStep: (step: number) => updateStep(step), signCharter: () => signCharterCall() }
 }))
 
 import onboardingReducer from 'state/onboarding'
 import { OnboardingProvider, useOnboarding } from '../OnboardingContext'
+
+const CHARTER_SUBSTEP = 7
 
 const renderOnboarding = (initialStep: number) => {
   const store = configureStore({ reducer: { onboarding: onboardingReducer } })
@@ -23,10 +26,22 @@ const renderOnboarding = (initialStep: number) => {
   return renderHook(() => useOnboarding(), { wrapper })
 }
 
+/** Walks the commitments step from its first screen up to the charter. */
+const goToCharter = async (result: { current: ReturnType<typeof useOnboarding> }) => {
+  for (let i = 0; i < CHARTER_SUBSTEP; i++) {
+    // eslint-disable-next-line no-await-in-loop
+    await act(async () => {
+      result.current.goNext()
+    })
+  }
+}
+
 describe('OnboardingContext', () => {
   beforeEach(() => {
     updateStep.mockReset()
+    signCharterCall.mockReset()
     updateStep.mockResolvedValue({ data: { onboarding_step: 1, onboarding_completed_at: null } })
+    signCharterCall.mockResolvedValue({ data: { charter_signed_at: '2026-07-09T09:30:00Z' } })
   })
 
   it('starts on the welcome screen when nothing is persisted', () => {
@@ -110,5 +125,56 @@ describe('OnboardingContext', () => {
     act(() => result.current.goNext())
     act(() => result.current.goBack())
     expect(result.current.screen).toBe('welcome')
+  })
+
+  it('labels the primary button `Signer` on the charter screen (US-3309)', async () => {
+    const { result } = renderOnboarding(1)
+    await goToCharter(result)
+    expect(result.current.subStep).toBe(CHARTER_SUBSTEP)
+    expect(result.current.primaryLabel).toBe('Signer')
+  })
+
+  it('signs the charter then moves to the confirmation screen', async () => {
+    const { result } = renderOnboarding(1)
+    await goToCharter(result)
+
+    await act(async () => {
+      result.current.goNext()
+    })
+
+    expect(signCharterCall).toHaveBeenCalledTimes(1)
+    expect(result.current.subStep).toBe(CHARTER_SUBSTEP + 1)
+    expect(result.current.primaryLabel).toBe('Continuer')
+  })
+
+  it('stays on the charter screen and raises an error when the signature fails', async () => {
+    signCharterCall.mockRejectedValue(new Error('boom'))
+    const { result } = renderOnboarding(1)
+    await goToCharter(result)
+
+    await act(async () => {
+      result.current.goNext()
+    })
+
+    expect(result.current.subStep).toBe(CHARTER_SUBSTEP)
+    expect(result.current.error).toBe(true)
+    expect(updateStep).not.toHaveBeenCalled()
+  })
+
+  it('does not sign twice when stepping back from the confirmation screen', async () => {
+    const { result } = renderOnboarding(1)
+    await goToCharter(result)
+    await act(async () => {
+      result.current.goNext()
+    })
+
+    act(() => result.current.goBack())
+    expect(result.current.subStep).toBe(CHARTER_SUBSTEP)
+    await act(async () => {
+      result.current.goNext()
+    })
+
+    expect(signCharterCall).toHaveBeenCalledTimes(1)
+    expect(result.current.subStep).toBe(CHARTER_SUBSTEP + 1)
   })
 })

@@ -10,7 +10,7 @@ import InfoBadge from 'components/ui/InfoBadge'
 import type { ComponentType } from 'react'
 import React from 'react'
 
-import useStyles from '../styles'
+import useStyles from '../../styles'
 
 const EDS_URL = 'https://eds.aphp.fr/'
 

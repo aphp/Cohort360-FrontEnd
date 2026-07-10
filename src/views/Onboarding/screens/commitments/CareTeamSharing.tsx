@@ -1,0 +1,25 @@
+import { Box, Typography } from '@mui/material'
+import React from 'react'
+
+import IllustrationPlaceholder from '../../IllustrationPlaceholder'
+import useStyles from '../../styles'
+
+const CareTeamSharing = () => {
+  const { classes } = useStyles()
+
+  return (
+    <Box>
+      <Typography variant="h6" className={classes.titleChip}>
+        Un partage limité à « l'équipe de soin »
+      </Typography>
+      <Typography className={classes.sectionText}>
+        Votre compte est défini par l'accès à un <strong>périmètre précis</strong>. Vous pouvez partager les données
+        associées à un patient ou groupe de patients{' '}
+        <strong>seulement avec les personnes ayant participé à leur prise en charge</strong>.
+      </Typography>
+      <IllustrationPlaceholder label="Illustration : partage restreint aux membres de l'équipe de soin" />
+    </Box>
+  )
+}
+
+export default CareTeamSharing
