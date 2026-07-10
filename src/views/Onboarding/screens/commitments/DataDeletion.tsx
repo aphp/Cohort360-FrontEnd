@@ -9,7 +9,7 @@ const DataDeletion = () => {
 
   return (
     <Box>
-      <Typography variant="h6" className={classes.titleChip}>
+      <Typography variant="h5" component="h2" className={classes.titleChip}>
         La suppression de vos données
       </Typography>
       <Typography className={classes.accentText}>

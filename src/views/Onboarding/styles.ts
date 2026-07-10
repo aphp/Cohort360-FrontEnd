@@ -256,15 +256,18 @@ const useStyles = makeStyles()((theme: Theme) => ({
     lineHeight: 1.5
   },
   titleChip: {
-    alignSelf: 'flex-start',
-    marginTop: theme.spacing(-6.5),
-    marginLeft: theme.spacing(-2),
+    // Inline-block so the chip hugs its label; it also straddles the top edge of the card.
+    display: 'inline-block',
+    marginTop: theme.spacing(-7),
     marginBottom: theme.spacing(2),
-    padding: theme.spacing(1, 2),
-    borderRadius: 6,
+    padding: theme.spacing(0.75, 2),
+    borderRadius: 8,
     backgroundColor: T.chipBg,
     color: T.surface,
+    fontSize: 16,
     fontWeight: 700,
+    lineHeight: 1.25,
+    textTransform: 'none',
     transform: `rotate(${T.chipTilt})`
   },
   accentText: {

@@ -10,7 +10,7 @@ const CareTeamSharing = () => {
 
   return (
     <Box>
-      <Typography variant="h6" className={classes.titleChip}>
+      <Typography variant="h5" component="h2" className={classes.titleChip}>
         Un partage limité à « l'équipe de soin »
       </Typography>
       <Typography className={classes.accentText}>

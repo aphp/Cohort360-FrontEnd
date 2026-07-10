@@ -12,7 +12,7 @@ const ActionsLogging = () => {
 
   return (
     <Box>
-      <Typography variant="h6" className={classes.titleChip}>
+      <Typography variant="h5" component="h2" className={classes.titleChip}>
         L'enregistrement de vos actions
       </Typography>
       <Typography className={classes.accentText}>
