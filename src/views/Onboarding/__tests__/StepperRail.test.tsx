@@ -18,15 +18,22 @@ describe('StepperRail', () => {
     expect(screen.getByText('Step C')).toBeInTheDocument()
   })
 
-  it('renders every step number', () => {
+  it('numbers the current and upcoming steps', () => {
     render(<StepperRail steps={steps} activeStep={1} />)
-    expect(screen.getByText('1')).toBeInTheDocument()
     expect(screen.getByText('2')).toBeInTheDocument()
     expect(screen.getByText('3')).toBeInTheDocument()
+  })
+
+  it('replaces the number of a completed step with a check mark', () => {
+    render(<StepperRail steps={steps} activeStep={1} />)
+    expect(screen.queryByText('1')).not.toBeInTheDocument()
+    expect(screen.getByTitle('Étape terminée')).toBeInTheDocument()
   })
 
   it('stays inactive when activeStep is -1', () => {
     render(<StepperRail steps={steps} activeStep={-1} />)
     expect(screen.getByText('Step A')).toBeInTheDocument()
+    expect(screen.getByText('1')).toBeInTheDocument()
+    expect(screen.queryByTitle('Étape terminée')).not.toBeInTheDocument()
   })
 })

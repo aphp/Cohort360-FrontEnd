@@ -27,10 +27,7 @@ const initialState: OnboardingState = {
 
 export const advanceOnboarding = createAsyncThunk<OnboardingProgress, number, { state: RootState }>(
   'onboarding/advance',
-  async (step) => {
-    const { data } = await serviceOnboarding.updateStep(step)
-    return data
-  }
+  (step) => serviceOnboarding.updateStep(step)
 )
 
 export const signCharter = createAsyncThunk<CharterSignature, void, { state: RootState }>(
@@ -41,8 +38,7 @@ export const signCharter = createAsyncThunk<CharterSignature, void, { state: Roo
     if (charterSignedAt !== null) {
       return { charter_signed_at: charterSignedAt }
     }
-    const { data } = await serviceOnboarding.signCharter()
-    return data
+    return serviceOnboarding.signCharter()
   }
 )
 

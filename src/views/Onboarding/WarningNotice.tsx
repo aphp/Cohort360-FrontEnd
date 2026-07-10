@@ -1,8 +1,10 @@
 import WarningRoundedIcon from '@mui/icons-material/WarningRounded'
 import { Box, Typography } from '@mui/material'
+import CircleBadge from 'components/ui/CircleBadge'
 import React from 'react'
 
 import useStyles from './styles'
+import { onboardingTokens } from './tokens'
 
 export const WARNING_NOTICE_TEXT =
   'L’utilisation que vous faites des données est tracée et engage votre responsabilité.'
@@ -14,17 +16,21 @@ type Props = {
 
 const WarningNotice = ({ variant }: Props) => {
   const { classes, cx } = useStyles()
+  const boxed = variant === 'boxed'
 
   return (
     <Box
       role="note"
-      data-testid={variant === 'boxed' ? 'onboarding-warning-banner' : 'onboarding-warning-inline'}
-      className={cx(
-        classes.warningNotice,
-        variant === 'boxed' ? classes.warningNoticeBoxed : classes.warningNoticeInline
-      )}
+      data-testid={boxed ? 'onboarding-warning-banner' : 'onboarding-warning-inline'}
+      className={cx(classes.warningNotice, boxed ? classes.warningNoticeBoxed : classes.warningNoticeInline)}
     >
-      <WarningRoundedIcon className={classes.warningIcon} fontSize="small" />
+      {boxed ? (
+        <WarningRoundedIcon className={classes.warningIcon} fontSize="small" />
+      ) : (
+        <CircleBadge color={onboardingTokens.warning} variant="filled" size={28} className={classes.warningBadge}>
+          <WarningRoundedIcon fontSize="inherit" />
+        </CircleBadge>
+      )}
       <Typography className={classes.warningText}>{WARNING_NOTICE_TEXT}</Typography>
     </Box>
   )

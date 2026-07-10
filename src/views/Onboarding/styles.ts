@@ -70,6 +70,10 @@ const useStyles = makeStyles()((theme: Theme) => ({
     borderColor: theme.palette.primary.main,
     color: theme.palette.primary.main
   },
+  stepCircleCompleted: {
+    borderColor: 'transparent',
+    color: theme.palette.primary.main
+  },
   stepLabel: {
     color: T.muted
   },
@@ -242,6 +246,9 @@ const useStyles = makeStyles()((theme: Theme) => ({
   warningIcon: {
     flexShrink: 0,
     color: T.warning
+  },
+  warningBadge: {
+    marginTop: theme.spacing(-0.25)
   },
   warningText: {
     color: T.warning,

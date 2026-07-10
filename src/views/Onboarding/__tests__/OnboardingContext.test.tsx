@@ -40,8 +40,8 @@ describe('OnboardingContext', () => {
   beforeEach(() => {
     updateStep.mockReset()
     signCharterCall.mockReset()
-    updateStep.mockResolvedValue({ data: { onboarding_step: 1, onboarding_completed_at: null } })
-    signCharterCall.mockResolvedValue({ data: { charter_signed_at: '2026-07-09T09:30:00Z' } })
+    updateStep.mockResolvedValue({ onboarding_step: 1, onboarding_completed_at: null })
+    signCharterCall.mockResolvedValue({ charter_signed_at: '2026-07-09T09:30:00Z' })
   })
 
   it('starts on the welcome screen when nothing is persisted', () => {

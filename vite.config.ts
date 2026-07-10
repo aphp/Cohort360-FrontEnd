@@ -8,6 +8,7 @@ import path from 'node:path'
 import { createRequire } from 'node:module'
 import { viteStaticCopy } from 'vite-plugin-static-copy'
 
+import { devOnboardingMock } from './vite-dev-onboarding-mock'
 import { buildDevProxy } from './vite-dev-proxy'
 
 const require = createRequire(import.meta.url)
@@ -42,6 +43,8 @@ export default defineConfig(({ mode }) => {
       ...(proxyKeys.length > 0 ? { proxy } : {})
     },
     plugins: [
+      // Before the /api/back proxy, so the mocked routes never reach the real back-end.
+      ...devOnboardingMock(env),
       react(),
       tsconfigPaths(),
       svgr(),
