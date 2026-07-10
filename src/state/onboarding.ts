@@ -1,5 +1,6 @@
-import type { PayloadAction } from '@reduxjs/toolkit'
+import type { Action, PayloadAction } from '@reduxjs/toolkit'
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
+import { REHYDRATE } from 'redux-persist'
 import serviceOnboarding, { type CharterSignature, type OnboardingProgress } from 'services/aphp/serviceOnboarding'
 import type { RootState } from 'state'
 import { logout } from 'state/me'
@@ -97,6 +98,16 @@ const onboardingSlice = createSlice({
       })
       .addCase(logout.fulfilled, () => initialState)
       .addCase(logout.rejected, () => initialState)
+      // The slice is persisted: an in-flight request that never settled would otherwise
+      // restore `saving: true` on reload and leave the journey buttons disabled forever.
+      .addMatcher(
+        (action: Action): action is Action => action.type === REHYDRATE,
+        (state) => {
+          state.saving = false
+          state.error = false
+          state.previousStep = null
+        }
+      )
   }
 })
 

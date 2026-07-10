@@ -1,3 +1,4 @@
+import { REHYDRATE } from 'redux-persist'
 import type { RootState } from 'state'
 import { logout } from 'state/me'
 import onboardingReducer, {
@@ -62,6 +63,15 @@ describe('onboarding reducer', () => {
     const completed: OnboardingState = { ...initialState, step: 3, completedAt: '2026-06-29T10:00:00Z' }
     const state = onboardingReducer(completed, logout.fulfilled(null, 'req'))
     expect(state).toEqual(initialState)
+  })
+
+  it('clears transient flags on rehydration so a stale `saving` cannot disable the buttons', () => {
+    const stuck: OnboardingState = { ...initialState, step: 1, saving: true, error: true, previousStep: 0 }
+    const state = onboardingReducer(stuck, { type: REHYDRATE })
+    expect(state.saving).toBe(false)
+    expect(state.error).toBe(false)
+    expect(state.previousStep).toBeNull()
+    expect(state.step).toBe(1)
   })
 
   it('records the charter signature timestamp on success (RG3309.02)', () => {
