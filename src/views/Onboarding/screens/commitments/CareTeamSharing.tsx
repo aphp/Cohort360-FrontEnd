@@ -1,7 +1,8 @@
+import CareTeamSharingArtwork from 'assets/images/onboarding/care-team-sharing.svg?react'
 import { Box, Typography } from '@mui/material'
 import React from 'react'
 
-import IllustrationPlaceholder from '../../IllustrationPlaceholder'
+import Illustration from '../../Illustration'
 import useStyles from '../../styles'
 
 const CareTeamSharing = () => {
@@ -17,7 +18,10 @@ const CareTeamSharing = () => {
         associées à un patient ou groupe de patients{' '}
         <strong>seulement avec les personnes ayant participé à leur prise en charge</strong>.
       </Typography>
-      <IllustrationPlaceholder label="Illustration : partage restreint aux membres de l'équipe de soin" />
+      <Illustration
+        image={CareTeamSharingArtwork}
+        label="Le partage est restreint aux personnes ayant participé à la prise en charge"
+      />
     </Box>
   )
 }

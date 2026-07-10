@@ -1,8 +1,9 @@
+import ActionsLoggingArtwork from 'assets/images/onboarding/actions-logging.svg?react'
 import { Box, Link, Typography } from '@mui/material'
 import { getConfig } from 'config'
 import React from 'react'
 
-import IllustrationPlaceholder from '../../IllustrationPlaceholder'
+import Illustration from '../../Illustration'
 import useStyles from '../../styles'
 
 const ActionsLogging = () => {
@@ -26,7 +27,7 @@ const ActionsLogging = () => {
         </Link>
         .
       </Typography>
-      <IllustrationPlaceholder label="Illustration : enregistrement et conservation des actions" />
+      <Illustration image={ActionsLoggingArtwork} label="Vos actions sont enregistrées et conservées" />
     </Box>
   )
 }

@@ -1,7 +1,8 @@
+import DataCrossingArtwork from 'assets/images/onboarding/data-crossing.svg?react'
 import { Box, Typography } from '@mui/material'
 import React from 'react'
 
-import IllustrationPlaceholder from '../../IllustrationPlaceholder'
+import Illustration from '../../Illustration'
 import useStyles from '../../styles'
 
 const DataCrossing = () => {
@@ -16,7 +17,7 @@ const DataCrossing = () => {
         Le croisement des données obtenues grâce à Cohort360 avec des données issues d'autres bases de données est{' '}
         <strong>formellement interdit</strong>.
       </Typography>
-      <IllustrationPlaceholder label="Illustration : croisement interdit entre deux jeux de données" />
+      <Illustration image={DataCrossingArtwork} label="Le croisement entre deux jeux de données est interdit" />
     </Box>
   )
 }

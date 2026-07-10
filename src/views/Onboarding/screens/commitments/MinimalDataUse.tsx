@@ -1,7 +1,8 @@
+import MinimalDataUseArtwork from 'assets/images/onboarding/minimal-data-use.svg?react'
 import { Box, Typography } from '@mui/material'
 import React from 'react'
 
-import IllustrationPlaceholder from '../../IllustrationPlaceholder'
+import Illustration from '../../Illustration'
 import useStyles from '../../styles'
 
 const MinimalDataUse = () => {
@@ -16,7 +17,10 @@ const MinimalDataUse = () => {
         En utilisant Cohort360, vous vous engagez à utiliser uniquement les données strictement nécessaires à votre
         recherche.
       </Typography>
-      <IllustrationPlaceholder label="Illustration : sélection du sous-ensemble de données strictement nécessaire" />
+      <Illustration
+        image={MinimalDataUseArtwork}
+        label="Seul le sous-ensemble de données strictement nécessaire est utilisé"
+      />
     </Box>
   )
 }

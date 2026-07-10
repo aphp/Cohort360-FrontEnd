@@ -13,7 +13,5 @@ export const onboardingTokens = {
   tileBg: '#F5F8FE',
   warning: '#E5007D',
   chipBg: '#1D4F9B',
-  documentBg: '#7F7F7F',
-  placeholderBorder: '#B9CDF2',
-  placeholderFg: '#7B8CA6'
+  documentBg: '#7F7F7F'
 } as const

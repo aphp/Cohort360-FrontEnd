@@ -269,17 +269,11 @@ const useStyles = makeStyles()((theme: Theme) => ({
     justifyContent: 'center',
     marginTop: theme.spacing(4)
   },
-  illustrationPlaceholder: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
+  illustration: {
+    // The exported artwork carries fixed width/height attributes: override them to scale down.
     width: '100%',
-    minHeight: 160,
-    padding: theme.spacing(2),
-    borderRadius: 6,
-    border: `1px dashed ${T.placeholderBorder}`,
-    color: T.placeholderFg,
-    textAlign: 'center'
+    height: 'auto',
+    maxWidth: 552
   },
   deletionIcon: {
     width: 56,
