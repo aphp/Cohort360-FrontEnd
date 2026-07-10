@@ -22,6 +22,9 @@ const clampRatio = (value: number) => Math.min(Math.max(value, 0), 1)
 /**
  * Rendered by hand rather than with MUI's Stepper: the connector below the active step
  * fills up as its screens are visited, which a plain `StepConnector` cannot express.
+ *
+ * Each item is a head (circle and label, vertically centred on one another) above a tail
+ * holding the segment, so a two-line label stays centred on its circle.
  */
 const StepperRail = ({ steps, activeStep, stepProgress = 0 }: Props) => {
   const { classes, cx } = useStyles()
@@ -41,7 +44,7 @@ const StepperRail = ({ steps, activeStep, stepProgress = 0 }: Props) => {
 
         return (
           <li key={step.key} className={classes.railItem}>
-            <Box className={classes.railMarker}>
+            <Box className={classes.railHead}>
               <span
                 className={cx(
                   classes.stepCircle,
@@ -51,19 +54,21 @@ const StepperRail = ({ steps, activeStep, stepProgress = 0 }: Props) => {
               >
                 {completed ? <CheckIcon fontSize="small" titleAccess="Étape terminée" /> : index + 1}
               </span>
-              {!isLast && (
+              <Typography
+                component="span"
+                aria-current={active ? 'step' : undefined}
+                className={cx(classes.stepLabel, active && classes.stepLabelActive)}
+              >
+                {step.label}
+              </Typography>
+            </Box>
+            {!isLast && (
+              <Box className={classes.railTail}>
                 <span className={classes.railSegment} aria-hidden>
                   <span className={classes.railSegmentFill} style={{ height: `${fillOf(index) * 100}%` }} />
                 </span>
-              )}
-            </Box>
-            <Typography
-              component="span"
-              aria-current={active ? 'step' : undefined}
-              className={cx(classes.stepLabel, active && classes.stepLabelActive)}
-            >
-              {step.label}
-            </Typography>
+              </Box>
+            )}
           </li>
         )
       })}

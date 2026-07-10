@@ -40,6 +40,15 @@ describe('StepperRail', () => {
     expect(screen.getByText('Step C')).not.toHaveAttribute('aria-current')
   })
 
+  it('centres each label on its circle rather than on the whole item', () => {
+    const { container } = render(<StepperRail steps={steps} activeStep={1} />)
+    const head = screen.getByText('Step B').parentElement as HTMLElement
+    expect(getComputedStyle(head).alignItems).toBe('center')
+    // The segment hangs below the head, so it never stretches the row the label sits in.
+    expect(head.querySelector('[aria-hidden]')).toBeNull()
+    expect(container.querySelectorAll('[aria-hidden]')).toHaveLength(steps.length - 1)
+  })
+
   it('draws one segment fewer than there are steps', () => {
     const { container } = render(<StepperRail steps={steps} activeStep={0} />)
     expect(segmentFills(container)).toHaveLength(steps.length - 1)

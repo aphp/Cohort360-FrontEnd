@@ -62,20 +62,23 @@ const useStyles = makeStyles()((theme: Theme) => ({
   },
   railItem: {
     display: 'flex',
-    alignItems: 'flex-start',
+    flexDirection: 'column'
+  },
+  railHead: {
+    display: 'flex',
+    // Centres the label on the circle, however many lines the label takes.
+    alignItems: 'center',
     gap: theme.spacing(2)
   },
-  railMarker: {
+  railTail: {
+    // As wide as the circle, so the segment hangs from its centre.
+    width: 28,
     display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    // Stretches to the item's height so the segment fills whatever the label leaves.
-    alignSelf: 'stretch'
+    justifyContent: 'center'
   },
   railSegment: {
-    flex: 1,
     width: 2,
-    minHeight: 40,
+    height: 40,
     marginTop: theme.spacing(0.5),
     marginBottom: theme.spacing(0.5),
     backgroundColor: T.railTodo
@@ -110,8 +113,7 @@ const useStyles = makeStyles()((theme: Theme) => ({
   },
   stepLabel: {
     color: T.railInactiveFg,
-    lineHeight: 1.35,
-    paddingTop: theme.spacing(0.25)
+    lineHeight: 1.35
   },
   stepLabelActive: {
     color: T.ink,
