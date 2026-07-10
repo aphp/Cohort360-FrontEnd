@@ -8,11 +8,11 @@ const DataDeletion = () => {
   const { classes } = useStyles()
 
   return (
-    <Box className={classes.accentScreen}>
-      <Typography variant="h5" component="h2" className={classes.titleChip}>
+    <Box>
+      <Typography variant="h4" className={classes.title}>
         La suppression de vos données
       </Typography>
-      <Typography className={classes.accentText}>
+      <Typography className={classes.sectionText}>
         Vous devez <strong>détruire toutes données sur supports mobiles</strong> dès la fin de leur utilisation. Par
         ailleurs, vous vous engagez à demander la <strong>clôture des accès</strong>, si nécessaire de manière
         anticipée, dès que ces derniers ne sont plus requis.

@@ -8,13 +8,13 @@ type Props = {
   header?: React.ReactNode
   steps: StepperItem[]
   activeStep: number
-  banner?: React.ReactNode
+  stepProgress?: number
   layout?: 'card' | 'bare'
   children: React.ReactNode
   footer?: React.ReactNode
 }
 
-const WizardShell = ({ header, steps, activeStep, banner, layout = 'card', children, footer }: Props) => {
+const WizardShell = ({ header, steps, activeStep, stepProgress, layout = 'card', children, footer }: Props) => {
   const { classes } = useStyles()
 
   return (
@@ -23,10 +23,9 @@ const WizardShell = ({ header, steps, activeStep, banner, layout = 'card', child
       <Box className={classes.body}>
         <Box className={classes.group}>
           <Box className={classes.stepper}>
-            <StepperRail steps={steps} activeStep={activeStep} />
+            <StepperRail steps={steps} activeStep={activeStep} stepProgress={stepProgress} />
           </Box>
           <Box className={classes.contentCol}>
-            {banner}
             {layout === 'card' ? <Box className={classes.card}>{children}</Box> : children}
             {footer && <Box className={classes.footer}>{footer}</Box>}
           </Box>

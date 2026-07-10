@@ -52,17 +52,16 @@ describe('Onboarding page', () => {
     expect(screen.getByText('Bienvenue !')).toBeInTheDocument()
   })
 
-  it('resumes on the first commitments screen, warning inside the card and not as a banner', async () => {
+  it('shows the warning on the opening commitments screen only', async () => {
     const user = userEvent.setup()
     renderAt({ ...baseState, step: 1 })
 
     expect(screen.getByText("Les règles d'utilisation des données dans Cohort360")).toBeInTheDocument()
-    expect(screen.getByTestId('onboarding-warning-inline')).toBeInTheDocument()
-    expect(screen.queryByTestId('onboarding-warning-banner')).not.toBeInTheDocument()
+    expect(screen.getByTestId('onboarding-warning')).toBeInTheDocument()
 
     await user.click(screen.getByRole('button', { name: /Continuer/ }))
     expect(screen.getByText("L'enregistrement de vos actions")).toBeInTheDocument()
-    expect(screen.getByTestId('onboarding-warning-banner')).toBeInTheDocument()
+    expect(screen.queryByTestId('onboarding-warning')).not.toBeInTheDocument()
   })
 
   it('falls back to the step placeholder while a step has no screen yet', () => {

@@ -1,13 +1,5 @@
 import CheckIcon from '@mui/icons-material/Check'
-import {
-  Step,
-  StepConnector,
-  stepConnectorClasses,
-  type StepIconProps,
-  StepLabel,
-  Stepper,
-  styled
-} from '@mui/material'
+import { Box, Typography } from '@mui/material'
 import React from 'react'
 
 import useStyles from './styles'
@@ -19,37 +11,63 @@ export type StepperItem = {
 
 type Props = {
   steps: StepperItem[]
+  /** -1 while the welcome screen is shown, so that no step reads as reached. */
   activeStep: number
+  /** How far the active step has travelled through its own screens, from 0 to 1. */
+  stepProgress?: number
 }
 
-const RailConnector = styled(StepConnector)(({ theme }) => ({
-  [`& .${stepConnectorClasses.line}`]: {
-    borderColor: theme.palette.primary.main
-  }
-}))
+const clampRatio = (value: number) => Math.min(Math.max(value, 0), 1)
 
-const StepperRail = ({ steps, activeStep }: Props) => {
+/**
+ * Rendered by hand rather than with MUI's Stepper: the connector below the active step
+ * fills up as its screens are visited, which a plain `StepConnector` cannot express.
+ */
+const StepperRail = ({ steps, activeStep, stepProgress = 0 }: Props) => {
   const { classes, cx } = useStyles()
 
-  const StepNumber = ({ icon, active, completed }: StepIconProps) => (
-    <span
-      className={cx(classes.stepCircle, active && classes.stepCircleActive, completed && classes.stepCircleCompleted)}
-    >
-      {completed ? <CheckIcon fontSize="small" titleAccess="Étape terminée" /> : icon}
-    </span>
-  )
+  const fillOf = (index: number) => {
+    if (index < activeStep) return 1
+    if (index === activeStep) return clampRatio(stepProgress)
+    return 0
+  }
 
-  // Linear on purpose: MUI derives `completed` from activeStep, and the rail is not clickable.
   return (
-    <Stepper activeStep={activeStep} orientation="vertical" connector={<RailConnector />}>
-      {steps.map((step) => (
-        <Step key={step.key}>
-          <StepLabel StepIconComponent={StepNumber} classes={{ label: classes.stepLabel }}>
-            {step.label}
-          </StepLabel>
-        </Step>
-      ))}
-    </Stepper>
+    <ol className={classes.rail}>
+      {steps.map((step, index) => {
+        const completed = index < activeStep
+        const active = index === activeStep
+        const isLast = index === steps.length - 1
+
+        return (
+          <li key={step.key} className={classes.railItem}>
+            <Box className={classes.railMarker}>
+              <span
+                className={cx(
+                  classes.stepCircle,
+                  completed && classes.stepCircleCompleted,
+                  active && classes.stepCircleActive
+                )}
+              >
+                {completed ? <CheckIcon fontSize="small" titleAccess="Étape terminée" /> : index + 1}
+              </span>
+              {!isLast && (
+                <span className={classes.railSegment} aria-hidden>
+                  <span className={classes.railSegmentFill} style={{ height: `${fillOf(index) * 100}%` }} />
+                </span>
+              )}
+            </Box>
+            <Typography
+              component="span"
+              aria-current={active ? 'step' : undefined}
+              className={cx(classes.stepLabel, active && classes.stepLabelActive)}
+            >
+              {step.label}
+            </Typography>
+          </li>
+        )
+      })}
+    </ol>
   )
 }
 

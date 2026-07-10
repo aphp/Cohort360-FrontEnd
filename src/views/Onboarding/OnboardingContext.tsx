@@ -17,6 +17,8 @@ type OnboardingContextValue = {
   error: boolean
   isFirstStep: boolean
   isLastStep: boolean
+  /** Share of the current step's screens already left behind, from 0 to 1. */
+  stepProgress: number
   screenConfig?: OnboardingScreenConfig
   primaryLabel: string
   goNext: () => void
@@ -108,6 +110,7 @@ export const OnboardingProvider = ({ initialStep, children }: ProviderProps) => 
       error,
       isFirstStep,
       isLastStep,
+      stepProgress: screen === 'welcome' ? 0 : subStep / screenCount,
       screenConfig,
       primaryLabel: screenConfig?.primaryAction?.label ?? defaultLabel,
       goNext,

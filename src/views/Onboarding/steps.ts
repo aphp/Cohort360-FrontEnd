@@ -34,8 +34,6 @@ export type OnboardingPrimaryAction = {
 export type OnboardingScreenConfig = {
   key: string
   component: ComponentType
-  /** Displays the responsibility banner above the card. */
-  showWarningBanner?: boolean
   /** `bare` drops the white card, for screens bringing their own container. */
   layout?: 'card' | 'bare'
   primaryAction?: OnboardingPrimaryAction
@@ -69,12 +67,12 @@ export const ONBOARDING_STEPS: OnboardingStepConfig[] = [
     icon: HistoryEduIcon,
     screens: [
       { key: 'usage-rules', component: UsageRules },
-      { key: 'actions-logging', component: ActionsLogging, showWarningBanner: true },
-      { key: 'care-team-sharing', component: CareTeamSharing, showWarningBanner: true },
+      { key: 'actions-logging', component: ActionsLogging },
+      { key: 'care-team-sharing', component: CareTeamSharing },
       { key: 'data-crossing', component: DataCrossing },
       { key: 'minimal-data-use', component: MinimalDataUse },
       { key: 'usage-purposes', component: UsagePurposes },
-      { key: 'data-deletion', component: DataDeletion, showWarningBanner: true },
+      { key: 'data-deletion', component: DataDeletion },
       {
         key: 'charter-signature',
         component: CharterSignature,

@@ -9,7 +9,6 @@ import { OnboardingProvider, useOnboarding } from './OnboardingContext'
 import StepPlaceholder from './StepPlaceholder'
 import { ONBOARDING_STEPS } from './steps'
 import useStyles from './styles'
-import WarningNotice from './WarningNotice'
 import WelcomeScreen from './WelcomeScreen'
 import WizardShell from './WizardShell'
 
@@ -30,7 +29,8 @@ const getInitials = (name?: string) =>
 const OnboardingLayout = () => {
   const { classes } = useStyles()
   const displayName = useAppSelector((state) => state.me?.displayName)
-  const { screen, currentStep, screenConfig, primaryLabel, saving, error, goNext, goBack } = useOnboarding()
+  const { screen, currentStep, screenConfig, stepProgress, primaryLabel, saving, error, goNext, goBack } =
+    useOnboarding()
 
   const activeStepConfig = ONBOARDING_STEPS[currentStep]
   const ActiveScreen = screenConfig?.component
@@ -65,7 +65,7 @@ const OnboardingLayout = () => {
       header={header}
       steps={ONBOARDING_STEPS}
       activeStep={screen === 'welcome' ? -1 : currentStep}
-      banner={screenConfig?.showWarningBanner ? <WarningNotice variant="boxed" /> : undefined}
+      stepProgress={stepProgress}
       layout={screenConfig?.layout}
       footer={footer}
     >

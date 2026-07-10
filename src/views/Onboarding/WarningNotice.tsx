@@ -9,28 +9,15 @@ import { onboardingTokens } from './tokens'
 export const WARNING_NOTICE_TEXT =
   'L’utilisation que vous faites des données est tracée et engage votre responsabilité.'
 
-type Props = {
-  /** `boxed` is the banner standing above the card, `inline` sits inside the card content. */
-  variant: 'boxed' | 'inline'
-}
-
-const WarningNotice = ({ variant }: Props) => {
-  const { classes, cx } = useStyles()
-  const boxed = variant === 'boxed'
+/** Shown once, on the opening screen of the commitments step (RG3308.02, revised mockups). */
+const WarningNotice = () => {
+  const { classes } = useStyles()
 
   return (
-    <Box
-      role="note"
-      data-testid={boxed ? 'onboarding-warning-banner' : 'onboarding-warning-inline'}
-      className={cx(classes.warningNotice, boxed ? classes.warningNoticeBoxed : classes.warningNoticeInline)}
-    >
-      {boxed ? (
-        <WarningRoundedIcon className={classes.warningIcon} fontSize="small" />
-      ) : (
-        <CircleBadge color={onboardingTokens.warning} variant="filled" size={28} className={classes.warningBadge}>
-          <WarningRoundedIcon fontSize="inherit" />
-        </CircleBadge>
-      )}
+    <Box role="note" data-testid="onboarding-warning" className={classes.warningNotice}>
+      <CircleBadge color={onboardingTokens.warning} variant="filled" size={28} className={classes.warningBadge}>
+        <WarningRoundedIcon fontSize="inherit" />
+      </CircleBadge>
       <Typography className={classes.warningText}>{WARNING_NOTICE_TEXT}</Typography>
     </Box>
   )

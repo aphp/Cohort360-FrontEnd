@@ -16,7 +16,7 @@ const UsageRules = () => {
         En demandant un accès à Cohort360, vous vous engagez à respecter plusieurs règles d'utilisation des données de
         santé de l'EDS.
       </Typography>
-      <WarningNotice variant="inline" />
+      <WarningNotice />
     </Box>
   )
 }

@@ -127,6 +127,21 @@ describe('OnboardingContext', () => {
     expect(result.current.screen).toBe('welcome')
   })
 
+  it('reports no progress on the welcome screen', () => {
+    const { result } = renderOnboarding(0)
+    expect(result.current.stepProgress).toBe(0)
+  })
+
+  it('advances stepProgress as the screens of a step are left behind', () => {
+    const { result } = renderOnboarding(0)
+    act(() => result.current.goNext()) // welcome -> first of four screens
+    expect(result.current.stepProgress).toBe(0)
+    act(() => result.current.goNext())
+    expect(result.current.stepProgress).toBe(0.25)
+    act(() => result.current.goNext())
+    expect(result.current.stepProgress).toBe(0.5)
+  })
+
   it('refuses to be used outside its provider', () => {
     expect(() => renderHook(() => useOnboarding())).toThrow(/must be used within an OnboardingProvider/)
   })

@@ -40,7 +40,8 @@ const useStyles = makeStyles()((theme: Theme) => ({
   body: {
     flex: 1,
     display: 'flex',
-    alignItems: 'center',
+    // Anchored to the top rather than centred: the rail must not drift when a card grows.
+    alignItems: 'flex-start',
     justifyContent: 'center',
     padding: theme.spacing(6)
   },
@@ -51,15 +52,47 @@ const useStyles = makeStyles()((theme: Theme) => ({
   },
   stepper: {
     marginTop: theme.spacing(3),
-    minWidth: 200
+    width: 220,
+    flexShrink: 0
+  },
+  rail: {
+    listStyle: 'none',
+    margin: 0,
+    padding: 0
+  },
+  railItem: {
+    display: 'flex',
+    alignItems: 'flex-start',
+    gap: theme.spacing(2)
+  },
+  railMarker: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    // Stretches to the item's height so the segment fills whatever the label leaves.
+    alignSelf: 'stretch'
+  },
+  railSegment: {
+    flex: 1,
+    width: 2,
+    minHeight: 40,
+    marginTop: theme.spacing(0.5),
+    marginBottom: theme.spacing(0.5),
+    backgroundColor: T.railTodo
+  },
+  railSegmentFill: {
+    display: 'block',
+    width: '100%',
+    backgroundColor: T.railDone
   },
   stepCircle: {
+    flexShrink: 0,
     width: 28,
     height: 28,
     borderRadius: '50%',
-    border: `2px solid ${T.stepCircleBorder}`,
+    border: `2px solid ${T.railTodo}`,
     backgroundColor: T.surface,
-    color: T.stepCircleInactive,
+    color: T.railDone,
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
@@ -67,15 +100,22 @@ const useStyles = makeStyles()((theme: Theme) => ({
     fontWeight: 700
   },
   stepCircleActive: {
-    borderColor: theme.palette.primary.main,
-    color: theme.palette.primary.main
+    border: 'none',
+    backgroundColor: T.railDone,
+    color: T.surface
   },
   stepCircleCompleted: {
-    borderColor: 'transparent',
-    color: theme.palette.primary.main
+    border: 'none',
+    color: T.railDone
   },
   stepLabel: {
-    color: T.muted
+    color: T.railInactiveFg,
+    lineHeight: 1.35,
+    paddingTop: theme.spacing(0.25)
+  },
+  stepLabelActive: {
+    color: T.ink,
+    fontWeight: 600
   },
   contentCol: {
     display: 'flex',
@@ -231,21 +271,8 @@ const useStyles = makeStyles()((theme: Theme) => ({
   warningNotice: {
     display: 'flex',
     alignItems: 'flex-start',
-    gap: theme.spacing(1.5)
-  },
-  warningNoticeBoxed: {
-    padding: theme.spacing(2),
-    marginBottom: theme.spacing(3),
-    borderRadius: 6,
-    border: `1px solid ${T.warning}`,
-    backgroundColor: T.surface
-  },
-  warningNoticeInline: {
+    gap: theme.spacing(1.5),
     marginTop: theme.spacing(3)
-  },
-  warningIcon: {
-    flexShrink: 0,
-    color: T.warning
   },
   warningBadge: {
     marginTop: theme.spacing(-0.25)
@@ -255,47 +282,8 @@ const useStyles = makeStyles()((theme: Theme) => ({
     fontWeight: 600,
     lineHeight: 1.5
   },
-  // Anchors the chip title, which is lifted out of the flow to straddle the card edge.
-  accentScreen: {
-    position: 'relative'
-  },
-  titleChip: {
-    /*
-     * Taken out of the flow so it does not push the body copy down: the mockup keeps the
-     * card's usual top padding. Half of the chip's height sits above the card's top border,
-     * hence the -50% translation stacked on the tilt.
-     */
-    position: 'absolute',
-    top: theme.spacing(-5),
-    left: 0,
-    display: 'inline-block',
-    padding: theme.spacing(0.75, 2),
-    borderRadius: 8,
-    backgroundColor: T.chipBg,
-    color: T.surface,
-    fontSize: 16,
-    fontWeight: 700,
-    lineHeight: 1.25,
-    textTransform: 'none',
-    transform: `translateY(-50%) rotate(${T.chipTilt})`
-  },
-  accentText: {
-    color: T.accentInk,
-    marginTop: theme.spacing(2),
-    lineHeight: 1.6
-  },
-  accentTextTight: {
-    marginTop: theme.spacing(1)
-  },
-  accentLink: {
-    color: T.accentInk,
-    textDecoration: 'underline',
-    '&:hover': {
-      textDecoration: 'none'
-    }
-  },
   bareTitle: {
-    color: T.chipBg,
+    color: T.deepBlue,
     fontWeight: 700,
     marginBottom: theme.spacing(4)
   },
@@ -313,7 +301,7 @@ const useStyles = makeStyles()((theme: Theme) => ({
   deletionIcon: {
     width: 56,
     height: 56,
-    backgroundColor: T.chipBg
+    backgroundColor: T.deepBlue
   },
   documentViewer: {
     padding: theme.spacing(3),
@@ -336,7 +324,8 @@ const useStyles = makeStyles()((theme: Theme) => ({
     backgroundColor: T.surface
   },
   confirmationIcon: {
-    alignSelf: 'center',
+    display: 'block',
+    margin: '0 auto',
     fontSize: 72,
     color: theme.palette.success.main
   },

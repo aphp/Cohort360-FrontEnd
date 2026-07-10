@@ -9,11 +9,11 @@ const CareTeamSharing = () => {
   const { classes } = useStyles()
 
   return (
-    <Box className={classes.accentScreen}>
-      <Typography variant="h5" component="h2" className={classes.titleChip}>
+    <Box>
+      <Typography variant="h4" className={classes.title}>
         Un partage limité à « l'équipe de soin »
       </Typography>
-      <Typography className={classes.accentText}>
+      <Typography className={classes.sectionText}>
         Votre compte est défini par l'accès à un <strong>périmètre précis</strong>. Vous pouvez partager les données
         associées à un patient ou groupe de patients{' '}
         <strong>seulement avec les personnes ayant participé à leur prise en charge</strong>.

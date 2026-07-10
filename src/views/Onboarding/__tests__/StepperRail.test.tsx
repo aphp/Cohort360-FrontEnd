@@ -10,6 +10,10 @@ const steps = [
   { key: 'c', label: 'Step C' }
 ]
 
+/** One segment per step except the last; each holds the filled part as its only child. */
+const segmentFills = (container: HTMLElement) =>
+  Array.from(container.querySelectorAll('[aria-hidden] > span')).map((node) => (node as HTMLElement).style.height)
+
 describe('StepperRail', () => {
   it('renders a label per step', () => {
     render(<StepperRail steps={steps} activeStep={0} />)
@@ -30,9 +34,35 @@ describe('StepperRail', () => {
     expect(screen.getByTitle('Étape terminée')).toBeInTheDocument()
   })
 
-  it('stays inactive when activeStep is -1', () => {
-    render(<StepperRail steps={steps} activeStep={-1} />)
-    expect(screen.getByText('Step A')).toBeInTheDocument()
+  it('marks only the active step for assistive technologies', () => {
+    render(<StepperRail steps={steps} activeStep={1} />)
+    expect(screen.getByText('Step B')).toHaveAttribute('aria-current', 'step')
+    expect(screen.getByText('Step C')).not.toHaveAttribute('aria-current')
+  })
+
+  it('draws one segment fewer than there are steps', () => {
+    const { container } = render(<StepperRail steps={steps} activeStep={0} />)
+    expect(segmentFills(container)).toHaveLength(steps.length - 1)
+  })
+
+  it('fills the segments of the steps already left behind', () => {
+    const { container } = render(<StepperRail steps={steps} activeStep={1} stepProgress={0} />)
+    expect(segmentFills(container)).toEqual(['100%', '0%'])
+  })
+
+  it('advances the segment below the active step as its screens are visited', () => {
+    const { container } = render(<StepperRail steps={steps} activeStep={1} stepProgress={0.25} />)
+    expect(segmentFills(container)).toEqual(['100%', '25%'])
+  })
+
+  it('clamps an out-of-range progress', () => {
+    const { container } = render(<StepperRail steps={steps} activeStep={0} stepProgress={1.8} />)
+    expect(segmentFills(container)[0]).toBe('100%')
+  })
+
+  it('leaves every segment empty on the welcome screen', () => {
+    const { container } = render(<StepperRail steps={steps} activeStep={-1} />)
+    expect(segmentFills(container)).toEqual(['0%', '0%'])
     expect(screen.getByText('1')).toBeInTheDocument()
     expect(screen.queryByTitle('Étape terminée')).not.toBeInTheDocument()
   })

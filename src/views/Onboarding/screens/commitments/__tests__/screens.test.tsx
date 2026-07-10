@@ -9,10 +9,10 @@ import UsagePurposes from '../UsagePurposes'
 import UsageRules from '../UsageRules'
 
 describe('UsageRules', () => {
-  it('introduces the commitments and carries the warning inside the card', () => {
+  it('introduces the commitments and is the only screen carrying the warning', () => {
     render(<UsageRules />)
     expect(screen.getByRole('heading')).toHaveTextContent("Les règles d'utilisation des données dans Cohort360")
-    expect(screen.getByTestId('onboarding-warning-inline')).toBeInTheDocument()
+    expect(screen.getByTestId('onboarding-warning')).toBeInTheDocument()
   })
 })
 

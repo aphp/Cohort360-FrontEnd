@@ -7,26 +7,26 @@ import Illustration from '../../Illustration'
 import useStyles from '../../styles'
 
 const ActionsLogging = () => {
-  const { classes, cx } = useStyles()
+  const { classes } = useStyles()
   const { mailDataProtection } = getConfig().system
 
   return (
-    <Box className={classes.accentScreen}>
-      <Typography variant="h5" component="h2" className={classes.titleChip}>
+    <Box>
+      <Typography variant="h4" className={classes.title}>
         L'enregistrement de vos actions
       </Typography>
-      <Typography className={classes.accentText}>
+      <Typography className={classes.sectionText}>
         <strong>
           À chaque connexion à Cohort360, vos actions sont enregistrées par la DSI et conservées pendant 3 ans.
         </strong>
       </Typography>
-      <Typography className={classes.accentText}>
+      <Typography className={classes.sectionText}>
         Ces données sont utilisées pour assurer la sécurité du système, réaliser des statistiques d'usage et répondre
         aux demandes d'audit de la CNIL.
       </Typography>
-      <Typography className={cx(classes.accentText, classes.accentTextTight)}>
+      <Typography className={classes.sectionText}>
         Vous pouvez accéder à vos données et les rectifier via{' '}
-        <Link className={classes.accentLink} href={`mailto:${mailDataProtection}`}>
+        <Link className={classes.link} href={`mailto:${mailDataProtection}`}>
           {mailDataProtection}
         </Link>
         .

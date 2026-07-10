@@ -8,14 +8,12 @@ export const onboardingTokens = {
   stepIconBg: '#FBE7D5',
   stepIconFg: '#C77B3B',
   avatarBg: '#5BC5F2',
-  stepCircleBorder: '#C4D3E8',
-  stepCircleInactive: '#9AA7B8',
   tileBg: '#F5F8FE',
   warning: '#E5007D',
-  // The three screens carrying the responsibility banner share a blue treatment:
-  // a tilted chip title over the card edge, and blue body copy instead of grey.
-  chipBg: '#0062AB',
-  chipTilt: '-1deg',
-  accentInk: '#052C5F',
-  documentBg: '#7F7F7F'
+  deepBlue: '#0062AB',
+  documentBg: '#7F7F7F',
+  // Rail: the travelled part is deep blue, what remains is a pale tint of it.
+  railDone: '#1D4F9B',
+  railTodo: '#A9C4EA',
+  railInactiveFg: '#5B6472'
 } as const
