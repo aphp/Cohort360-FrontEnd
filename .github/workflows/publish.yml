@@ -11,6 +11,7 @@ on:
     branches:
       - main
       - develop
+      - frontend-frigo
       - 'release/**'
 
 jobs:
@@ -50,6 +51,9 @@ jobs:
               ;;
             develop)
               echo "IMAGE_TAGS=${DOCKER_REPO}:develop" >> "$GITHUB_ENV"
+              ;;
+            frontend-frigo)
+              echo "IMAGE_TAGS=${DOCKER_REPO}:frontend-frigo" >> "$GITHUB_ENV"
               ;;
             release/*)
               echo "IMAGE_TAGS=${DOCKER_REPO}:${VERSION}-rc,${DOCKER_REPO}:${VERSION}-rc.${SHORT_SHA}" >> "$GITHUB_ENV"
