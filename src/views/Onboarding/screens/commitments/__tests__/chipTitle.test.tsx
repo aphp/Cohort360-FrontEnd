@@ -28,4 +28,13 @@ describe('chip titles of the accent screens', () => {
     // A block-level chip would span the whole card; the mockup hugs the text.
     expect(getComputedStyle(screen.getByRole('heading', { level: 2 })).display).toBe('inline-block')
   })
+
+  it.each(SCREENS)('$name lifts its chip out of the flow, straddling the card edge', ({ node }) => {
+    render(node)
+    const heading = screen.getByRole('heading', { level: 2 })
+    // In the flow, the chip would push the body copy down instead of overlapping the border.
+    expect(getComputedStyle(heading).position).toBe('absolute')
+    expect(getComputedStyle(heading).transform).toContain('translateY(-50%)')
+    expect(heading.parentElement && getComputedStyle(heading.parentElement).position).toBe('relative')
+  })
 })

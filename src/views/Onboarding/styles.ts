@@ -255,11 +255,20 @@ const useStyles = makeStyles()((theme: Theme) => ({
     fontWeight: 600,
     lineHeight: 1.5
   },
+  // Anchors the chip title, which is lifted out of the flow to straddle the card edge.
+  accentScreen: {
+    position: 'relative'
+  },
   titleChip: {
-    // Inline-block so the chip hugs its label; it also straddles the top edge of the card.
+    /*
+     * Taken out of the flow so it does not push the body copy down: the mockup keeps the
+     * card's usual top padding. Half of the chip's height sits above the card's top border,
+     * hence the -50% translation stacked on the tilt.
+     */
+    position: 'absolute',
+    top: theme.spacing(-5),
+    left: 0,
     display: 'inline-block',
-    marginTop: theme.spacing(-7),
-    marginBottom: theme.spacing(2),
     padding: theme.spacing(0.75, 2),
     borderRadius: 8,
     backgroundColor: T.chipBg,
@@ -268,7 +277,7 @@ const useStyles = makeStyles()((theme: Theme) => ({
     fontWeight: 700,
     lineHeight: 1.25,
     textTransform: 'none',
-    transform: `rotate(${T.chipTilt})`
+    transform: `translateY(-50%) rotate(${T.chipTilt})`
   },
   accentText: {
     color: T.accentInk,

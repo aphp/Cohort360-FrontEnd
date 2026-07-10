@@ -8,7 +8,7 @@ const DataDeletion = () => {
   const { classes } = useStyles()
 
   return (
-    <Box>
+    <Box className={classes.accentScreen}>
       <Typography variant="h5" component="h2" className={classes.titleChip}>
         La suppression de vos données
       </Typography>

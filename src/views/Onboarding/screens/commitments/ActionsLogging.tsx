@@ -11,7 +11,7 @@ const ActionsLogging = () => {
   const { mailDataProtection } = getConfig().system
 
   return (
-    <Box>
+    <Box className={classes.accentScreen}>
       <Typography variant="h5" component="h2" className={classes.titleChip}>
         L'enregistrement de vos actions
       </Typography>
