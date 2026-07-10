@@ -127,6 +127,23 @@ describe('OnboardingContext', () => {
     expect(result.current.screen).toBe('welcome')
   })
 
+  it('refuses to be used outside its provider', () => {
+    expect(() => renderHook(() => useOnboarding())).toThrow(/must be used within an OnboardingProvider/)
+  })
+
+  it('ignores goBack on the welcome screen', () => {
+    const { result } = renderOnboarding(0)
+    act(() => result.current.goBack())
+    expect(result.current.screen).toBe('welcome')
+    expect(result.current.currentStep).toBe(0)
+  })
+
+  it('clamps a persisted step beyond the last one', () => {
+    const { result } = renderOnboarding(99)
+    expect(result.current.currentStep).toBe(2)
+    expect(result.current.isLastStep).toBe(true)
+  })
+
   it('labels the primary button `Signer` on the charter screen (US-3309)', async () => {
     const { result } = renderOnboarding(1)
     await goToCharter(result)
@@ -159,6 +176,36 @@ describe('OnboardingContext', () => {
     expect(result.current.subStep).toBe(CHARTER_SUBSTEP)
     expect(result.current.error).toBe(true)
     expect(updateStep).not.toHaveBeenCalled()
+  })
+
+  it('ignores goNext while a request is still in flight', async () => {
+    let release: (value: unknown) => void = () => undefined
+    updateStep.mockReturnValue(new Promise((resolve) => (release = resolve)))
+
+    const { result } = renderOnboarding(2) // last macro step: goNext persists immediately
+    act(() => result.current.goNext())
+    expect(result.current.saving).toBe(true)
+    expect(updateStep).toHaveBeenCalledTimes(1)
+
+    act(() => result.current.goNext())
+    expect(updateStep).toHaveBeenCalledTimes(1)
+
+    await act(async () => {
+      release({ onboarding_step: 3, onboarding_completed_at: '2026-07-10T09:00:00Z' })
+    })
+    expect(result.current.saving).toBe(false)
+  })
+
+  it('clears the error banner when the user steps back', async () => {
+    updateStep.mockRejectedValue(new Error('boom'))
+    const { result } = renderOnboarding(2)
+    await act(async () => {
+      result.current.goNext()
+    })
+    expect(result.current.error).toBe(true)
+
+    act(() => result.current.goBack())
+    expect(result.current.error).toBe(false)
   })
 
   it('does not sign twice when stepping back from the confirmation screen', async () => {

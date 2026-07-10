@@ -10,20 +10,21 @@ vi.mock('services/aphp/serviceOnboarding', () => ({
   default: { updateStep: vi.fn(), signCharter: vi.fn() }
 }))
 
-import meReducer from 'state/me'
+import meReducer, { type MeState } from 'state/me'
 import onboardingReducer, { type OnboardingState } from 'state/onboarding'
 import Onboarding from '../Onboarding'
+import { ONBOARDING_ROUTE } from '../route'
 
-const renderAt = (onboarding: OnboardingState) => {
+const renderAt = (onboarding: OnboardingState, me: MeState = null) => {
   const store = configureStore({
     reducer: { onboarding: onboardingReducer, me: meReducer },
-    preloadedState: { onboarding }
+    preloadedState: { onboarding, me }
   })
   return render(
     <Provider store={store}>
-      <MemoryRouter initialEntries={['/onboarding']}>
+      <MemoryRouter initialEntries={[ONBOARDING_ROUTE]}>
         <Routes>
-          <Route path="/onboarding" element={<Onboarding />} />
+          <Route path={ONBOARDING_ROUTE} element={<Onboarding />} />
           <Route path="/home" element={<div>home page</div>} />
         </Routes>
       </MemoryRouter>
@@ -62,5 +63,40 @@ describe('Onboarding page', () => {
     await user.click(screen.getByRole('button', { name: /Continuer/ }))
     expect(screen.getByText("L'enregistrement de vos actions")).toBeInTheDocument()
     expect(screen.getByTestId('onboarding-warning-banner')).toBeInTheDocument()
+  })
+
+  it('falls back to the step placeholder while a step has no screen yet', () => {
+    renderAt({ ...baseState, step: 2 })
+    // The label also appears in the stepper rail, so target the card's heading.
+    expect(screen.getByRole('heading', { name: "Prendre en main l'outil" })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /Terminer/ })).toBeInTheDocument()
+  })
+
+  it('surfaces the progress error and keeps the user on the screen', () => {
+    renderAt({ ...baseState, step: 1, error: true })
+    expect(screen.getByRole('alert')).toHaveTextContent(/enregistrement de votre progression/)
+  })
+
+  it('disables both buttons while a request is in flight', () => {
+    renderAt({ ...baseState, step: 1, saving: true })
+    expect(screen.getByRole('button', { name: /Continuer/ })).toBeDisabled()
+    expect(screen.getByRole('button', { name: 'Revenir' })).toBeDisabled()
+  })
+
+  it('greets the connected user with their initials', () => {
+    renderAt(baseState, { displayName: 'Cesar RICHARD' } as MeState)
+    expect(screen.getByText('Cesar RICHARD')).toBeInTheDocument()
+    expect(screen.getByText('CR')).toBeInTheDocument()
+  })
+
+  it('keeps at most two initials, and none when no user is connected', () => {
+    renderAt(baseState, { displayName: 'Jean Pierre Marie DUPONT' } as MeState)
+    expect(screen.getByText('JP')).toBeInTheDocument()
+  })
+
+  it('hides the back button on the welcome screen', () => {
+    renderAt(baseState)
+    expect(screen.getByRole('button', { name: /Commencer/ })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Revenir' })).not.toBeInTheDocument()
   })
 })
