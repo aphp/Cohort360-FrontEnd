@@ -12,7 +12,7 @@ const DataDeletion = () => {
       <Typography variant="h6" className={classes.titleChip}>
         La suppression de vos données
       </Typography>
-      <Typography className={classes.sectionText}>
+      <Typography className={classes.accentText}>
         Vous devez <strong>détruire toutes données sur supports mobiles</strong> dès la fin de leur utilisation. Par
         ailleurs, vous vous engagez à demander la <strong>clôture des accès</strong>, si nécessaire de manière
         anticipée, dès que ces derniers ne sont plus requis.

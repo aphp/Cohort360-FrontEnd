@@ -12,6 +12,13 @@ describe('ActionsLogging (RG3308.03)', () => {
     expect(link).toHaveAttribute('href', 'mailto:protection.donnees.dsi@aphp.fr')
   })
 
+  it('states the retention period and the purposes of the logs', () => {
+    render(<ActionsLogging />)
+    expect(screen.getByText(/conservées pendant 3 ans/)).toBeInTheDocument()
+    expect(screen.getByText(/demandes d'audit de la CNIL/)).toBeInTheDocument()
+    expect(screen.getByText(/accéder à vos données et les rectifier/)).toBeInTheDocument()
+  })
+
   it('describes its illustration to assistive technologies', () => {
     render(<ActionsLogging />)
     expect(screen.getByRole('img', { name: 'Vos actions sont enregistrées et conservées' })).toBeInTheDocument()

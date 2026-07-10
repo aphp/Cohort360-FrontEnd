@@ -7,7 +7,7 @@ import Illustration from '../../Illustration'
 import useStyles from '../../styles'
 
 const ActionsLogging = () => {
-  const { classes } = useStyles()
+  const { classes, cx } = useStyles()
   const { mailDataProtection } = getConfig().system
 
   return (
@@ -15,14 +15,18 @@ const ActionsLogging = () => {
       <Typography variant="h6" className={classes.titleChip}>
         L'enregistrement de vos actions
       </Typography>
-      <Typography className={classes.sectionText}>
-        Chacune de vos actions dans Cohort360 est <strong>enregistrée et conservée</strong> : les requêtes que vous
-        lancez, les cohortes que vous créez et les données que vous exportez.
+      <Typography className={classes.accentText}>
+        <strong>
+          À chaque connexion à Cohort360, vos actions sont enregistrées par la DSI et conservées pendant 3 ans.
+        </strong>
       </Typography>
-      <Typography className={classes.sectionText}>
-        Ces enregistrements permettent de vérifier que les données de santé sont utilisées conformément aux finalités
-        autorisées. Pour toute question sur ces traitements, écrivez à{' '}
-        <Link className={classes.link} href={`mailto:${mailDataProtection}`}>
+      <Typography className={classes.accentText}>
+        Ces données sont utilisées pour assurer la sécurité du système, réaliser des statistiques d'usage et répondre
+        aux demandes d'audit de la CNIL.
+      </Typography>
+      <Typography className={cx(classes.accentText, classes.accentTextTight)}>
+        Vous pouvez accéder à vos données et les rectifier via{' '}
+        <Link className={classes.accentLink} href={`mailto:${mailDataProtection}`}>
           {mailDataProtection}
         </Link>
         .

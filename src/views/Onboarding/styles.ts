@@ -264,7 +264,23 @@ const useStyles = makeStyles()((theme: Theme) => ({
     borderRadius: 6,
     backgroundColor: T.chipBg,
     color: T.surface,
-    fontWeight: 700
+    fontWeight: 700,
+    transform: `rotate(${T.chipTilt})`
+  },
+  accentText: {
+    color: T.accentInk,
+    marginTop: theme.spacing(2),
+    lineHeight: 1.6
+  },
+  accentTextTight: {
+    marginTop: theme.spacing(1)
+  },
+  accentLink: {
+    color: T.accentInk,
+    textDecoration: 'underline',
+    '&:hover': {
+      textDecoration: 'none'
+    }
   },
   bareTitle: {
     color: T.chipBg,

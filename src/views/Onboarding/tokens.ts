@@ -12,6 +12,10 @@ export const onboardingTokens = {
   stepCircleInactive: '#9AA7B8',
   tileBg: '#F5F8FE',
   warning: '#E5007D',
-  chipBg: '#1D4F9B',
+  // The three screens carrying the responsibility banner share a blue treatment:
+  // a tilted chip title over the card edge, and blue body copy instead of grey.
+  chipBg: '#0062AB',
+  chipTilt: '-1deg',
+  accentInk: '#052C5F',
   documentBg: '#7F7F7F'
 } as const
