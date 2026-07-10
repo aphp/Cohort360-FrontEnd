@@ -148,6 +148,9 @@ export type AppConfig = {
     }
     feasibilityReport: FeatureConfig
     contact: FeatureConfig
+    maintenancePopup: FeatureConfig & {
+      exceptionAphCodes: string[]
+    }
   }
   core: {
     fhir: {
@@ -414,6 +417,10 @@ let config: AppConfig = {
     },
     contact: {
       enabled: false
+    },
+    maintenancePopup: {
+      enabled: false,
+      exceptionAphCodes: []
     }
   },
   system: {

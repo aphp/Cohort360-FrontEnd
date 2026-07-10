@@ -228,6 +228,9 @@ const getChildrenFromCodesBatch = async (
   codes: string[],
   signal?: AbortSignal
 ): Promise<Back_API_Response<Hierarchy<FhirItem>>> => {
+  // Codes CCAM ré-encodés : un code d'avant ré-encodage se cherche en préfixe. Scopé au valueset CCAM.
+  const isCcamHierarchy = valueSetUrl === getConfig().features.procedure?.valueSets?.procedureHierarchy?.url
+  const toFilterValue = (code: string) => (isCcamHierarchy && code && !code.endsWith('*') ? `${code}*` : code)
   const json = {
     resourceType: 'Parameters',
     parameter: [
@@ -245,7 +248,7 @@ const getChildrenFromCodesBatch = async (
               {
                 filter: codes.map((code) => ({
                   op: 'is-a',
-                  value: code
+                  value: toFilterValue(code)
                 }))
               }
             ]
