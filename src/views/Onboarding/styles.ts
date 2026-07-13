@@ -40,7 +40,8 @@ const useStyles = makeStyles()((theme: Theme) => ({
   body: {
     flex: 1,
     display: 'flex',
-    alignItems: 'center',
+    // Anchored to the top rather than centred: the rail must not drift when a card grows.
+    alignItems: 'flex-start',
     justifyContent: 'center',
     padding: theme.spacing(6)
   },
@@ -51,15 +52,50 @@ const useStyles = makeStyles()((theme: Theme) => ({
   },
   stepper: {
     marginTop: theme.spacing(3),
-    minWidth: 200
+    width: 220,
+    flexShrink: 0
+  },
+  rail: {
+    listStyle: 'none',
+    margin: 0,
+    padding: 0
+  },
+  railItem: {
+    display: 'flex',
+    flexDirection: 'column'
+  },
+  railHead: {
+    display: 'flex',
+    // Centres the label on the circle, however many lines the label takes.
+    alignItems: 'center',
+    gap: theme.spacing(2)
+  },
+  railTail: {
+    // As wide as the circle, so the segment hangs from its centre.
+    width: 28,
+    display: 'flex',
+    justifyContent: 'center'
+  },
+  railSegment: {
+    width: 2,
+    height: 40,
+    marginTop: theme.spacing(0.5),
+    marginBottom: theme.spacing(0.5),
+    backgroundColor: T.railTodo
+  },
+  railSegmentFill: {
+    display: 'block',
+    width: '100%',
+    backgroundColor: T.railDone
   },
   stepCircle: {
+    flexShrink: 0,
     width: 28,
     height: 28,
     borderRadius: '50%',
-    border: `2px solid ${T.stepCircleBorder}`,
+    border: `2px solid ${T.railTodo}`,
     backgroundColor: T.surface,
-    color: T.stepCircleInactive,
+    color: T.railDone,
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
@@ -67,11 +103,21 @@ const useStyles = makeStyles()((theme: Theme) => ({
     fontWeight: 700
   },
   stepCircleActive: {
-    borderColor: theme.palette.primary.main,
-    color: theme.palette.primary.main
+    border: 'none',
+    backgroundColor: T.railDone,
+    color: T.surface
+  },
+  stepCircleCompleted: {
+    border: 'none',
+    color: T.railDone
   },
   stepLabel: {
-    color: T.muted
+    color: T.railInactiveFg,
+    lineHeight: 1.35
+  },
+  stepLabelActive: {
+    color: T.ink,
+    fontWeight: 600
   },
   contentCol: {
     display: 'flex',
@@ -223,6 +269,72 @@ const useStyles = makeStyles()((theme: Theme) => ({
     borderRadius: 6,
     padding: theme.spacing(1, 3, 3),
     backgroundColor: T.tileBg
+  },
+  warningNotice: {
+    display: 'flex',
+    alignItems: 'flex-start',
+    gap: theme.spacing(1.5),
+    marginTop: theme.spacing(3)
+  },
+  warningBadge: {
+    marginTop: theme.spacing(-0.25)
+  },
+  warningText: {
+    color: T.warning,
+    fontWeight: 600,
+    lineHeight: 1.5
+  },
+  bareTitle: {
+    color: T.deepBlue,
+    fontWeight: 700,
+    marginBottom: theme.spacing(4)
+  },
+  illustrationRow: {
+    display: 'flex',
+    justifyContent: 'center',
+    marginTop: theme.spacing(4)
+  },
+  illustration: {
+    // The exported artwork carries fixed width/height attributes: override them to scale down.
+    width: '100%',
+    height: 'auto',
+    maxWidth: 552
+  },
+  deletionIcon: {
+    width: 56,
+    height: 56,
+    backgroundColor: T.deepBlue
+  },
+  documentViewer: {
+    padding: theme.spacing(3),
+    borderRadius: 6,
+    backgroundColor: T.documentBg
+  },
+  documentFrame: {
+    display: 'block',
+    width: '100%',
+    height: 420,
+    border: 'none',
+    backgroundColor: T.surface
+  },
+  documentFallback: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    gap: theme.spacing(2),
+    padding: theme.spacing(6),
+    backgroundColor: T.surface
+  },
+  confirmationIcon: {
+    display: 'block',
+    margin: '0 auto',
+    fontSize: 72,
+    color: theme.palette.success.main
+  },
+  confirmationTitle: {
+    marginTop: theme.spacing(3),
+    color: T.ink,
+    fontWeight: 700
   }
 }))
 
