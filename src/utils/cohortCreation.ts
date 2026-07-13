@@ -39,7 +39,6 @@ import { Hierarchy } from 'types/hierarchy'
 import { CodeCache } from 'state/valueSets'
 import { NewDurationRangeType } from 'components/CreationCohort/DiagramView/components/LogicalOperator/components/CriteriaRightPanel/CriteriaForm/types'
 import { getChildrenFromCodes, HIERARCHY_ROOT } from 'services/aphp/serviceValueSets'
-import { getAllCriteriaItems } from 'components/CreationCohort/DataList_Criteria'
 import { createHierarchyRoot } from './hierarchy'
 import { FhirItem } from 'types/valueSet'
 import { ScopeElement } from 'types/scope'
@@ -58,8 +57,19 @@ const DEFAULT_GROUP_ERROR: CriteriaGroup = {
   criteriaIds: []
 }
 
+export const getAllCriteriaItems = (criteria: readonly CriteriaItemType[]): CriteriaItemType[] => {
+  const allCriteriaItems: CriteriaItemType[] = []
+  for (const criterion of criteria) {
+    allCriteriaItems.push(criterion)
+    if (criterion.subItems && criterion.subItems.length > 0) {
+      allCriteriaItems.push(...getAllCriteriaItems(criterion.subItems))
+    }
+  }
+  return allCriteriaItems
+}
+
 const getCriteriaDefinitions = async (): Promise<CriteriaItemType[]> => {
-  const { default: criteriaList, getAllCriteriaItems } = await import('components/CreationCohort/DataList_Criteria')
+  const { default: criteriaList } = await import('components/CreationCohort/DataList_Criteria')
   return getAllCriteriaItems(criteriaList())
 }
 
@@ -819,7 +829,6 @@ export const fetchCriteriasCodes = async (
   oldCriteriaCache?: CodeCache
 ): Promise<CodeCache> => {
   const updatedCriteriaData: CodeCache = { ...oldCriteriaCache }
-  const { getAllCriteriaItems } = await import('components/CreationCohort/DataList_Criteria')
   const allCriterias = getAllCriteriaItems(criteriaList)
   for (const criteria of allCriterias) {
     const criteriaValues = selectedCriteria.filter(
