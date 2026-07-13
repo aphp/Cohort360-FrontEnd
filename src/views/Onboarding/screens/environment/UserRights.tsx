@@ -5,7 +5,7 @@ import React from 'react'
 
 import { useAppSelector } from 'state'
 
-import useStyles from '../styles'
+import useStyles from '../../styles'
 import { useUserAccesses } from './useUserAccesses'
 
 const UserRights = () => {

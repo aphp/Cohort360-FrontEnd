@@ -1,7 +1,7 @@
 import { Box, Typography } from '@mui/material'
 import React from 'react'
 
-import useStyles from '../styles'
+import useStyles from '../../styles'
 
 const WhatIsCohort360 = () => {
   const { classes } = useStyles()

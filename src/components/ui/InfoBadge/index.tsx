@@ -1,34 +1,26 @@
-import { styled } from '@mui/material'
+import { styled, useTheme } from '@mui/material'
 import React from 'react'
+
+import CircleBadge from 'components/ui/CircleBadge'
 
 type InfoBadgeProps = {
   size?: number
   className?: string
 }
 
-const Ring = styled('span', { shouldForwardProp: (prop) => prop !== 'ringSize' })<{ ringSize: number }>(
-  ({ theme, ringSize }) => ({
-    flexShrink: 0,
-    display: 'inline-flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    width: ringSize,
-    height: ringSize,
-    borderRadius: '50%',
-    border: `${Math.round(ringSize / 5)}px solid ${theme.palette.primary.dark}`,
-    color: theme.palette.primary.dark,
-    fontFamily: 'Georgia, serif',
-    fontStyle: 'italic',
-    fontWeight: 700,
-    fontSize: Math.round(ringSize * 0.5),
-    lineHeight: 1
-  })
-)
+const Glyph = styled('span')({
+  fontFamily: 'Georgia, serif',
+  fontStyle: 'italic'
+})
 
-const InfoBadge = ({ size = 24, className }: InfoBadgeProps) => (
-  <Ring ringSize={size} className={className}>
-    i
-  </Ring>
-)
+const InfoBadge = ({ size = 24, className }: InfoBadgeProps) => {
+  const theme = useTheme()
+
+  return (
+    <CircleBadge color={theme.palette.primary.dark} variant="outlined" size={size} className={className}>
+      <Glyph>i</Glyph>
+    </CircleBadge>
+  )
+}
 
 export default InfoBadge

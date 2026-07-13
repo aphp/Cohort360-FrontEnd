@@ -185,7 +185,8 @@ const Login = () => {
         dispatch(
           hydrateOnboarding({
             step: practitionerData.onboarding_step ?? 0,
-            completedAt: practitionerData.onboarding_completed_at ?? null
+            completedAt: practitionerData.onboarding_completed_at ?? null,
+            charterSignedAt: practitionerData.charter_signed_at ?? null
           })
         )
         dispatch(saveRights({ rights: practitionerPerimeters }))
