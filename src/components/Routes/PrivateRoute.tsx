@@ -33,11 +33,11 @@ import { throttle } from 'lodash'
 import type React from 'react'
 import { useContext, useEffect, useState } from 'react'
 import { Navigate, Outlet, useLocation } from 'react-router-dom'
+import useOnboardingStatus from 'hooks/onboarding/useOnboardingStatus'
 import { updateConfigFromFhirMetadata } from 'services/aphp/serviceFhirConfig'
-import { selectOnboardingCompleted, selectOnboardingSyncStatus, syncOnboarding } from 'state/onboarding'
 import { isAccessTokenValid } from 'utils/tokens'
 import { ONBOARDING_ROUTE } from 'views/Onboarding/route'
-import { useAppDispatch, useAppSelector } from '../../state'
+import { useAppSelector } from '../../state'
 
 /**
  * Global window object type declaration to access Microsoft Clarity tracking.
@@ -45,9 +45,6 @@ import { useAppDispatch, useAppSelector } from '../../state'
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 declare const window: any
-
-// Delay before retrying a failed onboarding resync, to avoid hammering the server while it is down.
-const ONBOARDING_RESYNC_RETRY_DELAY = 3000
 
 /**
  * PrivateRoute Component
@@ -85,12 +82,12 @@ const ONBOARDING_RESYNC_RETRY_DELAY = 3000
  */
 const PrivateRoute: React.FC = () => {
   const me = useAppSelector((state) => state.me)
-  const onboardingCompleted = useAppSelector(selectOnboardingCompleted)
-  const onboardingSyncStatus = useAppSelector(selectOnboardingSyncStatus)
-  const dispatch = useAppDispatch()
   const appConfig = useContext(AppConfig)
   const location = useLocation()
   const hasValidToken = isAccessTokenValid()
+  const { status: onboardingStatus, statusPending: onboardingStatusPending } = useOnboardingStatus(
+    !!me && hasValidToken
+  )
   const [fetchedFhirMetadata, setFetchedFhirMetadata] = useState(false)
 
   /** State to control when redirection to login page is allowed */
@@ -111,7 +108,6 @@ const PrivateRoute: React.FC = () => {
    * Dependencies:
    * - me: Current user authentication state
    * - appConfig.system.userTrackingBlacklist: List of user IDs to exclude from tracking
-   * - dispatch: Redux dispatch function (for consistency in dependency array)
    */
   useEffect(() => {
     if (window.clarity && me?.id) {
@@ -120,18 +116,7 @@ const PrivateRoute: React.FC = () => {
         window.clarity('set', 'exclude', 'true')
       }
     }
-  }, [me, appConfig.system.userTrackingBlacklist, dispatch])
-
-  useEffect(() => {
-    if (!me || !hasValidToken) return
-    if (onboardingSyncStatus === 'idle') {
-      dispatch(syncOnboarding())
-    } else if (onboardingSyncStatus === 'error') {
-      // Retry silently rather than gating a returning session on an unconfirmed status.
-      const timer = setTimeout(() => dispatch(syncOnboarding()), ONBOARDING_RESYNC_RETRY_DELAY)
-      return () => clearTimeout(timer)
-    }
-  }, [me, hasValidToken, onboardingSyncStatus, dispatch])
+  }, [me, appConfig.system.userTrackingBlacklist])
 
   useEffect(() => {
     const callFetchFhirMetadata = throttle(async () => {
@@ -177,16 +162,16 @@ const PrivateRoute: React.FC = () => {
         </DialogActions>
       </Dialog>
     )
-  } else if (onboardingSyncStatus !== 'ready') {
-    // idle | loading | error: never gate on an unconfirmed status. The resync keeps retrying in the
-    // background on failure, so a returning session is never judged on the default (not-onboarded)
-    // state and an already-onboarded account is never restarted on a transient error.
+  } else if (onboardingStatusPending) {
+    // Never gate on an unconfirmed status. The status query keeps retrying in the background on
+    // failure, so a returning session is never judged on the default (not-onboarded) state and an
+    // already-onboarded account is never restarted on a transient error.
     return (
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh' }}>
         <CircularProgress />
       </Box>
     )
-  } else if (!onboardingCompleted && !location.pathname.startsWith(ONBOARDING_ROUTE)) {
+  } else if (onboardingStatus?.onboarding_completed_at == null && !location.pathname.startsWith(ONBOARDING_ROUTE)) {
     // Status confirmed and onboarding not completed: gate the app behind the journey
     return <Navigate to={ONBOARDING_ROUTE} replace />
   } else {
