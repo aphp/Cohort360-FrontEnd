@@ -12,8 +12,8 @@ import { logout } from 'state/me'
 export const ONBOARDING_TOTAL_STEPS = 3
 
 // Tracks whether the current session's progress has been resynced from the server yet.
-// The gate waits for a settled status (`ready` or `error`) before deciding, so a returning
-// session is never judged on the default (not-onboarded) state while the resync is still in flight.
+// The gate waits for `ready` before deciding and keeps waiting while a failed resync retries,
+// so a returning session is never judged on the default (not-onboarded) state.
 export type OnboardingSyncStatus = 'idle' | 'loading' | 'ready' | 'error'
 
 export type OnboardingState = {
@@ -90,8 +90,8 @@ const onboardingSlice = createSlice({
         state.syncStatus = 'ready'
       })
       .addCase(syncOnboarding.rejected, (state) => {
-        // The gate treats an unconfirmed status as not-onboarded, so a regulatory step is
-        // never skipped because a resync failed.
+        // The gate keeps waiting on an unconfirmed status while the resync retries, so a failure
+        // neither skips a regulatory step nor restarts an already-onboarded account.
         state.syncStatus = 'error'
       })
       .addCase(advanceOnboarding.pending, (state, action) => {

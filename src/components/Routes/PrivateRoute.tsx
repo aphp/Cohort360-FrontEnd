@@ -46,6 +46,9 @@ import { useAppDispatch, useAppSelector } from '../../state'
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 declare const window: any
 
+// Delay before retrying a failed onboarding resync, to avoid hammering the server while it is down.
+const ONBOARDING_RESYNC_RETRY_DELAY = 3000
+
 /**
  * PrivateRoute Component
  *
@@ -120,8 +123,13 @@ const PrivateRoute: React.FC = () => {
   }, [me, appConfig.system.userTrackingBlacklist, dispatch])
 
   useEffect(() => {
-    if (me && hasValidToken && onboardingSyncStatus === 'idle') {
+    if (!me || !hasValidToken) return
+    if (onboardingSyncStatus === 'idle') {
       dispatch(syncOnboarding())
+    } else if (onboardingSyncStatus === 'error') {
+      // Retry silently rather than gating a returning session on an unconfirmed status.
+      const timer = setTimeout(() => dispatch(syncOnboarding()), ONBOARDING_RESYNC_RETRY_DELAY)
+      return () => clearTimeout(timer)
     }
   }, [me, hasValidToken, onboardingSyncStatus, dispatch])
 
@@ -169,15 +177,17 @@ const PrivateRoute: React.FC = () => {
         </DialogActions>
       </Dialog>
     )
-  } else if (onboardingSyncStatus === 'idle' || onboardingSyncStatus === 'loading') {
-    // Wait for the server truth before gating, so a returning session is never judged on the default state
+  } else if (onboardingSyncStatus !== 'ready') {
+    // idle | loading | error: never gate on an unconfirmed status. The resync keeps retrying in the
+    // background on failure, so a returning session is never judged on the default (not-onboarded)
+    // state and an already-onboarded account is never restarted on a transient error.
     return (
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh' }}>
         <CircularProgress />
       </Box>
     )
   } else if (!onboardingCompleted && !location.pathname.startsWith(ONBOARDING_ROUTE)) {
-    // Fail-closed: a resync error leaves the status unconfirmed, and a regulatory step must not be skipped
+    // Status confirmed and onboarding not completed: gate the app behind the journey
     return <Navigate to={ONBOARDING_ROUTE} replace />
   } else {
     // User is authenticated, render the protected route content

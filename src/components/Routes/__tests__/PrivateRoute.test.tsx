@@ -120,13 +120,27 @@ describe('PrivateRoute', () => {
     expect(screen.queryByText('private content')).not.toBeInTheDocument()
   })
 
-  it('redirige vers /onboarding quand le resync échoue (fail-closed)', () => {
+  it("patiente sans démarrer l'onboarding quand le resync échoue (fail-closed)", () => {
     setValidToken()
     mockedUseAppSelector.mockImplementation((selector) =>
       selector({ me: { id: 'user-1' }, onboarding: { completedAt: null, syncStatus: 'error' } } as never)
     )
     renderPrivateRoute()
-    expect(screen.getByText('onboarding page')).toBeInTheDocument()
+    expect(screen.getByRole('progressbar')).toBeInTheDocument()
+    expect(screen.queryByText('onboarding page')).not.toBeInTheDocument()
     expect(screen.queryByText('private content')).not.toBeInTheDocument()
+  })
+
+  it('relance le resync en tâche de fond après un échec', () => {
+    setValidToken()
+    vi.useFakeTimers()
+    mockedUseAppSelector.mockImplementation((selector) =>
+      selector({ me: { id: 'user-1' }, onboarding: { completedAt: null, syncStatus: 'error' } } as never)
+    )
+    renderPrivateRoute()
+    mockDispatch.mockClear()
+    vi.advanceTimersByTime(3000)
+    expect(mockDispatch).toHaveBeenCalled()
+    vi.useRealTimers()
   })
 })
