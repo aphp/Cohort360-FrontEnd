@@ -46,7 +46,9 @@ export const rootReducer = combineReducers({
 const persistConfig = {
   key: 'root',
   storage: localforage,
-  blacklist: ['message', 'warningDialog', 'questionnairesFormData']
+  // onboarding is intentionally not persisted: the server is the source of truth and it is
+  // resynced on every app entry, so a stale persisted value can never gate an onboarded user.
+  blacklist: ['message', 'warningDialog', 'questionnairesFormData', 'onboarding']
 }
 
 /**

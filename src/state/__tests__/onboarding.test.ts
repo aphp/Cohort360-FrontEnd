@@ -1,4 +1,3 @@
-import { REHYDRATE } from 'redux-persist'
 import type { RootState } from 'state'
 import { logout } from 'state/me'
 import onboardingReducer, {
@@ -6,7 +5,8 @@ import onboardingReducer, {
   hydrateOnboarding,
   type OnboardingState,
   selectOnboardingCompleted,
-  signCharter
+  signCharter,
+  syncOnboarding
 } from 'state/onboarding'
 import { describe, expect, it } from 'vitest'
 
@@ -18,7 +18,8 @@ const initialState: OnboardingState = {
   charterSignedAt: null,
   saving: false,
   error: false,
-  previousStep: null
+  previousStep: null,
+  syncStatus: 'idle'
 }
 
 describe('onboarding reducer', () => {
@@ -29,6 +30,30 @@ describe('onboarding reducer', () => {
     )
     expect(state.step).toBe(2)
     expect(state.completedAt).toBe('2026-06-29T10:00:00Z')
+    expect(state.syncStatus).toBe('ready')
+  })
+
+  it('marks the session as synced from the fetched status', () => {
+    const loading = onboardingReducer(initialState, syncOnboarding.pending('req'))
+    expect(loading.syncStatus).toBe('loading')
+    const ready = onboardingReducer(
+      loading,
+      syncOnboarding.fulfilled(
+        { onboarding_step: 3, onboarding_completed_at: '2026-06-29T10:00:00Z', charter_signed_at: SIGNED_AT },
+        'req'
+      )
+    )
+    expect(ready.step).toBe(3)
+    expect(ready.completedAt).toBe('2026-06-29T10:00:00Z')
+    expect(ready.charterSignedAt).toBe(SIGNED_AT)
+    expect(ready.syncStatus).toBe('ready')
+  })
+
+  it('falls into an error state when the status cannot be fetched', () => {
+    const loading = onboardingReducer(initialState, syncOnboarding.pending('req'))
+    const errored = onboardingReducer(loading, syncOnboarding.rejected(new Error('boom'), 'req'))
+    expect(errored.syncStatus).toBe('error')
+    expect(errored.completedAt).toBeNull()
   })
 
   it('applies the step optimistically while saving', () => {
@@ -63,15 +88,6 @@ describe('onboarding reducer', () => {
     const completed: OnboardingState = { ...initialState, step: 3, completedAt: '2026-06-29T10:00:00Z' }
     const state = onboardingReducer(completed, logout.fulfilled(null, 'req'))
     expect(state).toEqual(initialState)
-  })
-
-  it('clears transient flags on rehydration so a stale `saving` cannot disable the buttons', () => {
-    const stuck: OnboardingState = { ...initialState, step: 1, saving: true, error: true, previousStep: 0 }
-    const state = onboardingReducer(stuck, { type: REHYDRATE })
-    expect(state.saving).toBe(false)
-    expect(state.error).toBe(false)
-    expect(state.previousStep).toBeNull()
-    expect(state.step).toBe(1)
   })
 
   it('records the charter signature timestamp on success (RG3309.02)', () => {

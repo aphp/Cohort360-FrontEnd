@@ -18,14 +18,23 @@
  * @since 1.0.0
  */
 
-import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material'
+import {
+  Box,
+  Button,
+  CircularProgress,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle
+} from '@mui/material'
 import { AppConfig } from 'config'
 import { throttle } from 'lodash'
 import type React from 'react'
 import { useContext, useEffect, useState } from 'react'
 import { Navigate, Outlet, useLocation } from 'react-router-dom'
 import { updateConfigFromFhirMetadata } from 'services/aphp/serviceFhirConfig'
-import { selectOnboardingCompleted } from 'state/onboarding'
+import { selectOnboardingCompleted, selectOnboardingSyncStatus, syncOnboarding } from 'state/onboarding'
 import { isAccessTokenValid } from 'utils/tokens'
 import { ONBOARDING_ROUTE } from 'views/Onboarding/route'
 import { useAppDispatch, useAppSelector } from '../../state'
@@ -74,6 +83,7 @@ declare const window: any
 const PrivateRoute: React.FC = () => {
   const me = useAppSelector((state) => state.me)
   const onboardingCompleted = useAppSelector(selectOnboardingCompleted)
+  const onboardingSyncStatus = useAppSelector(selectOnboardingSyncStatus)
   const dispatch = useAppDispatch()
   const appConfig = useContext(AppConfig)
   const location = useLocation()
@@ -108,6 +118,12 @@ const PrivateRoute: React.FC = () => {
       }
     }
   }, [me, appConfig.system.userTrackingBlacklist, dispatch])
+
+  useEffect(() => {
+    if (me && hasValidToken && onboardingSyncStatus === 'idle') {
+      dispatch(syncOnboarding())
+    }
+  }, [me, hasValidToken, onboardingSyncStatus, dispatch])
 
   useEffect(() => {
     const callFetchFhirMetadata = throttle(async () => {
@@ -153,8 +169,15 @@ const PrivateRoute: React.FC = () => {
         </DialogActions>
       </Dialog>
     )
+  } else if (onboardingSyncStatus === 'idle' || onboardingSyncStatus === 'loading') {
+    // Wait for the server truth before gating, so a returning session is never judged on the default state
+    return (
+      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh' }}>
+        <CircularProgress />
+      </Box>
+    )
   } else if (!onboardingCompleted && !location.pathname.startsWith(ONBOARDING_ROUTE)) {
-    // Authenticated but onboarding not completed: gate the app behind the journey
+    // Fail-closed: a resync error leaves the status unconfirmed, and a regulatory step must not be skipped
     return <Navigate to={ONBOARDING_ROUTE} replace />
   } else {
     // User is authenticated, render the protected route content

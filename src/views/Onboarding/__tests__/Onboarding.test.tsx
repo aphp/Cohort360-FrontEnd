@@ -38,7 +38,8 @@ const baseState: OnboardingState = {
   charterSignedAt: null,
   saving: false,
   error: false,
-  previousStep: null
+  previousStep: null,
+  syncStatus: 'ready'
 }
 
 describe('Onboarding page', () => {

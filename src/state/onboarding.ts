@@ -1,12 +1,20 @@
-import type { Action, PayloadAction } from '@reduxjs/toolkit'
+import type { PayloadAction } from '@reduxjs/toolkit'
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
-import { REHYDRATE } from 'redux-persist'
-import serviceOnboarding, { type CharterSignature, type OnboardingProgress } from 'services/aphp/serviceOnboarding'
+import serviceOnboarding, {
+  type CharterSignature,
+  type OnboardingProgress,
+  type OnboardingStatus
+} from 'services/aphp/serviceOnboarding'
 import type { RootState } from 'state'
 import { logout } from 'state/me'
 
 // Mirrors User.ONBOARDING_TOTAL_STEPS server-side.
 export const ONBOARDING_TOTAL_STEPS = 3
+
+// Tracks whether the current session's progress has been resynced from the server yet.
+// The gate waits for a settled status (`ready` or `error`) before deciding, so a returning
+// session is never judged on the default (not-onboarded) state while the resync is still in flight.
+export type OnboardingSyncStatus = 'idle' | 'loading' | 'ready' | 'error'
 
 export type OnboardingState = {
   step: number
@@ -15,6 +23,7 @@ export type OnboardingState = {
   saving: boolean
   error: boolean
   previousStep: number | null
+  syncStatus: OnboardingSyncStatus
 }
 
 const initialState: OnboardingState = {
@@ -23,12 +32,17 @@ const initialState: OnboardingState = {
   charterSignedAt: null,
   saving: false,
   error: false,
-  previousStep: null
+  previousStep: null,
+  syncStatus: 'idle'
 }
 
 export const advanceOnboarding = createAsyncThunk<OnboardingProgress, number, { state: RootState }>(
   'onboarding/advance',
   (step) => serviceOnboarding.updateStep(step)
+)
+
+export const syncOnboarding = createAsyncThunk<OnboardingStatus, void, { state: RootState }>('onboarding/sync', () =>
+  serviceOnboarding.getStatus()
 )
 
 export const signCharter = createAsyncThunk<CharterSignature, void, { state: RootState }>(
@@ -57,6 +71,8 @@ const onboardingSlice = createSlice({
       state.saving = false
       state.error = false
       state.previousStep = null
+      // A fresh login already carries the server truth: no extra resync needed.
+      state.syncStatus = 'ready'
     },
     clearOnboardingError: (state) => {
       state.error = false
@@ -64,6 +80,20 @@ const onboardingSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
+      .addCase(syncOnboarding.pending, (state) => {
+        state.syncStatus = 'loading'
+      })
+      .addCase(syncOnboarding.fulfilled, (state, action) => {
+        state.step = action.payload.onboarding_step
+        state.completedAt = action.payload.onboarding_completed_at
+        state.charterSignedAt = action.payload.charter_signed_at
+        state.syncStatus = 'ready'
+      })
+      .addCase(syncOnboarding.rejected, (state) => {
+        // The gate treats an unconfirmed status as not-onboarded, so a regulatory step is
+        // never skipped because a resync failed.
+        state.syncStatus = 'error'
+      })
       .addCase(advanceOnboarding.pending, (state, action) => {
         state.saving = true
         state.error = false
@@ -98,20 +128,12 @@ const onboardingSlice = createSlice({
       })
       .addCase(logout.fulfilled, () => initialState)
       .addCase(logout.rejected, () => initialState)
-      // The slice is persisted: an in-flight request that never settled would otherwise
-      // restore `saving: true` on reload and leave the journey buttons disabled forever.
-      .addMatcher(
-        (action: Action): action is Action => action.type === REHYDRATE,
-        (state) => {
-          state.saving = false
-          state.error = false
-          state.previousStep = null
-        }
-      )
   }
 })
 
 export const selectOnboardingCompleted = (state: RootState): boolean => state.onboarding.completedAt !== null
+
+export const selectOnboardingSyncStatus = (state: RootState): OnboardingSyncStatus => state.onboarding.syncStatus
 
 export const { hydrateOnboarding, clearOnboardingError } = onboardingSlice.actions
 export default onboardingSlice.reducer

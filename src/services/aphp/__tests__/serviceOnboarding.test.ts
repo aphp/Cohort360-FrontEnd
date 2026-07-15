@@ -55,4 +55,21 @@ describe('serviceOnboarding', () => {
     await expect(serviceOnboarding.getRightsCatalog()).resolves.toEqual([{ name: 'Lecture', rights: [] }])
     expect(get).toHaveBeenCalledWith('accesses/rights/')
   })
+
+  it('returns the current onboarding status', async () => {
+    get.mockResolvedValue({
+      data: { onboarding_step: 3, onboarding_completed_at: '2026-06-29T10:00:00Z', charter_signed_at: null }
+    })
+    await expect(serviceOnboarding.getStatus()).resolves.toEqual({
+      onboarding_step: 3,
+      onboarding_completed_at: '2026-06-29T10:00:00Z',
+      charter_signed_at: null
+    })
+    expect(get).toHaveBeenCalledWith('/users/me/onboarding/')
+  })
+
+  it('rejects when the status request is swallowed by the interceptor', async () => {
+    get.mockResolvedValue(new Error('Request failed with status code 500'))
+    await expect(serviceOnboarding.getStatus()).rejects.toThrow()
+  })
 })
