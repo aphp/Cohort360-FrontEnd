@@ -3,8 +3,8 @@ import React from 'react'
 
 import useStyles from '../../styles'
 
-// Served from `public/` so the document can be swapped without rebuilding the app.
-export const CHARTER_PDF_URL = '/documents/charte-engagement-cohort360.pdf'
+const CHARTER_PDF_URL = '/documents/charte-engagement-cohort360.pdf'
+const CHARTER_PDF_EMBED_URL = `${CHARTER_PDF_URL}#navpanes=0&toolbar=0&statusbar=0&view=FitH`
 
 const CharterSignature = () => {
   const { classes } = useStyles()
@@ -17,7 +17,7 @@ const CharterSignature = () => {
       <Box className={classes.documentViewer}>
         <object
           className={classes.documentFrame}
-          data={CHARTER_PDF_URL}
+          data={CHARTER_PDF_EMBED_URL}
           type="application/pdf"
           aria-label="Charte d'engagement Cohort360"
         >

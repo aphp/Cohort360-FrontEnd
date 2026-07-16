@@ -73,7 +73,7 @@ describe('Onboarding page', () => {
     expect(screen.getByTestId('onboarding-warning')).toBeInTheDocument()
 
     await user.click(screen.getByRole('button', { name: /Continuer/ }))
-    expect(screen.getByText("L'enregistrement de vos actions")).toBeInTheDocument()
+    expect(screen.getByText("Les finalités d'usage")).toBeInTheDocument()
     expect(screen.queryByTestId('onboarding-warning')).not.toBeInTheDocument()
   })
 

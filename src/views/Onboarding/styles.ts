@@ -141,6 +141,14 @@ const useStyles = makeStyles()((theme: Theme) => ({
     gap: theme.spacing(2),
     marginTop: theme.spacing(3)
   },
+  backButton: {
+    // Pushed to the opposite edge from the primary action, which stays right-aligned when alone.
+    marginRight: 'auto',
+    backgroundColor: T.surface,
+    '&:hover': {
+      backgroundColor: T.surface
+    }
+  },
   title: {
     color: T.ink,
     fontWeight: 700
