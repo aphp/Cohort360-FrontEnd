@@ -2,13 +2,15 @@ import { render, screen } from '@testing-library/react'
 import React from 'react'
 import { describe, expect, it } from 'vitest'
 
-import CharterSignature, { CHARTER_PDF_URL } from '../CharterSignature'
+import CharterSignature from '../CharterSignature'
+
+const CHARTER_PDF_URL = '/documents/charte-engagement-cohort360.pdf'
 
 describe('CharterSignature (RG3309.01)', () => {
   it('embeds the charter as a scrollable PDF document', () => {
     render(<CharterSignature />)
     const document = screen.getByLabelText("Charte d'engagement Cohort360")
-    expect(document).toHaveAttribute('data', CHARTER_PDF_URL)
+    expect(document).toHaveAttribute('data', `${CHARTER_PDF_URL}#navpanes=0&toolbar=0&statusbar=0&view=FitH`)
     expect(document).toHaveAttribute('type', 'application/pdf')
   })
 
