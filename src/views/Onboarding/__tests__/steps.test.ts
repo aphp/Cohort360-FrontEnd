@@ -14,12 +14,12 @@ describe('onboarding step 2 configuration', () => {
   it('exposes the seven informative screens then the charter and its confirmation', () => {
     expect(commitmentScreens().map((screen) => screen.key)).toEqual([
       'usage-rules',
-      'actions-logging',
-      'care-team-sharing',
-      'data-crossing',
-      'minimal-data-use',
       'usage-purposes',
+      'minimal-data-use',
+      'data-crossing',
       'data-deletion',
+      'care-team-sharing',
+      'actions-logging',
       'charter-signature',
       'charter-confirmation'
     ])

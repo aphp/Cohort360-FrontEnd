@@ -1,3 +1,4 @@
+import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward'
 import { Avatar, Box, Button, Typography } from '@mui/material'
 import logo from 'assets/images/logo-login.png'
@@ -50,7 +51,13 @@ const OnboardingLayout = () => {
   const footer = (
     <>
       {screen === 'steps' && (
-        <Button onClick={goBack} disabled={saving}>
+        <Button
+          className={classes.backButton}
+          variant="outlined"
+          onClick={goBack}
+          disabled={saving}
+          startIcon={<ArrowBackIcon />}
+        >
           Revenir
         </Button>
       )}
