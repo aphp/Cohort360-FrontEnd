@@ -268,11 +268,7 @@ const QuestionSelectorDialog: React.FC<QuestionSelectorDialogProps> = ({
   const questionnaires = useMemo(
     () =>
       bundle.entry
-        .filter(
-          (e) =>
-            e.resource.name === 'APHPEDSQuestionnaireFicheHospitalisation' ||
-            e.resource.name === 'APHPEDSQuestionnaireFicheGrossesse'
-        )
+        .filter((e) => e.resource.name === 'FicheHospitalisation' || e.resource.name === 'FicheGrossesse')
         .map((e) => e.resource),
     [bundle]
   )
