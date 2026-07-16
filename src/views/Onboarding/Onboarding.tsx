@@ -1,6 +1,7 @@
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward'
 import { Avatar, Box, Button, Typography } from '@mui/material'
 import logo from 'assets/images/logo-login.png'
+import useOnboardingStatus from 'hooks/onboarding/useOnboardingStatus'
 import React from 'react'
 import { Navigate } from 'react-router-dom'
 import { useAppSelector } from 'state'
@@ -86,14 +87,14 @@ const OnboardingLayout = () => {
 }
 
 const Onboarding = () => {
-  const { step, completedAt } = useAppSelector((state) => state.onboarding)
+  const { status } = useOnboardingStatus()
 
-  if (completedAt !== null) {
+  if (status?.onboarding_completed_at != null) {
     return <Navigate to="/home" replace />
   }
 
   return (
-    <OnboardingProvider initialStep={step}>
+    <OnboardingProvider initialStep={status?.onboarding_step ?? 0}>
       <OnboardingLayout />
     </OnboardingProvider>
   )

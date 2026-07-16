@@ -1,10 +1,16 @@
 import type React from 'react'
 import { createContext, useContext, useMemo, useState } from 'react'
 
-import { useAppDispatch, useAppSelector } from 'state'
-import { advanceOnboarding, clearOnboardingError, ONBOARDING_TOTAL_STEPS } from 'state/onboarding'
+import useAdvanceOnboarding from 'hooks/onboarding/useAdvanceOnboarding'
+import useSignCharter from 'hooks/onboarding/useSignCharter'
 
-import { getScreenConfig, getStepScreenCount, ONBOARDING_STEPS, type OnboardingScreenConfig } from './steps'
+import {
+  getScreenConfig,
+  getStepScreenCount,
+  ONBOARDING_STEPS,
+  ONBOARDING_TOTAL_STEPS,
+  type OnboardingScreenConfig
+} from './steps'
 
 type OnboardingScreen = 'welcome' | 'steps'
 
@@ -35,8 +41,21 @@ type ProviderProps = {
 }
 
 export const OnboardingProvider = ({ initialStep, children }: ProviderProps) => {
-  const dispatch = useAppDispatch()
-  const { saving, error } = useAppSelector((state) => state.onboarding)
+  const {
+    mutate: persistStep,
+    reset: resetAdvance,
+    isPending: advancePending,
+    isError: advanceError
+  } = useAdvanceOnboarding()
+  const {
+    mutateAsync: signCharter,
+    reset: resetCharter,
+    isPending: charterPending,
+    isError: charterError
+  } = useSignCharter()
+
+  const saving = advancePending || charterPending
+  const error = advanceError || charterError
 
   const [currentStep, setCurrentStep] = useState(() => clampStep(initialStep))
   const [subStep, setSubStep] = useState(0)
@@ -55,7 +74,7 @@ export const OnboardingProvider = ({ initialStep, children }: ProviderProps) => 
         setSubStep((step) => step + 1)
         return
       }
-      dispatch(advanceOnboarding(currentStep + 1))
+      persistStep(currentStep + 1)
       if (!isLastMacroStep) {
         setCurrentStep((step) => step + 1)
         setSubStep(0)
@@ -72,8 +91,8 @@ export const OnboardingProvider = ({ initialStep, children }: ProviderProps) => 
       }
       const primaryAction = screenConfig?.primaryAction
       if (primaryAction) {
-        // On rejection the store raises the error message and the user stays on the screen.
-        primaryAction.run(dispatch).then(advance, () => undefined)
+        // On rejection the error message is raised and the user stays on the screen.
+        primaryAction.run({ signCharter }).then(advance, () => undefined)
         return
       }
       advance()
@@ -84,7 +103,8 @@ export const OnboardingProvider = ({ initialStep, children }: ProviderProps) => 
         return
       }
       if (error) {
-        dispatch(clearOnboardingError())
+        resetAdvance()
+        resetCharter()
       }
       if (subStep > 0) {
         setSubStep((step) => step - 1)
@@ -116,7 +136,7 @@ export const OnboardingProvider = ({ initialStep, children }: ProviderProps) => 
       goNext,
       goBack
     }
-  }, [screen, currentStep, subStep, saving, error, dispatch])
+  }, [screen, currentStep, subStep, saving, error, persistStep, signCharter, resetAdvance, resetCharter])
 
   return <OnboardingContext.Provider value={value}>{children}</OnboardingContext.Provider>
 }

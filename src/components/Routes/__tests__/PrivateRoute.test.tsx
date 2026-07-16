@@ -2,11 +2,20 @@ import { render, screen } from '@testing-library/react'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-const { mockDispatch } = vi.hoisted(() => ({ mockDispatch: vi.fn() }))
+const { mockUseAppSelector, mockUseOnboardingStatus } = vi.hoisted(() => ({
+  mockUseAppSelector: vi.fn(),
+  mockUseOnboardingStatus: vi.fn()
+}))
 
 vi.mock('state', () => ({
-  useAppSelector: vi.fn(),
-  useAppDispatch: () => mockDispatch
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  useAppSelector: (selector: any) => mockUseAppSelector(selector),
+  useAppDispatch: () => vi.fn()
+}))
+
+vi.mock('hooks/onboarding/useOnboardingStatus', () => ({
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  default: (...args: any[]) => mockUseOnboardingStatus(...args)
 }))
 
 vi.mock('services/aphp/serviceFhirConfig', () => ({
@@ -19,10 +28,8 @@ vi.mock('lodash', () => ({
 
 import { AppConfig, type AppConfig as AppConfigType } from 'config'
 import { ACCESS_TOKEN } from 'constants.js'
-import { useAppSelector } from 'state'
+import type { OnboardingStatus } from 'services/aphp/serviceOnboarding'
 import PrivateRoute from '../PrivateRoute'
-
-const mockedUseAppSelector = vi.mocked(useAppSelector)
 
 const makeJwt = (exp: number) => {
   const header = btoa(JSON.stringify({ alg: 'HS256' }))
@@ -46,16 +53,29 @@ const renderPrivateRoute = () =>
 
 const setValidToken = () => localStorage.setItem(ACCESS_TOKEN, makeJwt(Math.floor(Date.now() / 1000) + 3600))
 
-const stateNotOnboarded = { me: { id: 'user-1' }, onboarding: { completedAt: null, syncStatus: 'ready' } }
-const stateOnboarded = { me: { id: 'user-1' }, onboarding: { completedAt: '2026-01-01T00:00:00Z', syncStatus: 'ready' } }
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const setMe = (me: any) => mockUseAppSelector.mockImplementation((selector: any) => selector({ me }))
+
+const setStatus = (status: OnboardingStatus | undefined, statusPending = false) =>
+  mockUseOnboardingStatus.mockReturnValue({ status, statusPending, statusIsError: false, refetch: vi.fn() })
+
+const completedStatus: OnboardingStatus = {
+  onboarding_step: 3,
+  onboarding_completed_at: '2026-01-01T00:00:00Z',
+  charter_signed_at: '2026-01-01T00:00:00Z'
+}
+
+const pendingStatus: OnboardingStatus = {
+  onboarding_step: 0,
+  onboarding_completed_at: null,
+  charter_signed_at: null
+}
 
 describe('PrivateRoute', () => {
   beforeEach(() => {
     localStorage.clear()
-    mockDispatch.mockClear()
-    mockedUseAppSelector.mockImplementation((selector) =>
-      selector({ me: null, onboarding: { completedAt: null, syncStatus: 'idle' } } as never)
-    )
+    setMe(null)
+    setStatus(undefined, true)
   })
 
   it("bloque l'accès quand me est null", () => {
@@ -64,21 +84,32 @@ describe('PrivateRoute', () => {
   })
 
   it("bloque l'accès quand access_token est absent même avec me", () => {
-    mockedUseAppSelector.mockImplementation((selector) => selector(stateNotOnboarded as never))
+    setMe({ id: 'user-1' })
     renderPrivateRoute()
     expect(screen.getByText(/vous allez être redirigé vers la page de connexion/i)).toBeInTheDocument()
   })
 
   it("bloque l'accès quand le token est expiré", () => {
     localStorage.setItem(ACCESS_TOKEN, makeJwt(Math.floor(Date.now() / 1000) - 3600))
-    mockedUseAppSelector.mockImplementation((selector) => selector(stateNotOnboarded as never))
+    setMe({ id: 'user-1' })
     renderPrivateRoute()
     expect(screen.getByText(/vous allez être redirigé vers la page de connexion/i)).toBeInTheDocument()
   })
 
+  it('patiente tant que le statut onboarding n\'est pas confirmé', () => {
+    setValidToken()
+    setMe({ id: 'user-1' })
+    setStatus(undefined, true)
+    renderPrivateRoute()
+    expect(screen.getByRole('progressbar')).toBeInTheDocument()
+    expect(screen.queryByText('onboarding page')).not.toBeInTheDocument()
+    expect(screen.queryByText('private content')).not.toBeInTheDocument()
+  })
+
   it('redirige vers /onboarding quand le parcours n\'est pas terminé', () => {
     setValidToken()
-    mockedUseAppSelector.mockImplementation((selector) => selector(stateNotOnboarded as never))
+    setMe({ id: 'user-1' })
+    setStatus(pendingStatus)
     renderPrivateRoute()
     expect(screen.getByText('onboarding page')).toBeInTheDocument()
     expect(screen.queryByText('private content')).not.toBeInTheDocument()
@@ -86,61 +117,17 @@ describe('PrivateRoute', () => {
 
   it('laisse passer quand me, token valide et parcours terminé', () => {
     setValidToken()
-    mockedUseAppSelector.mockImplementation((selector) => selector(stateOnboarded as never))
+    setMe({ id: 'user-1' })
+    setStatus(completedStatus)
     renderPrivateRoute()
     expect(screen.getByText('private content')).toBeInTheDocument()
   })
 
-  it('déclenche le resync et patiente quand le statut est encore idle', () => {
+  it('ne déclenche la lecture du statut que lorsque la session est authentifiée', () => {
     setValidToken()
-    mockedUseAppSelector.mockImplementation((selector) =>
-      selector({ me: { id: 'user-1' }, onboarding: { completedAt: null, syncStatus: 'idle' } } as never)
-    )
+    setMe({ id: 'user-1' })
+    setStatus(completedStatus)
     renderPrivateRoute()
-    expect(mockDispatch).toHaveBeenCalled()
-    expect(screen.getByRole('progressbar')).toBeInTheDocument()
-    expect(screen.queryByText('private content')).not.toBeInTheDocument()
-  })
-
-  it('ne relance pas de resync quand le statut est déjà connu', () => {
-    setValidToken()
-    mockedUseAppSelector.mockImplementation((selector) => selector(stateOnboarded as never))
-    renderPrivateRoute()
-    expect(mockDispatch).not.toHaveBeenCalled()
-  })
-
-  it('patiente sans rien gater tant que le statut onboarding est en cours de resync', () => {
-    setValidToken()
-    mockedUseAppSelector.mockImplementation((selector) =>
-      selector({ me: { id: 'user-1' }, onboarding: { completedAt: null, syncStatus: 'loading' } } as never)
-    )
-    renderPrivateRoute()
-    expect(screen.getByRole('progressbar')).toBeInTheDocument()
-    expect(screen.queryByText('onboarding page')).not.toBeInTheDocument()
-    expect(screen.queryByText('private content')).not.toBeInTheDocument()
-  })
-
-  it("patiente sans démarrer l'onboarding quand le resync échoue (fail-closed)", () => {
-    setValidToken()
-    mockedUseAppSelector.mockImplementation((selector) =>
-      selector({ me: { id: 'user-1' }, onboarding: { completedAt: null, syncStatus: 'error' } } as never)
-    )
-    renderPrivateRoute()
-    expect(screen.getByRole('progressbar')).toBeInTheDocument()
-    expect(screen.queryByText('onboarding page')).not.toBeInTheDocument()
-    expect(screen.queryByText('private content')).not.toBeInTheDocument()
-  })
-
-  it('relance le resync en tâche de fond après un échec', () => {
-    setValidToken()
-    vi.useFakeTimers()
-    mockedUseAppSelector.mockImplementation((selector) =>
-      selector({ me: { id: 'user-1' }, onboarding: { completedAt: null, syncStatus: 'error' } } as never)
-    )
-    renderPrivateRoute()
-    mockDispatch.mockClear()
-    vi.advanceTimersByTime(3000)
-    expect(mockDispatch).toHaveBeenCalled()
-    vi.useRealTimers()
+    expect(mockUseOnboardingStatus).toHaveBeenCalledWith(true)
   })
 })

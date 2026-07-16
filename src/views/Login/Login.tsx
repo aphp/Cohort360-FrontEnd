@@ -14,6 +14,7 @@ import {
   TextField,
   Typography
 } from '@mui/material'
+import { useQueryClient } from '@tanstack/react-query'
 import Keycloak from 'assets/icones/keycloak.svg?react'
 import logoAPHP from 'assets/images/logo-aphp.png'
 import logo from 'assets/images/logo-login.png'
@@ -21,6 +22,7 @@ import { isAxiosError } from 'axios'
 import NoRights from 'components/ErrorView/NoRights'
 import { AppConfig } from 'config'
 import { ACCESS_TOKEN, REFRESH_TOKEN } from 'constants.js'
+import { ONBOARDING_STATUS_QUERY_KEY } from 'hooks/onboarding/useOnboardingStatus'
 import React, {
   type KeyboardEvent as ReactKeyboardEvent,
   type SyntheticEvent,
@@ -33,7 +35,6 @@ import { useNavigate } from 'react-router-dom'
 import services from 'services/aphp'
 import { useAppDispatch, useAppSelector } from 'state'
 import { login as loginAction, type MeState } from 'state/me'
-import { hydrateOnboarding } from 'state/onboarding'
 import { saveRights } from 'state/scope'
 import type { AccessExpiration, User } from 'types'
 import { getDaysLeft } from 'utils/dates'
@@ -122,6 +123,7 @@ const Login = () => {
   const { classes, cx } = useStyles()
   const appConfig = useContext(AppConfig)
   const dispatch = useAppDispatch()
+  const queryClient = useQueryClient()
   const me = useAppSelector((state) => state.me)
   const [loading, setLoading] = useState(false)
   const [username, setUsername] = useState('')
@@ -182,13 +184,12 @@ const Login = () => {
           accessExpirations
         }
         dispatch(loginAction(loginState))
-        dispatch(
-          hydrateOnboarding({
-            step: practitionerData.onboarding_step ?? 0,
-            completedAt: practitionerData.onboarding_completed_at ?? null,
-            charterSignedAt: practitionerData.charter_signed_at ?? null
-          })
-        )
+        // The login payload already carries the server truth, so the gate reads it without a resync.
+        queryClient.setQueryData(ONBOARDING_STATUS_QUERY_KEY, {
+          onboarding_step: practitionerData.onboarding_step ?? 0,
+          onboarding_completed_at: practitionerData.onboarding_completed_at ?? null,
+          charter_signed_at: practitionerData.charter_signed_at ?? null
+        })
         dispatch(saveRights({ rights: practitionerPerimeters }))
         const oldPath = localStorage.getItem('old-path')
         localStorage.removeItem('old-path')

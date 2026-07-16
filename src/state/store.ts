@@ -12,7 +12,6 @@ import exploredCohort from './exploredCohort'
 import me from './me'
 import message from './message'
 import { temporalConstraintsMiddleware } from './middlewares'
-import onboarding from './onboarding'
 import preferences from './preferences'
 import project from './project'
 import request from './request'
@@ -24,7 +23,6 @@ import warningDialog from './warningDialog'
 // Combine reducers
 export const rootReducer = combineReducers({
   me,
-  onboarding,
   preferences,
   cohortCreation: combineReducers({
     criteria,
@@ -46,9 +44,7 @@ export const rootReducer = combineReducers({
 const persistConfig = {
   key: 'root',
   storage: localforage,
-  // onboarding is intentionally not persisted: the server is the source of truth and it is
-  // resynced on every app entry, so a stale persisted value can never gate an onboarded user.
-  blacklist: ['message', 'warningDialog', 'questionnairesFormData', 'onboarding']
+  blacklist: ['message', 'warningDialog', 'questionnairesFormData']
 }
 
 /**
