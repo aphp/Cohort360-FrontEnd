@@ -40,10 +40,7 @@ const DownloadPopup: React.FC = () => {
         path = `/cohort/${resource}/${itemId}/download/`
       }
       const downloadResponse = await apiBackend.get(path, {
-        responseType: 'blob',
-        onDownloadProgress: (progressEvent) => {
-          if (progressEvent.progress === 1) setDownloading(null)
-        }
+        responseType: 'blob'
       })
 
       if (downloadResponse.status !== 200) {
@@ -65,6 +62,8 @@ const DownloadPopup: React.FC = () => {
 
       document.body.removeChild(link)
       window.URL.revokeObjectURL(url)
+
+      setDownloading(null)
     } catch (error) {
       console.error(error)
       setDownloading(false)
@@ -89,7 +88,7 @@ const DownloadPopup: React.FC = () => {
   if (downloading === null) {
     downloadStatusContent = (
       <Typography variant="h2" color="primary">
-        Téléchargement terminé!
+        Téléchargement terminé !
       </Typography>
     )
   } else if (downloading) {
