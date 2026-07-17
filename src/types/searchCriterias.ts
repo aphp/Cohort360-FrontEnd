@@ -7,8 +7,8 @@ import { FhirItem } from './valueSet'
 import { ScopeElement } from './scope'
 
 export enum FormNames {
-  PREGNANCY = 'APHPEDSQuestionnaireFicheGrossesse',
-  HOSPIT = 'APHPEDSQuestionnaireFicheHospitalisation',
+  PREGNANCY = 'FicheGrossesse',
+  HOSPIT = 'FicheHospitalisation',
   UNKNOWN = 'Inconnu'
 }
 
