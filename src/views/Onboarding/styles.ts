@@ -1,14 +1,21 @@
 import type { Theme } from '@mui/material/styles'
+import { eds } from 'styles/palette'
 import { makeStyles } from 'tss-react/mui'
 
 import { onboardingTokens as T } from './tokens'
+
+const FONT = "'Rubik', sans-serif"
 
 const useStyles = makeStyles()((theme: Theme) => ({
   page: {
     minHeight: '100vh',
     display: 'flex',
     flexDirection: 'column',
-    backgroundColor: T.pageBg
+    backgroundColor: T.pageBg,
+    fontFamily: FONT,
+    '& .MuiTypography-root, & .MuiButton-root': {
+      fontFamily: FONT
+    }
   },
   header: {
     display: 'flex',
@@ -93,7 +100,6 @@ const useStyles = makeStyles()((theme: Theme) => ({
     width: 28,
     height: 28,
     borderRadius: '50%',
-    border: `2px solid ${T.railTodo}`,
     backgroundColor: T.surface,
     color: T.railDone,
     display: 'flex',
@@ -103,12 +109,10 @@ const useStyles = makeStyles()((theme: Theme) => ({
     fontWeight: 700
   },
   stepCircleActive: {
-    border: 'none',
     backgroundColor: T.railDone,
     color: T.surface
   },
   stepCircleCompleted: {
-    border: 'none',
     color: T.railDone
   },
   stepLabel: {
@@ -143,9 +147,19 @@ const useStyles = makeStyles()((theme: Theme) => ({
   backButton: {
     // Pushed to the opposite edge from the primary action, which stays right-aligned when alone.
     marginRight: 'auto',
+    color: eds.blue[400],
+    borderColor: eds.blue[400],
     backgroundColor: T.surface,
     '&:hover': {
+      borderColor: eds.blue[400],
       backgroundColor: T.surface
+    }
+  },
+  nextButton: {
+    backgroundColor: eds.blue[400],
+    color: T.surface,
+    '&:hover': {
+      backgroundColor: eds.blue[600]
     }
   },
   title: {
@@ -154,11 +168,12 @@ const useStyles = makeStyles()((theme: Theme) => ({
   },
   intro: {
     color: T.muted,
+    fontSize: 16,
     marginTop: theme.spacing(2)
   },
   stepRow: {
     display: 'flex',
-    alignItems: 'flex-start',
+    alignItems: 'center',
     gap: theme.spacing(2),
     marginTop: theme.spacing(3)
   },
@@ -175,27 +190,42 @@ const useStyles = makeStyles()((theme: Theme) => ({
   },
   stepTitle: {
     color: T.ink,
+    fontSize: 16,
     fontWeight: 700
   },
   stepDesc: {
-    color: T.muted
+    color: T.muted,
+    fontSize: 16
   },
   error: {
     marginTop: theme.spacing(2),
     color: theme.palette.error.main
   },
   sectionText: {
-    color: T.muted,
+    color: T.ink,
+    fontSize: 16,
     marginTop: theme.spacing(2),
     lineHeight: 1.6
   },
   subTitle: {
     color: T.ink,
+    fontSize: 22,
     fontWeight: 700,
     marginTop: theme.spacing(3)
   },
+  sectionLead: {
+    color: T.ink,
+    fontSize: 16,
+    fontWeight: 700,
+    marginTop: theme.spacing(3)
+  },
+  rowLabel: {
+    color: T.ink,
+    fontSize: 16
+  },
   list: {
-    color: T.muted,
+    color: T.ink,
+    fontSize: 16,
     marginTop: theme.spacing(1.5),
     paddingLeft: theme.spacing(3),
     lineHeight: 1.6,
@@ -207,7 +237,8 @@ const useStyles = makeStyles()((theme: Theme) => ({
     display: 'inline-flex',
     alignItems: 'center',
     gap: theme.spacing(0.5),
-    color: theme.palette.primary.main,
+    color: eds.blue[400],
+    fontSize: 16,
     fontWeight: 600,
     textDecoration: 'none',
     '&:hover': {
@@ -221,19 +252,21 @@ const useStyles = makeStyles()((theme: Theme) => ({
     marginTop: theme.spacing(2)
   },
   divider: {
-    marginTop: theme.spacing(3)
+    marginTop: theme.spacing(3),
+    borderColor: eds.blue[200]
   },
   infoRow: {
     display: 'flex',
-    alignItems: 'flex-start',
+    alignItems: 'center',
     gap: theme.spacing(1.5),
     marginTop: theme.spacing(3)
   },
   infoBadge: {
-    marginTop: theme.spacing(0.25)
+    flexShrink: 0
   },
   infoText: {
-    color: theme.palette.primary.main,
+    color: eds.blue[800],
+    fontSize: 16,
     lineHeight: 1.6
   },
   loadingRow: {
@@ -279,22 +312,17 @@ const useStyles = makeStyles()((theme: Theme) => ({
   },
   warningNotice: {
     display: 'flex',
-    alignItems: 'flex-start',
+    alignItems: 'center',
     gap: theme.spacing(1.5),
     marginTop: theme.spacing(3)
   },
   warningBadge: {
-    marginTop: theme.spacing(-0.25)
+    flexShrink: 0
   },
   warningText: {
     color: T.warning,
     fontWeight: 600,
     lineHeight: 1.5
-  },
-  bareTitle: {
-    color: T.deepBlue,
-    fontWeight: 700,
-    marginBottom: theme.spacing(4)
   },
   illustrationRow: {
     display: 'flex',
