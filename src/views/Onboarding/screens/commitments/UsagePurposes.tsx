@@ -30,7 +30,7 @@ const UsagePurposes = () => {
       <Typography className={classes.sectionText}>
         L'Entrepôt de Données de Santé (EDS) de l'AP-HP contient des données à caractère personnel sensibles.
       </Typography>
-      <Typography className={classes.subTitle}>
+      <Typography className={classes.sectionLead}>
         Seules certaines finalités d'utilisation des données sont autorisées :
       </Typography>
       {PURPOSES.map(({ label, icon: Icon }) => (
@@ -38,7 +38,7 @@ const UsagePurposes = () => {
           <Box className={classes.iconBox}>
             <Icon fontSize="small" />
           </Box>
-          <Typography className={classes.stepTitle}>{label}</Typography>
+          <Typography className={classes.rowLabel}>{label}</Typography>
         </Box>
       ))}
     </Box>
