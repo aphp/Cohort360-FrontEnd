@@ -11,7 +11,7 @@ const CharterSignature = () => {
 
   return (
     <Box>
-      <Typography variant="h3" className={classes.bareTitle}>
+      <Typography variant="h4" className={classes.title}>
         Signer la charte d'engagement
       </Typography>
       <Box className={classes.documentViewer}>
@@ -28,6 +28,11 @@ const CharterSignature = () => {
             </Link>
           </Box>
         </object>
+      </Box>
+      <Box className={classes.linkRow}>
+        <Link className={classes.link} href={CHARTER_PDF_URL} download>
+          Télécharger une copie de la charte d'engagement
+        </Link>
       </Box>
     </Box>
   )
