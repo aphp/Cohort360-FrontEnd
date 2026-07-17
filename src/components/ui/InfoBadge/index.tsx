@@ -1,11 +1,13 @@
 import { styled, useTheme } from '@mui/material'
 import React from 'react'
 
-import CircleBadge from 'components/ui/CircleBadge'
+import CircleBadge, { type CircleBadgeVariant } from 'components/ui/CircleBadge'
 
 type InfoBadgeProps = {
   size?: number
   className?: string
+  color?: string
+  variant?: CircleBadgeVariant
 }
 
 const Glyph = styled('span')({
@@ -13,11 +15,11 @@ const Glyph = styled('span')({
   fontStyle: 'italic'
 })
 
-const InfoBadge = ({ size = 24, className }: InfoBadgeProps) => {
+const InfoBadge = ({ size = 24, className, color, variant = 'outlined' }: InfoBadgeProps) => {
   const theme = useTheme()
 
   return (
-    <CircleBadge color={theme.palette.primary.dark} variant="outlined" size={size} className={className}>
+    <CircleBadge color={color ?? theme.palette.primary.dark} variant={variant} size={size} className={className}>
       <Glyph>i</Glyph>
     </CircleBadge>
   )

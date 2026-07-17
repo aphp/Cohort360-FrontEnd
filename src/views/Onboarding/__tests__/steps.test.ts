@@ -33,8 +33,8 @@ describe('onboarding step 2 configuration', () => {
     expect(withAction[0].primaryAction?.label).toBe('Signer')
   })
 
-  it('renders the charter without the card wrapper', () => {
-    expect(getScreenConfig(COMMITMENTS_STEP, 7)?.layout).toBe('bare')
+  it('renders the charter inside the default card wrapper', () => {
+    expect(getScreenConfig(COMMITMENTS_STEP, 7)?.layout).toBeUndefined()
   })
 
   it('counts a screenless step as a single slot so the journey never stalls', () => {
