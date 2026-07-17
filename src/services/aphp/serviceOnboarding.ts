@@ -10,11 +10,18 @@ export type CharterSignature = {
   charter_signed_at: string
 }
 
+export type OnboardingStatus = {
+  onboarding_step: number
+  onboarding_completed_at: string | null
+  charter_signed_at: string | null
+}
+
 export interface IServiceOnboarding {
   updateStep: (step: number) => Promise<OnboardingProgress>
   signCharter: () => Promise<CharterSignature>
   getMyAccesses: () => Promise<MyAccess[]>
   getRightsCatalog: () => Promise<RightCatalogCategory[]>
+  getStatus: () => Promise<OnboardingStatus>
 }
 
 /**
@@ -39,7 +46,8 @@ const serviceOnboarding: IServiceOnboarding = {
   getRightsCatalog: async () => {
     const { data } = await apiBackend.get<RightCatalogCategory[]>('accesses/rights/')
     return data
-  }
+  },
+  getStatus: async () => requireData(await apiBackend.get<OnboardingStatus>('/users/me/onboarding/'))
 }
 
 export default serviceOnboarding

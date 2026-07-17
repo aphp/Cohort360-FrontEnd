@@ -3,8 +3,6 @@ import HistoryEduIcon from '@mui/icons-material/HistoryEdu'
 import MenuBookIcon from '@mui/icons-material/MenuBook'
 import type { SvgIconProps } from '@mui/material'
 import type { ComponentType } from 'react'
-import type { AppDispatch } from 'state'
-import { signCharter } from 'state/onboarding'
 
 import ActionsLogging from './screens/commitments/ActionsLogging'
 import CareTeamSharing from './screens/commitments/CareTeamSharing'
@@ -20,13 +18,21 @@ import UserRights from './screens/environment/UserRights'
 import WhatIsCohort360 from './screens/environment/WhatIsCohort360'
 import WhatIsEds from './screens/environment/WhatIsEds'
 
+// Mirrors User.ONBOARDING_TOTAL_STEPS server-side.
+export const ONBOARDING_TOTAL_STEPS = 3
+
+/** Actions a screen's primary button can trigger, injected by the wizard. */
+export type OnboardingActions = {
+  signCharter: () => Promise<unknown>
+}
+
 /**
  * Replaces the default `Continuer` button on a screen. It runs before the journey moves on:
- * a rejection leaves the user where they are, with the error surfaced by the store.
+ * a rejection leaves the user where they are, with the error surfaced by the wizard.
  */
 export type OnboardingPrimaryAction = {
   label: string
-  run: (dispatch: AppDispatch) => Promise<unknown>
+  run: (actions: OnboardingActions) => Promise<unknown>
   /** Shown instead of the generic progress-saving error when `run` rejects. */
   errorMessage?: string
 }
@@ -79,7 +85,7 @@ export const ONBOARDING_STEPS: OnboardingStepConfig[] = [
         layout: 'bare',
         primaryAction: {
           label: 'Signer',
-          run: (dispatch) => dispatch(signCharter()).unwrap(),
+          run: ({ signCharter }) => signCharter(),
           errorMessage: 'Une erreur est survenue lors de la signature de la charte. Veuillez réessayer.'
         }
       },
