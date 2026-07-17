@@ -61,7 +61,13 @@ const OnboardingLayout = () => {
           Revenir
         </Button>
       )}
-      <Button variant="contained" onClick={goNext} disabled={saving} endIcon={<ArrowForwardIcon />}>
+      <Button
+        className={classes.nextButton}
+        variant="contained"
+        onClick={goNext}
+        disabled={saving}
+        endIcon={<ArrowForwardIcon />}
+      >
         {primaryLabel}
       </Button>
     </>
