@@ -8,7 +8,6 @@ import { Navigate } from 'react-router-dom'
 import { useAppSelector } from 'state'
 
 import { OnboardingProvider, useOnboarding } from './OnboardingContext'
-import StepPlaceholder from './StepPlaceholder'
 import { ONBOARDING_STEPS } from './steps'
 import useStyles from './styles'
 import WelcomeScreen from './WelcomeScreen'
@@ -34,7 +33,6 @@ const OnboardingLayout = () => {
   const { screen, currentStep, screenConfig, stepProgress, primaryLabel, saving, error, goNext, goBack } =
     useOnboarding()
 
-  const activeStepConfig = ONBOARDING_STEPS[currentStep]
   const ActiveScreen = screenConfig?.component
 
   const header = (
@@ -77,13 +75,7 @@ const OnboardingLayout = () => {
       layout={screenConfig?.layout}
       footer={footer}
     >
-      {screen === 'welcome' ? (
-        <WelcomeScreen />
-      ) : ActiveScreen ? (
-        <ActiveScreen />
-      ) : (
-        <StepPlaceholder step={activeStepConfig} />
-      )}
+      {screen === 'welcome' ? <WelcomeScreen /> : ActiveScreen && <ActiveScreen />}
       {error && (
         <Typography role="alert" className={classes.error}>
           {screenConfig?.primaryAction?.errorMessage ?? PROGRESS_ERROR_MESSAGE}

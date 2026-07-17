@@ -343,6 +343,13 @@ const useStyles = makeStyles()((theme: Theme) => ({
     marginTop: theme.spacing(3),
     color: T.ink,
     fontWeight: 700
+  },
+  video: {
+    display: 'block',
+    width: '100%',
+    marginTop: theme.spacing(3),
+    borderRadius: 6,
+    backgroundColor: T.documentBg
   }
 }))
 

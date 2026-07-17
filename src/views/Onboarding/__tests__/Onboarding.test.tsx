@@ -77,11 +77,10 @@ describe('Onboarding page', () => {
     expect(screen.queryByTestId('onboarding-warning')).not.toBeInTheDocument()
   })
 
-  it('falls back to the step placeholder while a step has no screen yet', () => {
-    renderAt({ ...baseStatus, onboarding_step: 2 })
-    // The label also appears in the stepper rail, so target the card's heading.
-    expect(screen.getByRole('heading', { name: "Prendre en main l'outil" })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /Terminer/ })).toBeInTheDocument()
+  it('closes the journey on the guided tour, with a button to the application', () => {
+    renderAt({ ...baseStatus, onboarding_step: 2 }, { deidentified: false } as MeState)
+    expect(screen.getByRole('heading', { name: 'Prendre en main Cohort360' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /Accéder à Cohort360/ })).toBeInTheDocument()
   })
 
   it('surfaces the progress error and keeps the user on the screen', async () => {
@@ -89,7 +88,7 @@ describe('Onboarding page', () => {
     const user = userEvent.setup()
     renderAt({ ...baseStatus, onboarding_step: 2 })
 
-    await user.click(screen.getByRole('button', { name: /Terminer/ }))
+    await user.click(screen.getByRole('button', { name: /Accéder à Cohort360/ }))
     await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent(/enregistrement de votre progression/))
   })
 
@@ -98,8 +97,8 @@ describe('Onboarding page', () => {
     const user = userEvent.setup()
     renderAt({ ...baseStatus, onboarding_step: 2 })
 
-    await user.click(screen.getByRole('button', { name: /Terminer/ }))
-    await waitFor(() => expect(screen.getByRole('button', { name: /Terminer/ })).toBeDisabled())
+    await user.click(screen.getByRole('button', { name: /Accéder à Cohort360/ }))
+    await waitFor(() => expect(screen.getByRole('button', { name: /Accéder à Cohort360/ })).toBeDisabled())
     expect(screen.getByRole('button', { name: 'Revenir' })).toBeDisabled()
   })
 
