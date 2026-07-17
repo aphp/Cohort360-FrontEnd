@@ -1,7 +1,6 @@
-import { configureStore } from '@reduxjs/toolkit'
-import { act, renderHook } from '@testing-library/react'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { act, renderHook, waitFor } from '@testing-library/react'
 import type React from 'react'
-import { Provider } from 'react-redux'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 const updateStep = vi.fn()
@@ -11,17 +10,22 @@ vi.mock('services/aphp/serviceOnboarding', () => ({
   default: { updateStep: (step: number) => updateStep(step), signCharter: () => signCharterCall() }
 }))
 
-import onboardingReducer from 'state/onboarding'
+import { ONBOARDING_STATUS_QUERY_KEY } from 'hooks/onboarding/useOnboardingStatus'
 import { OnboardingProvider, useOnboarding } from '../OnboardingContext'
 
 const CHARTER_SUBSTEP = 7
 
 const renderOnboarding = (initialStep: number) => {
-  const store = configureStore({ reducer: { onboarding: onboardingReducer } })
+  const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
+  queryClient.setQueryData(ONBOARDING_STATUS_QUERY_KEY, {
+    onboarding_step: initialStep,
+    onboarding_completed_at: null,
+    charter_signed_at: null
+  })
   const wrapper = ({ children }: { children: React.ReactNode }) => (
-    <Provider store={store}>
+    <QueryClientProvider client={queryClient}>
       <OnboardingProvider initialStep={initialStep}>{children}</OnboardingProvider>
-    </Provider>
+    </QueryClientProvider>
   )
   return renderHook(() => useOnboarding(), { wrapper })
 }
@@ -188,8 +192,8 @@ describe('OnboardingContext', () => {
       result.current.goNext()
     })
 
+    await waitFor(() => expect(result.current.error).toBe(true))
     expect(result.current.subStep).toBe(CHARTER_SUBSTEP)
-    expect(result.current.error).toBe(true)
     expect(updateStep).not.toHaveBeenCalled()
   })
 
@@ -199,7 +203,7 @@ describe('OnboardingContext', () => {
 
     const { result } = renderOnboarding(2) // last macro step: goNext persists immediately
     act(() => result.current.goNext())
-    expect(result.current.saving).toBe(true)
+    await waitFor(() => expect(result.current.saving).toBe(true))
     expect(updateStep).toHaveBeenCalledTimes(1)
 
     act(() => result.current.goNext())
@@ -208,7 +212,7 @@ describe('OnboardingContext', () => {
     await act(async () => {
       release({ onboarding_step: 3, onboarding_completed_at: '2026-07-10T09:00:00Z' })
     })
-    expect(result.current.saving).toBe(false)
+    await waitFor(() => expect(result.current.saving).toBe(false))
   })
 
   it('clears the error banner when the user steps back', async () => {
@@ -217,7 +221,7 @@ describe('OnboardingContext', () => {
     await act(async () => {
       result.current.goNext()
     })
-    expect(result.current.error).toBe(true)
+    await waitFor(() => expect(result.current.error).toBe(true))
 
     act(() => result.current.goBack())
     expect(result.current.error).toBe(false)

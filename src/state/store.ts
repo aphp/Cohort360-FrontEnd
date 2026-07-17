@@ -12,7 +12,6 @@ import exploredCohort from './exploredCohort'
 import me from './me'
 import message from './message'
 import { temporalConstraintsMiddleware } from './middlewares'
-import onboarding from './onboarding'
 import preferences from './preferences'
 import project from './project'
 import request from './request'
@@ -24,7 +23,6 @@ import warningDialog from './warningDialog'
 // Combine reducers
 export const rootReducer = combineReducers({
   me,
-  onboarding,
   preferences,
   cohortCreation: combineReducers({
     criteria,
