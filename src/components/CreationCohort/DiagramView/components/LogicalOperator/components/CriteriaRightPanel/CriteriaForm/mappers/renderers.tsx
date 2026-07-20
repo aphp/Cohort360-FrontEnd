@@ -27,7 +27,7 @@ import { CriteriaLabel } from 'components/ui/CriteriaLabel'
 import { Comparators } from 'types/requestCriterias'
 import SimpleSelect from 'components/ui/Inputs/SimpleSelect'
 import ValueSetField from 'components/SearchValueSet/ValueSetField'
-import { checkIsLeaf, matchStoredCodeInCache } from 'utils/valueSets'
+import { checkIsLeaf, expandStoredCodesInCache } from 'utils/valueSets'
 import { getConfig } from 'config'
 import { selectValueSetCodes } from 'state/valueSets'
 import SearchbarWithCheck from 'components/ui/Searchbar/SearchbarWithChecks'
@@ -328,9 +328,7 @@ const FORM_ITEM_RENDERER: { [key in CriteriaFormItemType]: CriteriaFormItemView<
     const ccamHierarchyUrl = getConfig().features.procedure.valueSets.procedureHierarchy?.url
     const allowPrefixMatch =
       !!ccamHierarchyUrl && props.definition.valueSetsInfo.some((ref) => ref.url === ccamHierarchyUrl)
-    const valueWithLabels = (props.value ?? []).map((code) =>
-      matchStoredCodeInCache(code, codeCaches, allowPrefixMatch)
-    )
+    const valueWithLabels = expandStoredCodesInCache(props.value ?? [], codeCaches, allowPrefixMatch)
     // eslint-disable-next-line react-hooks/rules-of-hooks
     const [valueBuffer, setValueBuffer] = useState(valueWithLabels)
 

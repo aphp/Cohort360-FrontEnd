@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 const criteriaMocks = vi.hoisted(() => ({ getAllCriteriaItems: vi.fn() }))
 const valueSetMocks = vi.hoisted(() => ({
   getValueSetFromCodeSystem: vi.fn(),
-  matchStoredCodeInCache: vi.fn()
+  expandStoredCodesInCache: vi.fn()
 }))
 
 vi.mock('components/CreationCohort/DataList_Criteria', () => criteriaMocks)
@@ -23,8 +23,10 @@ describe('healCriteriaCodes', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     criteriaMocks.getAllCriteriaItems.mockReturnValue([ccamDefinition])
-    valueSetMocks.matchStoredCodeInCache.mockImplementation((code: any) =>
-      code.id === '000742' ? { id: '000742.....', system: 'https://ccam-vs', label: 'noeud' } : code
+    valueSetMocks.expandStoredCodesInCache.mockImplementation((codes: any[]) =>
+      codes.flatMap((code) =>
+        code.id === '000742' ? [{ id: '000742.....', system: 'https://ccam-vs', label: 'noeud' }] : [code]
+      )
     )
   })
 
@@ -54,5 +56,24 @@ describe('healCriteriaCodes', () => {
     const selectedCriteria = [{ type: 'PROC', code: [] }] as any
 
     expect(healCriteriaCodes([] as any, selectedCriteria, {} as any)).toBe(selectedCriteria)
+  })
+
+  it('expands a wildcard CCAM code into its declensions', () => {
+    valueSetMocks.expandStoredCodesInCache.mockImplementation((codes: any[]) =>
+      codes.flatMap((code) =>
+        code.id === 'JQGA004*'
+          ? [
+              { id: 'JQGA004...01', system: 'https://ccam-vs', label: '01' },
+              { id: 'JQGA004-1201', system: 'https://ccam-vs', label: '1201' },
+              code
+            ]
+          : [code]
+      )
+    )
+    const selectedCriteria = [{ type: 'PROC', code: [{ id: 'JQGA004*', system: 'https://ccam-vs' }] }] as any
+
+    const healed = healCriteriaCodes([] as any, selectedCriteria, {} as any) as any[]
+
+    expect(healed[0].code.map((c: any) => c.id)).toEqual(['JQGA004...01', 'JQGA004-1201', 'JQGA004*'])
   })
 })
