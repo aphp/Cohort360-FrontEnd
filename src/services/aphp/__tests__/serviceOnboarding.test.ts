@@ -56,6 +56,16 @@ describe('serviceOnboarding', () => {
     expect(get).toHaveBeenCalledWith('accesses/rights/')
   })
 
+  it('rejects when the accesses request is swallowed by the interceptor', async () => {
+    get.mockResolvedValue(new Error('Request failed with status code 503'))
+    await expect(serviceOnboarding.getMyAccesses()).rejects.toThrow()
+  })
+
+  it('rejects when the rights catalog request is swallowed by the interceptor', async () => {
+    get.mockResolvedValue(new Error('Request failed with status code 503'))
+    await expect(serviceOnboarding.getRightsCatalog()).rejects.toThrow()
+  })
+
   it('returns the current onboarding status', async () => {
     get.mockResolvedValue({
       data: { onboarding_step: 3, onboarding_completed_at: '2026-06-29T10:00:00Z', charter_signed_at: null }
