@@ -1,5 +1,5 @@
 import CheckCircleIcon from '@mui/icons-material/CheckCircle'
-import { Box, CircularProgress, Typography } from '@mui/material'
+import { Box, CircularProgress, Link, Typography } from '@mui/material'
 import moment from 'moment'
 import React from 'react'
 
@@ -7,6 +7,8 @@ import { useAppSelector } from 'state'
 
 import useStyles from '../../styles'
 import { useUserAccesses } from './useUserAccesses'
+
+const SUPPORT_MAIL = 'id.recherche.support.dsn@aphp.fr'
 
 const UserRights = () => {
   const { classes } = useStyles()
@@ -30,12 +32,20 @@ const UserRights = () => {
     )
   }
 
-  if (hasError) {
+  // Un appel en échec comme un périmètre vide laissent l'écran sans rien à montrer : même message,
+  // et le parcours reste franchissable.
+  if (hasError || accesses.length === 0) {
     return (
       <Box>
         {title}
-        <Typography role="alert" className={classes.error}>
-          Une erreur est survenue lors de la récupération de vos droits d'accès. Veuillez réessayer ultérieurement.
+        <Typography role="status" className={classes.sectionText}>
+          Le détail de votre accès à Cohort360 n'est pas disponible pour le moment.
+        </Typography>
+        <Typography className={classes.sectionText}>
+          Pour en savoir plus sur vos droits et votre périmètre accessible dans l'application, contactez le support :{' '}
+          <Link className={classes.inlineLink} href={`mailto:${SUPPORT_MAIL}`}>
+            {SUPPORT_MAIL}
+          </Link>
         </Typography>
       </Box>
     )
