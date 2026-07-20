@@ -13,7 +13,9 @@ import {
   getSearchSystemUrl,
   checkIsLeaf,
   matchStoredCodeInCache,
-  findCodeByIdOrPrefix
+  findCodeByIdOrPrefix,
+  expandStoredCodeInCache,
+  expandStoredCodesInCache
 } from 'utils/valueSets'
 import { HIERARCHY_ROOT } from 'services/aphp/serviceValueSets'
 import { Hierarchy } from 'types/hierarchy'
@@ -654,6 +656,80 @@ describe('valueSets utilities', () => {
       const stored = { id: 'ZZZZ999', system: CCAM }
       expect(matchStoredCodeInCache(stored, cache, true)).toBe(stored)
     })
+
+    it('keeps a segmented act code as stored', () => {
+      const segmented = {
+        [CCAM]: [item('JQGA004...01', 'Acte 01'), item('JQGA004...04', 'Acte 04'), item('JQGA004-1201', 'Acte 1201')]
+      }
+      const stored = { id: 'JQGA004', label: '', system: CCAM }
+      expect(matchStoredCodeInCache(stored, segmented, true)).toBe(stored)
+    })
+  })
+
+  describe('expandStoredCodeInCache', () => {
+    const CCAM = 'https://ccam'
+    const item = (id: string): Hierarchy<FhirItem> => ({ id, label: id, system: CCAM }) as Hierarchy<FhirItem>
+    const declensions = [item('JQGA004...01'), item('JQGA004...04'), item('JQGA004-1201')]
+
+    it('expands a wildcard code into every declension held in cache', () => {
+      const stored = { id: 'JQGA004*', system: CCAM }
+      const result = expandStoredCodeInCache(stored, { [CCAM]: declensions }, true)
+      expect(result.map((c) => c.id)).toEqual(['JQGA004...01', 'JQGA004...04', 'JQGA004-1201', 'JQGA004*'])
+    })
+
+    it('keeps the wildcard untouched when the cache holds no declension', () => {
+      const stored = { id: 'JQGA004*', system: CCAM }
+      expect(expandStoredCodeInCache(stored, { [CCAM]: [] }, true)).toEqual([stored])
+    })
+
+    it('does not expand a wildcard outside CCAM', () => {
+      const stored = { id: 'JQGA004*', system: CCAM }
+      const result = expandStoredCodeInCache(stored, { [CCAM]: declensions }, false)
+      expect(result).toEqual([stored])
+    })
+
+    it('falls back to the single match for a code without wildcard', () => {
+      const stored = { id: 'JQGA004...01', system: CCAM }
+      const result = expandStoredCodeInCache(stored, { [CCAM]: declensions }, true)
+      expect(result.map((c) => c.id)).toEqual(['JQGA004...01'])
+    })
+  })
+
+  describe('expandStoredCodesInCache', () => {
+    const CCAM = 'https://ccam'
+    const item = (id: string): Hierarchy<FhirItem> => ({ id, label: id, system: CCAM }) as Hierarchy<FhirItem>
+    const declensions = [
+      'JQGA004-2101',
+      'JQGA004-2104',
+      'JQGA004-1101',
+      'JQGA004-1204',
+      'JQGA004...01',
+      'JQGA004-2201',
+      'JQGA004-2204',
+      'JQGA004...04',
+      'JQGA004-1201',
+      'JQGA004-1104'
+    ].map(item)
+
+    it('checks every sibling of a migrated criterion without duplicating the stored ones', () => {
+      const stored = [
+        { id: 'JQGA004...04', system: CCAM },
+        { id: 'JQGA004*', system: CCAM },
+        { id: 'JQGA004...01', system: CCAM }
+      ]
+      const ids = expandStoredCodesInCache(stored, { [CCAM]: declensions }, true).map((code) => code.id)
+
+      expect(new Set(ids).size).toBe(ids.length)
+      declensions.forEach((declension) => expect(ids).toContain(declension.id))
+      expect(ids).toContain('JQGA004*')
+    })
+
+    it('keeps the wildcard alongside a partially loaded cache', () => {
+      const partial = { [CCAM]: [item('JQGA004...01'), item('JQGA004...04')] }
+      const ids = expandStoredCodesInCache([{ id: 'JQGA004*', system: CCAM }], partial, true).map((code) => code.id)
+
+      expect(ids).toEqual(['JQGA004...01', 'JQGA004...04', 'JQGA004*'])
+    })
   })
 
   describe('findCodeByIdOrPrefix', () => {
@@ -677,9 +753,14 @@ describe('valueSets utilities', () => {
       expect(findCodeByIdOrPrefix(list, '001472', true)?.id).toBe('001472.....')
     })
 
-    it('falls back to the shortest prefix match when there is no padding node', () => {
-      const list = [item('EPFA001...12'), item('EPFA001...1')]
-      expect(findCodeByIdOrPrefix(list, 'EPFA001', true)?.id).toBe('EPFA001...1')
+    it('leaves a segmented act code unresolved instead of electing one declension', () => {
+      const list = [item('JQGA004...01'), item('JQGA004...04'), item('JQGA004-1201')]
+      expect(findCodeByIdOrPrefix(list, 'JQGA004', true)).toBeUndefined()
+    })
+
+    it('returns undefined when a node has no padding successor', () => {
+      const list = [item('001472.001'), item('001472.0012')]
+      expect(findCodeByIdOrPrefix(list, '001472', true)).toBeUndefined()
     })
 
     it('ignores undefined entries in the list', () => {

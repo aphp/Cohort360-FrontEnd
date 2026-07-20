@@ -21,20 +21,21 @@ export const getValueSetFromCodeSystem = (codeSystemUrl: string): string | undef
   return reference?.url
 }
 
-// Match exact, sinon (CCAM) par préfixe : le noeud ré-encodé a un suffixe tout en points (`001472.....`),
-// préféré à ses descendants (`001472.001`). Désactivé hors CCAM pour éviter CIM10 `E11`/`E110`.
+// Chapitre CCAM : le ré-encodage lui a ajouté un suffixe tout en points, donc un seul successeur.
+const CCAM_NODE_CODE_RE = /^[0-9]{6}$/
+
+// Match exact, sinon `001472` -> `001472.....`, préféré à ses descendants `001472.001`. Un acte est
+// segmenté en plusieurs déclinaisons : en élire une restreindrait la sélection, on le laisse intact.
+// Désactivé hors CCAM pour éviter CIM10 `E11`/`E110`.
 export const findCodeByIdOrPrefix = (
   codes: readonly (Hierarchy<FhirItem> | undefined)[],
   id: string,
   allowPrefixMatch: boolean
 ): Hierarchy<FhirItem> | undefined => {
   const exact = codes.find((c) => c?.id === id)
-  if (exact || !allowPrefixMatch || !id) return exact
+  if (exact || !allowPrefixMatch || !id || !CCAM_NODE_CODE_RE.test(id)) return exact
   const prefixMatches = codes.filter((c): c is Hierarchy<FhirItem> => typeof c?.id === 'string' && c.id.startsWith(id))
-  return (
-    prefixMatches.find((c) => /^\.*$/.test(c.id.slice(id.length))) ??
-    [...prefixMatches].sort((a, b) => a.id.length - b.id.length)[0]
-  )
+  return prefixMatches.find((c) => /^\.*$/.test(c.id.slice(id.length)))
 }
 
 // Associe un code stocké au concept du cache (exact puis préfixe CCAM), sinon renvoie le code tel quel.
@@ -46,6 +47,39 @@ export const matchStoredCodeInCache = <T extends { id: string; system?: string }
   const allCodes = Object.values(codeCaches).flat()
   const scope = (code.system ? codeCaches[code.system] : undefined) ?? allCodes
   return findCodeByIdOrPrefix(scope, code.id, allowPrefixMatch) ?? allCodes.find((c) => c.id === code.id) ?? code
+}
+
+// `JQGA004*` vise toutes les déclinaisons de l'acte. On ajoute celles du cache pour qu'elles soient
+// cochées, en gardant l'étoile : sur un cache partiel, la retirer amputerait la sélection à la sauvegarde.
+export const expandStoredCodeInCache = <T extends { id: string; system?: string }>(
+  code: T,
+  codeCaches: Record<string, Hierarchy<FhirItem>[]>,
+  allowPrefixMatch: boolean
+): Array<Hierarchy<FhirItem> | T> => {
+  if (!allowPrefixMatch || !code.id.endsWith('*')) return [matchStoredCodeInCache(code, codeCaches, allowPrefixMatch)]
+  const root = code.id.slice(0, -1)
+  if (!root) return [code]
+  const allCodes = Object.values(codeCaches).flat()
+  const scope = (code.system ? codeCaches[code.system] : undefined) ?? allCodes
+  const declensions = scope.filter((c) => typeof c?.id === 'string' && c.id !== root && c.id.startsWith(root))
+  return [...declensions, code]
+}
+
+// Un acte peut être visé à la fois par son étoile et par une déclinaison déjà stockée, d'où le dédoublonnage.
+export const expandStoredCodesInCache = <T extends { id: string; system?: string }>(
+  codes: readonly T[],
+  codeCaches: Record<string, Hierarchy<FhirItem>[]>,
+  allowPrefixMatch: boolean
+): Array<Hierarchy<FhirItem> | T> => {
+  const seen = new Set<string>()
+  return codes
+    .flatMap((code) => expandStoredCodeInCache(code, codeCaches, allowPrefixMatch))
+    .filter((code) => {
+      const key = `${code.system ?? ''}|${code.id}`
+      if (seen.has(key)) return false
+      seen.add(key)
+      return true
+    })
 }
 
 // Helper function to get ValueSet Reference from CodeSystem URL

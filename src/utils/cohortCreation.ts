@@ -43,12 +43,12 @@ import { getChildrenFromCodes, HIERARCHY_ROOT } from 'services/aphp/serviceValue
 import { createHierarchyRoot } from './hierarchy'
 import { FhirItem } from 'types/valueSet'
 import { ScopeElement } from 'types/scope'
-import { getValueSetFromCodeSystem, matchStoredCodeInCache } from './valueSets'
+import { getValueSetFromCodeSystem, expandStoredCodesInCache } from './valueSets'
 import { formatAge } from './age'
 import { getConfig } from 'config'
 
 /** Current version of the Requeteur format used for cohort requests */
-const REQUETEUR_VERSION = 'v1.6.3'
+const REQUETEUR_VERSION = 'v1.6.4'
 
 /** Default criteria group used as fallback when group lookup fails */
 const DEFAULT_GROUP_ERROR: CriteriaGroup = {
@@ -875,15 +875,12 @@ export const healCriteriaCodes = (
         const values = next[dataKey] as unknown as LabelObject[] | undefined
         if (!values?.length) continue
         const allowPrefixMatch = !!ccamHierarchyUrl && item.valueSetsInfo.some((ref) => ref.url === ccamHierarchyUrl)
-        let fieldChanged = false
-        const healedValues = values.map((code) => {
-          const match = matchStoredCodeInCache(code, cache, allowPrefixMatch) as LabelObject
-          if (match.id !== code.id || match.system !== code.system) {
-            fieldChanged = true
-            return match
-          }
-          return code
-        })
+        const healedValues = expandStoredCodesInCache(values, cache, allowPrefixMatch) as LabelObject[]
+        const fieldChanged =
+          healedValues.length !== values.length ||
+          healedValues.some(
+            (healedCode, index) => healedCode.id !== values[index].id || healedCode.system !== values[index].system
+          )
         if (fieldChanged) {
           changed = true
           next = { ...next, [dataKey]: healedValues }
