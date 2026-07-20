@@ -39,14 +39,8 @@ const serviceOnboarding: IServiceOnboarding = {
   updateStep: async (step) =>
     requireData(await apiBackend.patch<OnboardingProgress>('/users/me/onboarding/', { onboarding_step: step })),
   signCharter: async () => requireData(await apiBackend.post<CharterSignature>('/users/me/onboarding/charter/')),
-  getMyAccesses: async () => {
-    const { data } = await apiBackend.get<MyAccess[]>('accesses/accesses/my-accesses/')
-    return data
-  },
-  getRightsCatalog: async () => {
-    const { data } = await apiBackend.get<RightCatalogCategory[]>('accesses/rights/')
-    return data
-  },
+  getMyAccesses: async () => requireData(await apiBackend.get<MyAccess[]>('accesses/accesses/my-accesses/')),
+  getRightsCatalog: async () => requireData(await apiBackend.get<RightCatalogCategory[]>('accesses/rights/')),
   getStatus: async () => requireData(await apiBackend.get<OnboardingStatus>('/users/me/onboarding/'))
 }
 

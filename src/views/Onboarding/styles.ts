@@ -259,6 +259,11 @@ const useStyles = makeStyles()((theme: Theme) => ({
       textDecoration: 'underline'
     }
   },
+  inlineLink: {
+    color: eds.blue[400],
+    fontWeight: 600,
+    textDecoration: 'underline'
+  },
   linkIcon: {
     fontSize: 16
   },
