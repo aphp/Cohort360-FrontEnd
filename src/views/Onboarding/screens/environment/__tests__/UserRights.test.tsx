@@ -110,9 +110,29 @@ describe('UserRights (US-3307)', () => {
     expect(await screen.findByText('Non renseignée')).toBeInTheDocument()
   })
 
-  it('shows an error message when a call fails', async () => {
+  it('tells the user his access details are unavailable when a call fails (RG3381.01)', async () => {
     getRightsCatalog.mockRejectedValue(new Error('boom'))
     renderUserRights()
-    expect(await screen.findByRole('alert')).toHaveTextContent(/Une erreur est survenue/)
+    expect(await screen.findByRole('status')).toHaveTextContent(
+      /Le détail de votre accès à Cohort360 n'est pas disponible/
+    )
+  })
+
+  it('points to the support without blocking the journey (RG3381.02)', async () => {
+    getMyAccesses.mockRejectedValue(new Error('boom'))
+    renderUserRights()
+    await screen.findByRole('status')
+    expect(screen.getByRole('link', { name: 'id.recherche.support.dsn@aphp.fr' })).toHaveAttribute(
+      'href',
+      'mailto:id.recherche.support.dsn@aphp.fr'
+    )
+  })
+
+  it('shows the same message when the API answers without any access', async () => {
+    getMyAccesses.mockResolvedValue([])
+    renderUserRights()
+    expect(await screen.findByRole('status')).toHaveTextContent(
+      /Le détail de votre accès à Cohort360 n'est pas disponible/
+    )
   })
 })
