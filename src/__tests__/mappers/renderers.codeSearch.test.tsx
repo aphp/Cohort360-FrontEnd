@@ -42,14 +42,22 @@ describe('FORM_ITEM_RENDERER.codeSearch', () => {
     )
   }
 
-  it('displays every declension of a stored wildcard code', () => {
+  it('displays the declensions of a stored wildcard code without the wildcard itself', () => {
     const { getByTestId } = renderCodeSearch([{ id: 'JQGA004*', system: CCAM }])
 
     const shown = getByTestId('field').textContent ?? ''
     expect(shown).toContain('JQGA004...01')
     expect(shown).toContain('JQGA004...04')
     expect(shown).toContain('JQGA004-1201')
-    expect(shown).toContain('JQGA004*')
+    expect(shown).not.toContain('JQGA004*')
+  })
+
+  it('keeps the wildcard code in the persisted value', () => {
+    const updateData = vi.fn()
+    renderCodeSearch([{ id: 'JQGA004*', system: CCAM }], updateData)
+
+    const saved = (updateData.mock.calls.at(-1)?.[0] ?? []) as { id: string }[]
+    expect(saved.some((code) => code.id === 'JQGA004*')).toBe(true)
   })
 
   it('leaves an already segmented code alone', () => {
