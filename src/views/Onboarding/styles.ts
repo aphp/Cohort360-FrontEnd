@@ -30,7 +30,21 @@ const useStyles = makeStyles()((theme: Theme) => ({
   userBox: {
     display: 'flex',
     alignItems: 'center',
-    gap: theme.spacing(1.5)
+    gap: theme.spacing(1.5),
+    padding: theme.spacing(0.5, 1),
+    borderRadius: 6,
+    '&:hover': {
+      backgroundColor: eds.blue[50]
+    }
+  },
+  userMenu: {
+    marginTop: theme.spacing(1),
+    borderRadius: 6
+  },
+  userMenuItem: {
+    fontFamily: FONT,
+    color: T.ink,
+    padding: theme.spacing(1.5, 3)
   },
   avatar: {
     width: 36,
@@ -244,6 +258,11 @@ const useStyles = makeStyles()((theme: Theme) => ({
     '&:hover': {
       textDecoration: 'underline'
     }
+  },
+  inlineLink: {
+    color: eds.blue[400],
+    fontWeight: 600,
+    textDecoration: 'underline'
   },
   linkIcon: {
     fontSize: 16
