@@ -27,10 +27,10 @@ const UserMenu = () => {
     return null
   }
 
-  const onLogout = () => {
+  const onLogout = async () => {
     setAnchorEl(null)
-    dispatch(logout())
-    navigate('/')
+    await dispatch(logout())
+    navigate('/', { replace: true })
   }
 
   return (

@@ -57,6 +57,30 @@ describe('UserMenu (US-3384)', () => {
     expect(screen.getByText('login page')).toBeInTheDocument()
   })
 
+  it('redirects to the login page only once the logout has completed (RG3384.02)', async () => {
+    let resolveLogout: () => void = () => undefined
+    practitionerLogout.mockImplementation(
+      () =>
+        new Promise<void>((resolve) => {
+          resolveLogout = () => resolve()
+        })
+    )
+    const user = userEvent.setup()
+    const store = renderUserMenu()
+
+    await user.click(screen.getByRole('button', { name: /Cesar RICHARD/ }))
+    await user.click(screen.getByRole('menuitem', { name: 'Se déconnecter' }))
+
+    await waitFor(() => expect(practitionerLogout).toHaveBeenCalled())
+    expect(screen.queryByText('login page')).not.toBeInTheDocument()
+    expect(store.getState().me).not.toBeNull()
+
+    resolveLogout()
+
+    await waitFor(() => expect(store.getState().me).toBeNull())
+    expect(screen.getByText('login page')).toBeInTheDocument()
+  })
+
   it('renders nothing when no user is connected', () => {
     renderUserMenu(null)
     expect(screen.queryByRole('button')).not.toBeInTheDocument()
