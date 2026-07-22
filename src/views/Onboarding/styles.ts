@@ -131,7 +131,6 @@ const useStyles = makeStyles()((theme: Theme) => ({
     borderRadius: 6,
     border: `1px solid ${T.cardBorder}`,
     backgroundColor: T.surface,
-    boxShadow: T.cardShadow,
     display: 'flex',
     flexDirection: 'column'
   },
