@@ -82,7 +82,6 @@ export const ONBOARDING_STEPS: OnboardingStepConfig[] = [
       {
         key: 'charter-signature',
         component: CharterSignature,
-        layout: 'bare',
         primaryAction: {
           label: 'Signer',
           run: ({ signCharter }) => signCharter(),
