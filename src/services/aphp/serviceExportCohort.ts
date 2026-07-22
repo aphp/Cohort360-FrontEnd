@@ -44,48 +44,21 @@ export const fetchExportTablesRelationsInfo = async (tableList: string[]) => {
 }
 
 /**
- * Extracts the filename from the Content-Disposition header.
- * @param contentDisposition  The Content-Disposition header value from which to extract the filename.
- * @returns {string}  The extracted filename, or a default name if extraction fails.
- */
-const extractFilename = (contentDisposition: string): string => {
-  const filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/
-  const matches = filenameRegex.exec(contentDisposition)
-  let default_filename = 'Download.zip'
-  if (matches?.[1]) {
-    default_filename = matches[1].replaceAll(/['"]/g, '')
-  }
-  return default_filename
-}
-
-/**
- *  Downloads the exported file for the given export ID.
+ * Requests a short-lived HttpOnly download ticket, then delegates the transfer
+ * to the browser download manager so multi-GB files are never materialized as a Blob.
  * @param id The ID of the export to download.
- * @param signal An optional AbortSignal to cancel the download request if needed.
+ * @param signal An optional AbortSignal to cancel ticket creation.
  */
 export const downloadExport = async (id: string, signal?: AbortSignal) => {
-  try {
-    const downloadResponse = await apiBackend.get(`/exports/${id}/download/`, {
-      responseType: 'blob',
-      signal
-    })
+  await apiBackend.post(`/exports/${id}/download-ticket/`, undefined, { signal })
 
-    const filename = extractFilename(downloadResponse.headers['content-disposition'])
-    const blob = new Blob([downloadResponse.data], { type: 'application/zip' })
+  const link = document.createElement('a')
+  link.href = apiBackend.getUri({ url: `/exports/${id}/download/` })
+  link.rel = 'noopener'
 
-    const url = window.URL.createObjectURL(blob)
-    const link = document.createElement('a')
-
-    link.href = url
-    link.download = filename
-
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
-    window.URL.revokeObjectURL(url)
-  } catch (error) {
-    console.error('Download error:', error)
-  }
+  document.body.appendChild(link)
+  link.click()
+  document.body.removeChild(link)
 }
 
 export const retryExport = async (id: string, signal?: AbortSignal) => {
