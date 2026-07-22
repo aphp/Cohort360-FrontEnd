@@ -89,10 +89,10 @@ export const OnboardingProvider = ({ initialStep, children }: ProviderProps) => 
         setScreen('steps')
         return
       }
-      const primaryAction = screenConfig?.primaryAction
-      if (primaryAction) {
+      const run = screenConfig?.primaryAction?.run
+      if (run) {
         // On rejection the error message is raised and the user stays on the screen.
-        primaryAction.run({ signCharter }).then(advance, () => undefined)
+        run({ signCharter }).then(advance, () => undefined)
         return
       }
       advance()

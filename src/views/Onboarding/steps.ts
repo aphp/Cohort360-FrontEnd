@@ -17,6 +17,7 @@ import DataAccess from './screens/environment/DataAccess'
 import UserRights from './screens/environment/UserRights'
 import WhatIsCohort360 from './screens/environment/WhatIsCohort360'
 import WhatIsEds from './screens/environment/WhatIsEds'
+import KeyFeatures from './screens/handson/KeyFeatures'
 
 // Mirrors User.ONBOARDING_TOTAL_STEPS server-side.
 export const ONBOARDING_TOTAL_STEPS = 3
@@ -27,12 +28,12 @@ export type OnboardingActions = {
 }
 
 /**
- * Replaces the default `Continuer` button on a screen. It runs before the journey moves on:
- * a rejection leaves the user where they are, with the error surfaced by the wizard.
+ * Replaces the default `Continuer` button on a screen. `run`, when set, runs before the journey
+ * moves on: a rejection leaves the user where they are, with the error surfaced by the wizard.
  */
 export type OnboardingPrimaryAction = {
   label: string
-  run: (actions: OnboardingActions) => Promise<unknown>
+  run?: (actions: OnboardingActions) => Promise<unknown>
   /** Shown instead of the generic progress-saving error when `run` rejects. */
   errorMessage?: string
 }
@@ -97,11 +98,17 @@ export const ONBOARDING_STEPS: OnboardingStepConfig[] = [
     label: "Prendre en main l'outil",
     summary: 'Explorez l’outil au travers d’une prise en main guidée de 3 fonctionnalités clés.',
     icon: FormatListBulletedIcon,
-    screens: []
+    screens: [
+      {
+        key: 'key-features',
+        component: KeyFeatures,
+        primaryAction: { label: 'Accéder à Cohort360' }
+      }
+    ]
   }
 ]
 
-// A step with no screen yet still occupies one slot in the journey, hence the floor at 1.
+// Guards the progress ratio: an unknown or screenless step still counts as one slot.
 export const getStepScreenCount = (stepIndex: number): number => ONBOARDING_STEPS[stepIndex]?.screens.length || 1
 
 export const getScreenConfig = (stepIndex: number, screenIndex: number): OnboardingScreenConfig | undefined =>
