@@ -2,9 +2,10 @@ import { render, screen } from '@testing-library/react'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-const { mockUseAppSelector, mockUseOnboardingStatus } = vi.hoisted(() => ({
+const { mockUseAppSelector, mockUseOnboardingStatus, mockUseOnboardingEnabled } = vi.hoisted(() => ({
   mockUseAppSelector: vi.fn(),
-  mockUseOnboardingStatus: vi.fn()
+  mockUseOnboardingStatus: vi.fn(),
+  mockUseOnboardingEnabled: vi.fn()
 }))
 
 vi.mock('state', () => ({
@@ -16,6 +17,10 @@ vi.mock('state', () => ({
 vi.mock('hooks/onboarding/useOnboardingStatus', () => ({
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   default: (...args: any[]) => mockUseOnboardingStatus(...args)
+}))
+
+vi.mock('hooks/onboarding/useOnboardingEnabled', () => ({
+  default: () => mockUseOnboardingEnabled()
 }))
 
 vi.mock('services/aphp/serviceFhirConfig', () => ({
@@ -76,6 +81,7 @@ describe('PrivateRoute', () => {
     localStorage.clear()
     setMe(null)
     setStatus(undefined, true)
+    mockUseOnboardingEnabled.mockReturnValue(true)
   })
 
   it("bloque l'accès quand me est null", () => {
@@ -129,5 +135,24 @@ describe('PrivateRoute', () => {
     setStatus(completedStatus)
     renderPrivateRoute()
     expect(mockUseOnboardingStatus).toHaveBeenCalledWith(true)
+  })
+
+  it('laisse passer sans redirection quand le feature flag est désactivé', () => {
+    setValidToken()
+    setMe({ id: 'user-1' })
+    setStatus(pendingStatus)
+    mockUseOnboardingEnabled.mockReturnValue(false)
+    renderPrivateRoute()
+    expect(screen.getByText('private content')).toBeInTheDocument()
+    expect(screen.queryByText('onboarding page')).not.toBeInTheDocument()
+  })
+
+  it('ne lit pas le statut onboarding quand le feature flag est désactivé', () => {
+    setValidToken()
+    setMe({ id: 'user-1' })
+    setStatus(completedStatus)
+    mockUseOnboardingEnabled.mockReturnValue(false)
+    renderPrivateRoute()
+    expect(mockUseOnboardingStatus).toHaveBeenCalledWith(false)
   })
 })

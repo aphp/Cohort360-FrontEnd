@@ -7,14 +7,19 @@ import { Provider } from 'react-redux'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-const { updateStep, signCharter, getStatus } = vi.hoisted(() => ({
+const { updateStep, signCharter, getStatus, mockUseOnboardingEnabled } = vi.hoisted(() => ({
   updateStep: vi.fn(),
   signCharter: vi.fn(),
-  getStatus: vi.fn()
+  getStatus: vi.fn(),
+  mockUseOnboardingEnabled: vi.fn()
 }))
 
 vi.mock('services/aphp/serviceOnboarding', () => ({
   default: { updateStep, signCharter, getStatus }
+}))
+
+vi.mock('hooks/onboarding/useOnboardingEnabled', () => ({
+  default: () => mockUseOnboardingEnabled()
 }))
 
 import { ONBOARDING_STATUS_QUERY_KEY } from 'hooks/onboarding/useOnboardingStatus'
@@ -53,6 +58,13 @@ describe('Onboarding page', () => {
     signCharter.mockReset()
     getStatus.mockReset()
     updateStep.mockResolvedValue({ onboarding_step: 3, onboarding_completed_at: null })
+    mockUseOnboardingEnabled.mockReturnValue(true)
+  })
+
+  it('redirects to /home when the feature flag is disabled', () => {
+    mockUseOnboardingEnabled.mockReturnValue(false)
+    renderAt(baseStatus)
+    expect(screen.getByText('home page')).toBeInTheDocument()
   })
 
   it('redirects to /home when the journey is already completed', () => {
