@@ -27,25 +27,25 @@ const renderWith = (enabled: boolean, allowedAphCodes: string[]) => {
 }
 
 describe('useOnboardingEnabled', () => {
-  it('reste désactivé quand le flag est off, quelle que soit la situation', () => {
+  it('reste désactivé pour tous par défaut (flag off, liste vide)', () => {
     setMe({ userName: '4163302' })
     expect(renderWith(false, [])).toBe(false)
-    expect(renderWith(false, ['4163302'])).toBe(false)
   })
 
-  it('est actif pour tous quand le flag est on et la liste vide', () => {
+  it('est actif pour tous quand le flag est on, sans regarder la liste', () => {
     setMe({ userName: '4163302' })
     expect(renderWith(true, [])).toBe(true)
+    expect(renderWith(true, ['7069721'])).toBe(true)
   })
 
-  it('en mode restreint, ne cible que les codes APH listés', () => {
+  it('active les codes APH listés même quand le flag global est off', () => {
     setMe({ userName: '4163302' })
-    expect(renderWith(true, ['4163302', '7069721'])).toBe(true)
-    expect(renderWith(true, ['7069721'])).toBe(false)
+    expect(renderWith(false, ['4163302', '7069721'])).toBe(true)
+    expect(renderWith(false, ['7069721'])).toBe(false)
   })
 
-  it('reste désactivé sans code APH utilisateur', () => {
+  it('reste désactivé sans code APH utilisateur quand seule la liste pilote', () => {
     setMe(null)
-    expect(renderWith(true, [])).toBe(false)
+    expect(renderWith(false, ['4163302'])).toBe(false)
   })
 })
