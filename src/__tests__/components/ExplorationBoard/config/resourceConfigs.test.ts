@@ -56,7 +56,7 @@ describe('pmsi config', () => {
   it('inclut la colonne IPP hors vue patient et la masque en vue patient', () => {
     const listConfig = conditionConfig(true, null, ['g1'])
     const table = listConfig.mapToTable!(emptyData)
-    expect(table.columns.some((c) => c.label?.startsWith('IPP'))).toBe(true)
+    expect(table.columns.some((c) => String(c.label ?? '').startsWith('IPP'))).toBe(true)
   })
 })
 

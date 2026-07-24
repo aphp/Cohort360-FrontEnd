@@ -57,7 +57,7 @@ describe('utils/filters - removeFilter', () => {
 
   it('réinitialise onlyPdfAvailable à false', () => {
     const filters = { onlyPdfAvailable: true } as never
-    const result = removeFilter(FilterKeys.ONLY_PDF_AVAILABLE, true, filters) as { onlyPdfAvailable: boolean }
+    const result = removeFilter(FilterKeys.ONLY_PDF_AVAILABLE, true as never, filters) as { onlyPdfAvailable: boolean }
     expect(result.onlyPdfAvailable).toBe(false)
   })
 
@@ -83,8 +83,8 @@ describe('utils/filters - getFilterLabel', () => {
   })
 
   it('formate le nombre de patients min/max', () => {
-    expect(getFilterLabel(FilterKeys.MIN_PATIENTS, 10)).toContain('10')
-    expect(getFilterLabel(FilterKeys.MAX_PATIENTS, 100)).toContain('100')
+    expect(getFilterLabel(FilterKeys.MIN_PATIENTS, 10 as never)).toContain('10')
+    expect(getFilterLabel(FilterKeys.MAX_PATIENTS, 100 as never)).toContain('100')
   })
 
   it('formate la source (dernier segment en majuscule)', () => {

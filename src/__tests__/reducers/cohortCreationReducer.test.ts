@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest'
-import { CriteriaGroupType, JobStatus } from 'types'
+import { CriteriaGroup, CriteriaGroupType, JobStatus } from 'types'
 import { CriteriaType, SelectedCriteriaType } from 'types/requestCriterias'
 
 vi.mock('config', async (importOriginal) => {
@@ -95,7 +95,7 @@ describe('cohortCreation slice - ajout de critères et groupes', () => {
   })
 
   it('addNewCriteriaGroup décrémente nextGroupId', () => {
-    const group = { id: -1, title: 'g', type: CriteriaGroupType.AND_GROUP, criteriaIds: [], isInclusive: true }
+    const group = { id: -1, title: 'g', type: CriteriaGroupType.AND_GROUP, criteriaIds: [], isInclusive: true } as CriteriaGroup
     const state = reducer(init(), addNewCriteriaGroup(group))
     expect(state.criteriaGroup).toHaveLength(2)
     expect(state.nextGroupId).toBe(-2)
@@ -104,7 +104,7 @@ describe('cohortCreation slice - ajout de critères et groupes', () => {
   it('editAllCriteria et editAllCriteriaGroup remplacent les tableaux', () => {
     const s1 = reducer(init(), editAllCriteria([crit(1), crit(2)]))
     expect(s1.selectedCriteria).toHaveLength(2)
-    const groups = [{ id: 0, title: 'root', type: CriteriaGroupType.AND_GROUP, criteriaIds: [1], isInclusive: true }]
+    const groups = [{ id: 0, title: 'root', type: CriteriaGroupType.AND_GROUP, criteriaIds: [1], isInclusive: true }] as CriteriaGroup[]
     const s2 = reducer(init(), editAllCriteriaGroup(groups))
     expect(s2.criteriaGroup[0].criteriaIds).toEqual([1])
   })
@@ -125,7 +125,7 @@ describe('cohortCreation slice - édition par id', () => {
   })
 
   it('editCriteriaGroup remplace le groupe correspondant', () => {
-    const updated = { id: 0, title: 'root renommé', type: CriteriaGroupType.OR_GROUP, criteriaIds: [], isInclusive: true }
+    const updated = { id: 0, title: 'root renommé', type: CriteriaGroupType.OR_GROUP, criteriaIds: [], isInclusive: true } as CriteriaGroup
     const state = reducer(init(), editCriteriaGroup(updated))
     expect(state.criteriaGroup[0].title).toBe('root renommé')
     expect(state.criteriaGroup[0].type).toBe(CriteriaGroupType.OR_GROUP)

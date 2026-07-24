@@ -270,7 +270,9 @@ describe('servicePerimeters.fetchPerimetersRights', () => {
       ])
     )
     const perimeters = [makeScopeElement({ id: '1' }), makeScopeElement({ id: '2' })]
-    const result = await servicesPerimeters.fetchPerimetersRights(perimeters)
+    const result = (await servicesPerimeters.fetchPerimetersRights(perimeters)) as never as Array<{
+      extension?: Array<{ url: string; valueString: string }>
+    }>
     expect(result[0].extension?.[0]).toEqual({ url: 'READ_ACCESS', valueString: 'DATA_NOMINATIVE' })
     expect(result[1].extension?.[0]).toEqual({ url: 'READ_ACCESS', valueString: 'DATA_PSEUDOANONYMISED' })
     expect(result[0].extension?.[1]).toEqual({ url: 'EXPORT_ACCESS', valueString: 'DATA_PSEUDOANONYMISED' })

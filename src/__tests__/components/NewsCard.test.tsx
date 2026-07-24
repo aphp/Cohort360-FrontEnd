@@ -1,12 +1,12 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, waitFor } from '@testing-library/react'
 
-const listStaticContents = vi.fn(async () => [
+const listStaticContents = vi.fn(async (..._a: any[]) => [
   { title: 'Version 3.1', content: '## Nouveautés\n- Point 1' },
   { title: 'Version 3.0', content: 'Contenu' }
 ])
 vi.mock('services/aphp/callApi', () => ({
-  listStaticContents: (...a: unknown[]) => listStaticContents(...a)
+  listStaticContents: (...a: any[]) => listStaticContents(...a)
 }))
 
 vi.mock('react-markdown', () => ({ default: ({ children }: { children?: unknown }) => <span>{children as never}</span> }))

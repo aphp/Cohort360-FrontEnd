@@ -1,9 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 
-const postIssue = vi.fn(async () => true)
+const postIssue = vi.fn(async (..._a: any[]) => true)
 vi.mock('services/aphp', () => ({
-  default: { contact: { postIssue: (...a: unknown[]) => postIssue(...a) } }
+  default: { contact: { postIssue: (...a: any[]) => postIssue(...a) } }
 }))
 
 vi.mock('state', () => ({

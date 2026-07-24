@@ -4,9 +4,9 @@ import { render, waitFor } from '@testing-library/react'
 vi.mock('react-pdf', () => ({ Document: () => null, Page: () => null, pdfjs: { GlobalWorkerOptions: {} } }))
 vi.mock('components/DocumentViewer/DocumentViewer', () => ({ default: () => <div data-testid="doc-viewer" /> }))
 
-const getCodeList = vi.fn(async () => ({ results: [{ id: 'dp', label: 'Diagnostic principal' }] }))
+const getCodeList = vi.fn(async (..._a: any[]) => ({ results: [{ id: 'dp', label: 'Diagnostic principal' }] }))
 vi.mock('services/aphp/serviceValueSets', () => ({
-  getCodeList: (...a: unknown[]) => getCodeList(...a)
+  getCodeList: (...a: any[]) => getCodeList(...a)
 }))
 
 vi.mock('components/ExplorationBoard/CriteriasSection', () => ({ default: () => <div data-testid="criterias-section" /> }))
@@ -19,13 +19,14 @@ import PatientTimeline from 'components/Patient/PatientTimeline'
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const encounter = (start: string): any => ({ resourceType: 'Encounter', id: `e-${start}`, period: { start } })
 
-const baseProps = {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const baseProps: any = {
   groupId: 'g1',
   deidentified: false,
   hospits: [encounter('2023-01-01')],
   procedures: [],
   diagnostics: []
-} as never
+}
 
 beforeEach(() => {
   vi.clearAllMocks()
