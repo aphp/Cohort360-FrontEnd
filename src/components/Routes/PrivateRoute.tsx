@@ -33,6 +33,7 @@ import { throttle } from 'lodash'
 import type React from 'react'
 import { useContext, useEffect, useState } from 'react'
 import { Navigate, Outlet, useLocation } from 'react-router-dom'
+import useOnboardingEnabled from 'hooks/onboarding/useOnboardingEnabled'
 import useOnboardingStatus from 'hooks/onboarding/useOnboardingStatus'
 import { updateConfigFromFhirMetadata } from 'services/aphp/serviceFhirConfig'
 import { isAccessTokenValid } from 'utils/tokens'
@@ -85,8 +86,9 @@ const PrivateRoute: React.FC = () => {
   const appConfig = useContext(AppConfig)
   const location = useLocation()
   const hasValidToken = isAccessTokenValid()
+  const onboardingEnabled = useOnboardingEnabled()
   const { status: onboardingStatus, statusPending: onboardingStatusPending } = useOnboardingStatus(
-    !!me && hasValidToken
+    !!me && hasValidToken && onboardingEnabled
   )
   const [fetchedFhirMetadata, setFetchedFhirMetadata] = useState(false)
 
@@ -162,6 +164,10 @@ const PrivateRoute: React.FC = () => {
         </DialogActions>
       </Dialog>
     )
+  } else if (!onboardingEnabled) {
+    // Feature flag off (globally, or the user's APH code is outside the restricted allow-list):
+    // the app behaves as before, no status fetch and no redirect to the journey.
+    return <Outlet />
   } else if (onboardingStatusPending) {
     // Never gate on an unconfirmed status. The status query keeps retrying in the background on
     // failure, so a returning session is never judged on the default (not-onboarded) state and an

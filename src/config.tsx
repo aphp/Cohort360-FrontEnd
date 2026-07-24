@@ -151,6 +151,9 @@ export type AppConfig = {
     maintenancePopup: FeatureConfig & {
       exceptionAphCodes: string[]
     }
+    onboarding: FeatureConfig & {
+      allowedAphCodes: string[]
+    }
   }
   core: {
     fhir: {
@@ -422,6 +425,10 @@ let config: AppConfig = {
     maintenancePopup: {
       enabled: false,
       exceptionAphCodes: []
+    },
+    onboarding: {
+      enabled: false,
+      allowedAphCodes: []
     }
   },
   system: {
