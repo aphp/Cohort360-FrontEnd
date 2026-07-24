@@ -2,6 +2,7 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward'
 import { Avatar, Box, Button, Typography } from '@mui/material'
 import logo from 'assets/images/logo-login.png'
+import useOnboardingEnabled from 'hooks/onboarding/useOnboardingEnabled'
 import useOnboardingStatus from 'hooks/onboarding/useOnboardingStatus'
 import React from 'react'
 import { Navigate } from 'react-router-dom'
@@ -86,7 +87,12 @@ const OnboardingLayout = () => {
 }
 
 const Onboarding = () => {
-  const { status } = useOnboardingStatus()
+  const onboardingEnabled = useOnboardingEnabled()
+  const { status } = useOnboardingStatus(onboardingEnabled)
+
+  if (!onboardingEnabled) {
+    return <Navigate to="/home" replace />
+  }
 
   if (status?.onboarding_completed_at != null) {
     return <Navigate to="/home" replace />
