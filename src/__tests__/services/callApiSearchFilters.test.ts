@@ -52,7 +52,7 @@ const fhirSearchMock = vi.fn().mockResolvedValue({ data: {} })
 
 vi.mock('services/apiFhir', () => ({
   default: { post: vi.fn(), interceptors: { request: { use: vi.fn() } } },
-  fhirSearch: (...args: unknown[]) => fhirSearchMock(...args),
+  fhirSearch: (...args: any[]) => fhirSearchMock(...args),
   addRequestConfigHook: vi.fn(),
   getAuthorizationMethod: vi.fn()
 }))

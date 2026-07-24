@@ -101,7 +101,7 @@ describe('servicePatients.fetchAllProcedures / fetchAllConditions', () => {
 
   it('fetchAllConditions retourne les ressources', async () => {
     mockFetchCondition.mockResolvedValue({ data: { resources: [{ resourceType: 'Condition', id: 'c1' }] } } as never)
-    const result = await servicesPatients.fetchAllConditions('patient-1', undefined, 50)
+    const result = await servicesPatients.fetchAllConditions('patient-1', undefined as never, 50)
     expect(result).toEqual([{ resourceType: 'Condition', id: 'c1' }])
     // groupId absent -> _list vide
     expect(mockFetchCondition).toHaveBeenCalledWith(expect.objectContaining({ _list: [] }))

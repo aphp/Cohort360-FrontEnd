@@ -16,12 +16,12 @@ vi.mock('state', () => ({
   useAppSelector: (selector: (s: unknown) => unknown) => selector({ me: { maintenance: { active: false } } })
 }))
 
-const useProjects = vi.fn(() => ({
+const useProjects = vi.fn((..._a: any[]) => ({
   projectsList: [{ uuid: 'p1', name: 'Projet 1' }],
   total: 1,
   loading: false
 }))
-vi.mock('hooks/researches/useProjects', () => ({ default: (...a: unknown[]) => useProjects(...a) }))
+vi.mock('hooks/researches/useProjects', () => ({ default: (...a: any[]) => useProjects(...a) }))
 vi.mock('hooks/researches/useCreateProject', () => ({ default: () => ({ mutate: vi.fn(), isPending: false }) }))
 vi.mock('hooks/researches/useDeleteProject', () => ({ default: () => ({ mutate: vi.fn(), isPending: false }) }))
 vi.mock('hooks/researches/useEditProject', () => ({ default: () => ({ mutate: vi.fn(), isPending: false }) }))

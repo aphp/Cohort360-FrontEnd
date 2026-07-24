@@ -4,11 +4,11 @@ import { CriteriaGroupType } from 'types'
 // unbuildRequest dépend de services.perimeters.fetchPopulationForRequeteur et de
 // la résolution des critères. On mocke la population et on teste avec des requêtes
 // composées de groupes (sans basicResource) pour rester robuste et déterministe.
-const fetchPopulationForRequeteur = vi.fn(async () => [{ id: 'p1', cohort_id: 'c1' }])
+const fetchPopulationForRequeteur = vi.fn(async (..._args: any[]) => [{ id: 'p1', cohort_id: 'c1' }])
 
 vi.mock('services/aphp', () => ({
   default: {
-    perimeters: { fetchPopulationForRequeteur: (...args: unknown[]) => fetchPopulationForRequeteur(...args) }
+    perimeters: { fetchPopulationForRequeteur: (...args: any[]) => fetchPopulationForRequeteur(...args) }
   }
 }))
 

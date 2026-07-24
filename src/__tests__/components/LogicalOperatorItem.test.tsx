@@ -32,11 +32,11 @@ const hookReturn = {
   setOperatorConfirmation: vi.fn()
 }
 
-const useLogicalOperator = vi.fn(() => hookReturn)
+const useLogicalOperator = vi.fn((..._a: any[]) => hookReturn)
 vi.mock('components/CreationCohort/DiagramView/components/LogicalOperator/components/LogicalOperatorItem/useLogicalOperator', () => ({
-  useLogicalOperator: (...a: unknown[]) => useLogicalOperator(...a)
+  useLogicalOperator: (...a: any[]) => useLogicalOperator(...a)
 }))
-vi.mock('./useLogicalOperator', () => ({ useLogicalOperator: (...a: unknown[]) => useLogicalOperator(...a) }))
+vi.mock('./useLogicalOperator', () => ({ useLogicalOperator: (...a: any[]) => useLogicalOperator(...a) }))
 
 import LogicalOperatorItem from 'components/CreationCohort/DiagramView/components/LogicalOperator/components/LogicalOperatorItem'
 

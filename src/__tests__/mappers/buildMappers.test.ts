@@ -2,10 +2,10 @@ import { describe, it, expect, beforeEach, vi } from 'vitest'
 
 // buildMappers dépend de services.perimeters pour la résolution des unités
 // exécutrices; on le mocke. Les autres mappers sont purs.
-const getPerimeters = vi.fn(async () => ({ results: [{ id: 'svc1', name: 'Service 1' }], count: 1 }))
+const getPerimeters = vi.fn(async (..._a: any[]) => ({ results: [{ id: 'svc1', name: 'Service 1' }], count: 1 }))
 
 vi.mock('services/aphp', () => ({
-  default: { perimeters: { getPerimeters: (...a: unknown[]) => getPerimeters(...a) } }
+  default: { perimeters: { getPerimeters: (...a: any[]) => getPerimeters(...a) } }
 }))
 
 import { BUILD_MAPPERS, UNBUILD_MAPPERS } from 'components/CreationCohort/DiagramView/components/LogicalOperator/components/CriteriaRightPanel/CriteriaForm/mappers/buildMappers'

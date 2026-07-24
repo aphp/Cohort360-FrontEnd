@@ -7,9 +7,9 @@ vi.mock('components/DocumentViewer/DocumentViewer', () => ({ default: () => <div
 const dispatch = vi.fn()
 vi.mock('state', () => ({ useAppDispatch: () => dispatch }))
 
-const shareRequest = vi.fn(async () => ({ status: 200 }))
+const shareRequest = vi.fn(async (..._a: any[]) => ({ status: 200 }))
 vi.mock('services/aphp', () => ({
-  default: { projects: { shareRequest: (...a: unknown[]) => shareRequest(...a) } }
+  default: { projects: { shareRequest: (...a: any[]) => shareRequest(...a) } }
 }))
 
 vi.mock('./components/RequestShareForm', () => ({ default: () => <div data-testid="share-form" /> }))

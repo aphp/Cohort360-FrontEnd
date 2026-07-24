@@ -3,7 +3,7 @@ import { render, screen, waitFor } from '@testing-library/react'
 
 const apiGet = vi.fn()
 vi.mock('services/apiFhir', () => ({
-  default: { get: (...a: unknown[]) => apiGet(...a) }
+  default: { get: (...a: any[]) => apiGet(...a) }
 }))
 
 import QuestionSelectorDialog from 'pages/ExportRequest/components/QuestionChoice'

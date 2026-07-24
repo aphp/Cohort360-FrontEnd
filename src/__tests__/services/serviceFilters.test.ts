@@ -86,7 +86,7 @@ describe('serviceFilters.getProviderFilters', () => {
 
 describe('serviceFilters.postFiltersService', () => {
   it('poste un filtre non identifiant en mode nominatif (nominal)', async () => {
-    mockPostFilters.mockResolvedValue(asAxios({ uuid: 'created' }))
+    mockPostFilters.mockResolvedValue(asAxios({ uuid: 'created' }) as never)
     const result = await postFiltersService(ResourceType.PATIENT, 'Mon filtre', criterias, false)
     expect(result).toEqual({ uuid: 'created' })
     // en mode nominatif on vérifie le caractère identifiant
@@ -95,7 +95,7 @@ describe('serviceFilters.postFiltersService', () => {
   })
 
   it('ne teste pas le caractère identifiant en mode pseudonymisé', async () => {
-    mockPostFilters.mockResolvedValue(asAxios({ uuid: 'created' }))
+    mockPostFilters.mockResolvedValue(asAxios({ uuid: 'created' }) as never)
     await postFiltersService(ResourceType.PATIENT, 'f', criterias, true)
     expect(mockIsIdentifying).not.toHaveBeenCalled()
     expect(mockPostFilters).toHaveBeenCalledWith(ResourceType.PATIENT, 'f', 'ga=1&gb=2', false)
@@ -103,33 +103,33 @@ describe('serviceFilters.postFiltersService', () => {
 
   it('propage identifying=true quand le filtre est identifiant', async () => {
     mockIsIdentifying.mockReturnValue(true)
-    mockPostFilters.mockResolvedValue(asAxios({ uuid: 'created' }))
+    mockPostFilters.mockResolvedValue(asAxios({ uuid: 'created' }) as never)
     await postFiltersService(ResourceType.PATIENT, 'f', criterias, false)
     expect(mockPostFilters).toHaveBeenCalledWith(ResourceType.PATIENT, 'f', 'ga=1&gb=2', true)
   })
 
   it('lève une erreur quand la réponse est hors 2xx (erreur API)', async () => {
-    mockPostFilters.mockResolvedValue(asAxios({ uuid: 'x' }, 400))
+    mockPostFilters.mockResolvedValue(asAxios({ uuid: 'x' }, 400) as never)
     await expect(postFiltersService(ResourceType.PATIENT, 'f', criterias, false)).rejects.toThrow()
   })
 })
 
 describe('serviceFilters.getFiltersService', () => {
   it('retourne les données en cas de succès', async () => {
-    mockGetFilters.mockResolvedValue(asAxios({ count: 2, results: [] }))
+    mockGetFilters.mockResolvedValue(asAxios({ count: 2, results: [] }) as never)
     const result = await getFiltersService(ResourceType.PATIENT, null, 20)
     expect(result).toEqual({ count: 2, results: [] })
     expect(mockGetFilters).toHaveBeenCalledWith(ResourceType.PATIENT, 20, 0, null)
   })
 
   it('utilise la limite par défaut de 10', async () => {
-    mockGetFilters.mockResolvedValue(asAxios({ count: 0, results: [] }))
+    mockGetFilters.mockResolvedValue(asAxios({ count: 0, results: [] }) as never)
     await getFiltersService(ResourceType.PATIENT)
     expect(mockGetFilters).toHaveBeenCalledWith(ResourceType.PATIENT, 10, 0, undefined)
   })
 
   it('lève une erreur quand la réponse est hors 2xx', async () => {
-    mockGetFilters.mockResolvedValue(asAxios({ count: 0, results: [] }, 503))
+    mockGetFilters.mockResolvedValue(asAxios({ count: 0, results: [] }, 503) as never)
     await expect(getFiltersService(ResourceType.PATIENT)).rejects.toThrow()
   })
 })
@@ -162,7 +162,7 @@ describe('serviceFilters.deleteFilterService / deleteFiltersService', () => {
 
 describe('serviceFilters.patchFiltersService', () => {
   it('met à jour un filtre (nominal)', async () => {
-    mockPatchFilters.mockResolvedValue(asAxios({ uuid: 'u1' }, 200))
+    mockPatchFilters.mockResolvedValue(asAxios({ uuid: 'u1' }, 200) as never)
     const res = await patchFiltersService(ResourceType.PATIENT, 'u1', 'nouveau nom', criterias, false)
     expect(res.data).toEqual({ uuid: 'u1' })
     expect(mockMapper).toHaveBeenCalled()
@@ -170,7 +170,7 @@ describe('serviceFilters.patchFiltersService', () => {
   })
 
   it('lève une erreur quand la réponse est hors 2xx', async () => {
-    mockPatchFilters.mockResolvedValue(asAxios({ uuid: 'u1' }, 422))
+    mockPatchFilters.mockResolvedValue(asAxios({ uuid: 'u1' }, 422) as never)
     await expect(patchFiltersService(ResourceType.PATIENT, 'u1', 'n', criterias, false)).rejects.toThrow()
   })
 })

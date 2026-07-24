@@ -6,18 +6,18 @@ const dispatch = vi.fn()
 vi.mock('state', () => ({ useAppDispatch: () => dispatch }))
 vi.mock('state/warningDialog', () => ({ showDialog: vi.fn((p) => ({ type: 'show', payload: p })) }))
 
-const fetchExportableCohorts = vi.fn(async () => [])
-const fetchExportableCohort = vi.fn(async () => [{ uuid: 'c1', group_id: 'g1', name: 'Cohorte' }])
+const fetchExportableCohorts = vi.fn(async (..._a: any[]) => [])
+const fetchExportableCohort = vi.fn(async (..._a: any[]) => [{ uuid: 'c1', group_id: 'g1', name: 'Cohorte' }])
 vi.mock('services/aphp/callApi', () => ({
-  fetchExportableCohorts: (...a: unknown[]) => fetchExportableCohorts(...a),
-  fetchExportableCohort: (...a: unknown[]) => fetchExportableCohort(...a)
+  fetchExportableCohorts: (...a: any[]) => fetchExportableCohorts(...a),
+  fetchExportableCohort: (...a: any[]) => fetchExportableCohort(...a)
 }))
 
-const fetchExportTablesInfo = vi.fn(async () => [
+const fetchExportTablesInfo = vi.fn(async (..._a: any[]) => [
   { name: 'person', columns: [], fhirResourceName: 'Patient', isFhirStandard: true, isOmopStandard: false }
 ])
 vi.mock('services/aphp/serviceExportCohort', () => ({
-  fetchExportTablesInfo: (...a: unknown[]) => fetchExportTablesInfo(...a),
+  fetchExportTablesInfo: (...a: any[]) => fetchExportTablesInfo(...a),
   fetchExportTablesRelationsInfo: vi.fn(async () => []),
   postExportCohort: vi.fn(async () => ({ data: {} }))
 }))

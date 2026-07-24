@@ -29,8 +29,8 @@ describe('documents.mapToTable', () => {
 
   it('masque la colonne IPP en vue patient', () => {
     const table = mapToTable({ list: [doc()] } as never, false, true, ['g1'], false)
-    const labels = table.columns.map((c) => c.label)
-    expect(labels.some((l) => l?.startsWith('IPP'))).toBe(false)
+    const labels = table.columns.map((c) => String(c.label ?? ''))
+    expect(labels.some((l) => l.startsWith('IPP'))).toBe(false)
   })
 
   it('gère un document annulé (statut CANCELLED)', () => {

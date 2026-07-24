@@ -62,7 +62,7 @@ describe('cohortCreation.checkNominativeCriteria', () => {
 })
 
 describe('cohortCreation.cleanNominativeCriterias', () => {
-  const dispatch = vi.fn()
+  const dispatch = vi.fn() as never
 
   it('supprime les critères sensibles et anonymise patient/encounter', () => {
     const selectedCriteria = [
@@ -77,9 +77,9 @@ describe('cohortCreation.cleanNominativeCriterias', () => {
       crit({ id: 3, type: CriteriaType.ENCOUNTER, age: { start: '1/2/3', end: null, includeNull: false } }),
       crit({ id: 4, type: CriteriaType.CONDITION })
     ]
-    const groups: CriteriaGroup[] = [
+    const groups = [
       { id: 0, title: 'root', type: CriteriaGroupType.AND_GROUP, criteriaIds: [1, 2, 3, 4] }
-    ]
+    ] as CriteriaGroup[]
 
     cleanNominativeCriterias(selectedCriteria, groups, dispatch)
 
@@ -115,10 +115,10 @@ describe('cohortCreation.cleanNominativeCriterias', () => {
 
   it('supprime les groupes vidés de leurs critères sensibles', () => {
     const selectedCriteria = [crit({ id: 1, type: CriteriaType.IPP_LIST }), crit({ id: 2, type: CriteriaType.CONDITION })]
-    const groups: CriteriaGroup[] = [
+    const groups = [
       { id: 0, title: 'root', type: CriteriaGroupType.AND_GROUP, criteriaIds: [-1, 2] },
       { id: -1, title: 'sub', type: CriteriaGroupType.AND_GROUP, criteriaIds: [1] }
-    ]
+    ] as CriteriaGroup[]
     cleanNominativeCriterias(selectedCriteria, groups, dispatch)
     const cleanedGroups = editAllCriteriaGroup.mock.calls[0][0] as CriteriaGroup[]
     // le sous-groupe -1 ne contenait que le critère IPP supprimé -> retiré

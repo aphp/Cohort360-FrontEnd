@@ -3,11 +3,12 @@ import { describe, it, expect, beforeEach, vi } from 'vitest'
 // callApi construit des paramètres de requête FHIR/backend. On mocke la couche
 // HTTP (fhirSearch, apiFhir, apiBackend, apiDatamodel) et on vérifie les
 // ressources ciblées et quelques paramètres clés.
-const fhirSearch = vi.fn(async () => ({ data: { resourceType: 'Bundle', total: 0 } }))
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const fhirSearch = vi.fn((..._args: any[]) => Promise.resolve({ data: { resourceType: 'Bundle', total: 0 } }))
 
 vi.mock('../../services/apiFhir', () => ({
   default: { get: vi.fn(async () => ({ data: {} })) },
-  fhirSearch: (...args: unknown[]) => fhirSearch(...args)
+  fhirSearch: (...args: any[]) => fhirSearch(...args)
 }))
 
 vi.mock('services/apiDatamodel', () => ({ default: { get: vi.fn(async () => ({ data: {} })) } }))
