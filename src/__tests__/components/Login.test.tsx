@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { AppConfig, getConfig } from 'config'
 
 const dispatch = vi.fn()
@@ -30,13 +31,17 @@ const configWithJwt = () => {
   }
 }
 
+const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
+
 const renderLogin = () =>
   render(
-    <AppConfig.Provider value={configWithJwt() as never}>
-      <MemoryRouter>
-        <Login />
-      </MemoryRouter>
-    </AppConfig.Provider>
+    <QueryClientProvider client={queryClient}>
+      <AppConfig.Provider value={configWithJwt() as never}>
+        <MemoryRouter>
+          <Login />
+        </MemoryRouter>
+      </AppConfig.Provider>
+    </QueryClientProvider>
   )
 
 beforeEach(() => {
