@@ -19,7 +19,7 @@ const PROGRESS_ERROR_MESSAGE =
 
 const OnboardingLayout = () => {
   const { classes } = useStyles()
-  const { screen, currentStep, screenConfig, stepProgress, primaryLabel, saving, error, goNext, goBack } =
+  const { screen, currentStep, screenConfig, stepProgress, primaryLabel, canProceed, saving, error, goNext, goBack } =
     useOnboarding()
 
   const ActiveScreen = screenConfig?.component
@@ -48,7 +48,7 @@ const OnboardingLayout = () => {
         className={classes.nextButton}
         variant="contained"
         onClick={goNext}
-        disabled={saving}
+        disabled={saving || !canProceed}
         endIcon={<ArrowForwardIcon />}
       >
         {primaryLabel}

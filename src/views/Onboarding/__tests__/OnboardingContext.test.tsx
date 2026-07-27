@@ -174,6 +174,7 @@ describe('OnboardingContext', () => {
     const { result } = renderOnboarding(1)
     await goToCharter(result)
 
+    act(() => result.current.setAcknowledged(true))
     await act(async () => {
       result.current.goNext()
     })
@@ -188,6 +189,7 @@ describe('OnboardingContext', () => {
     const { result } = renderOnboarding(1)
     await goToCharter(result)
 
+    act(() => result.current.setAcknowledged(true))
     await act(async () => {
       result.current.goNext()
     })
@@ -230,12 +232,14 @@ describe('OnboardingContext', () => {
   it('does not sign twice when stepping back from the confirmation screen', async () => {
     const { result } = renderOnboarding(1)
     await goToCharter(result)
+    act(() => result.current.setAcknowledged(true))
     await act(async () => {
       result.current.goNext()
     })
 
     act(() => result.current.goBack())
     expect(result.current.subStep).toBe(CHARTER_SUBSTEP)
+    act(() => result.current.setAcknowledged(true))
     await act(async () => {
       result.current.goNext()
     })

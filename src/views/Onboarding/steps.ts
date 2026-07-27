@@ -44,6 +44,8 @@ export type OnboardingScreenConfig = {
   /** `bare` drops the white card, for screens bringing their own container. */
   layout?: 'card' | 'bare'
   primaryAction?: OnboardingPrimaryAction
+  /** Holds the primary button until the screen reports an explicit acknowledgement. */
+  requiresAcknowledgement?: boolean
 }
 
 export type OnboardingStepConfig = {
@@ -83,6 +85,7 @@ export const ONBOARDING_STEPS: OnboardingStepConfig[] = [
       {
         key: 'charter-signature',
         component: CharterSignature,
+        requiresAcknowledgement: true,
         primaryAction: {
           label: 'Signer',
           run: ({ signCharter }) => signCharter(),
