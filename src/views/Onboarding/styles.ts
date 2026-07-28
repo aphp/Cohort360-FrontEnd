@@ -183,6 +183,7 @@ const useStyles = makeStyles()((theme: Theme) => ({
   intro: {
     color: T.muted,
     fontSize: 16,
+    lineHeight: '24px',
     marginTop: theme.spacing(2)
   },
   stepRow: {
@@ -209,7 +210,8 @@ const useStyles = makeStyles()((theme: Theme) => ({
   },
   stepDesc: {
     color: T.muted,
-    fontSize: 16
+    fontSize: 16,
+    lineHeight: '24px'
   },
   error: {
     marginTop: theme.spacing(2),
@@ -219,7 +221,7 @@ const useStyles = makeStyles()((theme: Theme) => ({
     color: T.ink,
     fontSize: 16,
     marginTop: theme.spacing(2),
-    lineHeight: 1.6
+    lineHeight: '24px'
   },
   subTitle: {
     color: T.ink,
@@ -235,14 +237,15 @@ const useStyles = makeStyles()((theme: Theme) => ({
   },
   rowLabel: {
     color: T.ink,
-    fontSize: 16
+    fontSize: 16,
+    lineHeight: '24px'
   },
   list: {
     color: T.ink,
     fontSize: 16,
     marginTop: theme.spacing(1.5),
     paddingLeft: theme.spacing(3),
-    lineHeight: 1.6,
+    lineHeight: '24px',
     '& li': {
       marginTop: theme.spacing(0.5)
     }
@@ -286,7 +289,7 @@ const useStyles = makeStyles()((theme: Theme) => ({
   infoText: {
     color: eds.blue[800],
     fontSize: 16,
-    lineHeight: 1.6
+    lineHeight: '24px'
   },
   loadingRow: {
     display: 'flex',
@@ -297,10 +300,14 @@ const useStyles = makeStyles()((theme: Theme) => ({
     marginTop: theme.spacing(3)
   },
   fieldLabel: {
-    color: T.muted
+    color: T.muted,
+    fontSize: 16,
+    lineHeight: '24px'
   },
   fieldValue: {
     color: T.ink,
+    fontSize: 16,
+    lineHeight: '24px',
     fontWeight: 700
   },
   rightItem: {
@@ -315,6 +322,8 @@ const useStyles = makeStyles()((theme: Theme) => ({
   },
   rightLabel: {
     color: T.ink,
+    fontSize: 16,
+    lineHeight: '24px',
     fontWeight: 700
   },
   tileGrid: {
@@ -329,6 +338,26 @@ const useStyles = makeStyles()((theme: Theme) => ({
     padding: theme.spacing(1, 3, 3),
     backgroundColor: T.tileBg
   },
+  consentRow: {
+    display: 'flex',
+    alignItems: 'flex-start',
+    gap: theme.spacing(1),
+    marginTop: theme.spacing(3),
+    marginLeft: 0,
+    marginRight: 0
+  },
+  consentCheckbox: {
+    paddingTop: 0,
+    color: eds.blue[400],
+    '&.Mui-checked': {
+      color: eds.blue[400]
+    }
+  },
+  consentText: {
+    color: T.ink,
+    fontSize: 16,
+    lineHeight: '24px'
+  },
   warningNotice: {
     display: 'flex',
     alignItems: 'center',
@@ -339,9 +368,9 @@ const useStyles = makeStyles()((theme: Theme) => ({
     flexShrink: 0
   },
   warningText: {
-    color: T.warning,
-    fontWeight: 600,
-    lineHeight: 1.5
+    color: T.ink,
+    fontSize: 16,
+    lineHeight: '24px'
   },
   illustrationRow: {
     display: 'flex',

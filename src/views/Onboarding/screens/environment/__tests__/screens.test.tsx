@@ -10,7 +10,7 @@ describe('WhatIsCohort360', () => {
   it('presents the tool', () => {
     render(<WhatIsCohort360 />)
     expect(screen.getByRole('heading')).toHaveTextContent("Qu'est-ce que Cohort360 ?")
-    expect(screen.getByText(/créer et de visualiser les données de groupes de patients/)).toBeInTheDocument()
+    expect(screen.getByText('visualiser les données de groupes de patients')).toBeInTheDocument()
   })
 })
 

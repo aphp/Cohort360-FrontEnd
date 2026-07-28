@@ -27,6 +27,10 @@ type OnboardingContextValue = {
   stepProgress: number
   screenConfig?: OnboardingScreenConfig
   primaryLabel: string
+  /** False while a screen still awaits its required acknowledgement, blocking the primary button. */
+  canProceed: boolean
+  acknowledged: boolean
+  setAcknowledged: (value: boolean) => void
   goNext: () => void
   goBack: () => void
 }
@@ -60,6 +64,7 @@ export const OnboardingProvider = ({ initialStep, children }: ProviderProps) => 
   const [currentStep, setCurrentStep] = useState(() => clampStep(initialStep))
   const [subStep, setSubStep] = useState(0)
   const [screen, setScreen] = useState<OnboardingScreen>(() => (initialStep <= 0 ? 'welcome' : 'steps'))
+  const [acknowledged, setAcknowledged] = useState(false)
 
   const value = useMemo<OnboardingContextValue>(() => {
     const screenCount = getStepScreenCount(currentStep)
@@ -67,8 +72,11 @@ export const OnboardingProvider = ({ initialStep, children }: ProviderProps) => 
     const isFirstStep = currentStep === 0 && subStep === 0
     const isLastStep = isLastMacroStep && subStep === screenCount - 1
     const screenConfig = screen === 'steps' ? getScreenConfig(currentStep, subStep) : undefined
+    const canProceed = !screenConfig?.requiresAcknowledgement || acknowledged
 
     const advance = () => {
+      // A fresh screen must earn its own acknowledgement again.
+      setAcknowledged(false)
       // Progress is persisted per macro step, only once its last screen is left.
       if (subStep < screenCount - 1) {
         setSubStep((step) => step + 1)
@@ -82,7 +90,7 @@ export const OnboardingProvider = ({ initialStep, children }: ProviderProps) => 
     }
 
     const goNext = () => {
-      if (saving) {
+      if (saving || !canProceed) {
         return
       }
       if (screen === 'welcome') {
@@ -102,6 +110,7 @@ export const OnboardingProvider = ({ initialStep, children }: ProviderProps) => 
       if (screen === 'welcome') {
         return
       }
+      setAcknowledged(false)
       if (error) {
         resetAdvance()
         resetCharter()
@@ -133,10 +142,13 @@ export const OnboardingProvider = ({ initialStep, children }: ProviderProps) => 
       stepProgress: screen === 'welcome' ? 0 : subStep / screenCount,
       screenConfig,
       primaryLabel: screenConfig?.primaryAction?.label ?? defaultLabel,
+      canProceed,
+      acknowledged,
+      setAcknowledged,
       goNext,
       goBack
     }
-  }, [screen, currentStep, subStep, saving, error, persistStep, signCharter, resetAdvance, resetCharter])
+  }, [screen, currentStep, subStep, acknowledged, saving, error, persistStep, signCharter, resetAdvance, resetCharter])
 
   return <OnboardingContext.Provider value={value}>{children}</OnboardingContext.Provider>
 }

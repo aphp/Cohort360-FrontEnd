@@ -89,6 +89,27 @@ describe('Onboarding page', () => {
     expect(screen.queryByTestId('onboarding-warning')).not.toBeInTheDocument()
   })
 
+  it('holds the charter signature until the consent is ticked', async () => {
+    signCharter.mockResolvedValue({ charter_signed_at: '2026-01-01T00:00:00Z' })
+    const user = userEvent.setup()
+    renderAt({ ...baseStatus, onboarding_step: 1 })
+
+    // Walk the commitments screens down to the charter.
+    for (let i = 0; i < 7; i++) {
+      await user.click(screen.getByRole('button', { name: /Continuer/ }))
+    }
+
+    expect(screen.getByRole('heading', { name: "Signer la charte d'engagement" })).toBeInTheDocument()
+    const sign = screen.getByRole('button', { name: /Signer/ })
+    expect(sign).toBeDisabled()
+
+    await user.click(screen.getByRole('checkbox', { name: /Je certifie avoir pris connaissance/ }))
+    expect(sign).toBeEnabled()
+
+    await user.click(sign)
+    await waitFor(() => expect(signCharter).toHaveBeenCalledTimes(1))
+  })
+
   it('closes the journey on the guided tour, with a button to the application', () => {
     renderAt({ ...baseStatus, onboarding_step: 2 }, { deidentified: false } as MeState)
     expect(screen.getByRole('heading', { name: 'Prendre en main Cohort360' })).toBeInTheDocument()
