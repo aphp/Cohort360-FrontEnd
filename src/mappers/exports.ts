@@ -8,7 +8,7 @@ import { JobStatus } from 'types'
 import { Refresh } from '@mui/icons-material'
 import { isDateBefore } from 'utils/dates'
 
-const mapExportsToRows = (list: ExportList[], callbacks: ExportCallbacks) => {
+const mapExportsToRows = (list: ExportList[], callbacks: ExportCallbacks, maintenanceIsActive: boolean) => {
   const rows: Row[] = []
   const unknown = 'N/A'
   const { onDownload, onRetry } = callbacks
@@ -19,18 +19,22 @@ const mapExportsToRows = (list: ExportList[], callbacks: ExportCallbacks) => {
         icon: Download,
         onClick: () => onDownload(elem.uuid, elem.target_name ?? elem.uuid, elem.output_format ?? ''),
         disabled:
-          elem.request_job_status !== JobStatus.FINISHED || (elem.created_at && isDateBefore(elem.created_at, 7))
+          maintenanceIsActive ||
+          elem.request_job_status !== JobStatus.FINISHED ||
+          (elem.created_at && isDateBefore(elem.created_at, 7))
       },
       {
         title: 'Relancer l’export',
-
         icon: Refresh,
         onClick: () => onRetry(elem.uuid),
-        disabled: !(
-          elem.request_job_status === JobStatus.FAILED ||
-          elem.request_job_status === JobStatus.SUSPENDED ||
-          elem.request_job_status === JobStatus.FINISHED
-        )
+        disabled:
+          maintenanceIsActive ||
+          elem.request_job_status === JobStatus.NEW ||
+          elem.request_job_status === JobStatus.ACCEPTED ||
+          elem.request_job_status === JobStatus.LONG_PENDING ||
+          elem.request_job_status === JobStatus.PENDING ||
+          elem.request_job_status === JobStatus.STARTED ||
+          (elem.request_job_status === JobStatus.FINISHED && elem.created_at && !isDateBefore(elem.created_at, 7))
       }
     ]
     const row: Row = [
@@ -89,9 +93,13 @@ const mapExportsToColumns = (): Column[] => {
   ]
 }
 
-export const mapExportListToTable = (exportList: ExportList[], callbacks: ExportCallbacks) => {
+export const mapExportListToTable = (
+  exportList: ExportList[],
+  callbacks: ExportCallbacks,
+  maintenanceIsActive: boolean
+) => {
   const table: Table = { rows: [], columns: [] }
   table.columns = mapExportsToColumns()
-  table.rows = mapExportsToRows(exportList, callbacks)
+  table.rows = mapExportsToRows(exportList, callbacks, maintenanceIsActive)
   return table
 }

@@ -9,14 +9,19 @@ import DiagramView from './DiagramView'
 import ModalCreateNewRequest from './Modals/ModalCreateNewRequest/ModalCreateNewRequest'
 
 import { useAppDispatch, useAppSelector } from 'state'
-import { fetchRequestCohortCreation, resetCohortCreation } from 'state/cohortCreation'
+import {
+  buildCohortCreation,
+  editAllCriteria,
+  fetchRequestCohortCreation,
+  resetCohortCreation
+} from 'state/cohortCreation'
 import { setSelectedRequest } from 'state/request'
 
 import { CurrentSnapshot } from 'types'
 
 import criteriaList from './DataList_Criteria'
 
-import { cleanNominativeCriterias, fetchCriteriasCodes } from 'utils/cohortCreation'
+import { cleanNominativeCriterias, fetchCriteriasCodes, healCriteriaCodes } from 'utils/cohortCreation'
 
 import useStyles from './styles'
 import services from 'services/aphp'
@@ -93,6 +98,12 @@ const Requeteur = () => {
       const criteriaCodesCache = await fetchCriteriasCodes(criteriaList(), selectedCriteria, valueSets.cache)
       dispatch(updateCache(criteriaCodesCache))
 
+      const healedCriteria = healCriteriaCodes(criteriaList(), selectedCriteria, criteriaCodesCache)
+      if (healedCriteria !== selectedCriteria) {
+        dispatch(editAllCriteria(healedCriteria))
+        dispatch(buildCohortCreation({ selectedPopulation: null }))
+      }
+
       const allowMaternityForms = selectedPopulation?.every((population) => population?.access === 'Nominatif')
       const questionnairesEnabled = config.features.questionnaires.enabled
       dispatch(
@@ -146,7 +157,7 @@ const Requeteur = () => {
         globalCount
       )
 
-      if (createCohortResult && createCohortResult.status === 201) {
+      if (createCohortResult?.status === 201) {
         dispatch(resetCohortCreation())
         navigate(`/home`)
       }

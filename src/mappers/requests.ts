@@ -38,14 +38,16 @@ const mapRequestsToRows = (
       },
       {
         title: 'Éditer la requête',
+        testId: 'EditIcon',
         icon: EditIcon,
         onClick: () => onClickEdit(request),
         disabled: disabled
       }
     ]
     const row: Row = [
-      ...(!simplified
-        ? [
+      ...(simplified
+        ? []
+        : [
             {
               id: `${request.uuid}-select`,
               value: {
@@ -55,8 +57,7 @@ const mapRequestsToRows = (
               },
               type: CellType.CHECKBOX
             }
-          ]
-        : []),
+          ]),
       {
         id: `${request.uuid}-name`,
         value: name,
@@ -64,15 +65,15 @@ const mapRequestsToRows = (
         sx: { fontWeight: 900 }
       },
       { id: `${request.uuid}-actions`, value: actions as Action[], type: CellType.ACTIONS },
-      ...(!requestId
-        ? [
+      ...(requestId
+        ? []
+        : [
             {
               id: `${request.uuid}-parentName`,
               value: parentName,
               type: CellType.TEXT
             }
-          ]
-        : []),
+          ]),
       {
         id: `${request.uuid}-updatedAt`,
         value: updatedAt,
@@ -99,8 +100,9 @@ const mapRequestsToColumns = (
   projectId?: string
 ): Column[] => {
   const columns: Column[] = [
-    ...(!simplified
-      ? [
+    ...(simplified
+      ? []
+      : [
           {
             label: '',
             isCheckbox: true,
@@ -110,14 +112,13 @@ const mapRequestsToColumns = (
               onSelectAll
             }
           }
-        ]
-      : []),
-    { label: ResearchesTableLabels.REQUEST_NAME, align: 'left', code: !simplified ? Order.NAME : undefined },
+        ]),
+    { label: ResearchesTableLabels.REQUEST_NAME, align: 'left', code: simplified ? undefined : Order.NAME },
     { label: '', align: 'left' },
-    ...(!projectId
-      ? [{ label: ResearchesTableLabels.PARENT_PROJECT, code: !simplified ? Order.PARENT_FOLDER : undefined }]
-      : []),
-    { label: ResearchesTableLabels.MODIFIED_AT, code: !simplified ? Order.UPDATED : undefined },
+    ...(projectId
+      ? []
+      : [{ label: ResearchesTableLabels.PARENT_PROJECT, code: simplified ? undefined : Order.PARENT_FOLDER }]),
+    { label: ResearchesTableLabels.MODIFIED_AT, code: simplified ? undefined : Order.UPDATED },
     { label: ResearchesTableLabels.COHORTS, align: 'left' }
   ]
 

@@ -30,7 +30,7 @@ const ValidationDialog: React.FC<ValidationDialogProps> = ({ open, onClose, mess
         )}
         {loading === LoadingStatus.IDDLE && error && (
           <>
-            <WarningIcon htmlColor="#FF9800" style={{ fontSize: 52 }} />
+            <WarningIcon data-testid="WarningIcon" htmlColor="#FF9800" style={{ fontSize: 52 }} />
             <Typography className={classes.typographyMargin}>
               Erreur lors de votre demande. Veuillez réessayer ultérieurement ou{' '}
               <a href={`mailto:${appConfig.system.mailSupport}`}>contacter le support</a> pour plus d'informations.

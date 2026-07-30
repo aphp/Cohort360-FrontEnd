@@ -14,7 +14,7 @@
  * - Request joining for complex query composition
  *
  * @module cohortCreation
- * @version 1.6.1
+ * @version 1.6.3
  * @since 1.0.0
  */
 
@@ -43,10 +43,12 @@ import { getChildrenFromCodes, HIERARCHY_ROOT } from 'services/aphp/serviceValue
 import { createHierarchyRoot } from './hierarchy'
 import { FhirItem } from 'types/valueSet'
 import { ScopeElement } from 'types/scope'
+import { getValueSetFromCodeSystem, expandStoredCodesInCache } from './valueSets'
 import { formatAge } from './age'
+import { getConfig } from 'config'
 
 /** Current version of the Requeteur format used for cohort requests */
-const REQUETEUR_VERSION = 'v1.6.1'
+const REQUETEUR_VERSION = 'v1.6.4'
 
 /** Default criteria group used as fallback when group lookup fails */
 const DEFAULT_GROUP_ERROR: CriteriaGroup = {
@@ -446,9 +448,7 @@ export function buildRequest(
   const deidentified: boolean =
     selectedPopulation === null
       ? false
-      : selectedPopulation
-          .map((population) => population && population.access)
-          .filter((elem) => elem && elem === 'Pseudonymisé').length > 0
+      : selectedPopulation.map((population) => population?.access).some((elem) => elem && elem === 'Pseudonymisé')
 
   const exploreCriteriaGroup = (itemIds: number[]): (RequeteurCriteriaType | RequeteurGroupType)[] => {
     let children: (RequeteurCriteriaType | RequeteurGroupType)[] = []
@@ -456,7 +456,30 @@ export function buildRequest(
     for (const itemId of itemIds) {
       let child: RequeteurCriteriaType | RequeteurGroupType | null = null
       const isGroup = itemId < 0
-      if (!isGroup) {
+      if (isGroup) {
+        const group: CriteriaGroup = criteriaGroup.find(({ id }) => id === itemId) ?? DEFAULT_GROUP_ERROR
+
+        // DO SPECIAL THING FOR `NamongM`
+        if (group.type === CriteriaGroupType.N_AMONG_M) {
+          child = {
+            _type: CriteriaGroupType.N_AMONG_M,
+            _id: group.id,
+            isInclusive: group.isInclusive ?? true,
+            criteria: exploreCriteriaGroup(group.criteriaIds),
+            nAmongMOptions: {
+              n: group.options.number,
+              operator: group.options.operator
+            }
+          }
+        } else {
+          child = {
+            _type: group.type,
+            _id: group.id,
+            isInclusive: group.isInclusive ?? true,
+            criteria: exploreCriteriaGroup(group.criteriaIds)
+          }
+        }
+      } else {
         const item: SelectedCriteriaType | undefined = selectedCriteria.find(({ id }) => id === itemId)
         if (!item) {
           console.error('Unknown criteria id', itemId)
@@ -480,35 +503,13 @@ export function buildRequest(
                     : undefined
                 }
               : undefined,
-          occurrence: !(item.type === CriteriaType.PATIENT || item.type === CriteriaType.IPP_LIST)
-            ? {
-                n: item.occurrence.value,
-                operator: item.occurrence.comparator
-              }
-            : undefined
-        }
-      } else {
-        const group: CriteriaGroup = criteriaGroup.find(({ id }) => id === itemId) ?? DEFAULT_GROUP_ERROR
-
-        // DO SPECIAL THING FOR `NamongM`
-        if (group.type === CriteriaGroupType.N_AMONG_M) {
-          child = {
-            _type: CriteriaGroupType.N_AMONG_M,
-            _id: group.id,
-            isInclusive: group.isInclusive ?? true,
-            criteria: exploreCriteriaGroup(group.criteriaIds),
-            nAmongMOptions: {
-              n: group.options.number,
-              operator: group.options.operator
-            }
-          }
-        } else {
-          child = {
-            _type: group.type,
-            _id: group.id,
-            isInclusive: group.isInclusive ?? true,
-            criteria: exploreCriteriaGroup(group.criteriaIds)
-          }
+          occurrence:
+            item.type === CriteriaType.PATIENT || item.type === CriteriaType.IPP_LIST
+              ? undefined
+              : {
+                  n: item.occurrence.value,
+                  operator: item.occurrence.comparator
+                }
         }
       }
       if (child) {
@@ -642,11 +643,11 @@ export async function unbuildRequest(_json: string): Promise<UnbuildRequestRetur
     }
   }
 
-  if (request !== undefined) {
+  if (request === undefined) {
+    return { population, criteria: [], criteriaGroup: [], idRemap: {} }
+  } else {
     criteriaGroup = [...criteriaGroup, { ...request }]
     exploreRequest(request)
-  } else {
-    return { population, criteria: [], criteriaGroup: [], idRemap: {} }
   }
 
   const convertJsonObjectsToCriteria = async (
@@ -765,22 +766,16 @@ export async function unbuildRequest(_json: string): Promise<UnbuildRequestRetur
   }
 }
 
-/**
- * Fetches hierarchical code data for a given code and value set systems.
- *
- * @param code - The code to fetch (or HIERARCHY_ROOT for root level)
- * @param systems - Array of value set system URLs to search
- * @returns Promise resolving to hierarchical code data, or undefined if not found
- *
- * @internal
- */
-const getCodesForValueSet = async (code: string, systems: string[]): Promise<Hierarchy<FhirItem>[] | undefined> => {
-  if (code === HIERARCHY_ROOT && systems.length) return [createHierarchyRoot(systems[0])]
-  for (const system of systems) {
+const getCodesForValueSet = async (
+  code: string,
+  valueSetUrls: string[]
+): Promise<Hierarchy<FhirItem>[] | undefined> => {
+  if (code === HIERARCHY_ROOT && valueSetUrls.length) return [createHierarchyRoot(valueSetUrls[0])]
+  for (const valueSetUrl of valueSetUrls) {
     try {
-      return (await getChildrenFromCodes(system, [code])).results
-    } catch {
-      console.error("Ce n'est pas une erreur.")
+      return (await getChildrenFromCodes(valueSetUrl, [code])).results
+    } catch (error) {
+      console.warn(`Résolution du code ${code} dans le valueSet ${valueSetUrl} échouée`, error)
     }
   }
 }
@@ -833,21 +828,21 @@ export const fetchCriteriasCodes = async (
             const labelValues = criterion[dataKey] as unknown as LabelObject[]
             if (labelValues && labelValues.length > 0) {
               for (const code of labelValues) {
-                const codeSystem = code.system ?? defaultValueSet
-                const valueSetCodeCache = [...(updatedCriteriaData[codeSystem] ?? [])]
+                const valueSetUrl = (code.system && getValueSetFromCodeSystem(code.system)) || defaultValueSet
+                const valueSetCodeCache = [...(updatedCriteriaData[valueSetUrl] ?? [])]
                 if (!valueSetCodeCache.find((data) => data.id === code.id)) {
                   try {
-                    const fetchedCode = await getCodesForValueSet(code.id, [codeSystem])
+                    const fetchedCode = await getCodesForValueSet(code.id, [valueSetUrl])
                     if (fetchedCode) {
                       valueSetCodeCache.push(...fetchedCode)
                     } else {
-                      console.warn(`Code ${code.id} not found in system ${codeSystem}`)
+                      console.warn(`Code ${code.id} not found in valueSet ${valueSetUrl}`)
                     }
                   } catch (e) {
-                    console.error(`Error fetching code ${code.id} from system ${codeSystem}`, e)
+                    console.error(`Error fetching code ${code.id} from valueSet ${valueSetUrl}`, e)
                   }
                 }
-                updatedCriteriaData[codeSystem] = valueSetCodeCache
+                updatedCriteriaData[valueSetUrl] = valueSetCodeCache
               }
             }
           }
@@ -856,6 +851,45 @@ export const fetchCriteriasCodes = async (
     }
   }
   return updatedCriteriaData
+}
+
+// Réaligne les codes CCAM d'avant ré-encodage sur leur forme courante du cache (000742 -> 000742.....).
+// Renvoie la référence d'origine si aucun code ne change.
+export const healCriteriaCodes = (
+  criteriaList: readonly CriteriaItemType[],
+  selectedCriteria: SelectedCriteriaType[],
+  cache: CodeCache
+): SelectedCriteriaType[] => {
+  const ccamHierarchyUrl = getConfig().features.procedure.valueSets.procedureHierarchy?.url
+  const allCriterias = getAllCriteriaItems(criteriaList)
+  let changed = false
+  const healed = selectedCriteria.map((criterion) => {
+    const definition = allCriterias.find((crit) => crit.id === criterion.type || crit.types?.includes(criterion.type))
+    const sections = definition?.formDefinition?.itemSections
+    if (!sections) return criterion
+    let next = criterion
+    for (const section of sections) {
+      for (const item of section.items || []) {
+        if (item.type !== 'codeSearch') continue
+        const dataKey = item.valueKey as keyof SelectedCriteriaType
+        const values = next[dataKey] as unknown as LabelObject[] | undefined
+        if (!values?.length) continue
+        const allowPrefixMatch = !!ccamHierarchyUrl && item.valueSetsInfo.some((ref) => ref.url === ccamHierarchyUrl)
+        const healedValues = expandStoredCodesInCache(values, cache, allowPrefixMatch) as LabelObject[]
+        const fieldChanged =
+          healedValues.length !== values.length ||
+          healedValues.some(
+            (healedCode, index) => healedCode.id !== values[index].id || healedCode.system !== values[index].system
+          )
+        if (fieldChanged) {
+          changed = true
+          next = { ...next, [dataKey]: healedValues }
+        }
+      }
+    }
+    return next
+  })
+  return changed ? healed : selectedCriteria
 }
 
 /**

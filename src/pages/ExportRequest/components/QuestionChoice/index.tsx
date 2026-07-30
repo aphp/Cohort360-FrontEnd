@@ -105,7 +105,7 @@ const normalize = (str: string) =>
   str
     .toLocaleLowerCase('fr-FR')
     .normalize('NFD')
-    .replace(/\p{Diacritic}/gu, '')
+    .replaceAll(/\p{Diacritic}/gu, '')
 
 /**
  * Checks if a linkId starts with the F_MATER_ prefix.
@@ -268,11 +268,7 @@ const QuestionSelectorDialog: React.FC<QuestionSelectorDialogProps> = ({
   const questionnaires = useMemo(
     () =>
       bundle.entry
-        .filter(
-          (e) =>
-            e.resource.name === 'APHPEDSQuestionnaireFicheHospitalisation' ||
-            e.resource.name === 'APHPEDSQuestionnaireFicheGrossesse'
-        )
+        .filter((e) => e.resource.name === 'FicheHospitalisation' || e.resource.name === 'FicheGrossesse')
         .map((e) => e.resource),
     [bundle]
   )

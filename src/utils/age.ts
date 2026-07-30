@@ -135,31 +135,40 @@ export const formatAge = (input: string, fromFormat: string, toFormat: string): 
  * // returns 'Âge entre 25 an(s) et 65 an(s)'
  * ```
  */
+const formatDurationParts = (date: DurationType) => {
+  const yearPart = (date.year ?? 0) > 0 ? `${date.year} an(s) ` : ''
+  const monthPart = (date.month ?? 0) > 0 ? `${date.month} mois ` : ''
+  const dayPart = (date.day ?? 0) > 0 ? `${date.day} jour(s) ` : ''
+  return { yearPart, monthPart, dayPart }
+}
+
 export const getDurationRangeLabel = (dates: DurationRangeType, keyword: string) => {
   const minDate: DurationType = convertStringToDuration(dates[0]) || { year: 0, month: 0, day: 0 }
   const maxDate: DurationType = convertStringToDuration(dates[1]) || { year: 0, month: 0, day: 0 }
+  const min = formatDurationParts(minDate)
+  const max = formatDurationParts(maxDate)
 
   if (dates[0] && dates[1]) {
     return `${keyword} entre
-    ${`${(minDate.year ?? 0) > 0 ? `${minDate.year} an(s) ` : ``}
-          ${(minDate.month ?? 0) > 0 ? `${minDate.month} mois ` : ``}
-          ${(minDate.day ?? 0) > 0 ? `${minDate.day} jour(s) ` : ``}`}
+    ${min.yearPart}
+          ${min.monthPart}
+          ${min.dayPart}
   et
-    ${(maxDate.year ?? 0) > 0 ? `${maxDate.year} an(s) ` : ``}
-    ${(maxDate.month ?? 0) > 0 ? `${maxDate.month} mois ` : ``}
-    ${(maxDate.day ?? 0) > 0 ? `${maxDate.day} jour(s) ` : ``}`
+    ${max.yearPart}
+    ${max.monthPart}
+    ${max.dayPart}`
   }
   if (dates[0] && !dates[1]) {
     return `${keyword} à partir de
-    ${`${(minDate.year ?? 0) > 0 ? `${minDate.year} an(s) ` : ``}
-          ${(minDate.month ?? 0) > 0 ? `${minDate.month} mois ` : ``}
-          ${(minDate.day ?? 0) > 0 ? `${minDate.day} jour(s) ` : ``}`}`
+    ${min.yearPart}
+          ${min.monthPart}
+          ${min.dayPart}`
   }
   if (!dates[0] && dates[1]) {
     return `${keyword} au maximum de
-      ${(maxDate.year ?? 0) > 0 ? `${maxDate.year} an(s) ` : ``}
-      ${(maxDate.month ?? 0) > 0 ? `${maxDate.month} mois ` : ``}
-      ${(maxDate.day ?? 0) > 0 ? `${maxDate.day} jour(s) ` : ``}`
+      ${max.yearPart}
+      ${max.monthPart}
+      ${max.dayPart}`
   }
   return ''
 }
@@ -262,8 +271,6 @@ export const checkMinMaxValue = (min: DurationType, max: DurationType) => {
   const error =
     (min.year === null && min.month === null && min.day === null) ||
     (max.year === null && max.month === null && max.day === null)
-      ? true
-      : false
 
   if (error === true) return true
   if (minDate > maxDate) return false

@@ -12,13 +12,14 @@ import {
   Typography,
   TextField,
   Checkbox,
+  Chip as ChipMui,
   Autocomplete,
   CircularProgress,
   ListItemText,
   IconButton,
   Switch
 } from '@mui/material'
-
+import CancelIcon from '@mui/icons-material/Cancel'
 import CloseIcon from '@mui/icons-material/Close'
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz'
 import SearchOutlined from '@mui/icons-material/SearchOutlined'
@@ -136,7 +137,7 @@ const ExportTable: React.FC<ExportTableProps> = ({
   }
 
   const onDisableSelectedTable = () => {
-    if (exportTable.name === 'person') return true
+    if (exportTable.name === 'Patient') return true
     if (count === 0) return true
     if (oneFile && !isCompatibleTable(exportTable.name)) return true
     return false
@@ -307,7 +308,13 @@ const ExportTable: React.FC<ExportTableProps> = ({
                   fontSize={12}
                   color={tableSetting?.isChecked ? '#153D8A' : '#888'}
                 >
-                  {`${count} ${exportTableResourceType === ResourceType.QUESTIONNAIRE_RESPONSE ? `dossier${plural(count ?? 0)} de spécialité` : `ligne${plural(count ?? 0)}`}`}
+                  {(() => {
+                    const label =
+                      exportTableResourceType === ResourceType.QUESTIONNAIRE_RESPONSE
+                        ? `dossier${plural(count ?? 0)} de spécialité`
+                        : `ligne${plural(count ?? 0)}`
+                    return `${count} ${label}`
+                  })()}
                 </Typography>
               )}
             </>
@@ -421,6 +428,19 @@ const ExportTable: React.FC<ExportTableProps> = ({
                   </li>
                 )
               }}
+              renderTags={(tagValue, getTagProps) =>
+                tagValue.map((option, index) => {
+                  const { onDelete } = getTagProps({ index })
+                  return (
+                    <ChipMui
+                      key={option}
+                      label={option}
+                      onDelete={onDelete}
+                      deleteIcon={<CancelIcon data-testid="CancelIcon" />}
+                    />
+                  )
+                })
+              }
               renderInput={(params) => {
                 return <TextField {...params} label="Sélectionnez une colonne" />
               }}
@@ -445,7 +465,7 @@ const ExportTable: React.FC<ExportTableProps> = ({
                     return `${option.name}`
                   }}
                   renderInput={(params) => <TextField {...params} label="Sélectionnez un filtre" />}
-                  value={tableSetting?.fhirFilter}
+                  value={tableSetting?.fhirFilter ?? null}
                   onChange={(_, value) => {
                     onChangeTableSettings([{ tableName: exportTable.name, key: 'fhirFilter', value }])
                   }}
@@ -515,11 +535,11 @@ const ExportTable: React.FC<ExportTableProps> = ({
               )}
               {!isExtended && selectedQuestions.length > 0 && (
                 <IconButton size="small" sx={{ color: '#5BC5F2' }} onClick={() => setIsExtended(true)}>
-                  <MoreHorizIcon />
+                  <MoreHorizIcon data-testid="MoreHorizIcon" />
                 </IconButton>
               )}
               <IconButton sx={{ color: '#5BC5F2' }} size="small" onClick={handleOpen}>
-                <SearchOutlined />
+                <SearchOutlined data-testid="SearchOutlinedIcon" />
               </IconButton>
             </Grid>
           </Grid>

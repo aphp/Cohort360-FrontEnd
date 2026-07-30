@@ -63,8 +63,16 @@ const ScopeTreeRow = ({ item, path, sourceType, mode, loading, onSelect, onExpan
               {internalLoading && <CircularProgress size={'15px'} color="info" />}
               {!internalLoading && (
                 <>
-                  {open && <KeyboardArrowDown onClick={() => setOpen(false)} color="secondary" />}
-                  {!open && <KeyboardArrowRight onClick={handleOpen} color="secondary" />}
+                  {open && (
+                    <KeyboardArrowDown
+                      data-testid="KeyboardArrowDownIcon"
+                      onClick={() => setOpen(false)}
+                      color="secondary"
+                    />
+                  )}
+                  {!open && (
+                    <KeyboardArrowRight data-testid="KeyboardArrowRightIcon" onClick={handleOpen} color="secondary" />
+                  )}
                 </>
               )}
             </>

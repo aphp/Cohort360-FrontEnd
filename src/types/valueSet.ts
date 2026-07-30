@@ -28,11 +28,13 @@ export type Reference = {
   title: string
   standard: boolean
   url: string
+  codeSystemUrls?: string[]
   checked: boolean
-  isHierarchy: boolean
   joinDisplayWithCode: boolean
   joinDisplayWithSystem: boolean
   filterRoots?: <T>(code: Hierarchy<T>) => boolean
+  resourceType?: 'ValueSet' | 'CodeSystem'
+  loadingMode?: 'list' | 'expand'
 }
 
 export type ValueSetSortField = 'statTotalUnique' | 'statTotal'
@@ -47,7 +49,12 @@ export type FhirItem = {
   label: string
   parentIds?: string[]
   childrenIds?: string[]
-  system: string
+  system: string // CodeSystem URL (for individual code identification)
+  valueSetUrl?: string // ValueSet URL (for grouping and API calls)
   statTotal?: number
   statTotalUnique?: number
 }
+
+// Utility types for reverse lookup functionality
+export type CodeSystemToValueSetMap = Record<string, string>
+export type ValueSetToCodeSystemMap = Record<string, string>

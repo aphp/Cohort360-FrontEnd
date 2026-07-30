@@ -1,7 +1,7 @@
 import React from 'react'
 import Card from '@mui/material/Card'
 import { Box, Button, Chip } from '@mui/material'
-
+import CancelIcon from '@mui/icons-material/Cancel'
 import useStyles from './styles'
 import { CohortComposition, CohortEncounter } from 'types'
 
@@ -34,7 +34,12 @@ const HospitItem = ({ data, onClick, isPeriod }: HospitItemTypes) => {
           <Box padding="8px 16px" display={'flex'} flexDirection={'column'} gap={1}>
             <Box display={'flex'} justifyContent={'space-between'} alignItems={'center'} flexWrap={'wrap'}>
               {data.serviceProvider?.display && (
-                <Chip label={data.serviceProvider.display} size="small" className={classes.chip} />
+                <Chip
+                  label={data.serviceProvider.display}
+                  size="small"
+                  className={classes.chip}
+                  deleteIcon={<CancelIcon data-testid="CancelIcon" />}
+                />
               )}
               {data.documents && data.documents.length > 0 && (
                 <Button

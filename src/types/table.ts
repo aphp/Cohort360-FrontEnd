@@ -9,6 +9,7 @@ export type Action = {
   onClick: (newItem?: unknown) => void | Promise<void>
   color?: string
   disabled?: boolean
+  testId?: string
 }
 
 export type Link = {
@@ -55,6 +56,7 @@ export type Icon = {
   icon: React.ElementType
   style?: React.CSSProperties
   tooltip?: string
+  testId?: string
 }
 
 export enum CellType {

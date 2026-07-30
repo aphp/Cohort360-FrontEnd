@@ -1,14 +1,23 @@
+import { usePagination } from 'components/ui/Pagination/usePagination'
 import { useSavedFilters } from 'hooks/filters/useSavedFilters'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import useSearchCriterias from 'reducers/searchCriteriasReducer'
 import { AdditionalInfo, ExplorationConfig, SearchWithFilters } from 'types/exploration'
 import { FilterKeys, FilterValue, Filters, SearchCriteriaKeys, SearchCriterias } from 'types/searchCriterias'
 import { selectFiltersAsArray } from 'utils/filters'
+import { useData } from './useData'
 
 export const useExplorationBoard = <T>(config: ExplorationConfig<T>) => {
-  const [additionalInfo, setAdditionalInfo] = useState<AdditionalInfo>({ type: config.type, deidentified: false })
+  const prevTypeRef = useRef(config.type)
+
   const [searchCriterias, { changeSearchBy, changeOrderBy, changeSearchInput, addFilters, removeFilter }] =
     useSearchCriterias(config.initSearchCriterias(), config.type)
+  const { count, data, dataLoading, fetchData } = useData(config)
+  const { pagination, onChangePage, onChangeTotal } = usePagination()
+
+  const [additionalInfo, setAdditionalInfo] = useState<AdditionalInfo>({ type: config.type, deidentified: false })
+  const additionalInfoRef = useRef(additionalInfo)
+  additionalInfoRef.current = additionalInfo
 
   const {
     allSavedFilters,
@@ -19,7 +28,28 @@ export const useExplorationBoard = <T>(config: ExplorationConfig<T>) => {
 
   const narrowSearch = useMemo(() => config.narrowSearchCriterias, [config])
 
-  const narrowedSearchCriterias = useMemo(() => narrowSearch(searchCriterias as SearchCriterias<T>), [searchCriterias])
+  const narrowedSearchCriterias = useMemo(
+    () => narrowSearch(searchCriterias as SearchCriterias<T>),
+    [searchCriterias, narrowSearch]
+  )
+
+  useEffect(() => {
+    let cancelled = false
+
+    const runFetch = async () => {
+      const results = await fetchData(pagination.currentPage, narrowedSearchCriterias)
+      if (!cancelled) onChangeTotal(results?.total ?? 0)
+    }
+
+    if (prevTypeRef.current !== config.type) {
+      onChangePage(1)
+      prevTypeRef.current = config.type
+    } else runFetch()
+
+    return () => {
+      cancelled = true
+    }
+  }, [pagination.currentPage, narrowedSearchCriterias, config.type])
 
   const narrowedSelectedFilter = useMemo(
     () =>
@@ -29,7 +59,7 @@ export const useExplorationBoard = <T>(config: ExplorationConfig<T>) => {
             filterParams: narrowSearch(selectedSavedFilter.filterParams as SearchCriterias<T>)
           }
         : null,
-    [selectedSavedFilter]
+    [selectedSavedFilter, narrowSearch]
   )
 
   const criterias = useMemo(() => {
@@ -41,6 +71,7 @@ export const useExplorationBoard = <T>(config: ExplorationConfig<T>) => {
   const onRemoveCriteria = (category: FilterKeys | SearchCriteriaKeys, value: FilterValue) => {
     if (category === SearchCriteriaKeys.SEARCH_INPUT) changeSearchInput('')
     else removeFilter(category as FilterKeys, value)
+    onChangePage(1)
   }
 
   const onSaveSearchCriterias = ({ searchBy, searchInput, filters, orderBy }: SearchWithFilters) => {
@@ -48,15 +79,16 @@ export const useExplorationBoard = <T>(config: ExplorationConfig<T>) => {
     if (searchInput !== undefined) changeSearchInput(searchInput)
     if (filters) addFilters(filters)
     if (orderBy) changeOrderBy(orderBy)
+    onChangePage(1)
   }
 
   useEffect(() => {
-    const fetchInfos = async () => {
-      const newInfo = await config.fetchAdditionalInfos(additionalInfo)
-      setAdditionalInfo({ ...additionalInfo, ...newInfo, type: config.type })
+    const fetch = async () => {
+      const newInfo = await config.fetchAdditionalInfos(additionalInfoRef.current)
+      setAdditionalInfo((prev) => ({ ...prev, ...newInfo, type: config.type }))
     }
-    fetchInfos()
-  }, [config.type])
+    fetch()
+  }, [config])
 
   return {
     savedFiltersData: {
@@ -70,6 +102,15 @@ export const useExplorationBoard = <T>(config: ExplorationConfig<T>) => {
       onEdit: (name: string, searchCriterias: SearchCriterias<Filters>) =>
         patchSavedFilter(name, searchCriterias, config.deidentified),
       onSubmit: onSaveSearchCriterias
+    },
+    data: {
+      data,
+      dataLoading,
+      count
+    },
+    page: {
+      pagination,
+      onChangePage
     },
     fetchStatus,
     additionalInfo,

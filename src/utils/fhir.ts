@@ -44,7 +44,7 @@ export const getExtension = (
 export const getPreferedCode = (code?: CodeableConcept): Coding | undefined => {
   return (
     code?.coding?.find((c) => c.userSelected === true) ||
-    (!getConfig().core.fhir.selectedCodeOnly ? code?.coding?.[0] : undefined)
+    (getConfig().core.fhir.selectedCodeOnly ? undefined : code?.coding?.[0])
   )
 }
 

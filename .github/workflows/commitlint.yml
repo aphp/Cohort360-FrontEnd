@@ -1,33 +1,37 @@
-name: commitlint
+name: cohort360-frontend-commitlint
 
-on: 
+on:
   pull_request:
     branches:
-      - 'develop'
-      - 'main'
+      - develop
+      - main
+    types: [opened, synchronize, reopened, ready_for_review, edited]
 
 jobs:
   commit-lint:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
         with:
           fetch-depth: 0
-      - name: Install commit-lint
+
+      - name: Install dependencies
+        run: npm ci --no-audit --ignore-scripts
+
+      - name: Validate PR commits with commitlint
+        env:
+          BASE_REF: ${{ github.event.pull_request.base.ref }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
         run: |
-          npm install --force conventional-changelog-conventionalcommits @commitlint/config-conventional commitlint@latest
-      - name: Fix commitlint error
-        run: |
-          sed -i 's/"type": "module",//g' package.json
-      - name: Validate current commit (last commit) with commitlint
-        if: github.event_name == 'push'
-        run: npx commitlint --from HEAD~1 --to HEAD --verbose
-      # Nobody seems to want to use this, so I'm commenting it out
-      # In the end we squash merge the PRs, so this is not really needed
-      # - name: Validate PR commits with commitlint
-      #   if: github.event_name == 'pull_request'
-      #   run: npx commitlint --from ${{ github.event.pull_request.head.sha }}~${{ github.event.pull_request.commits }} --to ${{ github.event.pull_request.head.sha }} --verbose
+          git fetch origin "$BASE_REF"
+          FROM=$(git merge-base "origin/$BASE_REF" "$HEAD_SHA")
+          ./node_modules/.bin/commitlint --from "$FROM" --to "$HEAD_SHA" --verbose
+
       - name: Validate PR title with commitlint
-        if: github.event_name == 'pull_request'
+        env:
+          PR_TITLE: ${{ github.event.pull_request.title }}
         run: |
-          echo "${{github.event.pull_request.title}}" | npx commitlint 
+          printf '%s\n' "$PR_TITLE" | ./node_modules/.bin/commitlint

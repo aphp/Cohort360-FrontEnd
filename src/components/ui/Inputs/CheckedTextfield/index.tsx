@@ -82,7 +82,7 @@ const CheckedTextfield = ({
               ? {
                   endAdornment: (
                     <InputAdornment position="end" style={{ padding: '0px 25px' }}>
-                      {error && <WarningIcon style={{ fill: '#F44336', height: 20 }} />}
+                      {error && <WarningIcon data-testid="WarningIcon" style={{ fill: '#F44336', height: 20 }} />}
                     </InputAdornment>
                   )
                 }

@@ -83,10 +83,7 @@ const SearchValueSet = ({ references, selectedNodes, onSelect }: SearchValueSetP
                   Référentiels :
                 </Typography>
                 <ReferencesParameters
-                  disabled={
-                    loadingStatus.init === LoadingStatus.FETCHING ||
-                    (mode === SearchMode.RESEARCH && loadingStatus.search === LoadingStatus.FETCHING)
-                  }
+                  disabled={loadingStatus.init === LoadingStatus.FETCHING}
                   onSelect={onChangeReferences}
                   type={mode === SearchMode.EXPLORATION ? Type.SINGLE : Type.MULTIPLE}
                   values={refs}
@@ -98,12 +95,11 @@ const SearchValueSet = ({ references, selectedNodes, onSelect }: SearchValueSetP
                     <Input
                       value={searchInput}
                       placeholder="Rechercher un code"
-                      disabled={loadingStatus.search === LoadingStatus.FETCHING}
                       fullWidth
                       onChange={(event) => onChangeSearchInput(event.target.value)}
                       endAdornment={
                         <IconButton onClick={() => onChangeSearchInput('')}>
-                          <ClearIcon style={{ fill: '#6f6f6f', height: 18 }} />
+                          <ClearIcon style={{ fill: '#6f6f6f', height: 18 }} data-testid="ClearIcon" />
                         </IconButton>
                       }
                     />
@@ -118,7 +114,7 @@ const SearchValueSet = ({ references, selectedNodes, onSelect }: SearchValueSetP
         <Displayer isDisplayed={mode === SearchMode.EXPLORATION} height="100%" className="ValueSetExploration">
           <ValueSetTable
             mode={SearchMode.EXPLORATION}
-            isHierarchy={refs.find((ref) => ref.checked)?.isHierarchy}
+            loadingMode={refs.find((ref) => ref.checked)?.loadingMode}
             loading={{ list: loadingStatus.init, expand: loadingStatus.expand }}
             hierarchy={exploration}
             selectAllStatus={selectAllStatus}
@@ -133,7 +129,7 @@ const SearchValueSet = ({ references, selectedNodes, onSelect }: SearchValueSetP
           <ValueSetTable
             mode={SearchMode.RESEARCH}
             selectAllStatus={selectAllStatus}
-            isHierarchy={false}
+            loadingMode="list"
             loading={{ list: loadingStatus.search, expand: loadingStatus.expand }}
             hierarchy={research}
             isSelectionDisabled={isSelectionDisabled}

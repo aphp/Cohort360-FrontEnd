@@ -69,10 +69,10 @@ type ErrorTables = Array<{
   error?: Error
 }>
 
-/** Initial state for table settings with person table pre-selected */
+/** Initial state for table settings with patient table pre-selected */
 const tableSettingsInitialState: TableSetting[] = [
   {
-    tableName: 'person',
+    tableName: 'Patient',
     isChecked: true,
     columns: null,
     fhirFilter: null,
@@ -80,10 +80,10 @@ const tableSettingsInitialState: TableSetting[] = [
   }
 ]
 
-/** Initial state for error tracking with person table having no errors */
+/** Initial state for error tracking with patient table having no errors */
 const errorTablesInitialState: ErrorTables = [
   {
-    tableName: 'person',
+    tableName: 'Patient',
     error: Error.NO_ERROR
   }
 ]
@@ -293,8 +293,8 @@ const ExportForm: React.FC = () => {
   }, [])
 
   const resetSelectedTables = () => {
-    const newSelectedTables = tableSettingsInitialState
-    setTablesSettings(newSelectedTables)
+    setTablesSettings(tableSettingsInitialState)
+    setErrorTables(errorTablesInitialState)
   }
 
   const handleSelectAllTables = useCallback(
@@ -318,7 +318,7 @@ const ExportForm: React.FC = () => {
       } else {
         setTablesSettings([
           {
-            tableName: 'person',
+            tableName: 'Patient',
             isChecked: true,
             columns: null,
             fhirFilter: null,
@@ -488,7 +488,7 @@ const ExportForm: React.FC = () => {
                 </span>
               }
             >
-              <InfoIcon fontSize="small" color="primary" />
+              <InfoIcon data-testid="InfoIcon" fontSize="small" color="primary" />
             </Tooltip>
           </Grid>
 
@@ -502,12 +502,13 @@ const ExportForm: React.FC = () => {
                 size="small"
                 onClick={() =>
                   window.open(
-                    `https://id.pages.data.aphp.fr/pfm/bigdata/eds-central-database/latest/data_catalog/`,
-                    '_blank'
+                    'https://id.pages.data.aphp.fr/isd/data-engineering/eds-central-database/latest/data_catalog/',
+                    '_blank',
+                    'noopener,noreferrer'
                   )
                 }
               >
-                <InfoIcon />
+                <InfoIcon data-testid="InfoIcon" />
               </IconButton>
             </Grid>
 
@@ -533,14 +534,14 @@ const ExportForm: React.FC = () => {
                     <Checkbox
                       color="secondary"
                       indeterminate={
-                        (exportTableList &&
+                        (exportTableList?.length !== undefined &&
                           tablesSettings.filter((tableSetting) => tableSetting.isChecked).length !==
                             exportTableList.length &&
                           tablesSettings.some((tableSetting) => tableSetting.isChecked)) ??
                         false
                       }
                       checked={
-                        (exportTableList &&
+                        (exportTableList?.length !== undefined &&
                           tablesSettings.filter((tableSetting) => tableSetting.isChecked).length ===
                             exportTableList.length) ??
                         false

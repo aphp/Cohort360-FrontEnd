@@ -16,7 +16,7 @@ const SublevelButton: React.FC<SublevelButtonProps> = ({ label, onClick, total }
     <Button
       customVariant="clear"
       disabled={total < 1}
-      endIcon={total >= 1 && <ArrowRightAltIcon />}
+      endIcon={total >= 1 && <ArrowRightAltIcon data-testid="ArrowRightAltIcon" />}
       onClick={(event) => {
         event.stopPropagation()
         onClick()

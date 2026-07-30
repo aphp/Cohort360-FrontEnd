@@ -1,4 +1,5 @@
 import { Chip, SxProps, Theme, Typography } from '@mui/material'
+import CancelIcon from '@mui/icons-material/Cancel'
 import React, { useMemo } from 'react'
 import { Hierarchy } from 'types/hierarchy'
 import { groupBySystem } from 'utils/hierarchy'
@@ -43,6 +44,7 @@ const CodesWithSystems = <T,>({
                 label={getLabelFromCode(code)}
                 sx={{ ...sx, marginBottom: '2px', marginRight: '2px' }}
                 onDelete={() => onDelete(code)}
+                deleteIcon={<CancelIcon data-testid="CancelIcon" />}
               />
             ))}
           </div>

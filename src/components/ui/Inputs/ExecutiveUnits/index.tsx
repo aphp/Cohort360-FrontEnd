@@ -59,7 +59,7 @@ const ExecutiveUnits = ({ value, sourceType, disabled = false, onChange, label }
             </>
           }
         >
-          <InfoIcon fontSize="small" color="primary" style={{ marginLeft: 4 }} />
+          <InfoIcon data-testid="InfoIcon" fontSize="small" color="primary" style={{ marginLeft: 4 }} />
         </Tooltip>
       </Grid>
       <Grid
@@ -96,7 +96,7 @@ const ExecutiveUnits = ({ value, sourceType, disabled = false, onChange, label }
             disabled={disabled}
           >
             {loading === LoadingStatus.FETCHING && <CircularProgress size={24} />}
-            {loading === LoadingStatus.SUCCESS && <SearchOutlined />}
+            {loading === LoadingStatus.SUCCESS && <SearchOutlined data-testid="SearchOutlinedIcon" />}
           </IconButton>
         </Grid>
       </Grid>

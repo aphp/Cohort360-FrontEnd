@@ -1,16 +1,18 @@
-import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react'
+import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import L, { LatLngBounds, LatLngTuple } from 'leaflet'
+import { Location } from 'fhir/r4'
 // https://github.com/PaulLeCam/react-leaflet/issues/1077
 //@ts-ignore
-import { Polygon, Rectangle, Tooltip, useMapEvents } from 'react-leaflet'
+import { Polygon, Rectangle, Tooltip, useMap, useMapEvents } from 'react-leaflet'
 //@ts-ignore
 import { MapContainer } from 'react-leaflet/MapContainer'
 //@ts-ignore
 import { TileLayer } from 'react-leaflet/TileLayer'
 import { fetchLocation } from 'services/aphp/callApi'
-import { getAllResults } from 'utils/apiHelpers'
+import { getAllResults, getApiResponseResources } from 'utils/apiHelpers'
 import {
   colorize,
+  computeCentroid,
   computeNearFilter,
   getColorPalette,
   isBoundCovered,
@@ -32,10 +34,15 @@ const LOCATION_FETCH_BATCH_SIZE = 2000
 const MAX_COUNT_QUANTILE = 0.96
 const ZONE_COLOR_OPACITY = 0.37
 const BORDER_RELATIVE_OPACITY = 1.33
-const MIN_ZOOM = 8
 const DEFAULT_MAP_CENTER: LatLngTuple = [48.8575, 2.3514]
 const TILE_URL = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
 const MAP_COPYRIGHTS = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+// Debounce delay for map pan/zoom events to reduce API call frequency
+const MAP_DEBOUNCE_DELAY_MS = 300
+// Maximum number of concurrent tile fetch requests to avoid overwhelming the backend
+const MAX_CONCURRENT_TILE_REQUESTS = 3
+// Minimum zoom level at which IRIS zones are fetched (zoomed out = more zones = heavier load)
+const MIN_ZOOM_FOR_IRIS_FETCH = 10
 const COLOR_PALETTE = [
   '#fad370',
   '#fac55c',
@@ -60,6 +67,90 @@ type IrisZonesProps = {
   cohortId: string
 }
 
+// Number of locations to fetch to find the best center (fetched without geo-filter, sorted by count desc)
+const AUTO_CENTER_FETCH_SIZE = 100
+
+/**
+ * Component that auto-centers the map on the zone with the highest patient density.
+ * Fetches a sample of locations without geo-filter on initial load and cohort change,
+ * finds the one with the highest count, and pans the map to its centroid.
+ */
+const AutoCenterMap = (props: { cohortId: string }) => {
+  const { cohortId } = props
+  const appConfig = useContext(AppConfig)
+  const map = useMap()
+  const hasCenteredRef = useRef(false)
+  const abortControllerRef = useRef<AbortController | null>(null)
+  const { locationCount: countExtUrl, locationShapeUrl: shapeExtUrl } = appConfig.features.locationMap.extensions
+
+  useEffect(() => {
+    hasCenteredRef.current = false
+  }, [cohortId])
+
+  useEffect(() => {
+    if (hasCenteredRef.current) return
+
+    // Cancel any previous in-flight request
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort()
+    }
+    const abortController = new AbortController()
+    abortControllerRef.current = abortController
+
+    const centerOnDensestZone = async () => {
+      try {
+        // Fetch locations without geo-filter to find the zone with highest patient count
+        const response = await fetchLocation({
+          _list: [cohortId],
+          size: AUTO_CENTER_FETCH_SIZE,
+          signal: abortController.signal
+        })
+
+        if (abortController.signal.aborted) return
+
+        const locations = getApiResponseResources(response) || []
+        if (locations.length === 0) return
+
+        // Find the location with the highest count
+        let maxCount = 0
+        let bestLocation: Location | null = null
+        for (const loc of locations) {
+          const count = getExtension(loc, countExtUrl)?.valueInteger || 0
+          if (count > maxCount) {
+            maxCount = count
+            bestLocation = loc
+          }
+        }
+
+        if (!bestLocation) return
+
+        // Parse the shape and compute the centroid
+        const shapeString = getExtension(bestLocation, shapeExtUrl)?.valueString
+        const shape = parseShape(shapeString)
+        if (!shape || shape.length === 0) return
+
+        const centroid = computeCentroid(shape)
+        if (!centroid) return
+
+        // Pan the map to the centroid with animation
+        map.flyTo(centroid, map.getZoom(), { animate: true, duration: 0.5 })
+        hasCenteredRef.current = true
+      } catch (error) {
+        if (error instanceof Error && error.name === 'AbortError') return
+        console.error('Failed to auto-center map:', error)
+      }
+    }
+
+    centerOnDensestZone()
+
+    return () => {
+      cancelPendingRequest(abortController)
+    }
+  }, [cohortId, map, countExtUrl, shapeExtUrl])
+
+  return null // This component only produces side effects
+}
+
 const IrisZones = (props: IrisZonesProps) => {
   const { cohortId } = props
   const appConfig = useContext(AppConfig)
@@ -67,49 +158,100 @@ const IrisZones = (props: IrisZonesProps) => {
   const [zones, setZones] = useState<{ [id: string]: ZoneInfo }>({})
   const [visibleZones, setVisibleZones] = useState<Array<ZoneInfo>>([])
   const [bounds, setBounds] = useState<LatLngBounds | null>(null)
-  const [loadedBounds, setLoadedBounds] = useState<LatLngBounds[]>([])
+  const [debouncedBounds, setDebouncedBounds] = useState<LatLngBounds | null>(null)
+  const currentZoomRef = useRef<number>(10)
+  const loadedBoundsRef = useRef<LatLngBounds[]>([])
   const [loadingBounds, setLoadingBounds] = useState<LatLngBounds[]>([])
   const [maxCount, setMaxCount] = useState(MAX_COUNT_DEFAULT)
   const [zoneOpacity, setZoneOpacity] = useState(ZONE_COLOR_OPACITY * 100)
   const colorPalette = getColorPalette(COLOR_PALETTE, maxCount)
+  // Refs for debouncing and request management
+  const debounceTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+  const abortControllerRef = useRef<AbortController | null>(null)
 
-  const updateBounds = useCallback((newBounds: LatLngBounds) => {
+  const updateBounds = useCallback((newBounds: LatLngBounds, zoom: number) => {
     setBounds((prevBounds) => {
       if (prevBounds !== null && newBounds.equals(prevBounds)) {
         return prevBounds
       }
       return newBounds
     })
+    currentZoomRef.current = zoom
   }, [])
 
-  // Update bounds on map move
+  // Debounce bounds changes to avoid flooding the API during rapid pan/zoom
+  useEffect(() => {
+    if (!bounds) return
+    // Clear any pending debounce timer
+    if (debounceTimeoutRef.current) {
+      clearTimeout(debounceTimeoutRef.current)
+    }
+    // Set a new debounce timer
+    debounceTimeoutRef.current = setTimeout(() => {
+      setDebouncedBounds(bounds)
+    }, MAP_DEBOUNCE_DELAY_MS)
+    return () => {
+      if (debounceTimeoutRef.current) {
+        clearTimeout(debounceTimeoutRef.current)
+      }
+    }
+  }, [bounds])
+
+  // Update bounds on map move (with zoom tracking)
   const map = useMapEvents({
     moveend: () => {
-      updateBounds(map.getBounds())
+      updateBounds(map.getBounds(), map.getZoom())
     },
     zoomend: () => {
-      updateBounds(map.getBounds())
+      updateBounds(map.getBounds(), map.getZoom())
     }
   })
   // Update bounds on first render
   useEffect(() => {
-    updateBounds(map.getBounds())
+    updateBounds(map.getBounds(), map.getZoom())
   }, [map, updateBounds])
 
-  // Reset zones when cohortId changes
+  // Reset zones when cohortId changes and trigger new fetch
   useEffect(() => {
+    // Clear any pending debounce timer to prevent stale bounds from the old cohort
+    if (debounceTimeoutRef.current) {
+      clearTimeout(debounceTimeoutRef.current)
+      debounceTimeoutRef.current = null
+    }
     setVisibleZones([])
     setZones({})
-    setLoadedBounds([])
+    loadedBoundsRef.current = []
     setMaxCount(MAX_COUNT_DEFAULT)
-  }, [cohortId])
-
-  // Fetch zones when bounds or nearFilter change
-  useEffect(() => {
-    const abortController = new AbortController()
+    // Trigger fetch for new cohort by setting debouncedBounds to current bounds
+    // (setting to null would prevent fetch until user pans/zooms)
     if (bounds) {
+      setDebouncedBounds(bounds)
+    }
+  }, [cohortId]) // eslint-disable-line react-hooks/exhaustive-deps -- bounds intentionally excluded to avoid re-triggering on pan/zoom
+
+  // Fetch zones when debounced bounds change (uses debounced bounds to avoid API flooding)
+  useEffect(() => {
+    // Cancel any previous in-flight request
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort()
+    }
+    const abortController = new AbortController()
+    abortControllerRef.current = abortController
+
+    if (debouncedBounds) {
+      // Skip fetching if zoomed out too far (prevents heavy queries when viewing large areas)
+      // Use the higher of: config minZoom or MIN_ZOOM_FOR_IRIS_FETCH to ensure consistent behavior
+      const minZoomThreshold = Math.max(
+        appConfig.features.locationMap.minZoom || MIN_ZOOM_FOR_IRIS_FETCH,
+        MIN_ZOOM_FOR_IRIS_FETCH
+      )
+      if (currentZoomRef.current < minZoomThreshold) {
+        setDataLoading(false)
+        return
+      }
+
       // If the current viewbox is already covered by the loaded bounds, do not fetch new locations
-      if (isBoundCovered(map, bounds, loadedBounds)) {
+      if (isBoundCovered(map, debouncedBounds, loadedBoundsRef.current)) {
         setDataLoading(false)
         return
       }
@@ -118,29 +260,41 @@ const IrisZones = (props: IrisZonesProps) => {
         try {
           setDataLoading(true)
           // Fetch fhir locations for the current viewbox using the near filter
-          const smallBounds = uncoveredBoundMeshUnits(map, bounds, loadedBounds)
+          const smallBounds = uncoveredBoundMeshUnits(map, debouncedBounds, loadedBoundsRef.current)
           if (DEBUG_SHOW_LOADED_BOUNDS) {
             setLoadingBounds(smallBounds)
           }
-          const locationParts = await Promise.all(
-            smallBounds.map(async (boundPart, i) => {
-              const loadingPartProgress = (stage: number, total: number) => {
-                updateLoadingProgress(i, stage, total, smallBounds.length)
-              }
-              const nearFilter = computeNearFilter(map, boundPart)
-              return await getAllResults(
-                fetchLocation,
-                {
-                  _list: [cohortId],
-                  size: LOCATION_FETCH_BATCH_SIZE,
-                  near: nearFilter,
-                  signal: abortController.signal
-                },
-                loadingPartProgress
-              )
-            })
-          )
-          const locations = locationParts.flat()
+
+          // Fetch tiles with limited concurrency to avoid overwhelming the backend
+          const locations: Location[] = []
+          for (let i = 0; i < smallBounds.length; i += MAX_CONCURRENT_TILE_REQUESTS) {
+            // Check if request was aborted
+            if (abortController.signal.aborted) {
+              setDataLoading(false)
+              return
+            }
+            const batchBounds = smallBounds.slice(i, i + MAX_CONCURRENT_TILE_REQUESTS)
+            const batchResults = await Promise.all(
+              batchBounds.map(async (boundPart, j) => {
+                const batchIndex = i + j
+                const loadingPartProgress = (stage: number, total: number) => {
+                  updateLoadingProgress(batchIndex, stage, total, smallBounds.length)
+                }
+                const nearFilter = computeNearFilter(map, boundPart)
+                return await getAllResults(
+                  fetchLocation,
+                  {
+                    _list: [cohortId],
+                    size: LOCATION_FETCH_BATCH_SIZE,
+                    near: nearFilter,
+                    signal: abortController.signal
+                  },
+                  loadingPartProgress
+                )
+              })
+            )
+            locations.push(...batchResults.flat())
+          }
 
           if (locations) {
             // updates loaded zones
@@ -166,21 +320,22 @@ const IrisZones = (props: IrisZonesProps) => {
                 { ...existingZones }
               )
               // update the loaded bounds
-              setLoadedBounds((prevLoadedBounds) => {
-                if (prevLoadedBounds.some((b) => b.equals(bounds))) {
-                  return prevLoadedBounds
-                }
-                return prevLoadedBounds.concat(bounds)
-              })
+              if (!loadedBoundsRef.current.some((b) => b.equals(debouncedBounds))) {
+                loadedBoundsRef.current = loadedBoundsRef.current.concat(debouncedBounds)
+              }
 
               return newZones
             })
           }
           setDataLoading(false)
         } catch (error) {
+          if (abortController.signal.aborted) {
+            setDataLoading(false)
+            return
+          }
           // TODO use snackbar setMessage to display error instead
-          // except if the error if of type AbortError (which is normal when the user moves the map too fast)
           console.error(error)
+          setDataLoading(false)
         }
       })()
     }
@@ -189,13 +344,13 @@ const IrisZones = (props: IrisZonesProps) => {
     }
   }, [
     cohortId,
-    bounds,
+    debouncedBounds,
     updateLoadingProgress,
     setDataLoading,
     map,
-    loadedBounds,
     appConfig.features.locationMap.extensions.locationShapeUrl,
-    appConfig.features.locationMap.extensions.locationCount
+    appConfig.features.locationMap.extensions.locationCount,
+    appConfig.features.locationMap.minZoom
   ])
 
   // Update visible zones (and max visible count) when zones or bounds change
@@ -275,8 +430,8 @@ const IrisZones = (props: IrisZonesProps) => {
       {SHOW_OPACITY_CONTROL && renderControls()}
       {DEBUG_SHOW_LOADED_BOUNDS && (
         <div>
-          {loadedBounds &&
-            loadedBounds.map((b, i) => (
+          {loadedBoundsRef.current &&
+            loadedBoundsRef.current.map((b, i) => (
               <Rectangle
                 key={`mesh_${i}`}
                 pathOptions={{
@@ -376,10 +531,11 @@ const LocationMap = (props: LocationMapProps) => {
         renderer={L.canvas()}
         center={center}
         zoom={10}
-        minZoom={appConfig.features.locationMap.minZoom || MIN_ZOOM}
+        minZoom={appConfig.features.locationMap.minZoom || MIN_ZOOM_FOR_IRIS_FETCH}
         scrollWheelZoom={true}
         style={{ height: '500px', width: '100%' }}
       >
+        <AutoCenterMap cohortId={cohortId} />
         <IrisZones cohortId={cohortId} />
         <TileLayer attribution={MAP_COPYRIGHTS} url={TILE_URL} />
       </MapContainer>

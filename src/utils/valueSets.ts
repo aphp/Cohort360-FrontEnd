@@ -3,42 +3,142 @@
  * @module utils/valueSets
  */
 
-import { getConfig } from 'config'
+import { getConfig, TerminologyResourceType, ValueSetConfig } from 'config'
 import { getReferences } from 'data/valueSets'
 import { HIERARCHY_ROOT, getChildrenFromCodes } from 'services/aphp/serviceValueSets'
 import { Codes, Hierarchy } from 'types/hierarchy'
 import { LabelObject } from 'types/searchCriterias'
 import { FhirItem } from 'types/valueSet'
 
-/**
- * Gets value set references that match the provided systems
- *
- * @param systems - Array of system URLs to filter by
- * @returns Array of matching value set references
- *
- * @example
- * ```typescript
- * const valueSets = getValueSetsFromSystems(['http://loinc.org', 'http://snomed.info/sct'])
- * ```
- */
-export const getValueSetsFromSystems = (systems: string[]) => {
-  return getReferences(getConfig()).filter((reference) => systems.includes(reference.url))
+export const getValueSetsByUrls = (urls: string[]) => {
+  return getReferences(getConfig()).filter((reference) => urls.includes(reference.url))
 }
 
-/**
- * Checks if a system should display codes alongside labels
- *
- * @param system - The system URL to check
- * @returns True if codes should be displayed with labels, false otherwise
- *
- * @example
- * ```typescript
- * isDisplayedWithCode('http://loinc.org') // returns true/false based on configuration
- * ```
- */
-export const isDisplayedWithCode = (system: string) => {
-  const isFound = getValueSetsFromSystems([system])?.[0]
-  return isFound?.joinDisplayWithCode
+// Reverse lookup function: given a CodeSystem URL, find the corresponding ValueSet URL
+export const getValueSetFromCodeSystem = (codeSystemUrl: string): string | undefined => {
+  const references = getReferences(getConfig())
+  const reference = references.find((ref) => ref.codeSystemUrls?.includes(codeSystemUrl))
+  return reference?.url
+}
+
+// Chapitre CCAM : le ré-encodage lui a ajouté un suffixe tout en points, donc un seul successeur.
+const CCAM_NODE_CODE_RE = /^[0-9]{6}$/
+
+// Match exact, sinon `001472` -> `001472.....`, préféré à ses descendants `001472.001`. Un acte est
+// segmenté en plusieurs déclinaisons : en élire une restreindrait la sélection, on le laisse intact.
+// Désactivé hors CCAM pour éviter CIM10 `E11`/`E110`.
+export const findCodeByIdOrPrefix = (
+  codes: readonly (Hierarchy<FhirItem> | undefined)[],
+  id: string,
+  allowPrefixMatch: boolean
+): Hierarchy<FhirItem> | undefined => {
+  const exact = codes.find((c) => c?.id === id)
+  if (exact || !allowPrefixMatch || !id || !CCAM_NODE_CODE_RE.test(id)) return exact
+  const prefixMatches = codes.filter((c): c is Hierarchy<FhirItem> => typeof c?.id === 'string' && c.id.startsWith(id))
+  return prefixMatches.find((c) => /^\.*$/.test(c.id.slice(id.length)))
+}
+
+// Associe un code stocké au concept du cache (exact puis préfixe CCAM), sinon renvoie le code tel quel.
+export const matchStoredCodeInCache = <T extends { id: string; system?: string }>(
+  code: T,
+  codeCaches: Record<string, Hierarchy<FhirItem>[]>,
+  allowPrefixMatch: boolean
+): Hierarchy<FhirItem> | T => {
+  const allCodes = Object.values(codeCaches).flat()
+  const scope = (code.system ? codeCaches[code.system] : undefined) ?? allCodes
+  return findCodeByIdOrPrefix(scope, code.id, allowPrefixMatch) ?? allCodes.find((c) => c.id === code.id) ?? code
+}
+
+// `JQGA004*` vise toutes les déclinaisons de l'acte. On ajoute celles du cache pour qu'elles soient
+// cochées, en gardant l'étoile : sur un cache partiel, la retirer amputerait la sélection à la sauvegarde.
+export const expandStoredCodeInCache = <T extends { id: string; system?: string }>(
+  code: T,
+  codeCaches: Record<string, Hierarchy<FhirItem>[]>,
+  allowPrefixMatch: boolean
+): Array<Hierarchy<FhirItem> | T> => {
+  if (!allowPrefixMatch || !code.id.endsWith('*')) return [matchStoredCodeInCache(code, codeCaches, allowPrefixMatch)]
+  const root = code.id.slice(0, -1)
+  if (!root) return [code]
+  const allCodes = Object.values(codeCaches).flat()
+  const scope = (code.system ? codeCaches[code.system] : undefined) ?? allCodes
+  const declensions = scope.filter((c) => typeof c?.id === 'string' && c.id !== root && c.id.startsWith(root))
+  return [...declensions, code]
+}
+
+// Un acte peut être visé à la fois par son étoile et par une déclinaison déjà stockée, d'où le dédoublonnage.
+export const expandStoredCodesInCache = <T extends { id: string; system?: string }>(
+  codes: readonly T[],
+  codeCaches: Record<string, Hierarchy<FhirItem>[]>,
+  allowPrefixMatch: boolean
+): Array<Hierarchy<FhirItem> | T> => {
+  const seen = new Set<string>()
+  return codes
+    .flatMap((code) => expandStoredCodeInCache(code, codeCaches, allowPrefixMatch))
+    .filter((code) => {
+      const key = `${code.system ?? ''}|${code.id}`
+      if (seen.has(key)) return false
+      seen.add(key)
+      return true
+    })
+}
+
+// Helper function to get ValueSet Reference from CodeSystem URL
+export const getValueSetReferenceFromCodeSystem = (codeSystemUrl: string) => {
+  const references = getReferences(getConfig())
+  return references.find((ref) => ref.codeSystemUrls?.includes(codeSystemUrl))
+}
+
+const getReference = (systemOrValueSetUrl: string) => {
+  return (
+    getValueSetReferenceFromCodeSystem(systemOrValueSetUrl) ||
+    getReferences(getConfig()).find((ref) => ref.url === systemOrValueSetUrl)
+  )
+}
+
+const findValueSetConfigByUrl = (url: string): ValueSetConfig | undefined => {
+  const config = getConfig()
+  const valueSetGroups: Array<Record<string, ValueSetConfig>> = [config.core.valueSets]
+  for (const feature of Object.values(config.features)) {
+    const valueSets = (feature as { valueSets?: Record<string, ValueSetConfig> })?.valueSets
+    if (valueSets) valueSetGroups.push(valueSets)
+  }
+  for (const group of valueSetGroups) {
+    for (const entry of Object.values(group)) {
+      if (entry?.url === url) return entry
+    }
+  }
+  return undefined
+}
+
+const resolveCodeSystemUrl = (url: string, codeSystemUrls?: string[]): string => {
+  const codeSystemUrl = codeSystemUrls?.[0]
+  if (!codeSystemUrl) {
+    console.error(
+      `[valueSets] Terminology "${url}" is declared as CodeSystem but has no codeSystemUrls; ` +
+        `falling back to the ValueSet url. This usually yields an empty result. Check the config.`
+    )
+    return url
+  }
+  return codeSystemUrl
+}
+
+export const getResourceTypeFromUrl = (url: string): TerminologyResourceType | undefined => {
+  return findValueSetConfigByUrl(url)?.resourceType
+}
+
+export const getCodeSystemUrlFromValueSetUrl = (url: string): string => {
+  const config = findValueSetConfigByUrl(url)
+  if (config?.resourceType === 'CodeSystem') return resolveCodeSystemUrl(url, config.codeSystemUrls)
+  return config?.codeSystemUrls?.[0] ?? url
+}
+
+export const getSearchSystemUrl = (config: ValueSetConfig): string => {
+  if (config.resourceType === 'CodeSystem') return resolveCodeSystemUrl(config.url, config.codeSystemUrls)
+  return config.url
+}
+
+export const isDisplayedWithCode = (systemOrValueSetUrl: string) => {
+  return getReference(systemOrValueSetUrl)?.joinDisplayWithCode
 }
 
 /**
@@ -52,9 +152,8 @@ export const isDisplayedWithCode = (system: string) => {
  * isDisplayedWithSystem('http://loinc.org') // returns true/false based on configuration
  * ```
  */
-export const isDisplayedWithSystem = (system: string) => {
-  const isFound = getValueSetsFromSystems([system])?.[0]
-  return isFound?.joinDisplayWithSystem
+export const isDisplayedWithSystem = (systemOrValueSetUrl: string) => {
+  return getReference(systemOrValueSetUrl)?.joinDisplayWithSystem
 }
 
 /**
@@ -70,7 +169,8 @@ export const isDisplayedWithSystem = (system: string) => {
  * ```
  */
 export const getLabelFromCode = <T>(code: Hierarchy<T>) => {
-  if (isDisplayedWithCode(code.system) && code.id !== HIERARCHY_ROOT) return `${code.id} - ${code.label}`
+  const urlToCheck = code.valueSetUrl || code.system
+  if (isDisplayedWithCode(urlToCheck) && code.id !== HIERARCHY_ROOT) return `${code.id} - ${code.label}`
   return code.label
 }
 
@@ -107,9 +207,8 @@ export const getFullLabelFromCode = (code: LabelObject) => {
  * getLabelFromSystem('http://loinc.org') // returns 'LOINC'
  * ```
  */
-export const getLabelFromSystem = (system: string) => {
-  const isFound = getValueSetsFromSystems([system])?.[0]
-  return isFound?.label || ''
+export const getLabelFromSystem = (systemOrValueSetUrl: string) => {
+  return getReference(systemOrValueSetUrl)?.label || ''
 }
 
 /**
@@ -130,8 +229,14 @@ export const checkIsLeaf = async <T>(codes: Hierarchy<T>[], cache: Codes<Hierarc
   if (codes.length !== 1 || codes?.[0]?.id === HIERARCHY_ROOT || children.length > 1) return false
   if (!children[0]) return true
   const code = codes[0]
-  const found = cache.get(code.system)?.get(children[0])
+  const cacheKey = code.valueSetUrl || code.system
+  const found = cache.get(cacheKey)?.get(children[0])
   let childCode: Hierarchy<FhirItem>[] = found ? [found] : []
-  if (!childCode.length) childCode = (await getChildrenFromCodes(code.system, children)).results
+  if (!childCode.length) {
+    // If we only have system (CodeSystem URL), try to find the corresponding ValueSet URL
+    const actualValueSetUrl = code.valueSetUrl || getValueSetFromCodeSystem(code.system) || code.system
+
+    childCode = (await getChildrenFromCodes(actualValueSetUrl, children)).results
+  }
   return checkIsLeaf(childCode, cache)
 }

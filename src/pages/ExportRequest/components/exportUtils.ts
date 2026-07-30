@@ -60,12 +60,7 @@ const fetchPatientCount = async (cohortId: string, patientsFilters?: SearchCrite
         _text: patientsFilters.searchInput,
         minBirthdate: minBirthdate,
         maxBirthdate: maxBirthdate,
-        deceased:
-          vitalStatuses && vitalStatuses.length === 1
-            ? vitalStatuses.includes(VitalStatus.DECEASED)
-              ? true
-              : false
-            : undefined
+        deceased: vitalStatuses?.length === 1 ? vitalStatuses.includes(VitalStatus.DECEASED) : undefined
       })
     } else {
       patientsResp = await fetchPatient({ size: 0, _list: [cohortId] })
@@ -390,7 +385,7 @@ export const getResourceType = (tableName: string): ResourceType => {
     condition: ResourceType.CONDITION,
     iris: ResourceType.UNKNOWN,
     visit_detail: ResourceType.UNKNOWN,
-    person: ResourceType.PATIENT,
+    Patient: ResourceType.PATIENT,
     note: ResourceType.DOCUMENTS,
     note_legacy: ResourceType.DOCUMENTS,
     fact_relationship: ResourceType.UNKNOWN,
@@ -421,7 +416,7 @@ export const getExportTableLabel = (tableName: string) => {
     care_site: 'Structure hospitalière',
     iris: 'Zone géographique',
     visit_detail: 'Détail de prise en charge',
-    person: 'Patient',
+    patient: 'Patient',
     note: 'Fait - Documents cliniques',
     note_legacy: 'Fait - Documents cliniques',
     fact_relationship: 'Référentiel',
@@ -435,15 +430,15 @@ export const getExportTableLabel = (tableName: string) => {
 }
 
 /**
- * Sorts an array of table information, placing the 'person' table first.
+ * Sorts an array of table information, placing the 'patient' table first.
  *
  * @param {TableInfo[]} tables - Array of table information objects
- * @returns {TableInfo[]} Sorted array with 'person' table first
+ * @returns {TableInfo[]} Sorted array with 'patient' table first
  */
 export const sortTables = (tables: TableInfo[]): TableInfo[] => {
   return tables.sort((a, b) => {
-    if (a.name === 'person') return -1
-    if (b.name === 'person') return 1
+    if (a.name === 'Patient') return -1
+    if (b.name === 'Patient') return 1
     return a.name.localeCompare(b.name)
   })
 }

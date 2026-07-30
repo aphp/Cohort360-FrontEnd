@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom'
 
 import { Button, Grid, Link, Typography } from '@mui/material'
 
-import JohnTravolta from 'assets/images/johntravolta.gif'
 import cohortLogo from 'assets/images/logo-login.png'
 
 import useStyles from './styles'
@@ -38,11 +37,6 @@ const PageNotFound: React.FC = () => {
         <div className={cx(classes.circle, classes.small)}></div>
         <div className={cx(classes.circle, classes.medium)}></div>
         <div className={cx(classes.circle, classes.big)}></div>
-        <img
-          src={JohnTravolta}
-          alt="John Travolta gif"
-          style={{ position: 'fixed', bottom: 0, right: 0, height: '50%', zIndex: -1 }}
-        />
       </Grid>
     </>
   )

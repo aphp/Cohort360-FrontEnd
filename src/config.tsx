@@ -3,14 +3,28 @@ import { Root } from 'react-dom/client'
 import * as R from 'ramda'
 import { CONFIG_URL } from 'constants.js'
 import { LabelObject } from 'types/searchCriterias'
-import { birthStatusData, booleanFieldsData, booleanOpenChoiceFieldsData, vmeData } from 'data/questionnaire_data'
+import {
+  birthStatusData,
+  booleanFieldsData,
+  booleanOpenChoiceFieldsData,
+  ultrasoundMonitoringData,
+  vmeData
+} from 'data/questionnaire_data'
 
 type DeepPartial<T> = {
   [P in keyof T]?: T[P] extends object ? DeepPartial<T[P]> : T[P]
 }
 
-type ValueSetConfig = {
-  url: string
+export type TerminologyResourceType = 'ValueSet' | 'CodeSystem'
+export type TerminologyLoadingMode = 'list' | 'expand'
+
+export const isExpandLoadingMode = (loadingMode?: TerminologyLoadingMode) => loadingMode === 'expand'
+
+export type ValueSetConfig = {
+  url: string // ValueSet URL (for searching/listing valuesets)
+  codeSystemUrls?: string[] // Array of CodeSystem URLs (for individual codes within valuesets)
+  resourceType?: TerminologyResourceType
+  loadingMode?: TerminologyLoadingMode
   title?: string
   data?: LabelObject[]
 }
@@ -126,6 +140,7 @@ export type AppConfig = {
       risksRelatedToObstetricHistory: ValueSetConfig
       booleanOpenChoiceFields: ValueSetConfig
       booleanFields: ValueSetConfig
+      ultrasoundMonitoring: ValueSetConfig
       vme: ValueSetConfig
       birthStatus: ValueSetConfig
     }> & {
@@ -140,6 +155,9 @@ export type AppConfig = {
     }
     feasibilityReport: FeatureConfig
     contact: FeatureConfig
+    maintenancePopup: FeatureConfig & {
+      exceptionAphCodes: string[]
+    }
   }
   core: {
     fhir: {
@@ -278,7 +296,7 @@ let config: AppConfig = {
       useNDA: true
     },
     diagnosticReport: {
-      enabled: false,
+      enabled: true,
       useStudyParam: false
     },
     export: {
@@ -394,6 +412,10 @@ let config: AppConfig = {
           url: 'booleanFields',
           data: booleanFieldsData
         },
+        ultrasoundMonitoring: {
+          url: 'ultrasoundMonitoring',
+          data: ultrasoundMonitoringData
+        },
         vme: {
           url: 'vme',
           data: vmeData
@@ -417,6 +439,10 @@ let config: AppConfig = {
     },
     contact: {
       enabled: false
+    },
+    maintenancePopup: {
+      enabled: false,
+      exceptionAphCodes: []
     }
   },
   system: {

@@ -11,7 +11,7 @@ import { getCodeList } from 'services/aphp/serviceValueSets'
 
 const valueSetsAdapter = createEntityAdapter<CodesCache<FhirItem>>()
 
-export type CodeCache = { [system: string]: Hierarchy<FhirItem>[] }
+export type CodeCache = { [valueSetUrl: string]: Hierarchy<FhirItem>[] }
 
 export type ValueSetStore = { entities: { [id: string]: CodesCache<FhirItem> | undefined }; cache: CodeCache }
 
@@ -80,7 +80,7 @@ const valueSetsSlice = createSlice({
   }),
   reducers: {
     saveValueSets: (state, action) => valueSetsAdapter.setMany(state, action.payload),
-    updateCache: (state, action: PayloadAction<{ [system: string]: Hierarchy<FhirItem>[] }>) => {
+    updateCache: (state, action: PayloadAction<{ [valueSetUrl: string]: Hierarchy<FhirItem>[] }>) => {
       return {
         ...state,
         cache: action.payload

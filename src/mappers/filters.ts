@@ -46,6 +46,7 @@ import {
 import servicesPerimeters from 'services/aphp/servicePerimeters'
 import { Hierarchy } from 'types/hierarchy'
 import { getConfig } from 'config'
+import { getSearchSystemUrl } from 'utils/valueSets'
 import { HIERARCHY_ROOT, getChildrenFromCodes, getCodeList, getHierarchyRoots } from 'services/aphp/serviceValueSets'
 import { ScopeElement } from 'types/scope'
 
@@ -367,16 +368,14 @@ const mapGenericToRequestParams = (filters: GenericFilter, type: ResourceType) =
   const { nda, durationRange, executiveUnits, encounterStatus } = filters
   const requestParams: string[] = []
   if (nda) requestParams.push(`${getGenericKeyFromResourceType(type, 'NDA')}=${encodeURIComponent(nda)}`)
-  if (durationRange && durationRange[0])
-    requestParams.push(`${getGenericKeyFromResourceType(type, 'DATE')}=ge${durationRange[0]}`)
-  if (durationRange && durationRange[1])
-    requestParams.push(`${getGenericKeyFromResourceType(type, 'DATE')}=le${durationRange[1]}`)
+  if (durationRange?.[0]) requestParams.push(`${getGenericKeyFromResourceType(type, 'DATE')}=ge${durationRange[0]}`)
+  if (durationRange?.[1]) requestParams.push(`${getGenericKeyFromResourceType(type, 'DATE')}=le${durationRange[1]}`)
   if (executiveUnits && executiveUnits.length > 0)
     requestParams.push(
       `${getGenericKeyFromResourceType(type, 'EXECUTIVE_UNITS')}=${executiveUnits.map((unit) => unit.id)}`
     )
   if (encounterStatus && encounterStatus.length > 0) {
-    const encounterStatusUrl = `${getConfig().core.valueSets.encounterStatus.url}|`
+    const encounterStatusUrl = `${getSearchSystemUrl(getConfig().core.valueSets.encounterStatus)}|`
     const urlString = encounterStatus.map((elem) => encounterStatusUrl + elem.id).join(',')
     requestParams.push(`${getGenericKeyFromResourceType(type, 'ENCOUNTER_STATUS')}=${encodeURIComponent(urlString)}`)
   }
@@ -432,7 +431,7 @@ const mapConditionToRequestParams = (filters: PMSIFilters) => {
   }
   if (code.length)
     requestParams.push(
-      `${ConditionParamsKeys.CODE}=${encodeURIComponent(code.map((e) => `${e.system}|${e.id}`).join(','))}`
+      `${ConditionParamsKeys.CODE}=${encodeURIComponent(code.map((e) => e.system + '|' + e.id).join(','))}`
     )
   if (source?.length) requestParams.push(`${ConditionParamsKeys.SOURCE}=${source}`)
   if (ipp) requestParams.push(`${ConditionParamsKeys.IPP}=${ipp}`)
@@ -448,7 +447,7 @@ const mapClaimToRequestParams = (filters: PMSIFilters) => {
   if (ipp) requestParams.push(`${ClaimParamsKeys.IPP}=${ipp}`)
   if (code.length)
     requestParams.push(
-      `${ClaimParamsKeys.CODE}=${encodeURIComponent(code.map((e) => `${e.system}|${e.id}`).join(','))}`
+      `${ClaimParamsKeys.CODE}=${encodeURIComponent(code.map((e) => e.system + '|' + e.id).join(','))}`
     )
   requestParams.push(
     ...mapGenericToRequestParams({ nda, durationRange, executiveUnits, encounterStatus }, ResourceType.CLAIM)
@@ -462,7 +461,7 @@ const mapProcedureToRequestParams = (filters: PMSIFilters) => {
   if (ipp) requestParams.push(`${ProcedureParamsKeys.IPP}=${ipp}`)
   if (code.length)
     requestParams.push(
-      `${ProcedureParamsKeys.CODE}=${encodeURIComponent(code.map((e) => `${e.system}|${e.id}`).join(','))}`
+      `${ProcedureParamsKeys.CODE}=${encodeURIComponent(code.map((e) => e.system + '|' + e.id).join(','))}`
     )
   if (source?.length) requestParams.push(`${ProcedureParamsKeys.SOURCE}=${source}`)
   if (ipp) requestParams.push(`${ProcedureParamsKeys.IPP}=${ipp}`)
@@ -476,13 +475,14 @@ const mapPrescriptionToRequestParams = (filters: MedicationFilters) => {
   const { code, prescriptionTypes, ipp, nda, durationRange, executiveUnits, encounterStatus } = filters
   const requestParams: string[] = []
   if (prescriptionTypes && prescriptionTypes.length > 0) {
-    const prescriptionTypesUrl = `${getConfig().features.medication.valueSets.medicationPrescriptionTypes.url}|`
+    const systemUrl = getSearchSystemUrl(getConfig().features.medication.valueSets.medicationPrescriptionTypes)
+    const prescriptionTypesUrl = `${systemUrl}|`
     const urlString = prescriptionTypes.map((elem) => prescriptionTypesUrl + elem.id).join(',')
     requestParams.push(`${PrescriptionParamsKeys.PRESCRIPTION_TYPES}=${encodeURIComponent(urlString)}`)
   }
   if (code.length > 0)
     requestParams.push(
-      `${PrescriptionParamsKeys.CODE}=${encodeURIComponent(code.map((e) => `${e.system}|${e.id}`).join(','))}`
+      `${PrescriptionParamsKeys.CODE}=${encodeURIComponent(code.map((e) => e.system + '|' + e.id).join(','))}`
     )
   if (ipp) requestParams.push(`${PrescriptionParamsKeys.IPP}=${ipp}`)
   requestParams.push(
@@ -498,13 +498,14 @@ const mapAdministrationToRequestParams = (filters: MedicationFilters) => {
   const { code, administrationRoutes, nda, ipp, durationRange, executiveUnits, encounterStatus } = filters
   const requestParams: string[] = []
   if (administrationRoutes && administrationRoutes.length > 0) {
-    const administrationRoutesUrl = `${getConfig().features.medication.valueSets.medicationAdministrations.url}|`
+    const systemUrl = getSearchSystemUrl(getConfig().features.medication.valueSets.medicationAdministrations)
+    const administrationRoutesUrl = `${systemUrl}|`
     const urlString = administrationRoutes.map((elem) => administrationRoutesUrl + elem.id).join(',')
     requestParams.push(`${AdministrationParamsKeys.ADMINISTRATION_ROUTES}=${encodeURIComponent(urlString)}`)
   }
   if (code.length > 0)
     requestParams.push(
-      `${AdministrationParamsKeys.CODE}=${encodeURIComponent(code.map((e) => `${e.system}|${e.id}`).join(','))}`
+      `${AdministrationParamsKeys.CODE}=${encodeURIComponent(code.map((e) => e.system + '|' + e.id).join(','))}`
     )
   if (ipp) requestParams.push(`${AdministrationParamsKeys.IPP}=${ipp}`)
   requestParams.push(
@@ -525,7 +526,7 @@ const mapBiologyToRequestParams = (filters: BiologyFilters) => {
   if (ipp) requestParams.push(`${ObservationParamsKeys.IPP}=${ipp}`)
   if (code.length)
     requestParams.push(
-      `${ObservationParamsKeys.CODE}=${encodeURIComponent(code.map((e) => `${e.system}|${e.id}`).join(','))}`
+      `${ObservationParamsKeys.CODE}=${encodeURIComponent(code.map((e) => e.system + '|' + e.id).join(','))}`
     )
   if (validatedStatus) requestParams.push(`${ObservationParamsKeys.VALIDATED_STATUS}=VAL`)
   requestParams.push(
@@ -557,7 +558,10 @@ const mapImagingToRequestParams = (filters: ImagingFilters) => {
     requestParams.push(
       `${ImagingParamsKeys.MODALITY}=${encodeURIComponent(
         modality
-          .map((labelObject) => `${getConfig().features.imaging.valueSets.imagingModalities.url}|${labelObject.id}`)
+          .map(
+            (labelObject) =>
+              `${getSearchSystemUrl(getConfig().features.imaging.valueSets.imagingModalities)}|${labelObject.id}`
+          )
           .join(',')
       )}`
     )
@@ -703,13 +707,13 @@ function mapBirthdatesRangesFromRequestParams(key: PatientsParamsKeys, parameter
     if (date?.includes('ge')) {
       const ageMin = date?.replace('ge', '')
       birthdatesRanges[0] = convertDurationToString(
-        convertTimestampToDuration(+ageMin, key === PatientsParamsKeys.DATE_IDENTIFIED ? false : true)
+        convertTimestampToDuration(+ageMin, key !== PatientsParamsKeys.DATE_IDENTIFIED)
       )
     }
     if (date?.includes('le')) {
       const ageMax = date?.replace('le', '')
       birthdatesRanges[1] = convertDurationToString(
-        convertTimestampToDuration(+ageMax, key === PatientsParamsKeys.DATE_IDENTIFIED ? false : true)
+        convertTimestampToDuration(+ageMax, key !== PatientsParamsKeys.DATE_IDENTIFIED)
       )
     }
   })

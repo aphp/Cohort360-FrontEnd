@@ -75,7 +75,7 @@ const PatientBoard = ({ patient }: PatientBoardProps) => {
     ],
     [config, patient]
   )
-  const { availableTabs, subTabs, selectedTab, selectedSubTab, handleChangeTab, handleChangeSubTab } =
+  const { tabs, subTabs, currentTab, currentSubTab, effectiveValue, handleChangeTab, handleChangeSubTab } =
     useTabs(tabConfig)
 
   const expConfig = useMemo(() => {
@@ -85,41 +85,36 @@ const PatientBoard = ({ patient }: PatientBoardProps) => {
 
   const sidebarConfig = useMemo(() => expConfig.get(ResourceType.PATIENT, SIDEBAR_OPTONS), [expConfig])
   const selectedConfig = useMemo(
-    () => expConfig.get((selectedSubTab ?? selectedTab) as ExplorationResourceType),
-    [expConfig, selectedSubTab, selectedTab]
+    () => expConfig.get(effectiveValue as ExplorationResourceType),
+    [expConfig, effectiveValue]
   )
 
-  if (patient && selectedTab === ResourceType.CLAIM) return <CohortRightOrNotExist />
+  if (patient && currentTab === ResourceType.CLAIM) return <CohortRightOrNotExist />
 
   return (
     <>
       <SidebarButton role="button" onClick={() => setIsSidebarOpened(true)}>
-        <ChevronLeftIcon color="action" width="20px" />
+        <ChevronLeftIcon data-testid="ChevronLeftIcon" color="action" width="20px" />
       </SidebarButton>
       <PatientHeader patient={patient} groupId={patient.groupId} />
       <Grid container sx={{ flexDirection: 'column', alignItems: 'center', backgroundColor: '#E6F1FD' }}>
         <Grid container size={11}>
           <TabsWrapper
-            value={selectedTab}
+            value={currentTab}
             onChange={(_, tab) => handleChangeTab(tab)}
             id="mainTabs"
             scrollButtons={'auto'}
             variant="scrollable"
           >
-            {availableTabs.map((tab) => {
-              const groupIdParam = patient.groupId ? `groupId=${patient.groupId}&` : ''
-              const defaultSubTab = tab.subs?.[0]?.value
-              const subtabParam = defaultSubTab ? `subtab=${defaultSubTab}` : ''
-              return (
-                <Tab
-                  key={tab.value}
-                  label={tab.label}
-                  value={tab.value}
-                  component={Link}
-                  to={`/patients/${patient.id}/${tab.value}?${groupIdParam}${subtabParam}`}
-                />
-              )
-            })}
+            {tabs.map((tab) => (
+              <Tab
+                key={tab.value}
+                label={tab.label}
+                value={tab.value}
+                component={Link}
+                to={`/patients/${patient.id}/${tab.value}${patient.groupId ? `?groupId=${patient.groupId}` : ''}`}
+              />
+            ))}
           </TabsWrapper>
         </Grid>
       </Grid>
@@ -129,10 +124,11 @@ const PatientBoard = ({ patient }: PatientBoardProps) => {
             <Grid container sx={{ borderBottom: '1px solid #848484' }}>
               <TabsWrapper
                 customVariant="secondary"
-                value={selectedSubTab}
+                value={currentSubTab}
                 onChange={(_, newSubTab) => handleChangeSubTab(newSubTab)}
               >
                 {subTabs.map((subTab) => {
+                  const groupIdParam = patient.groupId ? `${patient.groupId}&` : ''
                   return (
                     <Tab
                       sx={{ fontSize: 12 }}
@@ -140,15 +136,15 @@ const PatientBoard = ({ patient }: PatientBoardProps) => {
                       label={subTab.label}
                       value={subTab.value}
                       component={Link}
-                      to={`/patients/${patient.id}/${selectedTab}?${patient.groupId ? `${patient.groupId}&` : ''}subtab=${subTab.value}`}
+                      to={`/patients/${patient.id}/${currentTab}?${groupIdParam}subtab=${subTab.value}`}
                     />
                   )
                 })}
               </TabsWrapper>
             </Grid>
           )}
-          {selectedTab === ResourceType.PREVIEW && <PatientPreview patient={patient} />}
-          {selectedTab === ResourceType.TIMELINE && (
+          {currentTab === ResourceType.PREVIEW && <PatientPreview patient={patient} />}
+          {currentTab === ResourceType.TIMELINE && (
             <PatientTimeline
               hospits={patient.infos.hospits}
               procedures={patient.infos.procedures}
@@ -156,7 +152,7 @@ const PatientBoard = ({ patient }: PatientBoardProps) => {
               deidentified={patient.deidentified}
             />
           )}
-          {!(selectedTab === ResourceType.PREVIEW || selectedTab === ResourceType.TIMELINE) && (
+          {!(currentTab === ResourceType.PREVIEW || currentTab === ResourceType.TIMELINE) && (
             <>{selectedConfig && <ExplorationBoard config={selectedConfig} />}</>
           )}
         </Grid>

@@ -86,7 +86,7 @@ export const generateTimelineFormattedData = (
 
   const years = Object.keys(data)
     .map(Number)
-    .filter((y) => !isNaN(y))
+    .filter((y) => !Number.isNaN(y))
 
   if (years.length === 0) return []
 

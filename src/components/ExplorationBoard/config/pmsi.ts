@@ -20,18 +20,18 @@ import { CellType, Column, Row, Table } from 'types/table'
 import { FhirItem, Reference } from 'types/valueSet'
 import { fetchValueSet, narrowSearchCriterias, resolveAdditionalInfos } from 'utils/exploration'
 import { getCategory, getExtensionStringValue } from 'utils/fhir'
-import { getValueSetsFromSystems } from 'utils/valueSets'
+import { getValueSetsByUrls } from 'utils/valueSets'
 
 const fetchAdditionalInfos = async (additionalInfo: AdditionalInfo): Promise<AdditionalInfo> => {
   const fetchersMap: Record<string, () => Promise<FhirItem[] | undefined>> = {
     diagnosticTypesList: () =>
-      !additionalInfo.diagnosticTypesList
-        ? fetchValueSet(getConfig().features.condition.valueSets.conditionStatus.url)
-        : Promise.resolve(undefined),
+      additionalInfo.diagnosticTypesList
+        ? Promise.resolve(undefined)
+        : fetchValueSet(getConfig().features.condition.valueSets.conditionStatus.url),
     encounterStatusList: () =>
-      !additionalInfo.encounterStatusList
-        ? fetchValueSet(getConfig().core.valueSets.encounterStatus.url)
-        : Promise.resolve(undefined)
+      additionalInfo.encounterStatusList
+        ? Promise.resolve(undefined)
+        : fetchValueSet(getConfig().core.valueSets.encounterStatus.url)
   }
   const sourceType = SourceType.CCAM
   const resolved = await resolveAdditionalInfos(fetchersMap)
@@ -80,13 +80,14 @@ const mapToTable = (
     const codes = getPmsiCodes(type, elem)
     const source = elem.meta?.source?.split('/').filter(Boolean).pop()?.toUpperCase()
 
+    const ippGroupQuery = groupId ? `?groupId=${groupId}` : ''
     const row: Row = [
       !isPatient && {
         id: `${elem.id}-ipp`,
         value: elem.IPP
           ? {
               label: elem.IPP,
-              url: `/patients/${elem.idPatient}${groupId ? `?groupId=${groupId}` : ''}`
+              url: `/patients/${elem.idPatient}${ippGroupQuery}`
             }
           : 'Non renseigné',
         type: elem.IPP ? CellType.LINK : CellType.TEXT
@@ -162,7 +163,7 @@ export const conditionConfig = (
     narrowSearchCriterias(deidentified, searchCriterias, !!patient, [], ['searchBy']),
   fetchAdditionalInfos: async (infos) => {
     const _infos = await fetchAdditionalInfos(infos)
-    const references: Reference[] = getValueSetsFromSystems([
+    const references: Reference[] = getValueSetsByUrls([
       getConfig().features.condition.valueSets.conditionHierarchy.url
     ])
     const sourceType = SourceType.CIM10
@@ -193,7 +194,7 @@ export const procedureConfig = (
     narrowSearchCriterias(deidentified, searchCriterias, !!patient, ['diagnosticTypes'], ['searchBy']),
   fetchAdditionalInfos: async (infos) => {
     const _infos = await fetchAdditionalInfos(infos)
-    const references: Reference[] = getValueSetsFromSystems([
+    const references: Reference[] = getValueSetsByUrls([
       getConfig().features.procedure.valueSets.procedureHierarchy.url
     ])
     const sourceType = SourceType.CCAM
@@ -223,7 +224,7 @@ export const claimConfig = (
     narrowSearchCriterias(deidentified, searchCriterias, !!patient, ['diagnosticTypes', 'source'], ['searchBy']),
   fetchAdditionalInfos: async (infos) => {
     const _infos = await fetchAdditionalInfos(infos)
-    const references: Reference[] = getValueSetsFromSystems([getConfig().features.claim.valueSets.claimHierarchy.url])
+    const references: Reference[] = getValueSetsByUrls([getConfig().features.claim.valueSets.claimHierarchy.url])
     const sourceType = SourceType.GHM
     return { ..._infos, references, sourceType }
   },

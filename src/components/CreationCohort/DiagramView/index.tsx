@@ -63,6 +63,14 @@ const DiagramView: React.FC<DiagramViewWithAjvProps> = ({ isValidJson }) => {
     [requestState.selectedCriteria]
   )
 
+  const hasSelectedPopulation = !!(selectedPopulation && selectedPopulation.length > 0)
+  let mainContent: React.ReactNode
+  if (requestState.viewMode === 'logicalOperator') {
+    mainContent = hasSelectedPopulation ? <LogicalOperator /> : <></>
+  } else {
+    mainContent = <JsonView onJsonIssuesChange={isValidJson} />
+  }
+
   return (
     <HiddenScrollBar
       container
@@ -111,15 +119,7 @@ const DiagramView: React.FC<DiagramViewWithAjvProps> = ({ isValidJson }) => {
           )}
           {selectedPopulation && selectedPopulation.length > 0 ? <TemporalConstraintCard /> : <></>}
         </Grid>
-        {requestState.viewMode === 'logicalOperator' ? (
-          selectedPopulation && selectedPopulation.length > 0 ? (
-            <LogicalOperator />
-          ) : (
-            <></>
-          )
-        ) : (
-          <JsonView onJsonIssuesChange={isValidJson} />
-        )}
+        {mainContent}
 
         {/* Switch between view modes */}
         <Box

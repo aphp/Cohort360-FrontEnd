@@ -168,7 +168,7 @@ const EventSequenceTable: React.FC<{
                           onDeleteTemporalConstraint(temporalConstraint)
                         }}
                       >
-                        <DeleteIcon />
+                        <DeleteIcon data-testid="DeleteIcon" />
                       </IconButton>
                     </Tooltip>
                   </TableCellWrapper>

@@ -43,8 +43,6 @@ import { resetCohortCreation } from 'state/cohortCreation'
 import useStyles from './styles'
 import versionInfo from 'data/version.json'
 import Impersonation from 'components/Impersonation'
-import { Egg1, Egg2 } from 'components/Impersonation/Eggs'
-import JToolEggWrapper from 'components/Impersonation/JTool'
 import ShimmerBadge from 'components/ui/ShimmerBadge'
 import { AppConfig } from 'config'
 
@@ -141,7 +139,11 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
               [classes.menuButton]: !open
             })}
           >
-            {open ? <ChevronLeftIcon color="action" width="20px" /> : <MenuIcon width="20px" fill="#FFF" />}
+            {open ? (
+              <ChevronLeftIcon data-testid="ChevronLeftIcon" color="action" width="20px" />
+            ) : (
+              <MenuIcon width="20px" fill="#FFF" />
+            )}
           </IconButton>
         </div>
 
@@ -209,37 +211,33 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
           <ListItem>
             {!open && (
               <Tooltip title="Nouvelle requête">
-                <JToolEggWrapper Egg={Egg2}>
-                  <IconButton
-                    onClick={handleNewRequest}
-                    className={cx(classes.button, classes.miniButton)}
-                    disabled={maintenanceIsActive}
-                  >
-                    <AddIcon />
-                  </IconButton>
-                </JToolEggWrapper>
+                <IconButton
+                  onClick={handleNewRequest}
+                  className={cx(classes.button, classes.miniButton)}
+                  disabled={maintenanceIsActive}
+                >
+                  <AddIcon />
+                </IconButton>
               </Tooltip>
             )}
             {zoomed(
               <div className={classes.divNewRequest}>
-                <JToolEggWrapper Egg={Egg2}>
-                  <Button
-                    onClick={handleNewRequest}
-                    className={cx(classes.newCohortButton, classes.linkHover, {
-                      [classes.hide]: !open
-                    })}
-                    disabled={maintenanceIsActive}
-                  >
-                    <Typography variant={maintenanceIsActive ? 'h6' : 'h5'}>
-                      {maintenanceIsActive ? 'Nouvelle requête désactivée' : 'Nouvelle requête'}
-                    </Typography>
-                  </Button>
-                </JToolEggWrapper>
+                <Button
+                  onClick={handleNewRequest}
+                  className={cx(classes.newCohortButton, classes.linkHover, {
+                    [classes.hide]: !open
+                  })}
+                  disabled={maintenanceIsActive}
+                >
+                  <Typography variant={maintenanceIsActive ? 'h6' : 'h5'}>
+                    {maintenanceIsActive ? 'Nouvelle requête désactivée' : 'Nouvelle requête'}
+                  </Typography>
+                </Button>
               </div>
             )}
           </ListItem>
           {!!cohortCreation?.request?.requestId && (
-            <ListItem style={{ padding: !open ? '0 16px' : undefined }}>
+            <ListItem style={{ padding: open ? undefined : '0 16px' }}>
               {!open && (
                 <Tooltip title="Modifier la requête en cours">
                   <IconButton
@@ -247,7 +245,7 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
                     className={cx(classes.button, classes.miniButton)}
                     disabled={maintenanceIsActive}
                   >
-                    <EditIcon />
+                    <EditIcon data-testid="EditIcon" />
                   </IconButton>
                 </Tooltip>
               )}
@@ -269,7 +267,7 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
           )}
 
           <ListItemButton id="accueil" className={classes.listItem} onClick={() => navigate('/home')}>
-            <Tooltip title={!open ? 'Accueil' : ''}>
+            <Tooltip title={open ? '' : 'Accueil'}>
               <ListItemIcon className={classes.listIcon}>
                 <HomeIcon width="20px" fill="#FFF" />
               </ListItemIcon>
@@ -279,7 +277,7 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
           </ListItemButton>
 
           <ListItemButton id="patients" className={classes.listItem} onClick={handleDisplayPatientList}>
-            <Tooltip title={!open ? 'Mes patients' : ''}>
+            <Tooltip title={open ? '' : 'Mes patients'}>
               <ListItemIcon className={classes.listIcon}>
                 <PatientIcon width="20px" fill="#FFF" />
               </ListItemIcon>
@@ -309,16 +307,14 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
                 </ListItem>
               )}
               <ListItem>
-                <JToolEggWrapper Egg={Egg1}>
-                  <Link
-                    id="myPatient-link"
-                    onClick={() => navigate('/my-patients')}
-                    underline="hover"
-                    className={classes.nestedTitle}
-                  >
-                    Tous mes patients
-                  </Link>
-                </JToolEggWrapper>
+                <Link
+                  id="myPatient-link"
+                  onClick={() => navigate('/my-patients')}
+                  underline="hover"
+                  className={classes.nestedTitle}
+                >
+                  Tous mes patients
+                </Link>
               </ListItem>
               <ListItem>
                 <Link
@@ -334,7 +330,7 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
           </Collapse>
 
           <ListItemButton id="research" className={classes.listItem} onClick={handleDisplaySearchList}>
-            <Tooltip title={!open ? 'Mes recherches' : ''}>
+            <Tooltip title={open ? '' : 'Mes recherches'}>
               <ListItemIcon className={classes.listIcon}>
                 <ResearchIcon width="20px" fill="#FFF" />
               </ListItemIcon>
@@ -426,7 +422,7 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
               rel="noopener noreferrer"
               component="a"
             >
-              <Tooltip title={!open ? 'Documentation' : ''}>
+              <Tooltip title={open ? '' : 'Documentation'}>
                 <ListItemIcon className={classes.listIcon}>
                   <MenuBookIcon width="20px" htmlColor="#FFF" />
                 </ListItemIcon>

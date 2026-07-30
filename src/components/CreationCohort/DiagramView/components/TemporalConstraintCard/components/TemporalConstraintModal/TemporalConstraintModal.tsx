@@ -64,7 +64,7 @@ const TemporalConstraint: React.FC<{
             <Grid container sx={{ flexDirection: 'row', alignItems: 'center' }}>
               <Typography variant="h3">Séquence d'évènements entre deux critères</Typography>
               <Tooltip title="Les contraintes temporelles ne peuvent être ajoutées que sur le groupe ET principal.">
-                <InfoIcon fontSize="small" color="primary" style={{ marginLeft: 4 }} />
+                <InfoIcon data-testid="InfoIcon" fontSize="small" color="primary" style={{ marginLeft: 4 }} />
               </Tooltip>
             </Grid>
             <TemporalConstraintConfig

@@ -59,13 +59,12 @@ import useStyle from './styles'
 import { format } from 'utils/numbers'
 import services from 'services/aphp'
 import ValidationDialog from 'components/ui/ValidationDialog'
-import { JToolComponentEggWrapper } from 'components/Impersonation/JTool'
-import { Egg3 } from 'components/Impersonation/Eggs'
 import { WebSocketContext } from 'components/WebSocket/WebSocketProvider'
 import { AppConfig } from 'config'
 import { setRequestDetailedMode } from 'state/preferences'
 import { hasStageDetails } from '../DiagramView/components/CriteriaCount'
 import { isRequestFinished } from './utils'
+import { useCountReconciliation } from './useCountReconciliation'
 import { CriteriaType } from 'types/requestCriterias'
 
 const ControlPanel: React.FC<{
@@ -129,9 +128,14 @@ const ControlPanel: React.FC<{
   const accessIsPseudonymize: boolean | null =
     selectedPopulation === null
       ? null
-      : selectedPopulation
-          .map((population) => population && population.access)
-          .filter((elem) => elem && elem === 'Pseudonymisé').length > 0
+      : selectedPopulation.map((population) => population?.access).some((elem) => elem && elem === 'Pseudonymisé')
+
+  let accessLabel: string
+  if (accessIsPseudonymize === null) {
+    accessLabel = '-'
+  } else {
+    accessLabel = accessIsPseudonymize ? 'Pseudonymisé' : 'Nominatif'
+  }
 
   const checkIfLogicalOperatorIsEmpty = () => {
     let _criteriaGroup = criteriaGroup || []
@@ -237,6 +241,8 @@ const ControlPanel: React.FC<{
       setReportError(true)
     }
   }
+
+  useCountReconciliation(count)
 
   const isLoading = loading || countLoading === LoadingStatus.FETCHING || saveLoading
   const errorCriteria = selectedCriteria.filter((criteria) => criteria.error)
@@ -406,16 +412,10 @@ const ControlPanel: React.FC<{
           <Grid container size={12} justifyContent="space-between">
             <Typography className={cx(classes.boldText, classes.patientTypo)}>ACCÈS :</Typography>
             <Typography className={cx(classes.blueText, classes.boldText, classes.patientTypo)}>
-              {accessIsPseudonymize === null ? '-' : accessIsPseudonymize ? 'Pseudonymisé' : 'Nominatif'}
+              {accessLabel}
             </Typography>
           </Grid>
         </Grid>
-
-        <JToolComponentEggWrapper>
-          {!isLoading && (count.date ? moment(count.date).diff(moment.now()) > -100000 : false) && (
-            <Egg3 count={includePatient} />
-          )}
-        </JToolComponentEggWrapper>
 
         <Grid container className={classes.container}>
           <Grid container size={12} justifyContent="space-between">
@@ -430,11 +430,11 @@ const ControlPanel: React.FC<{
               <Grid container alignItems="center" style={{ width: 'fit-content' }}>
                 <Typography className={cx(classes.boldText, classes.patientTypo, classes.blueText)}>
                   {format(includePatient ?? prevCountDisplay)}
-                  {oldCount !== null && !!oldCount.includePatient
-                    ? (includePatient ?? 0) - oldCount.includePatient > 0
-                      ? ` (+${(includePatient ?? 0) - oldCount.includePatient})`
-                      : ` (${(includePatient ?? 0) - oldCount.includePatient})`
-                    : ''}
+                  {(() => {
+                    if (!oldCount?.includePatient) return ''
+                    const delta = (includePatient ?? 0) - oldCount.includePatient
+                    return delta > 0 ? ` (+${delta})` : ` (${delta})`
+                  })()}
                 </Typography>
                 {oldCount !== null && !!oldCount.includePatient && (
                   <Tooltip
@@ -446,7 +446,7 @@ const ControlPanel: React.FC<{
                       'DD/MM/YYYY'
                     )} et la date du jour.`}
                   >
-                    <InfoIcon />
+                    <InfoIcon data-testid="InfoIcon" />
                   </Tooltip>
                 )}
               </Grid>

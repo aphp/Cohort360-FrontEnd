@@ -132,7 +132,7 @@ const Export = () => {
   }
 
   useEffect(() => {
-    handleSearch({ page: Math.max(1, parseInt(searchParams.get('page') ?? '1', 10)) })
+    handleSearch({ page: Math.max(1, Number.parseInt(searchParams.get('page') ?? '1', 10)) })
   }, [])
 
   useEffect(() => {
@@ -141,15 +141,19 @@ const Export = () => {
 
   const table = useMemo(
     () =>
-      mapExportListToTable(exportList?.results ?? [], {
-        onDownload: (id) => {
-          void onDownload(id)
+      mapExportListToTable(
+        exportList?.results ?? [],
+        {
+          onDownload: (id) => {
+            void onDownload(id)
+          },
+          onRetry: (id) => {
+            void onRetry(id)
+          }
         },
-        onRetry: (id) => {
-          void onRetry(id)
-        }
-      }),
-    [exportList]
+        maintenanceIsActive
+      ),
+    [exportList, maintenanceIsActive]
   )
 
   return (

@@ -27,6 +27,20 @@ import { Hierarchy } from 'types/hierarchy'
 import { getConfig } from 'config'
 import { ScopeElement } from 'types/scope'
 
+// `unwrap()` rethrows this error name when an async thunk skips execution via its `condition` option.
+const isThunkConditionAbort = (e: unknown): boolean =>
+  typeof e === 'object' && e !== null && (e as { name?: unknown }).name === 'ConditionError'
+
+// gestion-de-projet: module-scoped guard for saveJson. The Redux `saveLoading`
+// flag alone does not stop every duplicate POST /request-query-snapshots/,
+// because two buildCohortCreation dispatches can each start a saveJson in
+// separate async ticks where the first has already settled (saveLoading back to
+// false) yet the second still creates another snapshot. This latch is claimed
+// synchronously in saveJson's `condition` and released in the thunk body's
+// `finally`, so a second overlapping save is aborted rather than issuing a
+// second POST.
+let saveJsonInFlight = false
+
 /**
  * State interface for cohort creation functionality.
  * Contains all data needed for building and managing cohort requests.
@@ -302,7 +316,7 @@ const saveJson = createAsyncThunk<SaveJsonReturn, SaveJsonParams, { state: RootS
       const { navHistory } = state.cohortCreation.request
       const _navHistory: CurrentSnapshot[] = navHistory.slice()
 
-      if (!snapshotsHistory || (snapshotsHistory && snapshotsHistory.length === 0)) {
+      if (!snapshotsHistory?.length) {
         if (requestId) {
           const newSnapshot = await services.cohortCreation.createSnapshot(requestId, newJson, true)
           if (newSnapshot) {
@@ -342,6 +356,24 @@ const saveJson = createAsyncThunk<SaveJsonReturn, SaveJsonParams, { state: RootS
     } catch (error) {
       console.error(error)
       throw error
+    } finally {
+      // Release the latch so subsequent (distinct) saves can run.
+      saveJsonInFlight = false
+    }
+  },
+  {
+    // gestion-de-projet#3259: concurrent saveJson dispatches race and both POST
+    // as firstTime=true, producing snapshots with duplicate version numbers.
+    // saveLoading is not enough on its own (two dispatches in separate ticks can
+    // both observe it false), so we also claim saveJsonInFlight synchronously here
+    // and release it in the thunk body's finally.
+    // Note: no caller aborts saveJson, so the payload creator (and its finally)
+    // always runs once this returns true. If an abort-before-body path is ever
+    // introduced, the latch would also need a reset on that path.
+    condition: (_, { getState }) => {
+      if (saveJsonInFlight || getState().cohortCreation.request.saveLoading) return false
+      saveJsonInFlight = true
+      return true
     }
   }
 )
@@ -394,14 +426,20 @@ const buildCohortCreation = createAsyncThunk<BuildCohortReturn, BuildCohortParam
 
       const json = buildRequest(_selectedPopulation, _selectedCriteria, _criteriaGroup, _temporalConstraints)
       if (json !== state?.cohortCreation?.request?.json) {
-        const saveJsonResponse = await dispatch(saveJson({ newJson: json })).unwrap()
-        await dispatch(
-          countCohortCreation({
-            json: json,
-            snapshotId: saveJsonResponse.currentSnapshot.uuid,
-            requestId: saveJsonResponse.requestId
-          })
-        )
+        try {
+          const saveJsonResponse = await dispatch(saveJson({ newJson: json })).unwrap()
+          await dispatch(
+            countCohortCreation({
+              json: json,
+              snapshotId: saveJsonResponse.currentSnapshot.uuid,
+              requestId: saveJsonResponse.requestId
+            })
+          )
+        } catch (e) {
+          // Swallow the abort when saveJson's condition skipped the dispatch;
+          // the in-flight save will finalize the snapshot.
+          if (!isThunkConditionAbort(e)) throw e
+        }
       }
 
       const allowSearchIpp = _selectedPopulation ? await services.perimeters.allowSearchIpp(_selectedPopulation) : false
@@ -717,7 +755,7 @@ const getTemporalConstraints = (
 const getNextCriteriaId = (selectedCriteria: { id: number }[], criteriaGroup: { criteriaIds: number[] }[]): number => {
   const criteriaIdsFromGroups = criteriaGroup.flatMap((group) => group.criteriaIds)
   const allIds = [...selectedCriteria.map((c) => c.id), ...criteriaIdsFromGroups]
-  const maxId = Math.max(0, ...allIds.filter((id): id is number => typeof id === 'number' && isFinite(id)))
+  const maxId = Math.max(0, ...allIds.filter((id): id is number => typeof id === 'number' && Number.isFinite(id)))
   return maxId + 1
 }
 
@@ -737,14 +775,14 @@ const moveCriterionInGroups = (snapshot: CriteriaGroup[], { active, over }: Move
     if (isTargetGroup) {
       let insertionIndex: number
 
-      if (over.id !== null) {
+      if (over.id === null) {
+        insertionIndex = active.groupId > over.groupId ? 0 : criteriaIds.length
+      } else {
         const overIndex = originalIds.indexOf(over.id)
         const activeIndex = originalIds.indexOf(active.id)
         const shouldInsertAfter =
           active.groupId > over.groupId || (active.groupId === over.groupId && activeIndex < overIndex)
         insertionIndex = shouldInsertAfter ? overIndex + 1 : overIndex
-      } else {
-        insertionIndex = active.groupId > over.groupId ? 0 : criteriaIds.length
       }
 
       criteriaIds.splice(insertionIndex, 0, active.id)

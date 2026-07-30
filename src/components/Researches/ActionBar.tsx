@@ -87,7 +87,7 @@ const ActionBar: React.FC<ActionBarProps> = ({
               <Button
                 width="fit-content"
                 onClick={onDelete}
-                endIcon={<DeleteIcon />}
+                endIcon={<DeleteIcon data-testid="DeleteIcon" />}
                 customVariant="pink"
                 disabled={disabled}
               >
@@ -106,7 +106,7 @@ const ActionBar: React.FC<ActionBarProps> = ({
             {totalSelected > 0 && (
               <DisplayDigits
                 nb={totalSelected}
-                label={`${label}${plural(totalSelected)} sélectionné${label !== 'échantillon' ? 'e' : ''}${plural(
+                label={`${label}${plural(totalSelected)} sélectionné${label === 'échantillon' ? '' : 'e'}${plural(
                   totalSelected
                 )} /`}
               />

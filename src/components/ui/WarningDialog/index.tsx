@@ -23,8 +23,8 @@ const WarningDialog = () => {
         <Grid container sx={{ alignItems: 'center' }}>
           <Grid size={2}>
             {status === 'success' && <CheckCircleOutlineIcon style={{ fontSize: 52 }} htmlColor="#BDEA88" />}
-            {status === 'error' && <CancelIcon style={{ fontSize: 52 }} htmlColor="#FC5656" />}
-            {status === 'warning' && <WarningIcon className={classes.warningIcon} />}
+            {status === 'error' && <CancelIcon data-testid="CancelIcon" style={{ fontSize: 52 }} htmlColor="#FC5656" />}
+            {status === 'warning' && <WarningIcon data-testid="WarningIcon" className={classes.warningIcon} />}
           </Grid>
           <Grid size={10}>
             <Typography>{message}</Typography>

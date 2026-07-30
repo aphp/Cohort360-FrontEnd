@@ -28,17 +28,17 @@ import {
   narrowSearchCriterias,
   resolveAdditionalInfos
 } from 'utils/exploration'
-import { getValueSetsFromSystems } from 'utils/valueSets'
+import { getValueSetsByUrls } from 'utils/valueSets'
 
 const fetchAdditionalInfos = async (additionalInfo: AdditionalInfo): Promise<AdditionalInfo> => {
   const fetchersMap: Record<string, () => Promise<FhirItem[] | undefined>> = {
     encounterStatusList: () =>
-      !additionalInfo.encounterStatusList
-        ? fetchValueSet(getConfig().core.valueSets.encounterStatus.url)
-        : Promise.resolve(undefined)
+      additionalInfo.encounterStatusList
+        ? Promise.resolve(undefined)
+        : fetchValueSet(getConfig().core.valueSets.encounterStatus.url)
   }
   const resolved = await resolveAdditionalInfos(fetchersMap)
-  const references: Reference[] = getValueSetsFromSystems([
+  const references: Reference[] = getValueSetsByUrls([
     getConfig().features.observation.valueSets.biologyHierarchyAnabio.url,
     getConfig().features.observation.valueSets.biologyHierarchyLoinc.url
   ])
@@ -105,13 +105,14 @@ const mapToTable = (data: Data, deidentified: boolean, groupId: string[], isPati
           valueUnit
         )}`
       : '-'
+    const ippGroupQuery = groupId ? `?groupId=${groupId}` : ''
     const row: Row = [
       !isPatient && {
         id: `${elem.id}-ipp`,
         value: elem.IPP
           ? {
               label: elem.IPP,
-              url: `/patients/${elem.idPatient}${groupId ? `?groupId=${groupId}` : ''}`
+              url: `/patients/${elem.idPatient}${ippGroupQuery}`
             }
           : 'Non renseigné',
         type: elem.IPP ? CellType.LINK : CellType.TEXT

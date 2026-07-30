@@ -25,11 +25,11 @@ const DurationInput = ({ value, label, includeDays = true, disabled = false, onC
 
   return (
     <BlockWrapper container sx={{ justifyContent: 'space-between', alignItems: 'flex-end' }}>
-      <Grid size={!includeDays ? 4 : 3} container sx={{ alignItems: 'flex-start' }}>
+      <Grid size={includeDays ? 3 : 4} container sx={{ alignItems: 'flex-start' }}>
         <DurationLegendWrapper variant="h5">{label}</DurationLegendWrapper>
       </Grid>
-      <Grid size={!includeDays ? 8 : 9} container sx={{ justifyContent: 'space-between' }}>
-        <Grid container size={!includeDays ? 5 : 3} sx={{ alignItems: 'center' }}>
+      <Grid size={includeDays ? 9 : 8} container sx={{ justifyContent: 'space-between' }}>
+        <Grid container size={includeDays ? 3 : 5} sx={{ alignItems: 'center' }}>
           <Grid size={7}>
             <TextFieldWrapper
               activated={!disabled && !!duration.year}
@@ -45,10 +45,10 @@ const DurationInput = ({ value, label, includeDays = true, disabled = false, onC
               }}
               size="small"
               onChange={(e) => {
-                if (!isNaN(+e.target.value)) {
+                if (!Number.isNaN(+e.target.value)) {
                   setDuration({
                     ...duration,
-                    year: e.target.value !== '' ? Math.floor(Math.abs(+e.target.value)) : 0
+                    year: e.target.value === '' ? 0 : Math.floor(Math.abs(+e.target.value))
                   })
                 }
               }}
@@ -60,7 +60,7 @@ const DurationInput = ({ value, label, includeDays = true, disabled = false, onC
             </DurationUnitWrapper>
           </Grid>
         </Grid>
-        <Grid container size={!includeDays ? 5 : 3} sx={{ alignItems: 'center' }}>
+        <Grid container size={includeDays ? 3 : 5} sx={{ alignItems: 'center' }}>
           <Grid size={6}>
             <TextFieldWrapper
               activated={!disabled && !!duration.month}
@@ -76,10 +76,10 @@ const DurationInput = ({ value, label, includeDays = true, disabled = false, onC
               }}
               size="small"
               onChange={(e) => {
-                if (!isNaN(+e.target.value) && +e.target.value <= 12) {
+                if (!Number.isNaN(+e.target.value) && +e.target.value <= 12) {
                   setDuration({
                     ...duration,
-                    month: e.target.value !== '' ? Math.floor(Math.abs(+e.target.value)) : 0
+                    month: e.target.value === '' ? 0 : Math.floor(Math.abs(+e.target.value))
                   })
                 }
               }}
@@ -108,10 +108,10 @@ const DurationInput = ({ value, label, includeDays = true, disabled = false, onC
                 }}
                 size="small"
                 onChange={(e) => {
-                  if (!isNaN(+e.target.value) && +e.target.value <= 31) {
+                  if (!Number.isNaN(+e.target.value) && +e.target.value <= 31) {
                     setDuration({
                       ...duration,
-                      day: e.target.value !== '' ? Math.floor(Math.abs(+e.target.value)) : 0
+                      day: e.target.value === '' ? 0 : Math.floor(Math.abs(+e.target.value))
                     })
                   }
                 }}

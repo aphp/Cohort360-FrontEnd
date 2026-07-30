@@ -24,6 +24,7 @@ import allDocTypes from 'assets/docTypes.json'
 import moment from 'moment'
 import { getDurationRangeLabel } from 'utils/age'
 import { getConfig } from 'config'
+import { getValueSetFromCodeSystem, expandStoredCodeInCache } from 'utils/valueSets'
 
 /************************************************************************************/
 /*                        Criteria Form Item Chip Display                           */
@@ -112,7 +113,7 @@ const getDocumentTypesLabel = (values: string[]) => {
 
 const chipForNumberAndComparator = (value: NumberAndComparatorDataType, name: string) => {
   if (value.comparator === Comparators.BETWEEN) {
-    return `${name} comprise entre ${value.value} et ${!value.maxValue ? '?' : value.maxValue}`
+    return `${name} comprise entre ${value.value} et ${value.maxValue ? value.maxValue : '?'}`
   }
   return `${name} ${value.comparator} ${+value.value}`
 }
@@ -142,13 +143,30 @@ const getLabelsForCodeSearchItem = (
   item: CodeSearchItem,
   valueSets: ValueSetStore
 ): LabelObject[] => {
+  const ccamHierarchyUrl = getConfig().features.procedure.valueSets.procedureHierarchy?.url
+  const allowPrefixMatch = !!ccamHierarchyUrl && item.valueSetsInfo.some((ref) => ref.url === ccamHierarchyUrl)
   return val
-    .map((value) => {
-      return (
-        (value.system
-          ? valueSets.cache[value.system]
-          : item.valueSetsInfo.flatMap((valueset) => valueSets.cache[valueset.url])) || []
-      ).find((code) => code && code.id === value.id) as LabelObject
+    .flatMap((value) => {
+      let cacheKey: string | undefined
+
+      if (value.system) {
+        // value.system is a CodeSystem URL, we need to find the corresponding ValueSet URL
+        const valueSetUrl = getValueSetFromCodeSystem(value.system)
+        if (valueSetUrl) {
+          cacheKey = valueSetUrl
+        } else {
+          // Fallback: try to find in any of the configured valueSets
+          cacheKey = item.valueSetsInfo.find((valueset) => valueSets.cache[valueset.url])?.url
+        }
+      }
+
+      const codeList = cacheKey
+        ? valueSets.cache[cacheKey]
+        : item.valueSetsInfo.flatMap((valueset) => valueSets.cache[valueset.url])
+      const scope = { [cacheKey ?? '']: codeList || [] }
+      return expandStoredCodeInCache(value, scope, allowPrefixMatch).filter(
+        (code) => !code.id.endsWith('*')
+      ) as LabelObject[]
     })
     .filter((code) => code !== undefined)
 }
@@ -201,7 +219,12 @@ const chipFromCodeSearch = (
 
 // TODO refacto this to be more generic using config
 const displaySystem = (system?: string) => {
-  switch (system) {
+  if (!system) return ''
+
+  // system might be a CodeSystem URL, so we need to find the corresponding ValueSet URL first
+  const valueSetUrl = getValueSetFromCodeSystem(system) || system
+
+  switch (valueSetUrl) {
     case getConfig().features.medication.valueSets.medicationAtc.url:
       return `${getConfig().features.medication.valueSets.medicationAtc.title}: `
     case getConfig().features.medication.valueSets.medicationUcd.url:
