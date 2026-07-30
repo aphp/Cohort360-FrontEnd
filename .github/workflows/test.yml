@@ -14,9 +14,6 @@ on:
       - 'hotfix/**'
   workflow_dispatch:
 
-permissions:
-  contents: read
-
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
@@ -32,11 +29,13 @@ jobs:
     steps:
       - name: Vers main — uniquement hotfix/** ou release/**
         if: github.event_name == 'pull_request' && github.event.pull_request.base.ref == 'main'
+        env:
+          HEAD_REF: ${{ github.head_ref }}
         run: |
-          case "${{ github.head_ref }}" in
+          case "$HEAD_REF" in
             hotfix/*|release/*) ;;
             *)
-              echo "::error title=PR invalide vers main::Seules les branches hotfix/** ou release/** peuvent cibler main (reçu: ${{ github.head_ref }})."
+              echo "::error title=PR invalide vers main::Seules les branches hotfix/** ou release/** peuvent cibler main (reçu: $HEAD_REF)."
               exit 1
               ;;
           esac
@@ -47,6 +46,8 @@ jobs:
     needs: [pr-target-guard]
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
         with:
@@ -71,6 +72,8 @@ jobs:
     needs: [pr-target-guard]
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
         with:
@@ -89,12 +92,14 @@ jobs:
         run: npm ci --no-audit --ignore-scripts
 
       - name: Type-check
-        run: npx tsc --noEmit
+        run: ./node_modules/.bin/tsc --noEmit
 
   test:
     needs: [pr-target-guard]
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
         with:
@@ -116,7 +121,7 @@ jobs:
         run: npm run coverage
 
       - name: Upload coverage artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: coverage-report
           path: coverage
@@ -147,6 +152,8 @@ jobs:
     needs: [lint, typecheck, test, sonar_precheck]
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
         with:

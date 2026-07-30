@@ -503,7 +503,8 @@ const ExportForm: React.FC = () => {
                 onClick={() =>
                   window.open(
                     'https://id.pages.data.aphp.fr/isd/data-engineering/eds-central-database/latest/data_catalog/',
-                    '_blank'
+                    '_blank',
+                    'noopener,noreferrer'
                   )
                 }
               >
