@@ -180,6 +180,48 @@ describe('serviceExportCohort.postExportCohort', () => {
     )
   })
 
+  it('ajoute automatiquement patient__identifier et patient__link quand Patient est sélectionné', async () => {
+    mockPost.mockResolvedValue(asAxios({ uuid: 'exp-3' }))
+    await postExportCohort({
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      cohortId: { uuid: 'cohort-3' } as any,
+      motivation: 'analyse',
+      group_tables: false,
+      outputFormat: 'csv',
+      tables: [
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        { tableName: 'Patient', respectTableRelationships: true, columns: null, fhirFilter: null } as any
+      ]
+    })
+    const payload = mockPost.mock.calls[0][1] as { export_tables: { table_name: string; cohort_result_source: string }[] }
+    const tableNames = payload.export_tables.map((table) => table.table_name)
+    expect(tableNames).toEqual(['Patient', 'patient__identifier', 'patient__link'])
+    payload.export_tables.forEach((table) => {
+      expect(table.cohort_result_source).toBe('cohort-3')
+    })
+  })
+
+  it('ne duplique pas une sous-table liée déjà sélectionnée', async () => {
+    mockPost.mockResolvedValue(asAxios({ uuid: 'exp-4' }))
+    await postExportCohort({
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      cohortId: { uuid: 'cohort-4' } as any,
+      motivation: 'analyse',
+      group_tables: false,
+      outputFormat: 'csv',
+      tables: [
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        { tableName: 'Patient', respectTableRelationships: true, columns: null, fhirFilter: null } as any,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        { tableName: 'patient__identifier', respectTableRelationships: true, columns: null, fhirFilter: null } as any
+      ]
+    })
+    const payload = mockPost.mock.calls[0][1] as { export_tables: { table_name: string }[] }
+    const tableNames = payload.export_tables.map((table) => table.table_name)
+    expect(tableNames).toEqual(['Patient', 'patient__identifier', 'patient__link'])
+    expect(tableNames.filter((name) => name === 'patient__identifier')).toHaveLength(1)
+  })
+
   it('omet fhir_filter quand aucun filtre n’est fourni', async () => {
     mockPost.mockResolvedValue(asAxios({ uuid: 'exp-2' }))
     await postExportCohort({

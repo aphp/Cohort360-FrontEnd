@@ -294,6 +294,11 @@ const ExportTable: React.FC<ExportTableProps> = ({
               {']'}
             </Typography>
           </div>
+          {exportTable.name === 'Patient' && (
+            <Typography variant="caption" fontStyle="italic" color="#888" sx={{ width: '100%', mt: '4px' }}>
+              Les sous-tables patient__identifier et patient__link seront également exportées avec la table Patient.
+            </Typography>
+          )}
         </Grid>
 
         <Grid container size={4}>
