@@ -8,6 +8,7 @@ on:
   push:
     branches:
       - frontend-frigo
+      - frigo
   workflow_run:
     workflows: [cohort360-frontend-test]
     types: [completed]
@@ -15,6 +16,7 @@ on:
       - main
       - develop
       - frontend-frigo
+      - frigo
       - 'release/**'
 
 jobs:
@@ -55,7 +57,7 @@ jobs:
             develop)
               echo "IMAGE_TAGS=${DOCKER_REPO}:develop" >> "$GITHUB_ENV"
               ;;
-            frontend-frigo)
+            frontend-frigo|frigo)
               echo "IMAGE_TAGS=${DOCKER_REPO}:frontend-frigo" >> "$GITHUB_ENV"
               ;;
             release/*)
