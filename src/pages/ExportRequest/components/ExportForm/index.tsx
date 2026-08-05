@@ -388,6 +388,7 @@ const ExportForm: React.FC = () => {
         compatibilitiesTables={compatibilitiesTables}
         exportTypeFile={exportTypeFile}
         oneFile={oneFile}
+        selectedTablesCount={tablesSettings.length}
       />
     ))
   }, [
@@ -400,7 +401,8 @@ const ExportForm: React.FC = () => {
     onChangeTableSettings,
     compatibilitiesTables,
     exportTypeFile,
-    oneFile
+    oneFile,
+    tablesSettings.length
   ])
 
   return (
