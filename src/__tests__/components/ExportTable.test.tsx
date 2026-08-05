@@ -63,6 +63,7 @@ const renderTable = (props: Partial<Parameters<typeof ExportTable>[0]> = {}) =>
         compatibilitiesTables={null}
         exportTypeFile="csv"
         oneFile={false}
+        selectedTablesCount={1}
         {...props}
       />
     </AppConfig.Provider>
@@ -98,5 +99,21 @@ describe('ExportTable', () => {
   it('gère une table non cochée', async () => {
     renderTable({ exportTableSettings: { ...tableSetting, isChecked: false } as never })
     expect(await screen.findByText('Patient')).toBeInTheDocument()
+  })
+
+  it('signale la sous-table patient__identifier sur la table Patient', async () => {
+    renderTable({ exportTable: { ...tableInfo, name: 'Patient' } })
+    expect(await screen.findByText(/patient__identifier sera également exportée/)).toBeInTheDocument()
+  })
+
+  it("masque la mention de patient__identifier en export regroupé lorsqu'une autre table est sélectionnée", async () => {
+    renderTable({ exportTable: { ...tableInfo, name: 'Patient' }, oneFile: true, selectedTablesCount: 2 })
+    await screen.findAllByText('Patient')
+    expect(screen.queryByText(/patient__identifier sera également exportée/)).not.toBeInTheDocument()
+  })
+
+  it('conserve la mention de patient__identifier en export regroupé sur la seule table Patient', async () => {
+    renderTable({ exportTable: { ...tableInfo, name: 'Patient' }, oneFile: true, selectedTablesCount: 1 })
+    expect(await screen.findByText(/patient__identifier sera également exportée/)).toBeInTheDocument()
   })
 })

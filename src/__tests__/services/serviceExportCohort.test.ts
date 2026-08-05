@@ -180,7 +180,7 @@ describe('serviceExportCohort.postExportCohort', () => {
     )
   })
 
-  it('ajoute automatiquement patient__identifier et patient__link quand Patient est sélectionné', async () => {
+  it('ajoute automatiquement patient__identifier quand Patient est sélectionné', async () => {
     mockPost.mockResolvedValue(asAxios({ uuid: 'exp-3' }))
     await postExportCohort({
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -195,7 +195,7 @@ describe('serviceExportCohort.postExportCohort', () => {
     })
     const payload = mockPost.mock.calls[0][1] as { export_tables: { table_name: string; cohort_result_source: string }[] }
     const tableNames = payload.export_tables.map((table) => table.table_name)
-    expect(tableNames).toEqual(['Patient', 'patient__identifier', 'patient__link'])
+    expect(tableNames).toEqual(['Patient', 'patient__identifier'])
     payload.export_tables.forEach((table) => {
       expect(table.cohort_result_source).toBe('cohort-3')
     })
@@ -218,8 +218,46 @@ describe('serviceExportCohort.postExportCohort', () => {
     })
     const payload = mockPost.mock.calls[0][1] as { export_tables: { table_name: string }[] }
     const tableNames = payload.export_tables.map((table) => table.table_name)
-    expect(tableNames).toEqual(['Patient', 'patient__identifier', 'patient__link'])
+    expect(tableNames).toEqual(['Patient', 'patient__identifier'])
     expect(tableNames.filter((name) => name === 'patient__identifier')).toHaveLength(1)
+  })
+
+  it("n'ajoute pas patient__identifier en export regroupé quand une autre table est sélectionnée", async () => {
+    mockPost.mockResolvedValue(asAxios({ uuid: 'exp-5' }))
+    await postExportCohort({
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      cohortId: { uuid: 'cohort-5' } as any,
+      motivation: 'analyse',
+      group_tables: true,
+      outputFormat: 'csv',
+      tables: [
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        { tableName: 'Patient', respectTableRelationships: true, columns: null, fhirFilter: null } as any,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        { tableName: 'visit_occurrence', respectTableRelationships: true, columns: null, fhirFilter: null } as any
+      ]
+    })
+    const payload = mockPost.mock.calls[0][1] as { export_tables: { table_name: string }[] }
+    const tableNames = payload.export_tables.map((table) => table.table_name)
+    expect(tableNames).toEqual(['Patient', 'visit_occurrence'])
+  })
+
+  it('ajoute patient__identifier en export regroupé quand Patient est la seule table sélectionnée', async () => {
+    mockPost.mockResolvedValue(asAxios({ uuid: 'exp-6' }))
+    await postExportCohort({
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      cohortId: { uuid: 'cohort-6' } as any,
+      motivation: 'analyse',
+      group_tables: true,
+      outputFormat: 'csv',
+      tables: [
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        { tableName: 'Patient', respectTableRelationships: true, columns: null, fhirFilter: null } as any
+      ]
+    })
+    const payload = mockPost.mock.calls[0][1] as { export_tables: { table_name: string }[] }
+    const tableNames = payload.export_tables.map((table) => table.table_name)
+    expect(tableNames).toEqual(['Patient', 'patient__identifier'])
   })
 
   it('omet fhir_filter quand aucun filtre n’est fourni', async () => {
