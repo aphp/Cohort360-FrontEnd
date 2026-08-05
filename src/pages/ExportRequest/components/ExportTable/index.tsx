@@ -60,6 +60,7 @@ type ExportTableProps = {
   compatibilitiesTables: string[] | null
   exportTypeFile: 'xlsx' | 'csv'
   oneFile: boolean
+  selectedTablesCount: number
 }
 
 /**
@@ -102,7 +103,8 @@ const ExportTable: React.FC<ExportTableProps> = ({
   onChangeTableSettings,
   compatibilitiesTables,
   exportTypeFile,
-  oneFile
+  oneFile,
+  selectedTablesCount
 }) => {
   const dispatch = useAppDispatch()
   const userId = useAppSelector((state) => state.me?.id)
@@ -294,6 +296,11 @@ const ExportTable: React.FC<ExportTableProps> = ({
               {']'}
             </Typography>
           </div>
+          {exportTable.name === 'Patient' && (!oneFile || selectedTablesCount === 1) && (
+            <Typography variant="caption" fontStyle="italic" color="#888" sx={{ width: '100%', mt: '4px' }}>
+              La sous-table patient__identifier sera également exportée avec la table Patient.
+            </Typography>
+          )}
         </Grid>
 
         <Grid container size={4}>

@@ -135,6 +135,10 @@ export const fetchExportsList = async (
   }
 }
 
+const AUTO_LINKED_TABLES: Record<string, string[]> = {
+  Patient: ['patient__identifier']
+}
+
 export const postExportCohort = async ({
   cohortId,
   motivation,
@@ -151,18 +155,41 @@ export const postExportCohort = async ({
   const nominative = true
   const shift_date = false
 
+  const export_tables = tables.map((table: TableSetting) => ({
+    table_name: table.tableName,
+    cohort_result_source: cohortId?.uuid,
+    respect_table_relationships: table.respectTableRelationships,
+    columns: table.columns,
+    ...(table.fhirFilter && { fhir_filter: table.fhirFilter?.uuid }),
+    pivot_merge_columns: table.pivotMergeColumns,
+    //pivot_split_columns : table.pivotSplitColumns,
+    pivot_merge_ids: table.pivotMergeIds
+  }))
+  // En export regroupé, une sous-table ne partage un lien hamiltonien avec sa table parente que si
+  // celle-ci est seule : au-delà, le dataexporter refuse la jointure sur clé primaire.
+  if (!group_tables || tables.length === 1) {
+    const existingTableNames = new Set(export_tables.map((table) => table.table_name))
+    tables.forEach((table: TableSetting) => {
+      const linkedTables = AUTO_LINKED_TABLES[table.tableName]
+      if (!linkedTables) return
+      linkedTables.forEach((linkedTableName) => {
+        if (existingTableNames.has(linkedTableName)) return
+        existingTableNames.add(linkedTableName)
+        export_tables.push({
+          table_name: linkedTableName,
+          cohort_result_source: cohortId?.uuid,
+          respect_table_relationships: table.respectTableRelationships,
+          columns: null,
+          pivot_merge_columns: undefined,
+          pivot_merge_ids: undefined
+        })
+      })
+    })
+  }
+
   return await apiBackend.post<Export>('/exports/', {
     motivation,
-    export_tables: tables.map((table: TableSetting) => ({
-      table_name: table.tableName,
-      cohort_result_source: cohortId?.uuid,
-      respect_table_relationships: table.respectTableRelationships,
-      columns: table.columns,
-      ...(table.fhirFilter && { fhir_filter: table.fhirFilter?.uuid }),
-      pivot_merge_columns: table.pivotMergeColumns,
-      //pivot_split_columns : table.pivotSplitColumns,
-      pivot_merge_ids: table.pivotMergeIds
-    })),
+    export_tables,
     nominative: nominative,
     shift_date: shift_date,
     output_format: outputFormat,
