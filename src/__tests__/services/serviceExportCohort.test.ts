@@ -222,7 +222,7 @@ describe('serviceExportCohort.postExportCohort', () => {
     expect(tableNames.filter((name) => name === 'patient__identifier')).toHaveLength(1)
   })
 
-  it("n'ajoute pas patient__identifier en export regroupé quand une autre table est sélectionnée", async () => {
+  it("n'ajoute pas patient__identifier en export regroupé", async () => {
     mockPost.mockResolvedValue(asAxios({ uuid: 'exp-5' }))
     await postExportCohort({
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -242,7 +242,7 @@ describe('serviceExportCohort.postExportCohort', () => {
     expect(tableNames).toEqual(['Patient', 'visit_occurrence'])
   })
 
-  it('ajoute patient__identifier en export regroupé quand Patient est la seule table sélectionnée', async () => {
+  it("n'ajoute pas patient__identifier en export regroupé même si Patient est la seule table", async () => {
     mockPost.mockResolvedValue(asAxios({ uuid: 'exp-6' }))
     await postExportCohort({
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -257,7 +257,7 @@ describe('serviceExportCohort.postExportCohort', () => {
     })
     const payload = mockPost.mock.calls[0][1] as { export_tables: { table_name: string }[] }
     const tableNames = payload.export_tables.map((table) => table.table_name)
-    expect(tableNames).toEqual(['Patient', 'patient__identifier'])
+    expect(tableNames).toEqual(['Patient'])
   })
 
   it('omet fhir_filter quand aucun filtre n’est fourni', async () => {
