@@ -10,15 +10,17 @@ describe('WhatIsCohort360', () => {
   it('presents the tool', () => {
     render(<WhatIsCohort360 />)
     expect(screen.getByRole('heading')).toHaveTextContent("Qu'est-ce que Cohort360 ?")
-    expect(screen.getByText('visualiser les données de groupes de patients')).toBeInTheDocument()
+    expect(
+      screen.getByText(/outil de datavisualisation visant à constituer des cohortes de patients/)
+    ).toBeInTheDocument()
   })
 })
 
 describe('WhatIsEds', () => {
   it('links to the EDS site in a new tab, safely', () => {
     render(<WhatIsEds />)
-    const link = screen.getByRole('link', { name: /En savoir plus sur l'EDS/ })
-    expect(link).toHaveAttribute('href', 'https://eds.aphp.fr/')
+    const link = screen.getByRole('link', { name: /Entrepôt de Données de Santé/ })
+    expect(link).toHaveAttribute('href', 'https://panorama.eds.aphp.fr/explorer-les-donnees')
     expect(link).toHaveAttribute('target', '_blank')
     expect(link).toHaveAttribute('rel', expect.stringContaining('noopener'))
   })

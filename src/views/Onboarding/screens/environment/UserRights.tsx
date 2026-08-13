@@ -17,7 +17,7 @@ const UserRights = () => {
 
   const title = (
     <Typography variant="h4" className={classes.title}>
-      Comprendre votre accès
+      Comprendre votre habilitation
     </Typography>
   )
 
@@ -55,7 +55,7 @@ const UserRights = () => {
     <Box>
       {title}
       <Box className={classes.fieldBlock}>
-        <Typography className={classes.fieldLabel}>Utilisateur :</Typography>
+        <Typography className={classes.fieldLabel}>NOM Prénom de l'utilisateur :</Typography>
         <Typography className={classes.fieldValue}>{displayName}</Typography>
       </Box>
 
@@ -78,12 +78,14 @@ const UserRights = () => {
             </Box>
 
             <Box className={classes.fieldBlock}>
-              <Typography className={classes.fieldLabel}>Votre périmètre des données accessibles :</Typography>
+              <Typography className={classes.fieldLabel}>Votre périmètre de données accessibles :</Typography>
               <Typography className={classes.fieldValue}>{access.perimeter}</Typography>
             </Box>
 
             <Box className={classes.fieldBlock}>
-              <Typography className={classes.fieldLabel}>Date d'expiration de votre accès à Cohort360 :</Typography>
+              <Typography className={classes.fieldLabel}>
+                Date d'expiration de votre habilitation à Cohort360 :
+              </Typography>
               <Typography className={classes.fieldValue}>
                 {access.expirationDate ? moment(access.expirationDate).format('DD/MM/YYYY') : 'Non renseignée'}
               </Typography>

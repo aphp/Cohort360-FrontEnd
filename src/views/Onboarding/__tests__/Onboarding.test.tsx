@@ -112,7 +112,7 @@ describe('Onboarding page', () => {
 
   it('closes the journey on the guided tour, with a button to the application', () => {
     renderAt({ ...baseStatus, onboarding_step: 2 }, { deidentified: false } as MeState)
-    expect(screen.getByRole('heading', { name: 'Prendre en main Cohort360' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: "Prendre en main l'outil" })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /Accéder à Cohort360/ })).toBeInTheDocument()
   })
 

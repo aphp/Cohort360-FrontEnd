@@ -3,7 +3,6 @@ import BiotechOutlinedIcon from '@mui/icons-material/BiotechOutlined'
 import ContactPageOutlinedIcon from '@mui/icons-material/ContactPageOutlined'
 import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined'
 import MedicationOutlinedIcon from '@mui/icons-material/MedicationOutlined'
-import OpenInNewIcon from '@mui/icons-material/OpenInNew'
 import { Box, Divider, Link, Typography } from '@mui/material'
 import type { SvgIconProps } from '@mui/material'
 import InfoBadge from 'components/ui/InfoBadge'
@@ -13,7 +12,7 @@ import { eds } from 'styles/palette'
 
 import useStyles from '../../styles'
 
-const EDS_URL = 'https://eds.aphp.fr/'
+const EDS_URL = 'https://panorama.eds.aphp.fr/explorer-les-donnees'
 
 type DataFamily = {
   label: string
@@ -34,12 +33,12 @@ const DATA_FAMILIES: DataFamily[] = [
   },
   {
     label: 'Médicaments',
-    description: 'Prescriptions, administrations',
+    description: 'Prescriptions et administrations.',
     icon: MedicationOutlinedIcon
   },
   {
     label: "Résultats d'examen",
-    description: 'Biologie, imagerie',
+    description: 'Biologie, imagerie…',
     icon: BiotechOutlinedIcon
   },
   {
@@ -58,16 +57,13 @@ const WhatIsEds = () => {
         Qu'est-ce que l'EDS ?
       </Typography>
       <Typography className={classes.sectionText}>
-        Cohort360 permet d'accéder à de nombreux{' '}
-        <strong>jeux de données, issues de l'Entrepôt de Données de Santé de l'AP-HP (EDS)</strong>. L'EDS centralise
-        toutes les données collectées dans les 38 hôpitaux de l'AP-HP.
-      </Typography>
-      <Box className={classes.linkRow}>
-        <Link className={classes.link} href={EDS_URL} target="_blank" rel="noopener noreferrer">
-          En savoir plus sur l'EDS
-          <OpenInNewIcon className={classes.linkIcon} fontSize="inherit" />
+        Cohort360 permet d'accéder à de nombreux <strong>jeux de données, issues des 38 hôpitaux de l'AP-HP</strong> et
+        centralisés dans{' '}
+        <Link className={classes.inlineLink} href={EDS_URL} target="_blank" rel="noopener noreferrer">
+          l'Entrepôt de Données de Santé (EDS)
         </Link>
-      </Box>
+        .
+      </Typography>
 
       <Typography className={classes.subTitle}>Les données de l'EDS</Typography>
       {DATA_FAMILIES.map(({ label, description, icon: Icon }) => (
