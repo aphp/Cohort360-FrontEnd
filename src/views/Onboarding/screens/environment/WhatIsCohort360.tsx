@@ -12,8 +12,8 @@ const WhatIsCohort360 = () => {
         Qu'est-ce que Cohort360 ?
       </Typography>
       <Typography className={classes.sectionText}>
-        Cohort360 est un outil qui permet aux professionnels de santé de l'AP-HP de{' '}
-        <strong>visualiser les données de groupes de patients</strong> (cohortes) en fonction de divers critères.
+        C'est un outil de datavisualisation visant à constituer des cohortes de patients. Il permet de dénombrer des
+        patients, d'analyser des données de soin et de les extraire à des fins de recherche et d'analyse.
       </Typography>
     </Box>
   )

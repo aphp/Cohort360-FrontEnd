@@ -14,6 +14,12 @@ describe('UsageRules', () => {
     expect(screen.getByRole('heading')).toHaveTextContent("Les règles d'utilisation des données dans Cohort360")
     expect(screen.getByTestId('onboarding-warning')).toBeInTheDocument()
   })
+
+  it('lists the texts the rules comply with', () => {
+    render(<UsageRules />)
+    expect(screen.getByText(/règles d'accès à l'EDS de l'AP-HP à des fins de recherche/)).toBeInTheDocument()
+    expect(screen.getByText(/loi n° 78-17 du 6 janvier 1978/)).toBeInTheDocument()
+  })
 })
 
 describe('DataCrossing', () => {

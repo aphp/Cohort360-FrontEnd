@@ -14,11 +14,11 @@ const KeyFeatures = () => {
   return (
     <Box>
       <Typography variant="h4" className={classes.title}>
-        Prendre en main Cohort360
+        Prendre en main l'outil
       </Typography>
 
       <Typography variant="h5" className={classes.subTitle}>
-        1 - Créer une cohorte grâce au requêteur
+        Comment utiliser le requêteur ?
       </Typography>
       <Typography className={classes.sectionText}>
         Le requêteur vous permet de <strong>combiner plusieurs critères</strong> (âge, pathologie, période,
@@ -31,26 +31,23 @@ const KeyFeatures = () => {
       <FeatureVideo name="constitution_cohorte" label="Créer une cohorte grâce au requêteur" />
 
       <Typography variant="h5" className={classes.subTitle}>
-        2 - Explorer les données
+        Comment explorer les données ?
       </Typography>
       <Typography className={classes.sectionText}>
-        L'exploration de données vous permet d'accéder aux données associées à un patient ou à différents groupes de
-        patients.
+        Cohort360 comprend un espace d'exploration de données en ligne pour explorer un patient ou un groupe de patient
+        (périmètre).
       </Typography>
       <FeatureVideo name="parcours_patient" label="Explorer les données" />
 
       {!deidentified && (
         <>
           <Typography variant="h5" className={classes.subTitle}>
-            3 - Exporter des données (accès nominatif uniquement)
+            Comment exporter des données ?
           </Typography>
           <Typography className={classes.sectionText}>
-            La fonctionnalité d'export de cohortes en local est disponible uniquement :
+            La fonctionnalité d'export de cohortes sur votre ordinateur (en .csv et en .xlsx) est disponible uniquement
+            pour certaines habilitations et limité à 20 000 patients par export.
           </Typography>
-          <ul className={classes.list}>
-            <li>pour les comptes avec un profil nominatif en périmètre équipe de soin</li>
-            <li>pour les cohortes de moins de 20 000 patients</li>
-          </ul>
           <FeatureVideo name="export_dataset" label="Exporter des données" />
         </>
       )}

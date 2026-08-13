@@ -60,7 +60,7 @@ export const ONBOARDING_STEPS: OnboardingStepConfig[] = [
   {
     key: 'environment',
     label: 'Découvrir votre environnement',
-    summary: 'Apprenez-en plus sur ce qu’est Cohort360 et sur vos accès aux données dans l’outil.',
+    summary: 'Apprenez-en plus sur ce qu’est Cohort360 et sur vos habilitations aux données dans l’outil.',
     icon: MenuBookIcon,
     screens: [
       { key: 'what-is-cohort360', component: WhatIsCohort360 },
@@ -98,7 +98,7 @@ export const ONBOARDING_STEPS: OnboardingStepConfig[] = [
   {
     key: 'handson',
     label: "Prendre en main l'outil",
-    summary: 'Explorez l’outil au travers d’une prise en main guidée de 3 fonctionnalités clés.',
+    summary: 'Explorez l’outil au travers d’une prise en main guidée des fonctionnalités clés.',
     icon: FormatListBulletedIcon,
     screens: [
       {

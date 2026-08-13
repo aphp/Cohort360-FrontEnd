@@ -30,7 +30,7 @@ describe('KeyFeatures (US-3310)', () => {
       '/assets/videos/parcours_patient.mp4',
       '/assets/videos/export_dataset.mp4'
     ])
-    expect(screen.getByText(/Exporter des données/)).toBeInTheDocument()
+    expect(screen.getByText(/Comment exporter des données \?/)).toBeInTheDocument()
   })
 
   it('drops the export video for a pseudonymised access (RG3310.02)', () => {
@@ -39,12 +39,12 @@ describe('KeyFeatures (US-3310)', () => {
       '/assets/videos/constitution_cohorte.mp4',
       '/assets/videos/parcours_patient.mp4'
     ])
-    expect(screen.queryByText(/Exporter des données/)).not.toBeInTheDocument()
+    expect(screen.queryByText(/Comment exporter des données \?/)).not.toBeInTheDocument()
   })
 
   it('drops the export video when the access is unknown', () => {
     const { container } = renderKeyFeatures(null)
     expect(videoSources(container)).toHaveLength(2)
-    expect(screen.queryByText(/Exporter des données/)).not.toBeInTheDocument()
+    expect(screen.queryByText(/Comment exporter des données \?/)).not.toBeInTheDocument()
   })
 })
