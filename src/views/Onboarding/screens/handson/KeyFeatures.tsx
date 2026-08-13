@@ -46,7 +46,7 @@ const KeyFeatures = () => {
           </Typography>
           <Typography className={classes.sectionText}>
             La fonctionnalité d'export de cohortes sur votre ordinateur (en .csv et en .xlsx) est disponible uniquement
-            pour certaines habilitations et limité à 20 000 patients par export.
+            pour certaines habilitations et limitée à 20 000 patients par export.
           </Typography>
           <FeatureVideo name="export_dataset" label="Exporter des données" />
         </>

@@ -20,7 +20,7 @@ const DataAccess = () => {
       </Typography>
       <ul className={classes.list}>
         <li>
-          <strong>Cas général :</strong> vous êtes rattaché à une ou plusieurs unités fonctionnelles : vous avez accès
+          <strong>Cas général :</strong> vous êtes rattaché à une ou plusieurs unités fonctionnelles, vous avez accès
           aux patients pris en charge par cette ou ces unités fonctionnelles.
         </li>
         <li>
