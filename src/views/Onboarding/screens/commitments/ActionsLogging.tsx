@@ -11,15 +11,13 @@ const ActionsLogging = () => {
   return (
     <Box>
       <Typography variant="h4" className={classes.title}>
-        L'enregistrement de vos actions
+        Vous acceptez que vos actions soient enregistrées
       </Typography>
       <Typography className={classes.sectionText}>
-        <strong>
-          À chaque connexion à Cohort360, vos actions sont enregistrées par la DSI et conservées pendant 3 ans.
-        </strong>
+        À chaque connexion à Cohort360, vos actions sont enregistrées par la DSN et conservées pendant 3 ans.
       </Typography>
       <Typography className={classes.sectionText}>
-        Ces données sont utilisées pour assurer la sécurité du système, réaliser des statistiques d'usage et répondre
+        Vos données d'usage sont utilisées pour assurer la sécurité du système, réaliser des statistiques et répondre
         aux demandes d'audit de la CNIL.
       </Typography>
       <Typography className={classes.sectionText}>
@@ -27,7 +25,6 @@ const ActionsLogging = () => {
         <Link className={classes.link} href={`mailto:${mailDataProtection}`}>
           {mailDataProtection}
         </Link>
-        .
       </Typography>
     </Box>
   )

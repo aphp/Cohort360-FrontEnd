@@ -1,23 +1,8 @@
-import LightbulbOutlinedIcon from '@mui/icons-material/LightbulbOutlined'
-import QueryStatsIcon from '@mui/icons-material/QueryStats'
-import ShareOutlinedIcon from '@mui/icons-material/ShareOutlined'
 import { Box, Typography } from '@mui/material'
-import type { SvgIconProps } from '@mui/material'
-import type { ComponentType } from 'react'
 import React from 'react'
 
+import InfoCallout from '../../InfoCallout'
 import useStyles from '../../styles'
-
-type Purpose = {
-  label: string
-  icon: ComponentType<SvgIconProps>
-}
-
-const PURPOSES: Purpose[] = [
-  { label: 'Innovation', icon: LightbulbOutlinedIcon },
-  { label: 'Recherche', icon: QueryStatsIcon },
-  { label: "Pilotage de l'activité hospitalière", icon: ShareOutlinedIcon }
-]
 
 const UsagePurposes = () => {
   const { classes } = useStyles()
@@ -25,22 +10,16 @@ const UsagePurposes = () => {
   return (
     <Box>
       <Typography variant="h4" className={classes.title}>
-        Les finalités d'usage
+        Vous n'utilisez les données que pour les finalités prévues
       </Typography>
       <Typography className={classes.sectionText}>
-        L'Entrepôt de Données de Santé (EDS) de l'AP-HP contient des données à caractère personnel sensibles.
+        Vous vous engagez à ne pas utiliser les informations, données ou renseignements auxquels vous accédez pour
+        d'autres fins que celles strictement prévues par vos attributions dans le cadre de vos missions.
       </Typography>
-      <Typography className={classes.sectionLead}>
-        Seules certaines finalités d'utilisation des données sont autorisées :
-      </Typography>
-      {PURPOSES.map(({ label, icon: Icon }) => (
-        <Box key={label} className={classes.stepRow}>
-          <Box className={classes.iconBox}>
-            <Icon fontSize="small" />
-          </Box>
-          <Typography className={classes.rowLabel}>{label}</Typography>
-        </Box>
-      ))}
+      <InfoCallout>
+        Par exemple : la réutilisation de données exportées dans un cadre autorisé pour d'autres usages est interdit.
+        Consulter le dossier médical d'un proche, même dans une intention de soin, est également interdit.
+      </InfoCallout>
     </Box>
   )
 }

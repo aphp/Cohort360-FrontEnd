@@ -3,6 +3,7 @@ import { Box, Typography } from '@mui/material'
 import React from 'react'
 
 import Illustration from '../../Illustration'
+import InfoCallout from '../../InfoCallout'
 import useStyles from '../../styles'
 
 const DataDeletion = () => {
@@ -11,14 +12,17 @@ const DataDeletion = () => {
   return (
     <Box>
       <Typography variant="h4" className={classes.title}>
-        La suppression de vos données
+        Vous supprimez les données à l'issue de votre mission
       </Typography>
       <Typography className={classes.sectionText}>
-        Vous devez <strong>détruire toutes données sur supports mobiles</strong> dès la fin de leur utilisation. Par
-        ailleurs, vous vous engagez à demander la <strong>clôture des accès</strong>, si nécessaire de manière
-        anticipée, dès que ces derniers ne sont plus requis.
+        En cas de cessation de vos fonctions, ou à la fin de votre projet, vous vous engagez à : supprimer intégralement
+        les données, fichiers et supports d'information relatifs à ces données, ainsi que les documents, codes ou moyens
+        d'accès que vous détenez, <strong>sans en conserver de copie</strong>.
       </Typography>
       <Illustration image={DataDeletionArtwork} label="Les données sont supprimées en fin de mission" />
+      <InfoCallout>
+        À l'issue de votre mission, tout accès aux données, en ligne ou par un export conservé, devient illégitime.
+      </InfoCallout>
     </Box>
   )
 }
