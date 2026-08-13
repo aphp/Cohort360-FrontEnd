@@ -12,7 +12,7 @@ const HANDSON_STEP = 2
 const commitmentScreens = () => ONBOARDING_STEPS[COMMITMENTS_STEP].screens
 
 describe('onboarding step 2 configuration', () => {
-  it('exposes the seven informative screens then the charter and its confirmation', () => {
+  it('exposes the seven informative screens then the summary and its confirmation', () => {
     expect(commitmentScreens().map((screen) => screen.key)).toEqual([
       'usage-rules',
       'usage-purposes',
@@ -21,19 +21,23 @@ describe('onboarding step 2 configuration', () => {
       'data-deletion',
       'care-team-sharing',
       'actions-logging',
-      'charter-signature',
+      'commitments-summary',
       'charter-confirmation'
     ])
   })
 
-  it('only the charter screen replaces the default primary button', () => {
+  it('only the summary screen replaces the default primary button (RG3429.07)', () => {
     const withAction = commitmentScreens().filter((screen) => screen.primaryAction)
     expect(withAction).toHaveLength(1)
-    expect(withAction[0].key).toBe('charter-signature')
-    expect(withAction[0].primaryAction?.label).toBe('Signer')
+    expect(withAction[0].key).toBe('commitments-summary')
+    expect(withAction[0].primaryAction?.label).toBe('Valider')
   })
 
-  it('renders the charter inside the default card wrapper', () => {
+  it('holds the summary button until the certification is ticked (RG3429.08)', () => {
+    expect(getScreenConfig(COMMITMENTS_STEP, 7)?.requiresAcknowledgement).toBe(true)
+  })
+
+  it('renders the summary inside the default card wrapper', () => {
     expect(getScreenConfig(COMMITMENTS_STEP, 7)?.layout).toBeUndefined()
   })
 

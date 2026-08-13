@@ -89,24 +89,24 @@ describe('Onboarding page', () => {
     expect(screen.queryByTestId('onboarding-warning')).not.toBeInTheDocument()
   })
 
-  it('holds the charter signature until the consent is ticked', async () => {
+  it('holds the commitments validation until the certification is ticked', async () => {
     signCharter.mockResolvedValue({ charter_signed_at: '2026-01-01T00:00:00Z' })
     const user = userEvent.setup()
     renderAt({ ...baseStatus, onboarding_step: 1 })
 
-    // Walk the commitments screens down to the charter.
+    // Walk the commitments screens down to the summary.
     for (let i = 0; i < 7; i++) {
       await user.click(screen.getByRole('button', { name: /Continuer/ }))
     }
 
-    expect(screen.getByRole('heading', { name: "Signer la charte d'engagement" })).toBeInTheDocument()
-    const sign = screen.getByRole('button', { name: /Signer/ })
-    expect(sign).toBeDisabled()
+    expect(screen.getByRole('heading', { name: 'Synthèse de vos engagements' })).toBeInTheDocument()
+    const validate = screen.getByRole('button', { name: /Valider/ })
+    expect(validate).toBeDisabled()
 
     await user.click(screen.getByRole('checkbox', { name: /Je certifie avoir pris connaissance/ }))
-    expect(sign).toBeEnabled()
+    expect(validate).toBeEnabled()
 
-    await user.click(sign)
+    await user.click(validate)
     await waitFor(() => expect(signCharter).toHaveBeenCalledTimes(1))
   })
 

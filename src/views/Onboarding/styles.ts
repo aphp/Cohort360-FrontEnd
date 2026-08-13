@@ -176,6 +176,16 @@ const useStyles = makeStyles()((theme: Theme) => ({
       backgroundColor: eds.blue[600]
     }
   },
+  screenTag: {
+    display: 'inline-block',
+    marginBottom: theme.spacing(2),
+    padding: theme.spacing(0.5, 1.5),
+    borderRadius: 4,
+    backgroundColor: eds.blue[50],
+    color: eds.blue[800],
+    fontSize: 14,
+    lineHeight: '18px'
+  },
   title: {
     color: T.ink,
     fontWeight: 700
