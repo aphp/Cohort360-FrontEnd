@@ -1,4 +1,4 @@
-import MinimalDataUseArtwork from 'assets/images/onboarding/minimal-data-use.svg?react'
+import PerimeterScopeArtwork from 'assets/images/onboarding/perimeter-scope.svg?react'
 import { Box, Typography } from '@mui/material'
 import React from 'react'
 
@@ -18,7 +18,7 @@ const MinimalDataUse = () => {
         recherche.
       </Typography>
       <Illustration
-        image={MinimalDataUseArtwork}
+        image={PerimeterScopeArtwork}
         label="Seul le sous-ensemble de données strictement nécessaire est utilisé"
       />
     </Box>
