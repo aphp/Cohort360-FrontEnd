@@ -29,7 +29,7 @@
     "client-oauth2": "^4.2.4",
     "d3": "^7.8.2",
     "d3-cloud": "^1.2.5",
-    "dompurify": "^3.4.12",
+    "dompurify": "^3.4.13",
     "graphql": "^16.11.0",
     "html-react-parser": "^5.2.6",
     "leaflet": "^1.9.4",
