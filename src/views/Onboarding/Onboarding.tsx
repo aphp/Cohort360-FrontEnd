@@ -8,6 +8,7 @@ import React from 'react'
 import { Navigate } from 'react-router-dom'
 
 import { OnboardingProvider, useOnboarding } from './OnboardingContext'
+import ScreenTag from './ScreenTag'
 import { ONBOARDING_STEPS } from './steps'
 import useStyles from './styles'
 import UserMenu from './UserMenu'
@@ -65,7 +66,16 @@ const OnboardingLayout = () => {
       layout={screenConfig?.layout}
       footer={footer}
     >
-      {screen === 'welcome' ? <WelcomeScreen /> : ActiveScreen && <ActiveScreen />}
+      {screen === 'welcome' ? (
+        <WelcomeScreen />
+      ) : (
+        ActiveScreen && (
+          <>
+            {screenConfig?.tag && <ScreenTag label={screenConfig.tag} />}
+            <ActiveScreen />
+          </>
+        )
+      )}
       {error && (
         <Typography role="alert" className={classes.error}>
           {screenConfig?.primaryAction?.errorMessage ?? PROGRESS_ERROR_MESSAGE}

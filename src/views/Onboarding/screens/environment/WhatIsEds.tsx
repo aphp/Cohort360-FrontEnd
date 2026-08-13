@@ -3,13 +3,12 @@ import BiotechOutlinedIcon from '@mui/icons-material/BiotechOutlined'
 import ContactPageOutlinedIcon from '@mui/icons-material/ContactPageOutlined'
 import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined'
 import MedicationOutlinedIcon from '@mui/icons-material/MedicationOutlined'
-import { Box, Divider, Link, Typography } from '@mui/material'
+import { Box, Link, Typography } from '@mui/material'
 import type { SvgIconProps } from '@mui/material'
-import InfoBadge from 'components/ui/InfoBadge'
 import type { ComponentType } from 'react'
 import React from 'react'
-import { eds } from 'styles/palette'
 
+import InfoCallout from '../../InfoCallout'
 import useStyles from '../../styles'
 
 const EDS_URL = 'https://panorama.eds.aphp.fr/explorer-les-donnees'
@@ -78,14 +77,10 @@ const WhatIsEds = () => {
         </Box>
       ))}
 
-      <Divider className={classes.divider} />
-      <Box className={classes.infoRow}>
-        <InfoBadge className={classes.infoBadge} variant="filled" color={eds.blue[600]} />
-        <Typography className={classes.infoText}>
-          Selon votre profil d'habilitation, vous accédez à des données nominatives (identité des patients visible) ou
-          pseudonymisées (identité masquée).
-        </Typography>
-      </Box>
+      <InfoCallout>
+        Selon votre profil d'habilitation, vous accédez à des données nominatives (identité des patients visible) ou
+        pseudonymisées (identité masquée).
+      </InfoCallout>
     </Box>
   )
 }

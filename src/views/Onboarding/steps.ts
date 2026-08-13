@@ -7,7 +7,7 @@ import type { ComponentType } from 'react'
 import ActionsLogging from './screens/commitments/ActionsLogging'
 import CareTeamSharing from './screens/commitments/CareTeamSharing'
 import CharterConfirmation from './screens/commitments/CharterConfirmation'
-import CharterSignature from './screens/commitments/CharterSignature'
+import CommitmentsSummary from './screens/commitments/CommitmentsSummary'
 import DataCrossing from './screens/commitments/DataCrossing'
 import DataDeletion from './screens/commitments/DataDeletion'
 import MinimalDataUse from './screens/commitments/MinimalDataUse'
@@ -41,6 +41,8 @@ export type OnboardingPrimaryAction = {
 export type OnboardingScreenConfig = {
   key: string
   component: ComponentType
+  /** Étiquette affichée au-dessus du titre, par exemple « Engagement 3 » (RG3429.02). */
+  tag?: string
   /** `bare` drops the white card, for screens bringing their own container. */
   layout?: 'card' | 'bare'
   primaryAction?: OnboardingPrimaryAction
@@ -83,13 +85,13 @@ export const ONBOARDING_STEPS: OnboardingStepConfig[] = [
       { key: 'care-team-sharing', component: CareTeamSharing },
       { key: 'actions-logging', component: ActionsLogging },
       {
-        key: 'charter-signature',
-        component: CharterSignature,
+        key: 'commitments-summary',
+        component: CommitmentsSummary,
         requiresAcknowledgement: true,
         primaryAction: {
-          label: 'Signer',
+          label: 'Valider',
           run: ({ signCharter }) => signCharter(),
-          errorMessage: 'Une erreur est survenue lors de la signature de la charte. Veuillez réessayer.'
+          errorMessage: 'Une erreur est survenue lors de la validation de vos engagements. Veuillez réessayer.'
         }
       },
       { key: 'charter-confirmation', component: CharterConfirmation }
