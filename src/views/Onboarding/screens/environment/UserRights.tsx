@@ -1,9 +1,11 @@
-import CheckCircleIcon from '@mui/icons-material/CheckCircle'
+import CheckIcon from '@mui/icons-material/Check'
 import { Box, CircularProgress, Link, Typography } from '@mui/material'
+import CircleBadge from 'components/ui/CircleBadge'
 import moment from 'moment'
 import React from 'react'
 
 import { useAppSelector } from 'state'
+import { aphp } from 'styles/palette'
 
 import useStyles from '../../styles'
 import { useUserAccesses } from './useUserAccesses'
@@ -71,7 +73,9 @@ const UserRights = () => {
               <Typography className={classes.fieldLabel}>Vos droits :</Typography>
               {access.rights.map((right) => (
                 <Box key={right} className={classes.rightItem}>
-                  <CheckCircleIcon className={classes.checkIcon} fontSize="small" />
+                  <CircleBadge className={classes.rightBadge} color={aphp.vert[500]} variant="filled" size={20}>
+                    <CheckIcon className={classes.rightCheck} fontSize="inherit" />
+                  </CircleBadge>
                   <Typography className={classes.rightLabel}>{right}</Typography>
                 </Box>
               ))}

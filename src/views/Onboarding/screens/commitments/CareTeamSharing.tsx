@@ -1,4 +1,4 @@
-import CareTeamSharingArtwork from 'assets/images/onboarding/care-team-sharing.svg?react'
+import MedicalSecrecyArtwork from 'assets/images/onboarding/medical-secrecy.svg?react'
 import { Box, Typography } from '@mui/material'
 import React from 'react'
 
@@ -19,7 +19,7 @@ const CareTeamSharing = () => {
         <strong>seulement avec les personnes ayant participé à leur prise en charge</strong>.
       </Typography>
       <Illustration
-        image={CareTeamSharingArtwork}
+        image={MedicalSecrecyArtwork}
         label="Le partage est restreint aux personnes ayant participé à la prise en charge"
       />
     </Box>

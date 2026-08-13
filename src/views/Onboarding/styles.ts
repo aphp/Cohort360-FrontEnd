@@ -1,5 +1,5 @@
 import type { Theme } from '@mui/material/styles'
-import { eds } from 'styles/palette'
+import { aphp, eds } from 'styles/palette'
 import { makeStyles } from 'tss-react/mui'
 
 import { onboardingTokens as T } from './tokens'
@@ -330,6 +330,12 @@ const useStyles = makeStyles()((theme: Theme) => ({
     flexShrink: 0,
     color: theme.palette.success.main
   },
+  rightBadge: {
+    flexShrink: 0
+  },
+  rightCheck: {
+    color: aphp.vert[600]
+  },
   rightLabel: {
     color: T.ink,
     fontSize: 16,
@@ -346,7 +352,7 @@ const useStyles = makeStyles()((theme: Theme) => ({
     border: `1px solid ${T.cardBorder}`,
     borderRadius: 6,
     padding: theme.spacing(1, 3, 3),
-    backgroundColor: T.tileBg
+    backgroundColor: aphp.vert[100]
   },
   consentRow: {
     display: 'flex',
@@ -392,31 +398,6 @@ const useStyles = makeStyles()((theme: Theme) => ({
     width: '100%',
     height: 'auto',
     maxWidth: 552
-  },
-  deletionIcon: {
-    width: 56,
-    height: 56,
-    backgroundColor: T.deepBlue
-  },
-  documentViewer: {
-    padding: theme.spacing(3),
-    borderRadius: 6,
-    backgroundColor: T.documentBg
-  },
-  documentFrame: {
-    display: 'block',
-    width: '100%',
-    height: 420,
-    border: 'none',
-    backgroundColor: T.surface
-  },
-  documentFallback: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    gap: theme.spacing(2),
-    padding: theme.spacing(6),
-    backgroundColor: T.surface
   },
   video: {
     display: 'block',

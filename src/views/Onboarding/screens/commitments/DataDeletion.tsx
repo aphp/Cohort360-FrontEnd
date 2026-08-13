@@ -1,7 +1,8 @@
-import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
-import { Avatar, Box, Typography } from '@mui/material'
+import DataDeletionArtwork from 'assets/images/onboarding/data-deletion.svg?react'
+import { Box, Typography } from '@mui/material'
 import React from 'react'
 
+import Illustration from '../../Illustration'
 import useStyles from '../../styles'
 
 const DataDeletion = () => {
@@ -17,11 +18,7 @@ const DataDeletion = () => {
         ailleurs, vous vous engagez à demander la <strong>clôture des accès</strong>, si nécessaire de manière
         anticipée, dès que ces derniers ne sont plus requis.
       </Typography>
-      <Box className={classes.illustrationRow}>
-        <Avatar className={classes.deletionIcon}>
-          <DeleteOutlineIcon />
-        </Avatar>
-      </Box>
+      <Illustration image={DataDeletionArtwork} label="Les données sont supprimées en fin de mission" />
     </Box>
   )
 }
