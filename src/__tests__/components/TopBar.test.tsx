@@ -1,14 +1,14 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen } from '@testing-library/react'
-import { MemoryRouter } from 'react-router-dom'
+import { MemoryRouter } from 'react-router'
 import { AppConfig, getConfig } from 'config'
 import { URLS } from 'types/exploration'
 import { AccessLevel } from 'components/ui/AccessBadge'
 
 const dispatch = vi.fn()
 const navigate = vi.fn()
-vi.mock('react-router-dom', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('react-router-dom')>()
+vi.mock('react-router', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('react-router')>()
   return { ...actual, useNavigate: () => navigate }
 })
 

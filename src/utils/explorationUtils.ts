@@ -13,7 +13,7 @@ import {
 import { isDateValid } from './dates'
 import { AppConfig } from 'config'
 import { format } from './numbers'
-import { SetURLSearchParams } from 'react-router-dom'
+import { SetURLSearchParams } from 'react-router'
 
 export const replaceItem = <T extends ProjectType | RequestType | Cohort>(item: T, itemsList: T[]) => {
   const index = itemsList.findIndex(({ uuid }) => uuid === item.uuid)

@@ -1,5 +1,5 @@
 import { useCallback } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router'
 import useEditCohort from 'hooks/researches/useEditCohort'
 import { Cohort } from 'types'
 

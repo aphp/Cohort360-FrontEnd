@@ -19,7 +19,7 @@
 
 import React, { useContext, useEffect } from 'react'
 import { useIdleTimer } from 'react-idle-timer'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router'
 
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText } from '@mui/material'
 

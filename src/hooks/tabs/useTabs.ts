@@ -1,6 +1,6 @@
 import { useValidatedSubTab } from 'hooks/tabs/useValidatedSubTab'
 import { useMemo, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { useParams } from 'react-router'
 import { ResourceType } from 'types/requestCriterias'
 
 type TabConfig = {
