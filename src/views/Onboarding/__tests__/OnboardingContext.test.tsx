@@ -13,7 +13,7 @@ vi.mock('services/aphp/serviceOnboarding', () => ({
 import { ONBOARDING_STATUS_QUERY_KEY } from 'hooks/onboarding/useOnboardingStatus'
 import { OnboardingProvider, useOnboarding } from '../OnboardingContext'
 
-const SUMMARY_SUBSTEP = 7
+const SUMMARY_SUBSTEP = 11
 
 const renderOnboarding = (initialStep: number) => {
   const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })

@@ -4,12 +4,17 @@ import MenuBookIcon from '@mui/icons-material/MenuBook'
 import type { SvgIconProps } from '@mui/material'
 import type { ComponentType } from 'react'
 
+import { getCommitmentTag } from './commitments'
 import ActionsLogging from './screens/commitments/ActionsLogging'
-import CareTeamSharing from './screens/commitments/CareTeamSharing'
 import CommitmentsSummary from './screens/commitments/CommitmentsSummary'
 import DataCrossing from './screens/commitments/DataCrossing'
 import DataDeletion from './screens/commitments/DataDeletion'
-import MinimalDataUse from './screens/commitments/MinimalDataUse'
+import DataProtection from './screens/commitments/DataProtection'
+import HabilitationLifecycle from './screens/commitments/HabilitationLifecycle'
+import IncidentReporting from './screens/commitments/IncidentReporting'
+import MedicalSecrecy from './screens/commitments/MedicalSecrecy'
+import PerimeterScope from './screens/commitments/PerimeterScope'
+import PersonalAccess from './screens/commitments/PersonalAccess'
 import UsagePurposes from './screens/commitments/UsagePurposes'
 import UsageRules from './screens/commitments/UsageRules'
 import DataAccess from './screens/environment/DataAccess'
@@ -20,6 +25,8 @@ import KeyFeatures from './screens/handson/KeyFeatures'
 
 // Mirrors User.ONBOARDING_TOTAL_STEPS server-side.
 export const ONBOARDING_TOTAL_STEPS = 3
+
+export const COMMITMENT_PRIMARY_LABEL = 'Je m’y engage'
 
 /** Actions a screen's primary button can trigger, injected by the wizard. */
 export type OnboardingActions = {
@@ -57,6 +64,27 @@ export type OnboardingStepConfig = {
   screens: OnboardingScreenConfig[]
 }
 
+/**
+ * Les dix engagements, dans l'ordre de `COMMITMENTS` : chacun porte son étiquette et remplace le bouton
+ * de navigation par « Je m’y engage » (RG3429.02, RG3429.04).
+ */
+const COMMITMENT_SCREENS: OnboardingScreenConfig[] = [
+  { key: 'personal-access', component: PersonalAccess },
+  { key: 'perimeter-scope', component: PerimeterScope },
+  { key: 'usage-purposes', component: UsagePurposes },
+  { key: 'data-crossing', component: DataCrossing },
+  { key: 'medical-secrecy', component: MedicalSecrecy },
+  { key: 'data-protection', component: DataProtection },
+  { key: 'incident-reporting', component: IncidentReporting },
+  { key: 'habilitation-lifecycle', component: HabilitationLifecycle },
+  { key: 'data-deletion', component: DataDeletion },
+  { key: 'actions-logging', component: ActionsLogging }
+].map((screen, index) => ({
+  ...screen,
+  tag: getCommitmentTag(index),
+  primaryAction: { label: COMMITMENT_PRIMARY_LABEL }
+}))
+
 export const ONBOARDING_STEPS: OnboardingStepConfig[] = [
   {
     key: 'environment',
@@ -77,12 +105,7 @@ export const ONBOARDING_STEPS: OnboardingStepConfig[] = [
     icon: HistoryEduIcon,
     screens: [
       { key: 'usage-rules', component: UsageRules },
-      { key: 'usage-purposes', component: UsagePurposes },
-      { key: 'minimal-data-use', component: MinimalDataUse },
-      { key: 'data-crossing', component: DataCrossing },
-      { key: 'data-deletion', component: DataDeletion },
-      { key: 'care-team-sharing', component: CareTeamSharing },
-      { key: 'actions-logging', component: ActionsLogging },
+      ...COMMITMENT_SCREENS,
       {
         key: 'commitments-summary',
         component: CommitmentsSummary,

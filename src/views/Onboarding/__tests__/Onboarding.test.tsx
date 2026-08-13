@@ -85,7 +85,7 @@ describe('Onboarding page', () => {
     expect(screen.getByTestId('onboarding-warning')).toBeInTheDocument()
 
     await user.click(screen.getByRole('button', { name: /Continuer/ }))
-    expect(screen.getByText("Les finalités d'usage")).toBeInTheDocument()
+    expect(screen.getByText('Vos accès sont personnels')).toBeInTheDocument()
     expect(screen.queryByTestId('onboarding-warning')).not.toBeInTheDocument()
   })
 
@@ -94,9 +94,11 @@ describe('Onboarding page', () => {
     const user = userEvent.setup()
     renderAt({ ...baseStatus, onboarding_step: 1 })
 
-    // Walk the commitments screens down to the summary.
-    for (let i = 0; i < 7; i++) {
-      await user.click(screen.getByRole('button', { name: /Continuer/ }))
+    // Walk the intro then the ten commitments, down to the summary.
+    await user.click(screen.getByRole('button', { name: /Continuer/ }))
+    for (let i = 0; i < 10; i++) {
+      // eslint-disable-next-line no-await-in-loop
+      await user.click(screen.getByRole('button', { name: /Je m’y engage/ }))
     }
 
     expect(screen.getByRole('heading', { name: 'Synthèse de vos engagements' })).toBeInTheDocument()
