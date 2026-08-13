@@ -5,7 +5,7 @@ import logo from 'assets/images/logo-login.png'
 import useOnboardingEnabled from 'hooks/onboarding/useOnboardingEnabled'
 import useOnboardingStatus from 'hooks/onboarding/useOnboardingStatus'
 import React from 'react'
-import { Navigate } from 'react-router-dom'
+import { Navigate } from 'react-router'
 
 import { OnboardingProvider, useOnboarding } from './OnboardingContext'
 import ScreenTag from './ScreenTag'

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { Grid } from '@mui/material'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router'
 import { useAppDispatch, useAppSelector } from 'state'
 import { closeAllOpenedPopulation } from 'state/scope'
 import ScopeTree from 'components/ScopeTree'

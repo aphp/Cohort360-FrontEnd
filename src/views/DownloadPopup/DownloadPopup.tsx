@@ -12,7 +12,7 @@ import {
 } from '@mui/material'
 import useStyles from './styles'
 import apiBackend from '../../services/apiBackend'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router'
 
 const DownloadPopup: React.FC = () => {
   const navigate = useNavigate()

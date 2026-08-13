@@ -4,7 +4,7 @@ import { useAppSelector } from 'state'
 import { Divider, Grid, Typography } from '@mui/material'
 
 import SearchInput from 'components/ui/Searchbar/SearchInput'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router'
 import DisplayLocked from 'components/ui/Display/DisplayLocked'
 
 const SearchPatientCard = () => {

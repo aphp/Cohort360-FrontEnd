@@ -1,4 +1,4 @@
-import { useLocation, useParams, useSearchParams } from 'react-router-dom'
+import { useLocation, useParams, useSearchParams } from 'react-router'
 import useCohort from './useCohort'
 import useProject from './useProject'
 import useRequest from './useRequest'
