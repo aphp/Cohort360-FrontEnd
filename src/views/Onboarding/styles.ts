@@ -418,17 +418,6 @@ const useStyles = makeStyles()((theme: Theme) => ({
     padding: theme.spacing(6),
     backgroundColor: T.surface
   },
-  confirmationIcon: {
-    display: 'block',
-    margin: '0 auto',
-    fontSize: 72,
-    color: theme.palette.success.main
-  },
-  confirmationTitle: {
-    marginTop: theme.spacing(3),
-    color: T.ink,
-    fontWeight: 700
-  },
   video: {
     display: 'block',
     width: '100%',

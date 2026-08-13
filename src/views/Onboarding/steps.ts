@@ -6,7 +6,6 @@ import type { ComponentType } from 'react'
 
 import ActionsLogging from './screens/commitments/ActionsLogging'
 import CareTeamSharing from './screens/commitments/CareTeamSharing'
-import CharterConfirmation from './screens/commitments/CharterConfirmation'
 import CommitmentsSummary from './screens/commitments/CommitmentsSummary'
 import DataCrossing from './screens/commitments/DataCrossing'
 import DataDeletion from './screens/commitments/DataDeletion'
@@ -93,8 +92,7 @@ export const ONBOARDING_STEPS: OnboardingStepConfig[] = [
           run: ({ signCharter }) => signCharter(),
           errorMessage: 'Une erreur est survenue lors de la validation de vos engagements. Veuillez réessayer.'
         }
-      },
-      { key: 'charter-confirmation', component: CharterConfirmation }
+      }
     ]
   },
   {

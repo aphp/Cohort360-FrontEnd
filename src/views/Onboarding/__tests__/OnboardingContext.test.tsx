@@ -170,7 +170,7 @@ describe('OnboardingContext', () => {
     expect(result.current.primaryLabel).toBe('Valider')
   })
 
-  it('records the commitments then moves to the confirmation screen', async () => {
+  it('records the commitments then moves on to the guided tour', async () => {
     const { result } = renderOnboarding(1)
     await goToSummary(result)
 
@@ -180,8 +180,9 @@ describe('OnboardingContext', () => {
     })
 
     expect(signCharterCall).toHaveBeenCalledTimes(1)
-    expect(result.current.subStep).toBe(SUMMARY_SUBSTEP + 1)
-    expect(result.current.primaryLabel).toBe('Continuer')
+    expect(result.current.currentStep).toBe(2)
+    expect(result.current.subStep).toBe(0)
+    expect(result.current.primaryLabel).toBe('Accéder à Cohort360')
   })
 
   it('stays on the summary screen and raises an error when the validation fails', async () => {
@@ -229,7 +230,7 @@ describe('OnboardingContext', () => {
     expect(result.current.error).toBe(false)
   })
 
-  it('does not sign twice when stepping back from the confirmation screen', async () => {
+  it('does not record twice when stepping back to the summary', async () => {
     const { result } = renderOnboarding(1)
     await goToSummary(result)
     act(() => result.current.setAcknowledged(true))
@@ -238,6 +239,7 @@ describe('OnboardingContext', () => {
     })
 
     act(() => result.current.goBack())
+    expect(result.current.currentStep).toBe(1)
     expect(result.current.subStep).toBe(SUMMARY_SUBSTEP)
     act(() => result.current.setAcknowledged(true))
     await act(async () => {
@@ -245,6 +247,6 @@ describe('OnboardingContext', () => {
     })
 
     expect(signCharterCall).toHaveBeenCalledTimes(1)
-    expect(result.current.subStep).toBe(SUMMARY_SUBSTEP + 1)
+    expect(result.current.currentStep).toBe(2)
   })
 })

@@ -12,7 +12,7 @@ const HANDSON_STEP = 2
 const commitmentScreens = () => ONBOARDING_STEPS[COMMITMENTS_STEP].screens
 
 describe('onboarding step 2 configuration', () => {
-  it('exposes the seven informative screens then the summary and its confirmation', () => {
+  it('exposes the seven informative screens then the summary', () => {
     expect(commitmentScreens().map((screen) => screen.key)).toEqual([
       'usage-rules',
       'usage-purposes',
@@ -21,8 +21,7 @@ describe('onboarding step 2 configuration', () => {
       'data-deletion',
       'care-team-sharing',
       'actions-logging',
-      'commitments-summary',
-      'charter-confirmation'
+      'commitments-summary'
     ])
   })
 
