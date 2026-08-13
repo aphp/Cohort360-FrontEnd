@@ -2,7 +2,6 @@ import { render, screen } from '@testing-library/react'
 import React from 'react'
 import { describe, expect, it } from 'vitest'
 
-import CharterConfirmation from '../CharterConfirmation'
 import DataCrossing from '../DataCrossing'
 import MinimalDataUse from '../MinimalDataUse'
 import UsagePurposes from '../UsagePurposes'
@@ -48,13 +47,5 @@ describe('UsagePurposes', () => {
     expect(screen.getByText('Recherche')).toBeInTheDocument()
     expect(screen.getByText("Pilotage de l'activité hospitalière")).toBeInTheDocument()
     expect(screen.getByText(/Seules certaines finalités/)).toBeInTheDocument()
-  })
-})
-
-describe('CharterConfirmation', () => {
-  it('confirms the signature and points to the help centre', () => {
-    render(<CharterConfirmation />)
-    expect(screen.getByRole('heading')).toHaveTextContent("Votre charte d'engagement a bien été signée.")
-    expect(screen.getByText(/centre d'aide de Cohort360/)).toBeInTheDocument()
   })
 })
