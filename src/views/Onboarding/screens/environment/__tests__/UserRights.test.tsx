@@ -72,6 +72,7 @@ describe('UserRights (US-3307)', () => {
   it('shows the user, habilitation name as profile, granted rights (catalog labels), perimeter and expiration', async () => {
     renderUserRights()
     expect(await screen.findByText('ADMIN CENTRAL')).toBeInTheDocument()
+    expect(screen.getByText('Comprendre votre habilitation')).toBeInTheDocument()
     expect(screen.getByText('Cesar RICHARD')).toBeInTheDocument()
     expect(screen.getByText('Lecture de données patient nominatives')).toBeInTheDocument()
     expect(screen.getByText('Lecture de données patient pseudonymisées')).toBeInTheDocument()
@@ -99,6 +100,7 @@ describe('UserRights (US-3307)', () => {
     renderUserRights()
 
     expect(await screen.findByText('ADMIN CENTRAL')).toBeInTheDocument()
+    expect(screen.getByText('Comprendre vos accès')).toBeInTheDocument()
     expect(screen.getByText('droit faible pour test')).toBeInTheDocument()
     expect(screen.getByText('UPS - AP-HP.UNIVERSITE PARIS SACLAY')).toBeInTheDocument()
     expect(screen.getByText('07/08/2026')).toBeInTheDocument()

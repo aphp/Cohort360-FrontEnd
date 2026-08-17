@@ -19,7 +19,7 @@ const UserRights = () => {
 
   const title = (
     <Typography variant="h4" className={classes.title}>
-      Comprendre votre habilitation
+      {accesses.length > 1 ? 'Comprendre vos accès' : 'Comprendre votre habilitation'}
     </Typography>
   )
 
@@ -73,7 +73,7 @@ const UserRights = () => {
               <Typography className={classes.fieldLabel}>Vos droits :</Typography>
               {access.rights.map((right) => (
                 <Box key={right} className={classes.rightItem}>
-                  <CircleBadge className={classes.rightBadge} color={aphp.vert[500]} variant="filled" size={20}>
+                  <CircleBadge className={classes.rightBadge} color={aphp.vertClair[500]} variant="filled" size={20}>
                     <CheckIcon className={classes.rightCheck} fontSize="inherit" />
                   </CircleBadge>
                   <Typography className={classes.rightLabel}>{right}</Typography>

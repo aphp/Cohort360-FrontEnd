@@ -369,7 +369,12 @@ const useStyles = makeStyles()((theme: Theme) => ({
     color: T.commitmentCheck
   },
   rightBadge: {
-    flexShrink: 0
+    flexShrink: 0,
+    backgroundColor: aphp.vertClair[500],
+    color: aphp.vert[600],
+    '& svg': {
+      color: aphp.vert[600]
+    }
   },
   rightCheck: {
     color: aphp.vert[600]
@@ -387,7 +392,7 @@ const useStyles = makeStyles()((theme: Theme) => ({
     marginTop: theme.spacing(2)
   },
   tile: {
-    border: `1px solid ${T.cardBorder}`,
+    border: `1px solid ${aphp.vert[25]}`,
     borderRadius: 6,
     padding: theme.spacing(1, 3, 3),
     backgroundColor: aphp.vert[100]
