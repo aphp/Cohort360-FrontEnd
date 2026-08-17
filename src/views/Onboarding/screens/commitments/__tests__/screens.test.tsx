@@ -4,6 +4,7 @@ import { describe, expect, it } from 'vitest'
 
 import DataCrossing from '../DataCrossing'
 import DataDeletion from '../DataDeletion'
+import HabilitationLifecycle from '../HabilitationLifecycle'
 import MedicalSecrecy from '../MedicalSecrecy'
 import PerimeterScope from '../PerimeterScope'
 import PersonalAccess from '../PersonalAccess'
@@ -64,6 +65,16 @@ describe('MedicalSecrecy', () => {
     render(<MedicalSecrecy />)
     expect(screen.getByRole('heading')).toHaveTextContent('Vous respectez le secret médical')
     expect(screen.getByRole('img')).toBeInTheDocument()
+  })
+})
+
+describe('HabilitationLifecycle', () => {
+  it('keeps the full wording of the screen, which the summary shortens', () => {
+    render(<HabilitationLifecycle />)
+    expect(screen.getByRole('heading')).toHaveTextContent(
+      'Vous anticipez la modification ou la clôture de vos habilitations'
+    )
+    expect(screen.getByRole('note')).toHaveTextContent(/changement de service/)
   })
 })
 

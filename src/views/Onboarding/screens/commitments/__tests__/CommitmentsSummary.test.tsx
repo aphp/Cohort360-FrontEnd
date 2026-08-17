@@ -28,6 +28,12 @@ describe('CommitmentsSummary (RG3429.05)', () => {
     expect(COMMITMENTS).toHaveLength(10)
   })
 
+  it('shortens the eighth commitment, as the mockups do', () => {
+    renderSummary()
+    expect(screen.getByText('Vous anticipez la modification ou la clôture de vos accès')).toBeInTheDocument()
+    expect(screen.queryByText(/clôture de vos habilitations/)).not.toBeInTheDocument()
+  })
+
   it('exposes the mandatory certification, unchecked at first (RG3429.07)', async () => {
     const user = userEvent.setup()
     renderSummary()
