@@ -9,7 +9,7 @@ const WelcomeScreen = () => {
 
   return (
     <Box>
-      <Typography variant="h4" className={classes.title}>
+      <Typography variant="h4" className={classes.welcomeTitle}>
         Bienvenue !
       </Typography>
       <Typography className={classes.intro}>

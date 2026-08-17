@@ -18,12 +18,14 @@ const CommitmentsSummary = () => {
       <Typography variant="h4" className={classes.title}>
         Synthèse de vos engagements
       </Typography>
-      {COMMITMENTS.map((commitment) => (
-        <Box key={commitment} className={classes.rightItem}>
-          <CheckCircleIcon className={classes.checkIcon} fontSize="small" />
-          <Typography className={classes.rightLabel}>{commitment}</Typography>
-        </Box>
-      ))}
+      <Box className={classes.commitmentList}>
+        {COMMITMENTS.map((commitment) => (
+          <Box key={commitment} className={classes.commitmentRow}>
+            <CheckCircleIcon className={classes.checkIcon} fontSize="small" />
+            <Typography className={classes.commitmentLabel}>{commitment}</Typography>
+          </Box>
+        ))}
+      </Box>
       <Divider className={classes.divider} />
       <FormControlLabel
         className={classes.consentRow}

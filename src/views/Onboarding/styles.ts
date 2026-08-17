@@ -6,6 +6,10 @@ import { onboardingTokens as T } from './tokens'
 
 const FONT = "'Rubik', sans-serif"
 
+const RAIL_WIDTH = 200
+const RAIL_GAP = 64
+const CARD_WIDTH = 600
+
 const useStyles = makeStyles()((theme: Theme) => ({
   page: {
     minHeight: '100vh',
@@ -21,7 +25,7 @@ const useStyles = makeStyles()((theme: Theme) => ({
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-between',
-    padding: theme.spacing(2, 4),
+    padding: theme.spacing(3, 4),
     backgroundColor: T.surface
   },
   logo: {
@@ -64,16 +68,18 @@ const useStyles = makeStyles()((theme: Theme) => ({
     // Anchored to the top rather than centred: the rail must not drift when a card grows.
     alignItems: 'flex-start',
     justifyContent: 'center',
-    padding: theme.spacing(6)
+    // 116px below the banner, where the mockups place the top of the card.
+    padding: theme.spacing(14.5, 6, 6)
   },
   group: {
     display: 'flex',
     alignItems: 'flex-start',
-    gap: theme.spacing(8)
+    gap: RAIL_GAP,
+    marginLeft: -(RAIL_WIDTH + RAIL_GAP)
   },
   stepper: {
-    marginTop: theme.spacing(3),
-    width: 220,
+    marginTop: theme.spacing(5.5),
+    width: RAIL_WIDTH,
     flexShrink: 0
   },
   rail: {
@@ -131,21 +137,21 @@ const useStyles = makeStyles()((theme: Theme) => ({
   },
   stepLabel: {
     color: T.railInactiveFg,
+    fontSize: 14,
     lineHeight: 1.35
   },
   stepLabelActive: {
-    color: T.ink,
-    fontWeight: 600
+    color: T.ink
   },
   contentCol: {
     display: 'flex',
     flexDirection: 'column',
-    width: 640,
+    width: CARD_WIDTH,
     maxWidth: '100%'
   },
   card: {
     width: '100%',
-    padding: theme.spacing(5),
+    padding: theme.spacing(5, 3, 4),
     borderRadius: 6,
     border: `1px solid ${T.cardBorder}`,
     backgroundColor: T.surface,
@@ -156,30 +162,42 @@ const useStyles = makeStyles()((theme: Theme) => ({
     display: 'flex',
     justifyContent: 'flex-end',
     gap: theme.spacing(2),
-    marginTop: theme.spacing(3)
+    marginTop: theme.spacing(7)
   },
   backButton: {
     // Pushed to the opposite edge from the primary action, which stays right-aligned when alone.
     marginRight: 'auto',
-    color: eds.blue[400],
-    borderColor: eds.blue[400],
+    color: T.bodyInk,
+    borderColor: T.secondaryActionBorder,
     backgroundColor: T.surface,
+    fontSize: 14,
+    fontWeight: 400,
     '&:hover': {
-      borderColor: eds.blue[400],
+      borderColor: T.secondaryActionBorder,
       backgroundColor: T.surface
     }
   },
   nextButton: {
-    backgroundColor: eds.blue[400],
+    backgroundColor: T.primaryAction,
     color: T.surface,
+    fontSize: 14,
+    fontWeight: 600,
+    boxShadow: 'none',
     '&:hover': {
-      backgroundColor: eds.blue[600]
+      backgroundColor: T.primaryActionHover,
+      boxShadow: 'none'
+    },
+    '&.Mui-disabled': {
+      backgroundColor: eds.blue[100],
+      color: T.surface
     }
   },
   screenTag: {
     display: 'inline-block',
-    marginBottom: theme.spacing(2),
-    padding: theme.spacing(0.5, 1.5),
+    // Flex item of the card: without this the pill stretches to the full width.
+    alignSelf: 'flex-start',
+    marginBottom: theme.spacing(1.5),
+    padding: theme.spacing(0.25, 1.5),
     borderRadius: 4,
     backgroundColor: eds.blue[50],
     color: eds.blue[800],
@@ -187,6 +205,10 @@ const useStyles = makeStyles()((theme: Theme) => ({
     lineHeight: '18px'
   },
   title: {
+    color: T.titleInk,
+    fontWeight: 700
+  },
+  welcomeTitle: {
     color: T.ink,
     fontWeight: 700
   },
@@ -228,7 +250,7 @@ const useStyles = makeStyles()((theme: Theme) => ({
     color: theme.palette.error.main
   },
   sectionText: {
-    color: T.ink,
+    color: T.bodyInk,
     fontSize: 16,
     marginTop: theme.spacing(2),
     lineHeight: '24px'
@@ -251,7 +273,7 @@ const useStyles = makeStyles()((theme: Theme) => ({
     lineHeight: '24px'
   },
   list: {
-    color: T.ink,
+    color: T.bodyInk,
     fontSize: 16,
     marginTop: theme.spacing(1.5),
     paddingLeft: theme.spacing(3),
@@ -266,15 +288,16 @@ const useStyles = makeStyles()((theme: Theme) => ({
     gap: theme.spacing(0.5),
     color: eds.blue[400],
     fontSize: 16,
-    fontWeight: 600,
-    textDecoration: 'none',
-    '&:hover': {
-      textDecoration: 'underline'
-    }
+    textDecoration: 'underline'
   },
   inlineLink: {
     color: eds.blue[400],
     fontWeight: 600,
+    textDecoration: 'underline'
+  },
+  // The legal references keep the colour of the running text: only the underline sets them apart.
+  legalLink: {
+    color: 'inherit',
     textDecoration: 'underline'
   },
   linkIcon: {
@@ -289,7 +312,7 @@ const useStyles = makeStyles()((theme: Theme) => ({
   },
   infoRow: {
     display: 'flex',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     gap: theme.spacing(1.5),
     marginTop: theme.spacing(3)
   },
@@ -298,6 +321,21 @@ const useStyles = makeStyles()((theme: Theme) => ({
   },
   infoText: {
     color: eds.blue[800],
+    fontSize: 16,
+    lineHeight: '24px'
+  },
+  commitmentList: {
+    marginTop: theme.spacing(5)
+  },
+  commitmentRow: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: theme.spacing(1.5),
+    marginLeft: theme.spacing(3),
+    minHeight: 40
+  },
+  commitmentLabel: {
+    color: T.bodyInk,
     fontSize: 16,
     lineHeight: '24px'
   },
@@ -328,7 +366,7 @@ const useStyles = makeStyles()((theme: Theme) => ({
   },
   checkIcon: {
     flexShrink: 0,
-    color: theme.palette.success.main
+    color: T.commitmentCheck
   },
   rightBadge: {
     flexShrink: 0
@@ -356,27 +394,26 @@ const useStyles = makeStyles()((theme: Theme) => ({
   },
   consentRow: {
     display: 'flex',
-    alignItems: 'flex-start',
+    alignItems: 'center',
     gap: theme.spacing(1),
     marginTop: theme.spacing(3),
     marginLeft: 0,
     marginRight: 0
   },
   consentCheckbox: {
-    paddingTop: 0,
     color: eds.blue[400],
     '&.Mui-checked': {
       color: eds.blue[400]
     }
   },
   consentText: {
-    color: T.ink,
+    color: T.bodyInk,
     fontSize: 16,
     lineHeight: '24px'
   },
   warningNotice: {
     display: 'flex',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     gap: theme.spacing(1.5),
     marginTop: theme.spacing(3)
   },
@@ -384,20 +421,18 @@ const useStyles = makeStyles()((theme: Theme) => ({
     flexShrink: 0
   },
   warningText: {
-    color: T.ink,
+    color: T.warning,
     fontSize: 16,
     lineHeight: '24px'
   },
   illustrationRow: {
     display: 'flex',
     justifyContent: 'center',
-    marginTop: theme.spacing(4)
+    marginTop: theme.spacing(3)
   },
   illustration: {
-    // The exported artwork carries fixed width/height attributes: override them to scale down.
-    width: '100%',
-    height: 'auto',
-    maxWidth: 552
+    maxWidth: '100%',
+    height: 'auto'
   },
   video: {
     display: 'block',

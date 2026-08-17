@@ -19,7 +19,7 @@ const InfoCallout = ({ children, variant = 'filled' }: Props) => {
     <>
       <Divider className={classes.divider} />
       <Box role="note" className={classes.infoRow}>
-        <InfoBadge className={classes.infoBadge} variant={variant} color={eds.blue[600]} />
+        <InfoBadge className={classes.infoBadge} variant={variant} color={eds.blue[600]} size={32} />
         <Typography className={classes.infoText}>{children}</Typography>
       </Box>
     </>

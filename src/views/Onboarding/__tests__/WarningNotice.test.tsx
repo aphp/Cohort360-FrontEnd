@@ -1,5 +1,6 @@
 import { render, screen } from '@testing-library/react'
 import React from 'react'
+import { eds } from 'styles/palette'
 import { describe, expect, it } from 'vitest'
 
 import { onboardingTokens } from '../tokens'
@@ -21,7 +22,7 @@ describe('WarningNotice', () => {
     const { container } = render(<WarningNotice />)
     const circle = filledCircle(container)
     expect(circle).toBeDefined()
-    expect(getComputedStyle(circle as HTMLElement).backgroundColor).toBe('rgb(229, 0, 125)')
-    expect(onboardingTokens.warning).toBe('#E5007D')
+    expect(getComputedStyle(circle as HTMLElement).backgroundColor).toBe('rgb(237, 6, 119)')
+    expect(onboardingTokens.warning).toBe(eds.fuchsia[600])
   })
 })

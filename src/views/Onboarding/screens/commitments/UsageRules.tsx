@@ -24,13 +24,13 @@ const UsageRules = () => {
       </Typography>
       <ul className={classes.list}>
         <li>
-          <Link className={classes.inlineLink} href={EDS_ACCESS_RULES_URL} target="_blank" rel="noopener noreferrer">
+          <Link className={classes.legalLink} href={EDS_ACCESS_RULES_URL} target="_blank" rel="noopener noreferrer">
             aux règles d'accès à l'EDS de l'AP-HP à des fins de recherche
           </Link>
         </li>
         <li>
           aux dispositions réglementaires applicables, notamment issues du{' '}
-          <Link className={classes.inlineLink} href={DATA_PROTECTION_ACT_URL} target="_blank" rel="noopener noreferrer">
+          <Link className={classes.legalLink} href={DATA_PROTECTION_ACT_URL} target="_blank" rel="noopener noreferrer">
             Règlement général sur la protection des données, de la loi n° 78-17 du 6 janvier 1978 relative à
             l'informatique, aux fichiers et aux libertés modifiée, et du code pénal.
           </Link>
