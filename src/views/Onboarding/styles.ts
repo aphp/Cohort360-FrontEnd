@@ -392,10 +392,10 @@ const useStyles = makeStyles()((theme: Theme) => ({
     marginTop: theme.spacing(2)
   },
   tile: {
-    border: `1px solid ${aphp.vert[25]}`,
+    border: `1px solid ${aphp.vert[100]}`,
     borderRadius: 6,
     padding: theme.spacing(1, 3, 3),
-    backgroundColor: aphp.vert[100]
+    backgroundColor: aphp.vert[25]
   },
   consentRow: {
     display: 'flex',
