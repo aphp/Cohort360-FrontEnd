@@ -127,6 +127,8 @@ const ExportForm: React.FC = () => {
 
   const limitError = errorTables.some((errorTable) => errorTable.error === Error.ERROR_TABLE_LIMIT)
   const fetchCountError = errorTables.some((errorTable) => errorTable.error === Error.ERROR_FETCH)
+  // Le regroupement en un seul fichier repose sur une jointure : il faut au moins deux tables à relier.
+  const groupedTablesError = oneFile && tablesSettings.filter((tableSetting) => tableSetting.isChecked).length < 2
 
   const _checkExportableCohortID = useCallback(async () => {
     if (cohortID !== null) {
@@ -636,7 +638,12 @@ const ExportForm: React.FC = () => {
               />
               <Button
                 disabled={
-                  conditions === false || motivation === null || error === Error.ERROR_MOTIF || limitError || exporting
+                  conditions === false ||
+                  motivation === null ||
+                  error === Error.ERROR_MOTIF ||
+                  limitError ||
+                  groupedTablesError ||
+                  exporting
                 }
                 onClick={() => {
                   setExporting(true)
@@ -665,6 +672,11 @@ const ExportForm: React.FC = () => {
             {limitError && (
               <CustomAlert severity="error">
                 Merci d'indiquer des tables qui respectent la limite de lignes autorisées.
+              </CustomAlert>
+            )}
+            {groupedTablesError && (
+              <CustomAlert severity="error">
+                Merci de sélectionner au moins deux tables pour regrouper l'export en un seul fichier.
               </CustomAlert>
             )}
           </Grid>
