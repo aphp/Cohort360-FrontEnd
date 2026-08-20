@@ -165,9 +165,9 @@ export const postExportCohort = async ({
     //pivot_split_columns : table.pivotSplitColumns,
     pivot_merge_ids: table.pivotMergeIds
   }))
-  // En export regroupé, une sous-table ne partage un lien hamiltonien avec sa table parente que si
-  // celle-ci est seule : au-delà, le dataexporter refuse la jointure sur clé primaire.
-  if (!group_tables || tables.length === 1) {
+  // Le dataexporter refuse la jointure sur clé primaire dès qu'une sous-table est demandée,
+  // celle-ci étant en relation 1-N avec sa table parente.
+  if (!group_tables) {
     const existingTableNames = new Set(export_tables.map((table) => table.table_name))
     tables.forEach((table: TableSetting) => {
       const linkedTables = AUTO_LINKED_TABLES[table.tableName]
