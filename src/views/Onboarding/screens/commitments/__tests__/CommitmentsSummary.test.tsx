@@ -34,6 +34,14 @@ describe('CommitmentsSummary (RG3429.05)', () => {
     expect(screen.queryByText(/clôture de vos habilitations/)).not.toBeInTheDocument()
   })
 
+  it('offers the commitments recap as a downloadable document', () => {
+    renderSummary()
+
+    const link = screen.getByRole('link', { name: 'Télécharger un récapitulatif de vos engagements' })
+    expect(link).toHaveAttribute('href', '/documents/synthese-engagements-cohort360.pdf')
+    expect(link).toHaveAttribute('download')
+  })
+
   it('exposes the mandatory certification, unchecked at first (RG3429.07)', async () => {
     const user = userEvent.setup()
     renderSummary()
