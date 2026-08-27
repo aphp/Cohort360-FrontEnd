@@ -1,6 +1,6 @@
-import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted'
+import ChecklistIcon from '@mui/icons-material/Checklist'
 import HistoryEduIcon from '@mui/icons-material/HistoryEdu'
-import MenuBookIcon from '@mui/icons-material/MenuBook'
+import LocalLibraryIcon from '@mui/icons-material/LocalLibrary'
 import type { SvgIconProps } from '@mui/material'
 import type { ComponentType } from 'react'
 
@@ -20,7 +20,6 @@ import UsageRules from './screens/commitments/UsageRules'
 import DataAccess from './screens/environment/DataAccess'
 import UserRights from './screens/environment/UserRights'
 import WhatIsCohort360 from './screens/environment/WhatIsCohort360'
-import WhatIsEds from './screens/environment/WhatIsEds'
 import KeyFeatures from './screens/handson/KeyFeatures'
 
 // Mirrors User.ONBOARDING_TOTAL_STEPS server-side.
@@ -90,10 +89,9 @@ export const ONBOARDING_STEPS: OnboardingStepConfig[] = [
     key: 'environment',
     label: 'Découvrir votre environnement',
     summary: 'Apprenez-en plus sur ce qu’est Cohort360 et sur vos habilitations aux données dans l’outil.',
-    icon: MenuBookIcon,
+    icon: LocalLibraryIcon,
     screens: [
       { key: 'what-is-cohort360', component: WhatIsCohort360 },
-      { key: 'what-is-eds', component: WhatIsEds },
       { key: 'data-access', component: DataAccess },
       { key: 'user-rights', component: UserRights }
     ]
@@ -122,7 +120,7 @@ export const ONBOARDING_STEPS: OnboardingStepConfig[] = [
     key: 'handson',
     label: "Prendre en main l'outil",
     summary: 'Explorez l’outil au travers d’une prise en main guidée des fonctionnalités clés.',
-    icon: FormatListBulletedIcon,
+    icon: ChecklistIcon,
     screens: [
       {
         key: 'key-features',

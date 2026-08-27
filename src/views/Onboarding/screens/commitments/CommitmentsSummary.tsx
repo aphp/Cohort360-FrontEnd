@@ -23,16 +23,14 @@ const CommitmentsSummary = () => {
       <Box className={classes.commitmentList}>
         {COMMITMENTS.map((commitment) => (
           <Box key={commitment} className={classes.commitmentRow}>
-            <CheckCircleIcon className={classes.checkIcon} fontSize="small" />
+            <CheckCircleIcon className={classes.checkIcon} />
             <Typography className={classes.commitmentLabel}>{commitment}</Typography>
           </Box>
         ))}
       </Box>
-      <Box className={classes.linkRow}>
-        <Link className={classes.link} href={COMMITMENTS_SUMMARY_URL} download>
-          Télécharger un récapitulatif de vos engagements
-        </Link>
-      </Box>
+      <Link className={classes.downloadLink} href={COMMITMENTS_SUMMARY_URL} download>
+        Télécharger un récapitulatif de vos engagements
+      </Link>
       <Divider className={classes.divider} />
       <FormControlLabel
         className={classes.consentRow}
