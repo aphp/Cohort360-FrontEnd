@@ -456,7 +456,9 @@ const useStyles = makeStyles()((theme: Theme) => ({
   video: {
     display: 'block',
     width: '100%',
+    aspectRatio: '16 / 9',
     marginTop: theme.spacing(3),
+    border: 0,
     borderRadius: 6,
     backgroundColor: T.documentBg
   }
