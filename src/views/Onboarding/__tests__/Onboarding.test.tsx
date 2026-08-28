@@ -77,6 +77,13 @@ describe('Onboarding page', () => {
     expect(screen.getByText('Bienvenue !')).toBeInTheDocument()
   })
 
+  it('overrides the MUI button metrics with those of the mockups', () => {
+    renderAt(baseStatus)
+    const style = getComputedStyle(screen.getByRole('button', { name: /Commencer/ }))
+    expect(style.padding).toBe('8px')
+    expect(style.borderRadius).toBe('5px')
+  })
+
   it('shows the warning on the opening commitments screen only', async () => {
     const user = userEvent.setup()
     renderAt({ ...baseStatus, onboarding_step: 1 })

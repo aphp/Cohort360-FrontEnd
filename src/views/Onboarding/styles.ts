@@ -1,5 +1,5 @@
 import type { Theme } from '@mui/material/styles'
-import { aphp, eds } from 'styles/palette'
+import { eds } from 'styles/palette'
 import { makeStyles } from 'tss-react/mui'
 
 import { onboardingTokens as T } from './tokens'
@@ -25,7 +25,7 @@ const useStyles = makeStyles()((theme: Theme) => ({
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-between',
-    padding: theme.spacing(3, 4),
+    padding: theme.spacing(3, 5),
     backgroundColor: T.surface
   },
   logo: {
@@ -34,7 +34,7 @@ const useStyles = makeStyles()((theme: Theme) => ({
   userBox: {
     display: 'flex',
     alignItems: 'center',
-    gap: theme.spacing(1.5),
+    gap: theme.spacing(0.75),
     padding: theme.spacing(0.5, 1),
     borderRadius: 6,
     '&:hover': {
@@ -43,23 +43,27 @@ const useStyles = makeStyles()((theme: Theme) => ({
   },
   userMenu: {
     marginTop: theme.spacing(1),
-    borderRadius: 6
+    borderRadius: 5,
+    border: `1px solid ${T.menuBorder}`,
+    boxShadow: '0 4px 2px rgba(0, 0, 0, 0.25)'
   },
   userMenuItem: {
     fontFamily: FONT,
+    fontSize: 14,
+    lineHeight: '18px',
     color: T.ink,
-    padding: theme.spacing(1.5, 3)
+    padding: theme.spacing(2)
   },
   avatar: {
-    width: 36,
-    height: 36,
+    width: 30,
+    height: 30,
     fontSize: 14,
-    fontWeight: 700,
     color: T.surface,
     backgroundColor: T.avatarBg
   },
   user: {
-    fontWeight: 600,
+    fontSize: 14,
+    lineHeight: '18px',
     color: T.ink
   },
   body: {
@@ -95,7 +99,7 @@ const useStyles = makeStyles()((theme: Theme) => ({
     display: 'flex',
     // Centres the label on the circle, however many lines the label takes.
     alignItems: 'center',
-    gap: theme.spacing(2)
+    gap: theme.spacing(1.5)
   },
   railTail: {
     // As wide as the circle, so the segment hangs from its centre.
@@ -105,7 +109,7 @@ const useStyles = makeStyles()((theme: Theme) => ({
   },
   railSegment: {
     width: 2,
-    height: 40,
+    height: 24,
     marginTop: theme.spacing(0.5),
     marginBottom: theme.spacing(0.5),
     backgroundColor: T.railTodo
@@ -125,8 +129,8 @@ const useStyles = makeStyles()((theme: Theme) => ({
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    fontSize: 13,
-    fontWeight: 700
+    fontSize: 14,
+    fontWeight: 600
   },
   stepCircleActive: {
     backgroundColor: T.railDone,
@@ -138,7 +142,7 @@ const useStyles = makeStyles()((theme: Theme) => ({
   stepLabel: {
     color: T.railInactiveFg,
     fontSize: 14,
-    lineHeight: 1.35
+    lineHeight: '18px'
   },
   stepLabelActive: {
     color: T.ink
@@ -151,12 +155,16 @@ const useStyles = makeStyles()((theme: Theme) => ({
   },
   card: {
     width: '100%',
-    padding: theme.spacing(5, 3, 4),
+    padding: theme.spacing(5, 5, 4),
     borderRadius: 6,
     border: `1px solid ${T.cardBorder}`,
     backgroundColor: T.surface,
     display: 'flex',
-    flexDirection: 'column'
+    flexDirection: 'column',
+    // L'emphase du corps de texte est un Medium, jamais un gras.
+    '& strong': {
+      fontWeight: 500
+    }
   },
   footer: {
     display: 'flex',
@@ -164,13 +172,22 @@ const useStyles = makeStyles()((theme: Theme) => ({
     gap: theme.spacing(2),
     marginTop: theme.spacing(7)
   },
+  button: {
+    padding: theme.spacing(1),
+    borderRadius: 5,
+    gap: theme.spacing(0.5),
+    fontSize: 14,
+    lineHeight: '18px',
+    '& .MuiButton-startIcon, & .MuiButton-endIcon': {
+      margin: 0
+    }
+  },
   backButton: {
     // Pushed to the opposite edge from the primary action, which stays right-aligned when alone.
     marginRight: 'auto',
     color: T.bodyInk,
     borderColor: T.secondaryActionBorder,
     backgroundColor: T.surface,
-    fontSize: 14,
     fontWeight: 400,
     '&:hover': {
       borderColor: T.secondaryActionBorder,
@@ -180,7 +197,6 @@ const useStyles = makeStyles()((theme: Theme) => ({
   nextButton: {
     backgroundColor: T.primaryAction,
     color: T.surface,
-    fontSize: 14,
     fontWeight: 600,
     boxShadow: 'none',
     '&:hover': {
@@ -197,10 +213,10 @@ const useStyles = makeStyles()((theme: Theme) => ({
     // Flex item of the card: without this the pill stretches to the full width.
     alignSelf: 'flex-start',
     marginBottom: theme.spacing(1.5),
-    padding: theme.spacing(0.25, 1.5),
+    padding: theme.spacing(0.25, 1),
     borderRadius: 4,
     backgroundColor: eds.blue[50],
-    color: eds.blue[800],
+    color: T.tagInk,
     fontSize: 14,
     lineHeight: '18px'
   },
@@ -208,26 +224,39 @@ const useStyles = makeStyles()((theme: Theme) => ({
     color: T.titleInk,
     fontWeight: 700
   },
-  welcomeTitle: {
-    color: T.ink,
+  sectionTitle: {
+    color: T.titleInk,
+    fontSize: 28,
+    lineHeight: '36px',
     fontWeight: 700
   },
-  intro: {
-    color: T.muted,
+  subTitle: {
+    color: T.bodyInk,
+    fontSize: 22,
+    lineHeight: '28px',
+    fontWeight: 500,
+    marginTop: theme.spacing(3)
+  },
+  // Blocks are spaced by 24, but two paragraphs running on from one another only by 8.
+  sectionText: {
+    color: T.bodyInk,
     fontSize: 16,
     lineHeight: '24px',
-    marginTop: theme.spacing(2)
+    marginTop: theme.spacing(3),
+    '& + &': {
+      marginTop: theme.spacing(1)
+    }
   },
   stepRow: {
     display: 'flex',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     gap: theme.spacing(2),
     marginTop: theme.spacing(3)
   },
   iconBox: {
     flexShrink: 0,
-    width: 40,
-    height: 40,
+    width: 32,
+    height: 32,
     borderRadius: '50%',
     display: 'flex',
     alignItems: 'center',
@@ -236,75 +265,44 @@ const useStyles = makeStyles()((theme: Theme) => ({
     color: T.stepIconFg
   },
   stepTitle: {
-    color: T.ink,
+    color: T.bodyInk,
     fontSize: 16,
-    fontWeight: 700
+    lineHeight: '24px',
+    fontWeight: 500
   },
   stepDesc: {
-    color: T.muted,
+    color: T.secondaryInk,
     fontSize: 16,
-    lineHeight: '24px'
+    lineHeight: '24px',
+    marginTop: theme.spacing(1)
   },
   error: {
     marginTop: theme.spacing(2),
     color: theme.palette.error.main
   },
-  sectionText: {
-    color: T.bodyInk,
-    fontSize: 16,
-    marginTop: theme.spacing(2),
-    lineHeight: '24px'
-  },
-  subTitle: {
-    color: T.ink,
-    fontSize: 22,
-    fontWeight: 700,
-    marginTop: theme.spacing(3)
-  },
-  sectionLead: {
-    color: T.ink,
-    fontSize: 16,
-    fontWeight: 700,
-    marginTop: theme.spacing(3)
-  },
-  rowLabel: {
-    color: T.ink,
-    fontSize: 16,
-    lineHeight: '24px'
-  },
   list: {
     color: T.bodyInk,
     fontSize: 16,
-    marginTop: theme.spacing(1.5),
+    marginTop: theme.spacing(1),
     paddingLeft: theme.spacing(3),
-    lineHeight: '24px',
-    '& li': {
-      marginTop: theme.spacing(0.5)
-    }
-  },
-  link: {
-    display: 'inline-flex',
-    alignItems: 'center',
-    gap: theme.spacing(0.5),
-    color: eds.blue[400],
-    fontSize: 16,
-    textDecoration: 'underline'
+    lineHeight: '24px'
   },
   inlineLink: {
     color: eds.blue[400],
-    fontWeight: 600,
+    textDecoration: 'underline'
+  },
+  downloadLink: {
+    display: 'inline-block',
+    marginTop: theme.spacing(3),
+    color: eds.blue[400],
+    fontSize: 16,
+    lineHeight: '24px',
     textDecoration: 'underline'
   },
   // The legal references keep the colour of the running text: only the underline sets them apart.
   legalLink: {
     color: 'inherit',
     textDecoration: 'underline'
-  },
-  linkIcon: {
-    fontSize: 16
-  },
-  linkRow: {
-    marginTop: theme.spacing(2)
   },
   divider: {
     marginTop: theme.spacing(3),
@@ -314,7 +312,8 @@ const useStyles = makeStyles()((theme: Theme) => ({
     display: 'flex',
     alignItems: 'flex-start',
     gap: theme.spacing(1.5),
-    marginTop: theme.spacing(3)
+    marginTop: theme.spacing(3),
+    padding: theme.spacing(1, 0)
   },
   infoBadge: {
     flexShrink: 0
@@ -324,14 +323,22 @@ const useStyles = makeStyles()((theme: Theme) => ({
     fontSize: 16,
     lineHeight: '24px'
   },
+  featureSection: {
+    display: 'flex',
+    flexDirection: 'column',
+    marginTop: theme.spacing(5),
+    '& + &': {
+      marginTop: theme.spacing(7)
+    }
+  },
   commitmentList: {
-    marginTop: theme.spacing(5)
+    marginTop: theme.spacing(3)
   },
   commitmentRow: {
     display: 'flex',
     alignItems: 'center',
-    gap: theme.spacing(1.5),
-    marginLeft: theme.spacing(3),
+    gap: theme.spacing(1),
+    marginLeft: theme.spacing(2),
     minHeight: 40
   },
   commitmentLabel: {
@@ -348,65 +355,71 @@ const useStyles = makeStyles()((theme: Theme) => ({
     marginTop: theme.spacing(3)
   },
   fieldLabel: {
-    color: T.muted,
+    color: T.secondaryInk,
     fontSize: 16,
     lineHeight: '24px'
   },
   fieldValue: {
-    color: T.ink,
+    color: T.bodyInk,
     fontSize: 16,
     lineHeight: '24px',
-    fontWeight: 700
+    fontWeight: 500
   },
   rightItem: {
     display: 'flex',
     alignItems: 'center',
-    gap: theme.spacing(1.5),
-    marginTop: theme.spacing(1.5)
+    gap: theme.spacing(2),
+    marginTop: theme.spacing(3)
   },
   checkIcon: {
     flexShrink: 0,
+    fontSize: 16,
     color: T.commitmentCheck
   },
   rightBadge: {
-    flexShrink: 0,
-    backgroundColor: aphp.vertClair[500],
-    color: aphp.vert[600],
-    '& svg': {
-      color: aphp.vert[600]
-    }
+    flexShrink: 0
   },
   rightCheck: {
-    color: aphp.vert[600]
+    color: T.rightBadgeFg
   },
   rightLabel: {
-    color: T.ink,
+    color: T.bodyInk,
     fontSize: 16,
     lineHeight: '24px',
-    fontWeight: 700
+    fontWeight: 500
   },
   tileGrid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
-    gap: theme.spacing(2),
-    marginTop: theme.spacing(2)
+    display: 'flex',
+    flexDirection: 'column',
+    gap: theme.spacing(3),
+    marginTop: theme.spacing(3)
   },
   tile: {
-    border: `1px solid ${aphp.vert[100]}`,
-    borderRadius: 6,
-    padding: theme.spacing(1, 3, 3),
-    backgroundColor: aphp.vert[25]
+    border: `1px solid ${T.tileBorder}`,
+    borderRadius: 4,
+    padding: theme.spacing(3, 2),
+    backgroundColor: T.tileBg
+  },
+  tileTitle: {
+    color: T.titleInk,
+    fontSize: 22,
+    lineHeight: '28px',
+    fontWeight: 500
   },
   consentRow: {
     display: 'flex',
     alignItems: 'center',
-    gap: theme.spacing(1),
+    gap: theme.spacing(1.5),
     marginTop: theme.spacing(3),
     marginLeft: 0,
     marginRight: 0
   },
   consentCheckbox: {
-    color: eds.blue[400],
+    padding: 0,
+    color: T.consentBorder,
+    '& .MuiSvgIcon-root': {
+      fontSize: 16
+    },
     '&.Mui-checked': {
       color: eds.blue[400]
     }
@@ -418,9 +431,10 @@ const useStyles = makeStyles()((theme: Theme) => ({
   },
   warningNotice: {
     display: 'flex',
-    alignItems: 'flex-start',
+    alignItems: 'center',
     gap: theme.spacing(1.5),
-    marginTop: theme.spacing(3)
+    marginTop: theme.spacing(3),
+    padding: theme.spacing(1, 0)
   },
   warningBadge: {
     flexShrink: 0
@@ -442,7 +456,9 @@ const useStyles = makeStyles()((theme: Theme) => ({
   video: {
     display: 'block',
     width: '100%',
+    aspectRatio: '16 / 9',
     marginTop: theme.spacing(3),
+    border: 0,
     borderRadius: 6,
     backgroundColor: T.documentBg
   }

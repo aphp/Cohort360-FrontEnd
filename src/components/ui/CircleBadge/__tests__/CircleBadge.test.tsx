@@ -44,13 +44,15 @@ describe('CircleBadge', () => {
 })
 
 describe('InfoBadge', () => {
-  it('still renders the italic "i" glyph after being rebuilt on CircleBadge', () => {
-    render(<InfoBadge />)
-    expect(screen.getByText('i')).toBeInTheDocument()
+  it('draws the Material icon rather than a text glyph', () => {
+    const { container } = render(<InfoBadge />)
+    expect(container.querySelector('svg')).toBeInTheDocument()
+    expect(screen.queryByText('i')).not.toBeInTheDocument()
   })
 
-  it('forwards its size to the badge', () => {
+  it('forwards its size to the badge and scales the icon with it', () => {
     const { container } = render(<InfoBadge size={32} />)
     expect(getComputedStyle(circleOf(container)).width).toBe('32px')
+    expect(getComputedStyle(container.querySelector('svg') as Element).fontSize).toBe('24px')
   })
 })

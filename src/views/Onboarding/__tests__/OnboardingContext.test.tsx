@@ -68,14 +68,13 @@ describe('OnboardingContext', () => {
     expect(result.current.currentStep).toBe(0)
     expect(result.current.subStep).toBe(0)
 
-    // The environment step is made of four screens (three from 3306, one from 3307).
+    // The environment step is made of three screens.
     act(() => result.current.goNext())
     expect(result.current.subStep).toBe(1)
     expect(updateStep).not.toHaveBeenCalled()
 
     act(() => result.current.goNext())
-    act(() => result.current.goNext())
-    expect(result.current.subStep).toBe(3)
+    expect(result.current.subStep).toBe(2)
     expect(updateStep).not.toHaveBeenCalled()
   })
 
@@ -83,8 +82,7 @@ describe('OnboardingContext', () => {
     const { result } = renderOnboarding(0)
     act(() => result.current.goNext()) // welcome -> screen 0
     act(() => result.current.goNext()) // screen 1
-    act(() => result.current.goNext()) // screen 2
-    act(() => result.current.goNext()) // screen 3 (last of step 0)
+    act(() => result.current.goNext()) // screen 2 (last of step 0)
     await act(async () => {
       result.current.goNext() // leaves step 0
     })
@@ -95,7 +93,7 @@ describe('OnboardingContext', () => {
 
   it('steps back through screens then to the previous macro step', async () => {
     const { result } = renderOnboarding(0)
-    for (let i = 0; i < 5; i++) {
+    for (let i = 0; i < 4; i++) {
       // eslint-disable-next-line no-await-in-loop
       await act(async () => {
         result.current.goNext()
@@ -105,7 +103,7 @@ describe('OnboardingContext', () => {
     expect(result.current.currentStep).toBe(1)
     act(() => result.current.goBack())
     expect(result.current.currentStep).toBe(0)
-    expect(result.current.subStep).toBe(3)
+    expect(result.current.subStep).toBe(2)
   })
 
   it('resumes directly at the persisted macro step (RG3305.06)', () => {
@@ -138,12 +136,12 @@ describe('OnboardingContext', () => {
 
   it('advances stepProgress as the screens of a step are left behind', () => {
     const { result } = renderOnboarding(0)
-    act(() => result.current.goNext()) // welcome -> first of four screens
+    act(() => result.current.goNext()) // welcome -> first of three screens
     expect(result.current.stepProgress).toBe(0)
     act(() => result.current.goNext())
-    expect(result.current.stepProgress).toBe(0.25)
+    expect(result.current.stepProgress).toBeCloseTo(1 / 3)
     act(() => result.current.goNext())
-    expect(result.current.stepProgress).toBe(0.5)
+    expect(result.current.stepProgress).toBeCloseTo(2 / 3)
   })
 
   it('refuses to be used outside its provider', () => {

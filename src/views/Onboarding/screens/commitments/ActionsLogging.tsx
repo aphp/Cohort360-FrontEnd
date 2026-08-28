@@ -22,7 +22,7 @@ const ActionsLogging = () => {
       </Typography>
       <Typography className={classes.sectionText}>
         Vous pouvez accéder à vos données et les rectifier via{' '}
-        <Link className={classes.link} href={`mailto:${mailDataProtection}`}>
+        <Link className={classes.inlineLink} href={`mailto:${mailDataProtection}`}>
           {mailDataProtection}
         </Link>
       </Typography>
