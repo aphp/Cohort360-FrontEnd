@@ -27,7 +27,7 @@ import { format } from 'utils/numbers'
 import { SimpleChartDataType, GenderRepartitionType, AgeRepartitionType, VisiteRepartitionType } from 'types'
 import LocationMap from 'components/Dashboard/Preview/LocationMap'
 import { AppConfig } from 'config'
-import { useSearchParams } from 'react-router-dom'
+import { useSearchParams } from 'react-router'
 import { getCleanGroupId } from 'utils/paginationUtils'
 
 const MAP_WARNING_PERSON_COUNT_THRESHOLD = 1000000

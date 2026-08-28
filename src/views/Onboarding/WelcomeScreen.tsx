@@ -12,7 +12,7 @@ const WelcomeScreen = () => {
       <Typography variant="h4" className={classes.title}>
         Bienvenue !
       </Typography>
-      <Typography className={classes.intro}>
+      <Typography className={classes.sectionText}>
         Avant de commencer à utiliser l'outil, nous vous proposons un parcours en 3 étapes pour vous aider à comprendre
         l'outil Cohort360.
       </Typography>

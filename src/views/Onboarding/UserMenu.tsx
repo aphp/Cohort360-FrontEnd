@@ -1,6 +1,6 @@
 import { Avatar, ButtonBase, Menu, MenuItem, Typography } from '@mui/material'
 import React, { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router'
 
 import { useAppDispatch, useAppSelector } from 'state'
 import { logout } from 'state/me'

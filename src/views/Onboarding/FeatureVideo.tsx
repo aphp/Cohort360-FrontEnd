@@ -2,28 +2,29 @@ import React from 'react'
 
 import useStyles from './styles'
 
-const VIDEOS_PATH = '/assets/videos'
+// Domaine sans cookie : rien n'est déposé tant que la vidéo n'est pas lancée.
+const EMBED_PATH = 'https://www.youtube-nocookie.com/embed'
 
 type Props = {
-  /** Base name of the mp4 and of its picture, both served from `public/assets/videos`. */
-  name: string
+  /** Identifiant de la vidéo sur la chaîne Cohort360. */
+  videoId: string
   /** Described to assistive technologies, which cannot read the video. */
   label: string
 }
 
-const FeatureVideo = ({ name, label }: Props) => {
+const FeatureVideo = ({ videoId, label }: Props) => {
   const { classes } = useStyles()
 
   return (
-    <video
+    <iframe
       className={classes.video}
-      controls
-      preload="none"
-      poster={`${VIDEOS_PATH}/${name}_poster.jpg`}
-      aria-label={label}
-    >
-      <source src={`${VIDEOS_PATH}/${name}.mp4`} type="video/mp4" />
-    </video>
+      src={`${EMBED_PATH}/${videoId}`}
+      title={label}
+      loading="lazy"
+      referrerPolicy="strict-origin-when-cross-origin"
+      allow="encrypted-media; picture-in-picture"
+      allowFullScreen
+    />
   )
 }
 

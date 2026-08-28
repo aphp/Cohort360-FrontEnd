@@ -50,7 +50,7 @@ const access = (overrides: Partial<MyAccess> = {}): MyAccess => ({
   ...overrides
 })
 
-const baseMe = { displayName: 'Cesar RICHARD' } as MeState
+const baseMe = { displayName: 'Cesar RICHARD', userName: '4286397' } as MeState
 
 const renderUserRights = (me: MeState = baseMe) => {
   const store = configureStore({ reducer: { me: meReducer }, preloadedState: { me } })
@@ -80,6 +80,23 @@ describe('UserRights (US-3307)', () => {
     expect(screen.getByText('20/04/2027')).toBeInTheDocument()
   })
 
+  it('carries the APH of the user next to his name, inside the tile', async () => {
+    renderUserRights()
+    await screen.findByText('ADMIN CENTRAL')
+    expect(screen.getByText("APH de l'utilisateur :")).toBeInTheDocument()
+    expect(screen.getByText('4286397')).toBeInTheDocument()
+  })
+
+  it('puts the habilitation title in the singular, then in the plural', async () => {
+    const { unmount } = renderUserRights()
+    expect(await screen.findByRole('heading')).toHaveTextContent('Comprendre votre habilitation')
+    unmount()
+
+    getMyAccesses.mockResolvedValue([access(), access({ id: 2 })])
+    renderUserRights()
+    expect(await screen.findByRole('heading')).toHaveTextContent('Comprendre vos habilitations')
+  })
+
   it('lists only granted rights (a non-granted right is not shown)', async () => {
     renderUserRights()
     await screen.findByText('ADMIN CENTRAL')
@@ -102,6 +119,9 @@ describe('UserRights (US-3307)', () => {
     expect(screen.getByText('droit faible pour test')).toBeInTheDocument()
     expect(screen.getByText('UPS - AP-HP.UNIVERSITE PARIS SACLAY')).toBeInTheDocument()
     expect(screen.getByText('07/08/2026')).toBeInTheDocument()
+
+    const tiles = screen.getByText('ADMIN CENTRAL').parentElement?.parentElement as HTMLElement
+    expect(getComputedStyle(tiles).flexDirection).toBe('column')
   })
 
   it('falls back gracefully when no expiration date is available', async () => {
@@ -116,6 +136,13 @@ describe('UserRights (US-3307)', () => {
     expect(await screen.findByRole('status')).toHaveTextContent(
       /Le détail de votre accès à Cohort360 n'est pas disponible/
     )
+  })
+
+  it('titles the fallback screen after the access, not the habilitation', async () => {
+    getMyAccesses.mockResolvedValue([])
+    renderUserRights()
+    await screen.findByRole('status')
+    expect(screen.getByRole('heading')).toHaveTextContent('Comprendre votre accès')
   })
 
   it('points to the support without blocking the journey (RG3381.02)', async () => {

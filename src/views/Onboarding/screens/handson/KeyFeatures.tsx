@@ -6,6 +6,12 @@ import { useAppSelector } from 'state'
 import FeatureVideo from '../../FeatureVideo'
 import useStyles from '../../styles'
 
+const TUTORIALS = {
+  query: '-UjXIK4Svb4',
+  exploration: 'ykyMg_4MVcI',
+  export: '01ZgR9lk_aE'
+}
+
 const KeyFeatures = () => {
   const { classes } = useStyles()
   // Unknown access falls back to the pseudonymised journey, which hides the export video (RG3310.02).
@@ -14,45 +20,46 @@ const KeyFeatures = () => {
   return (
     <Box>
       <Typography variant="h4" className={classes.title}>
-        Prendre en main Cohort360
+        Prendre en main l'outil
       </Typography>
 
-      <Typography variant="h5" className={classes.subTitle}>
-        1 - Créer une cohorte grâce au requêteur
-      </Typography>
-      <Typography className={classes.sectionText}>
-        Le requêteur vous permet de <strong>combiner plusieurs critères</strong> (âge, pathologie, période,
-        traitements...) pour <strong>générer une cohorte de patients</strong>.
-      </Typography>
-      <Typography className={classes.sectionText}>
-        Les données de l'EDS étant en mouvement, votre cohorte correspond à une{' '}
-        <strong>« photographie » de vos critères à un instant T</strong> au sein de votre périmètre.
-      </Typography>
-      <FeatureVideo name="constitution_cohorte" label="Créer une cohorte grâce au requêteur" />
+      <Box className={classes.featureSection}>
+        <Typography variant="h5" className={classes.sectionTitle}>
+          Comment utiliser le requêteur ?
+        </Typography>
+        <Typography className={classes.sectionText}>
+          Le requêteur vous permet de <strong>combiner plusieurs critères</strong> (âge, pathologie, période,
+          traitements...) pour <strong>générer une cohorte de patients</strong>.
+        </Typography>
+        <Typography className={classes.sectionText}>
+          Les données de l'EDS étant en mouvement, votre cohorte correspond à une{' '}
+          <strong>« photographie » de vos critères à un instant T</strong> au sein de votre périmètre.
+        </Typography>
+        <FeatureVideo videoId={TUTORIALS.query} label="Créer une cohorte grâce au requêteur" />
+      </Box>
 
-      <Typography variant="h5" className={classes.subTitle}>
-        2 - Explorer les données
-      </Typography>
-      <Typography className={classes.sectionText}>
-        L'exploration de données vous permet d'accéder aux données associées à un patient ou à différents groupes de
-        patients.
-      </Typography>
-      <FeatureVideo name="parcours_patient" label="Explorer les données" />
+      <Box className={classes.featureSection}>
+        <Typography variant="h5" className={classes.sectionTitle}>
+          Comment explorer les données ?
+        </Typography>
+        <Typography className={classes.sectionText}>
+          Cohort360 comprend un espace d'exploration de données en ligne pour explorer un patient ou un groupe de
+          patient (périmètre).
+        </Typography>
+        <FeatureVideo videoId={TUTORIALS.exploration} label="Explorer les données" />
+      </Box>
 
       {!deidentified && (
-        <>
-          <Typography variant="h5" className={classes.subTitle}>
-            3 - Exporter des données (accès nominatif uniquement)
+        <Box className={classes.featureSection}>
+          <Typography variant="h5" className={classes.sectionTitle}>
+            Comment exporter des données ?
           </Typography>
           <Typography className={classes.sectionText}>
-            La fonctionnalité d'export de cohortes en local est disponible uniquement :
+            La fonctionnalité d'export de cohortes sur votre ordinateur (en .csv et en .xlsx) est disponible uniquement
+            pour certaines habilitations et limitée à 20 000 patients par export.
           </Typography>
-          <ul className={classes.list}>
-            <li>pour les comptes avec un profil nominatif en périmètre équipe de soin</li>
-            <li>pour les cohortes de moins de 20 000 patients</li>
-          </ul>
-          <FeatureVideo name="export_dataset" label="Exporter des données" />
-        </>
+          <FeatureVideo videoId={TUTORIALS.export} label="Exporter des données" />
+        </Box>
       )}
     </Box>
   )

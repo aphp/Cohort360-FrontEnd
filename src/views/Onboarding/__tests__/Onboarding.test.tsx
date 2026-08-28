@@ -4,7 +4,7 @@ import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import React from 'react'
 import { Provider } from 'react-redux'
-import { MemoryRouter, Route, Routes } from 'react-router-dom'
+import { MemoryRouter, Route, Routes } from 'react-router'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 const { updateStep, signCharter, getStatus, mockUseOnboardingEnabled } = vi.hoisted(() => ({
@@ -77,6 +77,13 @@ describe('Onboarding page', () => {
     expect(screen.getByText('Bienvenue !')).toBeInTheDocument()
   })
 
+  it('overrides the MUI button metrics with those of the mockups', () => {
+    renderAt(baseStatus)
+    const style = getComputedStyle(screen.getByRole('button', { name: /Commencer/ }))
+    expect(style.padding).toBe('8px')
+    expect(style.borderRadius).toBe('5px')
+  })
+
   it('shows the warning on the opening commitments screen only', async () => {
     const user = userEvent.setup()
     renderAt({ ...baseStatus, onboarding_step: 1 })
@@ -85,34 +92,36 @@ describe('Onboarding page', () => {
     expect(screen.getByTestId('onboarding-warning')).toBeInTheDocument()
 
     await user.click(screen.getByRole('button', { name: /Continuer/ }))
-    expect(screen.getByText("Les finalités d'usage")).toBeInTheDocument()
+    expect(screen.getByText('Vos accès sont personnels')).toBeInTheDocument()
     expect(screen.queryByTestId('onboarding-warning')).not.toBeInTheDocument()
   })
 
-  it('holds the charter signature until the consent is ticked', async () => {
+  it('holds the commitments validation until the certification is ticked', async () => {
     signCharter.mockResolvedValue({ charter_signed_at: '2026-01-01T00:00:00Z' })
     const user = userEvent.setup()
     renderAt({ ...baseStatus, onboarding_step: 1 })
 
-    // Walk the commitments screens down to the charter.
-    for (let i = 0; i < 7; i++) {
-      await user.click(screen.getByRole('button', { name: /Continuer/ }))
+    // Walk the intro then the ten commitments, down to the summary.
+    await user.click(screen.getByRole('button', { name: /Continuer/ }))
+    for (let i = 0; i < 10; i++) {
+      // eslint-disable-next-line no-await-in-loop
+      await user.click(screen.getByRole('button', { name: /Je m’y engage/ }))
     }
 
-    expect(screen.getByRole('heading', { name: "Signer la charte d'engagement" })).toBeInTheDocument()
-    const sign = screen.getByRole('button', { name: /Signer/ })
-    expect(sign).toBeDisabled()
+    expect(screen.getByRole('heading', { name: 'Synthèse de vos engagements' })).toBeInTheDocument()
+    const validate = screen.getByRole('button', { name: /Valider/ })
+    expect(validate).toBeDisabled()
 
     await user.click(screen.getByRole('checkbox', { name: /Je certifie avoir pris connaissance/ }))
-    expect(sign).toBeEnabled()
+    expect(validate).toBeEnabled()
 
-    await user.click(sign)
+    await user.click(validate)
     await waitFor(() => expect(signCharter).toHaveBeenCalledTimes(1))
   })
 
   it('closes the journey on the guided tour, with a button to the application', () => {
     renderAt({ ...baseStatus, onboarding_step: 2 }, { deidentified: false } as MeState)
-    expect(screen.getByRole('heading', { name: 'Prendre en main Cohort360' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: "Prendre en main l'outil" })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /Accéder à Cohort360/ })).toBeInTheDocument()
   })
 

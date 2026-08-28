@@ -46,7 +46,11 @@ export const aphp = {
     300: '#66BF88',
     200: '#99D4B4',
     100: '#CCE8D7',
-    50: '#E6F5EC'
+    50: '#E6F5EC',
+    25: '#F2F9F5'
+  },
+  vertClair: {
+    500: '#C3DCA5'
   },
   violet: {
     800: '#400A42',

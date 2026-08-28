@@ -31,7 +31,7 @@ import React, {
   useEffect,
   useState
 } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router'
 import services from 'services/aphp'
 import { useAppDispatch, useAppSelector } from 'state'
 import { login as loginAction, type MeState } from 'state/me'

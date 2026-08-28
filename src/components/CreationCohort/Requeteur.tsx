@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState, useRef, useContext } from 'react'
 import { CircularProgress } from '@mui/material'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router'
 
 import Grid from '@mui/material/Grid'
 

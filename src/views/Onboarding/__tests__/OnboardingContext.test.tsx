@@ -13,7 +13,7 @@ vi.mock('services/aphp/serviceOnboarding', () => ({
 import { ONBOARDING_STATUS_QUERY_KEY } from 'hooks/onboarding/useOnboardingStatus'
 import { OnboardingProvider, useOnboarding } from '../OnboardingContext'
 
-const CHARTER_SUBSTEP = 7
+const SUMMARY_SUBSTEP = 11
 
 const renderOnboarding = (initialStep: number) => {
   const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
@@ -30,9 +30,9 @@ const renderOnboarding = (initialStep: number) => {
   return renderHook(() => useOnboarding(), { wrapper })
 }
 
-/** Walks the commitments step from its first screen up to the charter. */
-const goToCharter = async (result: { current: ReturnType<typeof useOnboarding> }) => {
-  for (let i = 0; i < CHARTER_SUBSTEP; i++) {
+/** Walks the commitments step from its first screen up to the summary. */
+const goToSummary = async (result: { current: ReturnType<typeof useOnboarding> }) => {
+  for (let i = 0; i < SUMMARY_SUBSTEP; i++) {
     // eslint-disable-next-line no-await-in-loop
     await act(async () => {
       result.current.goNext()
@@ -68,14 +68,13 @@ describe('OnboardingContext', () => {
     expect(result.current.currentStep).toBe(0)
     expect(result.current.subStep).toBe(0)
 
-    // The environment step is made of four screens (three from 3306, one from 3307).
+    // The environment step is made of three screens.
     act(() => result.current.goNext())
     expect(result.current.subStep).toBe(1)
     expect(updateStep).not.toHaveBeenCalled()
 
     act(() => result.current.goNext())
-    act(() => result.current.goNext())
-    expect(result.current.subStep).toBe(3)
+    expect(result.current.subStep).toBe(2)
     expect(updateStep).not.toHaveBeenCalled()
   })
 
@@ -83,8 +82,7 @@ describe('OnboardingContext', () => {
     const { result } = renderOnboarding(0)
     act(() => result.current.goNext()) // welcome -> screen 0
     act(() => result.current.goNext()) // screen 1
-    act(() => result.current.goNext()) // screen 2
-    act(() => result.current.goNext()) // screen 3 (last of step 0)
+    act(() => result.current.goNext()) // screen 2 (last of step 0)
     await act(async () => {
       result.current.goNext() // leaves step 0
     })
@@ -95,7 +93,7 @@ describe('OnboardingContext', () => {
 
   it('steps back through screens then to the previous macro step', async () => {
     const { result } = renderOnboarding(0)
-    for (let i = 0; i < 5; i++) {
+    for (let i = 0; i < 4; i++) {
       // eslint-disable-next-line no-await-in-loop
       await act(async () => {
         result.current.goNext()
@@ -105,7 +103,7 @@ describe('OnboardingContext', () => {
     expect(result.current.currentStep).toBe(1)
     act(() => result.current.goBack())
     expect(result.current.currentStep).toBe(0)
-    expect(result.current.subStep).toBe(3)
+    expect(result.current.subStep).toBe(2)
   })
 
   it('resumes directly at the persisted macro step (RG3305.06)', () => {
@@ -138,12 +136,12 @@ describe('OnboardingContext', () => {
 
   it('advances stepProgress as the screens of a step are left behind', () => {
     const { result } = renderOnboarding(0)
-    act(() => result.current.goNext()) // welcome -> first of four screens
+    act(() => result.current.goNext()) // welcome -> first of three screens
     expect(result.current.stepProgress).toBe(0)
     act(() => result.current.goNext())
-    expect(result.current.stepProgress).toBe(0.25)
+    expect(result.current.stepProgress).toBeCloseTo(1 / 3)
     act(() => result.current.goNext())
-    expect(result.current.stepProgress).toBe(0.5)
+    expect(result.current.stepProgress).toBeCloseTo(2 / 3)
   })
 
   it('refuses to be used outside its provider', () => {
@@ -163,16 +161,16 @@ describe('OnboardingContext', () => {
     expect(result.current.isLastStep).toBe(true)
   })
 
-  it('labels the primary button `Signer` on the charter screen (US-3309)', async () => {
+  it('labels the primary button `Valider` on the summary screen (RG3429.07)', async () => {
     const { result } = renderOnboarding(1)
-    await goToCharter(result)
-    expect(result.current.subStep).toBe(CHARTER_SUBSTEP)
-    expect(result.current.primaryLabel).toBe('Signer')
+    await goToSummary(result)
+    expect(result.current.subStep).toBe(SUMMARY_SUBSTEP)
+    expect(result.current.primaryLabel).toBe('Valider')
   })
 
-  it('signs the charter then moves to the confirmation screen', async () => {
+  it('records the commitments then moves on to the guided tour', async () => {
     const { result } = renderOnboarding(1)
-    await goToCharter(result)
+    await goToSummary(result)
 
     act(() => result.current.setAcknowledged(true))
     await act(async () => {
@@ -180,14 +178,15 @@ describe('OnboardingContext', () => {
     })
 
     expect(signCharterCall).toHaveBeenCalledTimes(1)
-    expect(result.current.subStep).toBe(CHARTER_SUBSTEP + 1)
-    expect(result.current.primaryLabel).toBe('Continuer')
+    expect(result.current.currentStep).toBe(2)
+    expect(result.current.subStep).toBe(0)
+    expect(result.current.primaryLabel).toBe('Accéder à Cohort360')
   })
 
-  it('stays on the charter screen and raises an error when the signature fails', async () => {
+  it('stays on the summary screen and raises an error when the validation fails', async () => {
     signCharterCall.mockRejectedValue(new Error('boom'))
     const { result } = renderOnboarding(1)
-    await goToCharter(result)
+    await goToSummary(result)
 
     act(() => result.current.setAcknowledged(true))
     await act(async () => {
@@ -195,7 +194,7 @@ describe('OnboardingContext', () => {
     })
 
     await waitFor(() => expect(result.current.error).toBe(true))
-    expect(result.current.subStep).toBe(CHARTER_SUBSTEP)
+    expect(result.current.subStep).toBe(SUMMARY_SUBSTEP)
     expect(updateStep).not.toHaveBeenCalled()
   })
 
@@ -229,22 +228,23 @@ describe('OnboardingContext', () => {
     expect(result.current.error).toBe(false)
   })
 
-  it('does not sign twice when stepping back from the confirmation screen', async () => {
+  it('does not record twice when stepping back to the summary', async () => {
     const { result } = renderOnboarding(1)
-    await goToCharter(result)
+    await goToSummary(result)
     act(() => result.current.setAcknowledged(true))
     await act(async () => {
       result.current.goNext()
     })
 
     act(() => result.current.goBack())
-    expect(result.current.subStep).toBe(CHARTER_SUBSTEP)
+    expect(result.current.currentStep).toBe(1)
+    expect(result.current.subStep).toBe(SUMMARY_SUBSTEP)
     act(() => result.current.setAcknowledged(true))
     await act(async () => {
       result.current.goNext()
     })
 
     expect(signCharterCall).toHaveBeenCalledTimes(1)
-    expect(result.current.subStep).toBe(CHARTER_SUBSTEP + 1)
+    expect(result.current.currentStep).toBe(2)
   })
 })

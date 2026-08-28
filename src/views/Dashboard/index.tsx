@@ -1,5 +1,5 @@
 import React, { useEffect, useContext, useMemo } from 'react'
-import { Link, useSearchParams } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router'
 import { Grid, Tab } from '@mui/material'
 import CohortPreview from 'components/Dashboard/Preview/Preview'
 import TopBar from 'components/TopBar/TopBar'

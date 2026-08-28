@@ -4,37 +4,62 @@ vi.mock('services/aphp/serviceOnboarding', () => ({
   default: { updateStep: vi.fn(), signCharter: vi.fn() }
 }))
 
-import { getScreenConfig, getStepScreenCount, ONBOARDING_STEPS } from '../steps'
+import { COMMITMENTS } from '../commitments'
+import { COMMITMENT_PRIMARY_LABEL, getScreenConfig, getStepScreenCount, ONBOARDING_STEPS } from '../steps'
 
 const COMMITMENTS_STEP = 1
 const HANDSON_STEP = 2
+const SUMMARY_SUBSTEP = 11
 
 const commitmentScreens = () => ONBOARDING_STEPS[COMMITMENTS_STEP].screens
 
 describe('onboarding step 2 configuration', () => {
-  it('exposes the seven informative screens then the charter and its confirmation', () => {
+  it('opens on the rules then walks the ten commitments before the summary', () => {
     expect(commitmentScreens().map((screen) => screen.key)).toEqual([
       'usage-rules',
+      'personal-access',
+      'perimeter-scope',
       'usage-purposes',
-      'minimal-data-use',
       'data-crossing',
+      'medical-secrecy',
+      'data-protection',
+      'incident-reporting',
+      'habilitation-lifecycle',
       'data-deletion',
-      'care-team-sharing',
       'actions-logging',
-      'charter-signature',
-      'charter-confirmation'
+      'commitments-summary'
     ])
   })
 
-  it('only the charter screen replaces the default primary button', () => {
-    const withAction = commitmentScreens().filter((screen) => screen.primaryAction)
-    expect(withAction).toHaveLength(1)
-    expect(withAction[0].key).toBe('charter-signature')
-    expect(withAction[0].primaryAction?.label).toBe('Signer')
+  it('tags each commitment screen in order (RG3429.02)', () => {
+    const tags = commitmentScreens()
+      .map((screen) => screen.tag)
+      .filter(Boolean)
+    expect(tags).toEqual(COMMITMENTS.map((_, index) => `Engagement ${index + 1}`))
   })
 
-  it('renders the charter inside the default card wrapper', () => {
-    expect(getScreenConfig(COMMITMENTS_STEP, 7)?.layout).toBeUndefined()
+  it('labels the ten commitment buttons `Je m’y engage` (RG3429.04)', () => {
+    const commitments = commitmentScreens().filter((screen) => screen.tag)
+    expect(commitments).toHaveLength(10)
+    for (const screen of commitments) {
+      expect(screen.primaryAction?.label).toBe(COMMITMENT_PRIMARY_LABEL)
+      expect(screen.primaryAction?.run).toBeUndefined()
+    }
+  })
+
+  it('only the summary screen records the validation (RG3429.07)', () => {
+    const summary = getScreenConfig(COMMITMENTS_STEP, SUMMARY_SUBSTEP)
+    expect(summary?.key).toBe('commitments-summary')
+    expect(summary?.primaryAction?.label).toBe('Valider')
+    expect(summary?.primaryAction?.run).toBeDefined()
+  })
+
+  it('holds the summary button until the certification is ticked (RG3429.08)', () => {
+    expect(getScreenConfig(COMMITMENTS_STEP, SUMMARY_SUBSTEP)?.requiresAcknowledgement).toBe(true)
+  })
+
+  it('renders the summary inside the default card wrapper', () => {
+    expect(getScreenConfig(COMMITMENTS_STEP, SUMMARY_SUBSTEP)?.layout).toBeUndefined()
   })
 
   it('counts a screenless step as a single slot so the journey never stalls', () => {

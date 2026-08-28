@@ -5,14 +5,13 @@ import { describe, expect, it } from 'vitest'
 import FeatureVideo from '../FeatureVideo'
 
 describe('FeatureVideo', () => {
-  it('pairs the mp4 with its poster and waits for the user before downloading it', () => {
-    const { container } = render(<FeatureVideo name="demo_cohort_360" label="Démonstration de Cohort360" />)
-    const video = container.querySelector('video')
+  it('embeds the tutorial from the cookieless domain and waits for the section to be reached', () => {
+    const { container } = render(<FeatureVideo videoId="-UjXIK4Svb4" label="Créer une cohorte grâce au requêteur" />)
+    const frame = container.querySelector('iframe')
 
-    expect(video).toHaveAttribute('poster', '/assets/videos/demo_cohort_360_poster.jpg')
-    expect(video).toHaveAttribute('preload', 'none')
-    expect(video).toHaveAttribute('controls')
-    expect(video).toHaveAttribute('aria-label', 'Démonstration de Cohort360')
-    expect(container.querySelector('video source')).toHaveAttribute('src', '/assets/videos/demo_cohort_360.mp4')
+    expect(frame).toHaveAttribute('src', 'https://www.youtube-nocookie.com/embed/-UjXIK4Svb4')
+    expect(frame).toHaveAttribute('title', 'Créer une cohorte grâce au requêteur')
+    expect(frame).toHaveAttribute('loading', 'lazy')
+    expect(frame).toHaveAttribute('allowfullscreen')
   })
 })

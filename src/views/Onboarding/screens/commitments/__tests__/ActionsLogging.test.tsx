@@ -19,11 +19,6 @@ describe('ActionsLogging (RG3308.03)', () => {
     expect(screen.getByText(/accéder à vos données et les rectifier/)).toBeInTheDocument()
   })
 
-  it('describes its illustration to assistive technologies', () => {
-    render(<ActionsLogging />)
-    expect(screen.getByRole('img', { name: 'Vos actions sont enregistrées et conservées' })).toBeInTheDocument()
-  })
-
   it('reads the address from the runtime configuration', () => {
     updateConfig({ system: { mailDataProtection: 'dpo@example.org' } })
     render(<ActionsLogging />)

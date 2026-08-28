@@ -1,5 +1,5 @@
 import React from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router'
 
 import Button from '@mui/material/Button'
 import Dialog from '@mui/material/Dialog'
