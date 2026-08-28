@@ -60,7 +60,7 @@ const WhatIsCohort360 = () => {
         patients, d'analyser des données de soin et de les extraire à des fins de recherche et d'analyse.
       </Typography>
       <Typography className={classes.sectionText}>
-        Cohort360 permet d'accéder à de nombreux <strong>jeux de données, issues des 38 hôpitaux de l'AP-HP</strong> et
+        Cohort360 permet d'accéder à de nombreux <strong>jeux de données, issus des 38 hôpitaux de l'AP-HP</strong> et
         centralisés dans{' '}
         <Link className={classes.inlineLink} href={EDS_URL} target="_blank" rel="noopener noreferrer">
           l'Entrepôt de Données de Santé (EDS)
