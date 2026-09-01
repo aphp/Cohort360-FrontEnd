@@ -119,6 +119,18 @@ describe('Onboarding page', () => {
     await waitFor(() => expect(signCharter).toHaveBeenCalledTimes(1))
   })
 
+  it('goes back to the top of the page on each screen change', async () => {
+    const scrollTo = vi.spyOn(window, 'scrollTo')
+    const user = userEvent.setup()
+    renderAt({ ...baseStatus, onboarding_step: 1 })
+    scrollTo.mockClear()
+
+    await user.click(screen.getByRole('button', { name: /Continuer/ }))
+    expect(scrollTo).toHaveBeenCalledWith(0, 0)
+
+    scrollTo.mockRestore()
+  })
+
   it('closes the journey on the guided tour, with a button to the application', () => {
     renderAt({ ...baseStatus, onboarding_step: 2 }, { deidentified: false } as MeState)
     expect(screen.getByRole('heading', { name: "Prendre en main l'outil" })).toBeInTheDocument()
