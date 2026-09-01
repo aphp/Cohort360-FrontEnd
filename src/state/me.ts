@@ -50,6 +50,8 @@ export type MeState = null | {
   }
   /** Impersonated user information */
   impersonation?: User
+  /** Whether the user is exempted from partial maintenance */
+  maintenanceExempted?: boolean
 }
 
 /**

@@ -45,6 +45,7 @@ import versionInfo from 'data/version.json'
 import Impersonation from 'components/Impersonation'
 import ShimmerBadge from 'components/ui/ShimmerBadge'
 import { AppConfig } from 'config'
+import useMaintenanceIsActive from 'hooks/maintenance/useMaintenanceIsActive'
 
 const smallDrawerWidth = 52
 const largeDrawerWidth = 260
@@ -59,7 +60,7 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
   const practitioner = useAppSelector((state) => state.me)
   const open = useAppSelector((state) => state.drawer)
   const cohortCreation = useAppSelector((state) => state.cohortCreation)
-  const maintenanceIsActive = practitioner?.maintenance?.active
+  const maintenanceIsActive = useMaintenanceIsActive()
   // v-- just for zoom transition..
   const [allreadyOpen, setAllreadyOpen] = useState(false)
 

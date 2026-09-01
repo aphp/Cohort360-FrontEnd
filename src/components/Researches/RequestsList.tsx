@@ -1,7 +1,7 @@
 /* eslint-disable max-statements */
 import React, { useEffect, useState } from 'react'
 import { useNavigate, useParams, useSearchParams } from 'react-router'
-import { useAppDispatch, useAppSelector } from 'state'
+import { useAppDispatch } from 'state'
 import { resetCohortCreation } from 'state/cohortCreation'
 import { setSelectedProject } from 'state/project'
 
@@ -38,6 +38,7 @@ import {
   getRequestsConfirmDeletionTitle,
   getRequestsSearchParams
 } from 'utils/explorationUtils'
+import useMaintenanceIsActive from 'hooks/maintenance/useMaintenanceIsActive'
 
 type RequestsListProps = {
   simplified?: boolean
@@ -50,7 +51,7 @@ const RequestsList = ({ simplified = false, rowsPerPage = 20 }: RequestsListProp
   const { projectId } = useParams()
   const [searchParams, setSearchParams] = useSearchParams()
   const { searchInput, startDate, endDate, page, orderBy, orderDirection } = getRequestsSearchParams(searchParams)
-  const maintenanceIsActive = useAppSelector((state) => state?.me?.maintenance?.active ?? false)
+  const maintenanceIsActive = useMaintenanceIsActive()
 
   const [paramsReady, setParamsReady] = useState(false)
   const [deleteMode, setDeleteMode] = useState(false)

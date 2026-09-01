@@ -33,6 +33,7 @@ import { AppConfig } from 'config'
 import { Cohort } from 'types'
 import { URLS } from 'types/exploration'
 import Button from 'components/ui/Button'
+import useMaintenanceIsActive from 'hooks/maintenance/useMaintenanceIsActive'
 
 type TopBarProps = {
   context: URLS
@@ -51,7 +52,7 @@ const TopBar: React.FC<TopBarProps> = ({ context, patientsNb, access }) => {
   const navigate = useNavigate()
 
   const appConfig = useContext(AppConfig)
-  const maintenanceIsActive = useAppSelector((state) => state.me?.maintenance?.active ?? false)
+  const maintenanceIsActive = useMaintenanceIsActive()
   const dashboard = useAppSelector((state) => state.exploredCohort)
 
   const [openModal, setOpenModal] = useState<'' | 'edit' | 'delete' | 'sample'>('')

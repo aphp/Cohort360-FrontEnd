@@ -18,6 +18,7 @@ import CustomAlert from 'components/ui/Alert'
 import { HiddenScrollBar } from 'components/ui/Scrollbar/styles'
 import { CriteriaType, ViewMode } from 'types/requestCriterias'
 import { PinkSwitch } from './styles'
+import useMaintenanceIsActive from 'hooks/maintenance/useMaintenanceIsActive'
 
 interface DiagramViewWithAjvProps {
   isValidJson: (canExecuteJson: boolean) => void
@@ -27,7 +28,7 @@ const DiagramView: React.FC<DiagramViewWithAjvProps> = ({ isValidJson }) => {
   const dispatch = useAppDispatch()
   const { selectedPopulation = [], ...requestState } = useAppSelector((state) => state.cohortCreation.request || {})
   const { rights } = useAppSelector((state) => state.scope || {})
-  const maintenanceIsActive = useAppSelector((state) => state.me?.maintenance?.active || false)
+  const maintenanceIsActive = useMaintenanceIsActive()
   const [openDrawer, setOpenDrawer] = useState(false)
   const [rightsError, setRightsError] = useState(false)
   const [selectedCodes, setSelectedCodes] = useState<Hierarchy<ScopeElement>[]>([])

@@ -64,6 +64,7 @@ import { hasStageDetails } from '../DiagramView/components/CriteriaCount'
 import { isRequestFinished } from './utils'
 import { useCountReconciliation } from './useCountReconciliation'
 import { CriteriaType } from 'types/requestCriterias'
+import useMaintenanceIsActive from 'hooks/maintenance/useMaintenanceIsActive'
 
 const ControlPanel: React.FC<{
   canExecuteJson: boolean
@@ -111,7 +112,7 @@ const ControlPanel: React.FC<{
   )
   const [prevCountDisplay, setPrevCountDisplay] = useState<number | undefined>()
 
-  const maintenanceIsActive = useAppSelector((state) => state.me?.maintenance?.active ?? false)
+  const maintenanceIsActive = useMaintenanceIsActive()
 
   const cohortLimit = appConfig.features.cohort.shortCohortLimit
 

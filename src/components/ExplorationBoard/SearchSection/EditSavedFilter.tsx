@@ -7,8 +7,8 @@ import { SelectedFilter } from 'hooks/filters/useSavedFilters'
 import Select from 'components/ui/Searchbar/Select'
 import { Controller, useForm } from 'react-hook-form'
 import ExplorationFilters from '../Filters'
-import { useAppSelector } from 'state'
 import { AdditionalInfo } from 'types/exploration'
+import useMaintenanceIsActive from 'hooks/maintenance/useMaintenanceIsActive'
 
 type EditSavedFilterProps = {
   open: boolean
@@ -19,7 +19,7 @@ type EditSavedFilterProps = {
 }
 
 const EditSavedFilter = ({ open, criteria, infos, onEdit, onClose }: EditSavedFilterProps) => {
-  const maintenanceIsActive = useAppSelector((state) => state.me)?.maintenance?.active
+  const maintenanceIsActive = useMaintenanceIsActive()
   const [isError, setIsError] = useState(false)
   const [hasChanged, setHasChanged] = useState(false)
   const [form, setForm] = useState(criteria.filterParams.filters)

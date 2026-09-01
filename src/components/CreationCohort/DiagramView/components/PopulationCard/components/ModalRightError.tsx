@@ -8,14 +8,14 @@ import DialogContent from '@mui/material/DialogContent'
 import DialogContentText from '@mui/material/DialogContentText'
 import DialogTitle from '@mui/material/DialogTitle'
 
-import { useAppSelector } from 'state'
+import useMaintenanceIsActive from 'hooks/maintenance/useMaintenanceIsActive'
 
 type ModalRightErrorProps = {
   open: boolean
   handleClose: () => void
 }
 const ModalRightError: React.FC<ModalRightErrorProps> = ({ open, handleClose }) => {
-  const maintenanceIsActive = useAppSelector((state) => state.me?.maintenance?.active ?? false)
+  const maintenanceIsActive = useMaintenanceIsActive()
 
   const navigate = useNavigate()
 

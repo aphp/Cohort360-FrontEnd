@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router'
-import { useAppSelector } from 'state'
 
 import { Grid, Typography } from '@mui/material'
 import AddOrEditItem from './Modals/AddOrEditItem'
@@ -27,10 +26,11 @@ import {
 } from 'utils/explorationUtils'
 import { ExplorationsSearchParams } from 'types/cohorts'
 import { plural } from 'utils/string'
+import useMaintenanceIsActive from 'hooks/maintenance/useMaintenanceIsActive'
 
 const ProjectsList = () => {
   const navigate = useNavigate()
-  const maintenanceIsActive = useAppSelector((state) => state.me?.maintenance?.active ?? false)
+  const maintenanceIsActive = useMaintenanceIsActive()
   const [searchParams, setSearchParams] = useSearchParams()
   const { searchInput, startDate, endDate, orderBy, orderDirection } = getFoldersSearchParams(searchParams)
   const [order, setOrder] = useState<OrderBy>({ orderBy, orderDirection })
