@@ -135,10 +135,6 @@ export const fetchExportsList = async (
   }
 }
 
-const AUTO_LINKED_TABLES: Record<string, string[]> = {
-  Patient: ['patient__identifier']
-}
-
 export const postExportCohort = async ({
   cohortId,
   motivation,
@@ -165,27 +161,6 @@ export const postExportCohort = async ({
     //pivot_split_columns : table.pivotSplitColumns,
     pivot_merge_ids: table.pivotMergeIds
   }))
-  // Le dataexporter refuse la jointure sur clé primaire dès qu'une sous-table est demandée,
-  // celle-ci étant en relation 1-N avec sa table parente.
-  if (!group_tables) {
-    const existingTableNames = new Set(export_tables.map((table) => table.table_name))
-    tables.forEach((table: TableSetting) => {
-      const linkedTables = AUTO_LINKED_TABLES[table.tableName]
-      if (!linkedTables) return
-      linkedTables.forEach((linkedTableName) => {
-        if (existingTableNames.has(linkedTableName)) return
-        existingTableNames.add(linkedTableName)
-        export_tables.push({
-          table_name: linkedTableName,
-          cohort_result_source: cohortId?.uuid,
-          respect_table_relationships: table.respectTableRelationships,
-          columns: null,
-          pivot_merge_columns: undefined,
-          pivot_merge_ids: undefined
-        })
-      })
-    })
-  }
 
   return await apiBackend.post<Export>('/exports/', {
     motivation,
