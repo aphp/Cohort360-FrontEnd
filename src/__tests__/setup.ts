@@ -6,6 +6,9 @@ import '@testing-library/jest-dom/vitest'
 // ajoute les méthodes react-testing-library à Vitest pour l'autocompletion
 expect.extend(matchers)
 
+// jsdom ne sait pas défiler
+window.scrollTo = () => undefined
+
 afterEach(() => {
   // Après chaque test, on peut executer des fonctions au besoin
   cleanup()
