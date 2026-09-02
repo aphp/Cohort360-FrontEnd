@@ -10,13 +10,14 @@ import useStyles from './styles'
 import { TemporalConstraintsKind } from 'types'
 import { getSelectableGroups } from 'utils/temporalConstraints'
 import { CriteriaType } from 'types/requestCriterias'
+import useMaintenanceIsActive from 'hooks/maintenance/useMaintenanceIsActive'
 
 const TemporalConstraint: React.FC = () => {
   const [modalIsOpen, setModalIsOpen] = useState(false)
   const [temporalConstraintExist, setTemporalConstraintExist] = useState(false)
   const [disableTemporalConstraint, setDisableTemporalConstraint] = useState(false)
 
-  const maintenanceIsActive = useAppSelector((state) => state.me?.maintenance?.active ?? false)
+  const maintenanceIsActive = useMaintenanceIsActive()
   const {
     criteriaGroup = [],
     temporalConstraints,

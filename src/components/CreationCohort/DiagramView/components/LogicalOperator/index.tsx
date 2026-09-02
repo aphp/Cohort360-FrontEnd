@@ -32,6 +32,7 @@ import { DndContext, DragEndEvent, PointerSensor, UniqueIdentifier, useSensor, u
 import { SortableContext } from '@dnd-kit/sortable'
 import Draggable from 'components/ui/DragAndDrop/Draggable'
 import { snapVerticalCenterToCursor } from 'components/ui/DragAndDrop/snapVerticalCenterToCursor'
+import useMaintenanceIsActive from 'hooks/maintenance/useMaintenanceIsActive'
 
 const OVERFLOW = 1
 const HEADER = 74
@@ -342,7 +343,7 @@ const LogicalOperator: React.FC = () => {
     [request.selectedCriteria]
   )
 
-  const maintenanceIsActive = useAppSelector((state) => state.me?.maintenance?.active ?? false)
+  const maintenanceIsActive = useMaintenanceIsActive()
 
   return (
     <>

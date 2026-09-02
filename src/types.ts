@@ -91,6 +91,7 @@ export type MaintenanceInfo = {
   type: string
   message: string
   is_data_saved_message_hidden: boolean
+  user_exempted?: boolean
 }
 
 export type FHIR_API_Response<T extends Resource> = T | OperationOutcome

@@ -1,12 +1,12 @@
 import { useEffect, useMemo, useState, useContext } from 'react'
 import { useNavigate, useSearchParams } from 'react-router'
-import { useAppSelector } from 'state'
 import { AppConfig } from 'config'
 
 import { checkSearchParamsErrors, getCohortsSearchParams, removeFromSearchParams } from 'utils/explorationUtils'
 import { selectFiltersAsArray } from 'utils/filters'
 import { CohortsFilters, OrderBy, FilterKeys } from 'types/searchCriterias'
 import { CohortsType, ExplorationsSearchParams } from 'types/cohorts'
+import useMaintenanceIsActive from 'hooks/maintenance/useMaintenanceIsActive'
 
 type CohortListControllerParams<TItem> = {
   useData: (args: {
@@ -29,7 +29,7 @@ const useCohortListController = <TItem,>({
   simplified = false
 }: CohortListControllerParams<TItem>) => {
   const navigate = useNavigate()
-  const maintenanceIsActive = useAppSelector((s) => s?.me?.maintenance?.active ?? false)
+  const maintenanceIsActive = useMaintenanceIsActive()
   const appConfig = useContext(AppConfig)
 
   const [searchParams, setSearchParams] = useSearchParams()

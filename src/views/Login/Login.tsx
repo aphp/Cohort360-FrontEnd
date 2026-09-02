@@ -181,7 +181,8 @@ const Login = () => {
           deidentified: nominativeGroupsIds.length === 0,
           lastConnection,
           maintenance,
-          accessExpirations
+          accessExpirations,
+          maintenanceExempted: maintenance.user_exempted ?? false
         }
         dispatch(loginAction(loginState))
         // The login payload already carries the server truth, so the gate reads it without a resync.

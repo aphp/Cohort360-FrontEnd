@@ -3,12 +3,12 @@ import { AccordionDetails, AccordionSummary, Grid, Tooltip, Typography } from '@
 import { FilterKeys, FilterValue, SearchCriteriaKeys } from 'types/searchCriterias'
 import SaveFilter from './SaveFilter'
 import Truncated from 'components/ui/Truncated'
-import { useAppSelector } from 'state'
 import { DisplayOptions, GAP } from 'types/exploration'
 import AccordionWrapper from 'components/ui/Accordion'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import { ChipWrapper } from 'components/ui/Chip/styles'
 import CancelIcon from '@mui/icons-material/Cancel'
+import useMaintenanceIsActive from 'hooks/maintenance/useMaintenanceIsActive'
 
 type Criteria = {
   value: FilterValue
@@ -25,7 +25,7 @@ type CriteriasSectionProps = {
 }
 
 const CriteriasSection = ({ value, displayOptions, onDelete, onSaveFilters }: CriteriasSectionProps) => {
-  const maintenanceIsActive = useAppSelector((state) => state.me)?.maintenance?.active
+  const maintenanceIsActive = useMaintenanceIsActive()
 
   const CustomChip = ({ value, category, label, disabled = false }: Criteria) => {
     return (

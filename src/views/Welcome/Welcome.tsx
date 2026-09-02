@@ -27,6 +27,7 @@ import Markdown from 'react-markdown'
 import { getBannerMessageLevel, sortContent } from 'data/infoMessage'
 import { plural } from 'utils/string'
 import { AppConfig } from 'config'
+import useMaintenanceIsActive from 'hooks/maintenance/useMaintenanceIsActive'
 
 const Welcome = () => {
   const { classes } = useStyles()
@@ -45,7 +46,7 @@ const Welcome = () => {
   const maintenancePopupInitialized = useRef(false)
 
   const accessExpirations: AccessExpiration[] = meState?.accessExpirations ?? []
-  const maintenanceIsActive = meState?.maintenance?.active
+  const maintenanceIsActive = useMaintenanceIsActive()
 
   const lastConnection = practitioner?.lastConnection
     ? moment(practitioner.lastConnection).format('[Dernière connexion : ]ddd DD MMMM YYYY[, à ]HH:mm')

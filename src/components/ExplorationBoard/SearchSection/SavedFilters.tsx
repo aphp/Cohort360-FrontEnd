@@ -6,9 +6,9 @@ import { DeleteOutline, SavedSearch, Visibility } from '@mui/icons-material'
 import { SelectedFilter } from 'hooks/filters/useSavedFilters'
 import { Filters, SavedFiltersResults, SearchCriterias } from 'types/searchCriterias'
 import EditSavedFilter from './EditSavedFilter'
-import { useAppSelector } from 'state'
 import { AdditionalInfo } from 'types/exploration'
 import Button from 'components/ui/Button'
+import useMaintenanceIsActive from 'hooks/maintenance/useMaintenanceIsActive'
 
 type SavedFiltersProps = {
   selectedFilter: SelectedFilter<Filters> | null
@@ -35,7 +35,7 @@ const SavedFilters = ({
   const [toggleDeleteModal, setToggleDeleteModal] = useState(false)
   const [toggleDisplayModal, setToggleDisplayModal] = useState(false)
   const [selectedItems, setSelectedItems] = useState<string[]>([])
-  const maintenanceIsActive = useAppSelector((state) => state.me)?.maintenance?.active
+  const maintenanceIsActive = useMaintenanceIsActive()
 
   const asListItems = useMemo(
     () =>

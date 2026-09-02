@@ -24,6 +24,7 @@ import Button from 'components/ui/Button'
 import AddIcon from '@mui/icons-material/Add'
 import PageContainer from 'components/ui/PageContainer'
 import WaitingPopup from 'views/WaitingPopup/WaitingPopup'
+import useMaintenanceIsActive from 'hooks/maintenance/useMaintenanceIsActive'
 
 const RESULTS_PER_PAGE = 20
 
@@ -46,7 +47,7 @@ const Export = () => {
   const user = useAppSelector((state) => state.me?.impersonation?.username ?? state.me?.userName) ?? ''
   const deidentified = useAppSelector((state) => state.me?.deidentified)
   const [exportList, setExportList] = useState<Back_API_Response<ExportList> | null>(null)
-  const maintenanceIsActive = useAppSelector((state) => state.me?.maintenance?.active) ?? false
+  const maintenanceIsActive = useMaintenanceIsActive()
   const [loadingStatus, setLoadingStatus] = useState(LoadingStatus.FETCHING)
   const [downloading, setDownloading] = useState<boolean | null>(false)
   const [searchParams, setSearchParams] = useSearchParams()
