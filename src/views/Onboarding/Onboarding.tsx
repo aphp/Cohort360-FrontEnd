@@ -1,10 +1,10 @@
 import ArrowBackRoundedIcon from '@mui/icons-material/ArrowBackRounded'
 import ArrowForwardRoundedIcon from '@mui/icons-material/ArrowForwardRounded'
-import { Button, Typography } from '@mui/material'
+import { Button, GlobalStyles, Typography } from '@mui/material'
 import logo from 'assets/images/logo-login.png'
 import useOnboardingEnabled from 'hooks/onboarding/useOnboardingEnabled'
 import useOnboardingStatus from 'hooks/onboarding/useOnboardingStatus'
-import React from 'react'
+import React, { useEffect } from 'react'
 import { Navigate } from 'react-router'
 
 import { OnboardingProvider, useOnboarding } from './OnboardingContext'
@@ -20,10 +20,25 @@ const PROGRESS_ERROR_MESSAGE =
 
 const OnboardingLayout = () => {
   const { classes, cx } = useStyles()
-  const { screen, currentStep, screenConfig, stepProgress, primaryLabel, canProceed, saving, error, goNext, goBack } =
-    useOnboarding()
+  const {
+    screen,
+    currentStep,
+    subStep,
+    screenConfig,
+    stepProgress,
+    primaryLabel,
+    canProceed,
+    saving,
+    error,
+    goNext,
+    goBack
+  } = useOnboarding()
 
   const ActiveScreen = screenConfig?.component
+
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [screen, currentStep, subStep])
 
   const header = (
     <>
@@ -58,30 +73,34 @@ const OnboardingLayout = () => {
   )
 
   return (
-    <WizardShell
-      header={header}
-      steps={ONBOARDING_STEPS}
-      activeStep={screen === 'welcome' ? -1 : currentStep}
-      stepProgress={stepProgress}
-      layout={screenConfig?.layout}
-      footer={footer}
-    >
-      {screen === 'welcome' ? (
-        <WelcomeScreen />
-      ) : (
-        ActiveScreen && (
-          <>
-            {screenConfig?.tag && <ScreenTag label={screenConfig.tag} />}
-            <ActiveScreen />
-          </>
-        )
-      )}
-      {error && (
-        <Typography role="alert" className={classes.error}>
-          {screenConfig?.primaryAction?.errorMessage ?? PROGRESS_ERROR_MESSAGE}
-        </Typography>
-      )}
-    </WizardShell>
+    <>
+      {/* Scrollbar always on, so screens do not shift sideways when the content grows. */}
+      <GlobalStyles styles={{ html: { overflowY: 'scroll' } }} />
+      <WizardShell
+        header={header}
+        steps={ONBOARDING_STEPS}
+        activeStep={screen === 'welcome' ? -1 : currentStep}
+        stepProgress={stepProgress}
+        layout={screenConfig?.layout}
+        footer={footer}
+      >
+        {screen === 'welcome' ? (
+          <WelcomeScreen />
+        ) : (
+          ActiveScreen && (
+            <>
+              {screenConfig?.tag && <ScreenTag label={screenConfig.tag} />}
+              <ActiveScreen />
+            </>
+          )
+        )}
+        {error && (
+          <Typography role="alert" className={classes.error}>
+            {screenConfig?.primaryAction?.errorMessage ?? PROGRESS_ERROR_MESSAGE}
+          </Typography>
+        )}
+      </WizardShell>
+    </>
   )
 }
 

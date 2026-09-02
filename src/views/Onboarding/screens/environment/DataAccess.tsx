@@ -24,8 +24,8 @@ const DataAccess = () => {
           aux patients pris en charge par cette ou ces unités fonctionnelles.
         </li>
         <li>
-          <strong>Recherche multicentrique :</strong> votre accès est limité aux unités fonctionnelles validées dans le
-          cadre de votre projet de recherche.
+          <strong>Recherche multicentrique :</strong> vous êtes data scientist en URC, vous avez accès à tous les
+          patients de l’AP-HP en pseudonymisé.
         </li>
       </ul>
     </Box>
