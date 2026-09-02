@@ -2,28 +2,26 @@ import React from 'react'
 
 import useStyles from './styles'
 
-// Domaine sans cookie : rien n'est déposé tant que la vidéo n'est pas lancée.
-const EMBED_PATH = 'https://www.youtube-nocookie.com/embed'
+const TUTORIAL_URL = 'https://formaphp.fr/documents/orbisetmoi/Tutoriels_Video/Cohort360_v0.mp4'
 
 type Props = {
-  /** Identifiant de la vidéo sur la chaîne Cohort360. */
-  videoId: string
+  /** Position de départ du chapitre dans le tutoriel, en secondes. */
+  startAt: number
   /** Described to assistive technologies, which cannot read the video. */
   label: string
 }
 
-const FeatureVideo = ({ videoId, label }: Props) => {
+const FeatureVideo = ({ startAt, label }: Props) => {
   const { classes } = useStyles()
 
   return (
-    <iframe
+    <video
       className={classes.video}
-      src={`${EMBED_PATH}/${videoId}`}
-      title={label}
-      loading="lazy"
-      referrerPolicy="strict-origin-when-cross-origin"
-      allow="encrypted-media; picture-in-picture"
-      allowFullScreen
+      src={`${TUTORIAL_URL}#t=${startAt}`}
+      aria-label={label}
+      controls
+      playsInline
+      preload="metadata"
     />
   )
 }
