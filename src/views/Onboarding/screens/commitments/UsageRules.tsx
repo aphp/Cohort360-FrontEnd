@@ -20,7 +20,7 @@ const UsageRules = () => {
         l'EDS.
       </Typography>
       <Typography className={classes.sectionText}>
-        Les règles d'utilisation qui vont vous être présentées sont conformes :
+        Les règles d'utilisation qui vous seront présentées sont conformes&nbsp;:
       </Typography>
       <ul className={classes.list}>
         <li>
