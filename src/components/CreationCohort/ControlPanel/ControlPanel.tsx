@@ -65,6 +65,7 @@ import { isRequestFinished } from './utils'
 import { useCountReconciliation } from './useCountReconciliation'
 import { CriteriaType } from 'types/requestCriterias'
 import useMaintenanceIsActive from 'hooks/maintenance/useMaintenanceIsActive'
+import { accessType } from 'types/scope'
 
 const ControlPanel: React.FC<{
   canExecuteJson: boolean
@@ -124,7 +125,7 @@ const ControlPanel: React.FC<{
   const accessIsPseudonymize: boolean | null =
     selectedPopulation === null
       ? null
-      : selectedPopulation.map((population) => population?.access).some((elem) => elem && elem === 'Pseudonymisé')
+      : selectedPopulation.map((population) => population?.access).some((elem) => elem && elem === accessType.PSEUDO)
 
   let accessLabel: string
   if (accessIsPseudonymize === null) {

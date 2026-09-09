@@ -1,4 +1,5 @@
-import { Cohort, JobStatus, ProjectType, QuerySnapshotInfo, RequestType } from 'types'
+import { Cohort, GroupRights, JobStatus, ProjectType, QuerySnapshotInfo, RequestType } from 'types'
+import { accessType } from 'types/scope'
 import { CohortsType, ExplorationsSearchParams } from 'types/cohorts'
 import {
   CohortsFilters,
@@ -105,6 +106,20 @@ export const redirectOnParentCohortDeletion = (parentRequestId?: string, parentF
 
 export const isCohortExportable = (cohort: Cohort, appConfig: AppConfig) => {
   return appConfig.features.export.enabled ? !!cohort?.rights?.export_csv_xlsx_nomi : false
+}
+
+/**
+ * Niveau de sensibilité des données de la cohorte pour l'utilisateur courant, au sens CNIL :
+ * distingue une consultation en clair (nominatif) d'une consultation pseudonymisée. Cette
+ * distinction conditionne les obligations de traçabilité et de sécurité de l'utilisateur, elle
+ * repose donc sur les droits de LECTURE (`read_patient_nomi` / `read_patient_pseudo`) et non sur
+ * le droit d'export (`export_csv_xlsx_nomi`).
+ * Retourne `undefined` quand les droits sont inconnus ou absents : on préfère n'afficher aucune
+ * mention plutôt qu'une mention « Pseudonymisé » qui sous-estimerait les obligations.
+ */
+export const getCohortSensitivity = (rights?: GroupRights): accessType | undefined => {
+  if (!rights || (!rights.read_patient_nomi && !rights.read_patient_pseudo)) return undefined
+  return rights.read_patient_nomi ? accessType.NOMINAL : accessType.PSEUDO
 }
 
 export const isExportDisabled = (cohort: Cohort, maintenanceIsActive: boolean, isExportable: boolean) => {

@@ -19,6 +19,7 @@ export enum ResearchesTableLabels {
   PARENT_COHORT = 'cohorte parent',
   TOTAL_PERCENTAGE = 'pourcentage du total',
   STATUS = 'statut',
+  SENSITIVITY = 'sensibilité',
   PATIENT_TOTAL = 'nb de patients',
   APHP_TOTAL = 'estimation du nb de patients ap-hp',
   CREATED_AT = 'date de création',

@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { AxiosResponse } from 'axios'
 import { ReadRightPerimeter } from 'types'
-import { ScopeElement, SourceType, System, Rights } from 'types/scope'
+import { ScopeElement, SourceType, System, Rights, accessType } from 'types/scope'
 import { Hierarchy } from 'types/hierarchy'
 
 // --- Mocks ---------------------------------------------------------------
@@ -75,19 +75,28 @@ beforeEach(() => {
 // --- getAccessFromRights (pure logic, params invalides) ------------------
 
 describe('servicePerimeters.getAccessFromRights', () => {
-  it('retourne "Nominatif" quand read_access vaut DATA_NOMINATIVE', () => {
+  it('retourne accessType.NOMINAL quand read_access vaut DATA_NOMINATIVE', () => {
     const rights = makeReadRight({ read_access: 'DATA_NOMINATIVE' })
-    expect(servicesPerimeters.getAccessFromRights(rights)).toBe('Nominatif')
+    expect(servicesPerimeters.getAccessFromRights(rights)).toBe(accessType.NOMINAL)
   })
 
-  it('retourne "Nominatif" quand right_read_patient_nominative est true', () => {
+  it('retourne accessType.NOMINAL quand right_read_patient_nominative est true', () => {
     const rights = makeReadRight({ right_read_patient_nominative: true })
-    expect(servicesPerimeters.getAccessFromRights(rights)).toBe('Nominatif')
+    expect(servicesPerimeters.getAccessFromRights(rights)).toBe(accessType.NOMINAL)
   })
 
-  it('retourne "Pseudonymisé" par défaut sinon', () => {
+  it('retourne accessType.PSEUDO par défaut sinon', () => {
     const rights = makeReadRight({ read_access: 'DATA_PSEUDOANONYMISED', right_read_patient_nominative: false })
-    expect(servicesPerimeters.getAccessFromRights(rights)).toBe('Pseudonymisé')
+    expect(servicesPerimeters.getAccessFromRights(rights)).toBe(accessType.PSEUDO)
+  })
+
+  it('conserve la valeur "Nominatif"/"Pseudonymisé" de l’enum (compat. sérialisation)', () => {
+    expect(servicesPerimeters.getAccessFromRights(makeReadRight({ right_read_patient_nominative: true }))).toBe(
+      'Nominatif'
+    )
+    expect(servicesPerimeters.getAccessFromRights(makeReadRight({ right_read_patient_nominative: false }))).toBe(
+      'Pseudonymisé'
+    )
   })
 })
 
@@ -103,7 +112,7 @@ describe('servicePerimeters.mapRightsToScopeElement', () => {
     expect(result.id).toBe('42')
     expect(result.system).toBe(System.ScopeTree)
     expect(result.label).toBe('H-42 - Hôpital 42')
-    expect(result.access).toBe('Nominatif')
+    expect(result.access).toBe(accessType.NOMINAL)
     expect(result.rights?.read_access).toBe('DATA_NOMINATIVE')
     expect(result.rights?.export_access).toBe('DATA_PSEUDOANONYMISED')
   })
@@ -111,7 +120,7 @@ describe('servicePerimeters.mapRightsToScopeElement', () => {
   it('mappe un droit pseudonymisé vers accès "Pseudonymisé"', () => {
     const item = makeReadRight({ right_read_patient_nominative: false })
     const result = servicesPerimeters.mapRightsToScopeElement(item)
-    expect(result.access).toBe('Pseudonymisé')
+    expect(result.access).toBe(accessType.PSEUDO)
     expect(result.rights?.read_access).toBe('DATA_PSEUDOANONYMISED')
   })
 })

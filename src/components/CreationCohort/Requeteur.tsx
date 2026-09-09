@@ -29,6 +29,7 @@ import { setCriteriaData } from 'state/criteria'
 import { AppConfig } from 'config'
 import { initValueSets, updateCache } from 'state/valueSets'
 import { initQuestionnairesFormData } from 'state/questionnairesFormData'
+import { accessType } from 'types/scope'
 
 const Requeteur = () => {
   const {
@@ -106,7 +107,8 @@ const Requeteur = () => {
         dispatch(buildCohortCreation({ selectedPopulation: null }))
       }
 
-      const allowMaternityForms = selectedPopulation?.every((population) => population?.access === 'Nominatif')
+      const allowMaternityForms =
+        selectedPopulation?.every((population) => population?.access === accessType.NOMINAL) ?? false
       const questionnairesEnabled = config.features.questionnaires.enabled
       dispatch(
         setCriteriaData({
@@ -135,7 +137,7 @@ const Requeteur = () => {
   }, [dispatch, selectedCriteria, allowSearchIpp, selectedPopulation])
 
   useEffect(() => {
-    if (selectedPopulation?.some((perimeter) => perimeter?.access === 'Pseudonymisé') && isCriteriaNominative) {
+    if (selectedPopulation?.some((perimeter) => perimeter?.access === accessType.PSEUDO) && isCriteriaNominative) {
       cleanNominativeCriterias(selectedCriteria, criteriaGroup, dispatch)
     }
   }, [selectedPopulation, isCriteriaNominative])
