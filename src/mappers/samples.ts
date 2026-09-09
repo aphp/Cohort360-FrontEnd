@@ -3,7 +3,13 @@ import { Cohort } from 'types'
 import { CohortCallbacks, ResearchesTableLabels } from 'types/cohorts'
 import { Order } from 'types/searchCriterias'
 import { Action, CellType, Column, Favorite, Row, Table } from 'types/table'
-import { getExportTooltip, getGlobalEstimation, isCohortExportable, isExportDisabled } from 'utils/explorationUtils'
+import {
+  getCohortSensitivity,
+  getExportTooltip,
+  getGlobalEstimation,
+  isCohortExportable,
+  isExportDisabled
+} from 'utils/explorationUtils'
 import { formatDate } from 'utils/dates'
 import { format, formatPercentage } from 'utils/numbers'
 import Download from 'assets/icones/download.svg?react'
@@ -21,6 +27,7 @@ const getSamplesInfos = (cohort: Cohort) => {
   const createdAt = formatDate(cohort.created_at)
   const samples = cohort.sample_cohorts?.length ?? 0
   const samplingRatio = formatPercentage(cohort.sampling_ratio)
+  const sensitivity = getCohortSensitivity(cohort.rights) ?? ''
   return {
     name,
     parentName,
@@ -29,7 +36,8 @@ const getSamplesInfos = (cohort: Cohort) => {
     globalTotal,
     createdAt,
     samples,
-    samplingRatio
+    samplingRatio,
+    sensitivity
   }
 }
 
@@ -43,7 +51,7 @@ const mapSamplesToRows = (
 ) => {
   const rows: Row[] = []
   list.forEach((cohort) => {
-    const { name, parentName, statusChip, total, createdAt, samplingRatio } = getSamplesInfos(cohort)
+    const { name, parentName, statusChip, total, createdAt, samplingRatio, sensitivity } = getSamplesInfos(cohort)
     const { onClickRow, onClickFav, onClickExport, onClickEdit, onSelectCohort, onClickCohortVersion } = callbacks
     const actions = [
       {
@@ -103,6 +111,12 @@ const mapSamplesToRows = (
         type: CellType.STATUS_CHIP
       },
       {
+        id: `${cohort.uuid}-sensitivity`,
+        value: sensitivity,
+        type: CellType.TEXT,
+        sx: { width: 150 }
+      },
+      {
         id: `${cohort.uuid}-total`,
         value: total,
         type: CellType.TEXT,
@@ -149,6 +163,7 @@ const mapSamplesToColumns = (
     { label: '' },
     ...(cohortId ? [] : [{ label: ResearchesTableLabels.PARENT_COHORT, code: Order.REQUEST }]),
     { label: ResearchesTableLabels.STATUS },
+    { label: ResearchesTableLabels.SENSITIVITY },
     { label: ResearchesTableLabels.PATIENT_TOTAL, code: Order.RESULT_SIZE },
     { label: ResearchesTableLabels.TOTAL_PERCENTAGE },
     { label: ResearchesTableLabels.CREATED_AT, code: Order.CREATED_AT }

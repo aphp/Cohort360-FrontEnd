@@ -45,5 +45,10 @@ export type ScopeElement = {
   cohort_size: string
   full_path: string
   rights?: ReadRightPerimeter
-  access?: 'Nominatif' | 'Pseudonymisé'
+  access?: accessType
+}
+
+export enum accessType {
+  NOMINAL = 'Nominatif',
+  PSEUDO = 'Pseudonymisé'
 }

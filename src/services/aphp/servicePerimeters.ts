@@ -23,6 +23,7 @@ import { FetchScopeOptions, Rights, ScopeElement, SourceType, System } from 'typ
 import { scopeLevelsToRequestParam } from 'utils/perimeters'
 import { mapParamsToNetworkParams } from 'utils/url'
 import { Hierarchy } from 'types/hierarchy'
+import { accessType } from 'types/scope'
 import { getExtension } from 'utils/fhir'
 
 export interface IServicePerimeters {
@@ -97,7 +98,7 @@ export interface IServicePerimeters {
    * à travers un ScopePage on retourne 'Nominatif' ou 'Pseudonymisé' selon les droits d'accès
    * @param perimeterItem
    */
-  getAccessFromRights: (item: ReadRightPerimeter) => 'Nominatif' | 'Pseudonymisé'
+  getAccessFromRights: (item: ReadRightPerimeter) => accessType
 }
 
 const servicesPerimeters: IServicePerimeters = {
@@ -384,8 +385,8 @@ const servicesPerimeters: IServicePerimeters = {
 
   getAccessFromRights: (rights: ReadRightPerimeter) => {
     return rights.read_access === 'DATA_NOMINATIVE' || rights.right_read_patient_nominative === true
-      ? 'Nominatif'
-      : 'Pseudonymisé'
+      ? accessType.NOMINAL
+      : accessType.PSEUDO
   }
 }
 
