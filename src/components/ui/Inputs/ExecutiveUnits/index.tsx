@@ -36,6 +36,12 @@ const ExecutiveUnits = ({ value, sourceType, disabled = false, onChange, label }
     onChange(newSelectedPopulation)
   }
 
+  const handleOpen = () => {
+    if (disabled) return
+    setOpen(true)
+    setIsExtended(false)
+  }
+
   useEffect(() => {
     const handleFetchPopulation = async () => {
       const response = await servicesPerimeters.getPerimeters({ sourceType: SourceType.APHP })
@@ -71,9 +77,15 @@ const ExecutiveUnits = ({ value, sourceType, disabled = false, onChange, label }
           padding: '9px 3px 9px 12px'
         }}
       >
-        <Grid container size={{ xs: 10 }} sx={{ alignItems: 'center' }}>
-          {!value.length && <FormLabel component="legend">Sélectionner une unité exécutrice</FormLabel>}
+        <Grid
+          container
+          size={{ xs: 10 }}
+          sx={{ alignItems: 'center' }}
+          style={{ cursor: disabled ? 'default' : 'pointer' }}
+          onClick={handleOpen}
+        >
           <CodesWithSystems disabled={disabled} codes={value} isExtended={isExtended} onDelete={handleDelete} />
+          {!value.length && <FormLabel component="legend">Sélectionner une unité exécutrice</FormLabel>}
         </Grid>
         <Grid size={{ xs: 2 }} container sx={{ justifyContent: 'flex-end' }}>
           {value.length > 0 && isExtended && (
@@ -86,15 +98,7 @@ const ExecutiveUnits = ({ value, sourceType, disabled = false, onChange, label }
               <MoreHorizIcon />
             </IconButton>
           )}
-          <IconButton
-            sx={{ color: '#5BC5F2' }}
-            size="small"
-            onClick={() => {
-              setOpen(true)
-              setIsExtended(false)
-            }}
-            disabled={disabled}
-          >
+          <IconButton sx={{ color: '#5BC5F2' }} size="small" onClick={handleOpen} disabled={disabled}>
             {loading === LoadingStatus.FETCHING && <CircularProgress size={24} />}
             {loading === LoadingStatus.SUCCESS && <SearchOutlined data-testid="SearchOutlinedIcon" />}
           </IconButton>
