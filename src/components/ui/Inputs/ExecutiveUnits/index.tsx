@@ -81,8 +81,6 @@ const ExecutiveUnits = ({ value, sourceType, disabled = false, onChange, label }
           container
           size={{ xs: 10 }}
           sx={{ alignItems: 'center' }}
-          role="button"
-          tabIndex={0}
           style={{ cursor: disabled ? 'default' : 'pointer' }}
           onClick={handleOpen}
         >
