@@ -37,7 +37,7 @@ export function safeJsonParse(text: string): SafeParseResult {
 export function formatAjvErrors(errors?: ErrorObject[] | null): string[] {
   if (!errors?.length) return []
   const msg = errors[0].message || 'Invaid JSON'
-  const path = errors[0].dataPath
+  const path = errors[0].instancePath
   const extra = errors[0].params ? ` (${JSON.stringify(errors[0].params)})` : ''
   return [` ${path} ${msg} ${extra}`]
 }
