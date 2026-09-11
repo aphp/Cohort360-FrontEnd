@@ -18,6 +18,7 @@ on:
       - frontend-frigo
       - frigo
       - 'release/**'
+      - 'hotfix/**'
 
 jobs:
   publish:
@@ -39,16 +40,27 @@ jobs:
         run: |
           set -euo pipefail
           VERSION=$(jq -r .version package.json)
-          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
           SHORT_SHA="${GIT_SHA:0:7}"
 
-          if [[ "$HEAD_BRANCH" == release/* ]]; then
-            BRANCH_VER="${HEAD_BRANCH#release/}"
-            if [ "${BRANCH_VER}" != "${VERSION}" ]; then
-              echo "::error title=Version mismatch::Le suffixe release '${BRANCH_VER}' doit égaler la version dans package.json '${VERSION}'."
-              exit 1
-            fi
-          fi
+          case "$HEAD_BRANCH" in
+            hotfix/*)
+              # Le suffixe de branche fait foi : package.json n'est bumpé
+              # qu'au go MEP (tag final), pas à chaque itération du hotfix.
+              VERSION="${HEAD_BRANCH#hotfix/}"
+              if ! [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+                echo "::error title=Version invalide::Le suffixe de branche hotfix '${VERSION}' doit être de la forme X.Y.Z."
+                exit 1
+              fi
+              ;;
+            release/*)
+              BRANCH_VER="${HEAD_BRANCH#release/}"
+              if [ "${BRANCH_VER}" != "${VERSION}" ]; then
+                echo "::error title=Version mismatch::Le suffixe release '${BRANCH_VER}' doit égaler la version dans package.json '${VERSION}'."
+                exit 1
+              fi
+              ;;
+          esac
+          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
 
           case "$HEAD_BRANCH" in
             main)
@@ -60,7 +72,7 @@ jobs:
             frontend-frigo|frigo)
               echo "IMAGE_TAGS=${DOCKER_REPO}:frontend-frigo" >> "$GITHUB_ENV"
               ;;
-            release/*)
+            release/*|hotfix/*)
               echo "IMAGE_TAGS=${DOCKER_REPO}:${VERSION}-rc,${DOCKER_REPO}:${VERSION}-rc.${SHORT_SHA}" >> "$GITHUB_ENV"
               ;;
             *)

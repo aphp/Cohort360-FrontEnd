@@ -7,25 +7,19 @@ on:
       - main
     types: [opened, synchronize, reopened, ready_for_review, edited]
 
-permissions:
-  contents: read
-  pull-requests: read
-
 jobs:
   commit-lint:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
         with:
           fetch-depth: 0
 
-      - name: Install commit-lint
-        run: |
-          npm install --ignore-scripts --force conventional-changelog-conventionalcommits @commitlint/config-conventional commitlint@latest
-
-      - name: Fix commitlint error
-        run: |
-          sed -i 's/"type": "module",//g' package.json
+      - name: Install dependencies
+        run: npm ci --no-audit --ignore-scripts
 
       - name: Validate PR commits with commitlint
         env:
@@ -34,8 +28,10 @@ jobs:
         run: |
           git fetch origin "$BASE_REF"
           FROM=$(git merge-base "origin/$BASE_REF" "$HEAD_SHA")
-          npx commitlint --from "$FROM" --to "$HEAD_SHA" --verbose
+          ./node_modules/.bin/commitlint --from "$FROM" --to "$HEAD_SHA" --verbose
 
       - name: Validate PR title with commitlint
+        env:
+          PR_TITLE: ${{ github.event.pull_request.title }}
         run: |
-          echo "${{ github.event.pull_request.title }}" | npx commitlint
+          printf '%s\n' "$PR_TITLE" | ./node_modules/.bin/commitlint
