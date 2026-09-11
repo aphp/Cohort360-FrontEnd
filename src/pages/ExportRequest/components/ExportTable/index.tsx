@@ -294,7 +294,7 @@ const ExportTable: React.FC<ExportTableProps> = ({
               {']'}
             </Typography>
           </div>
-          {exportTable.name === 'Patient' && (
+          {exportTable.name === 'Patient' && !oneFile && (
             <Typography variant="caption" fontStyle="italic" color="#888" sx={{ width: '100%', mt: '4px' }}>
               La sous-table patient__identifier sera également exportée avec la table Patient.
             </Typography>
