@@ -1,7 +1,7 @@
 import { Claim, Condition, Procedure } from 'fhir/r4'
 import { ExplorationResults, FetchOptions, FetchParams, Patient } from 'types/exploration'
 import { Direction, Order, PMSIFilters } from 'types/searchCriterias'
-import { fetcherWithParams, getCommonParamsAll, getCommonParamsList } from 'utils/exploration'
+import { fetcherWithParams, fetchInPages, getCommonParamsAll, getCommonParamsList } from 'utils/exploration'
 import { fetchClaim, fetchCondition, fetchProcedure } from './callApi'
 import { getCategory, getExtensionStringValue } from 'utils/fhir'
 import { getConfig } from 'config'
@@ -18,13 +18,22 @@ const getPMSIFilters = (
   ...getCommonParamsList(fetchParams, groupId)
 })
 
+/**
+ * @param includeRelatedResources Set to `false` to skip `_include` entirely instead
+ * of paginating around HAPI-0389 (see `fetchInPages`). Only safe for callers that
+ * don't read the included Patient/Encounter resources from the bundle — e.g.
+ * `fetchLastPmsi`, which links encounters from `patient.infos.hospits` instead.
+ * Callers that do read them (e.g. `ExplorationBoard`'s cohort-level tabs, via
+ * `getResourceInfosFromBundle`) must keep the `true` default. Defaults to `true`.
+ */
 export const fetchConditionList = (
   fetchParams: FetchParams,
   { filters }: FetchOptions<PMSIFilters>,
   patient: Patient | null,
   deidentified: boolean,
   groupId: string[],
-  signal?: AbortSignal
+  signal?: AbortSignal,
+  includeRelatedResources = true
 ): Promise<ExplorationResults<Condition>> => {
   const { diagnosticTypes, source, code, durationRange } = filters
   const params = {
@@ -35,7 +44,9 @@ export const fetchConditionList = (
     'max-recorded-date': durationRange?.[1] ?? '',
     uniqueFacet: ['subject'],
     subject: patient?.infos?.id,
-    _include: ['Encounter:encounter', 'Patient:subject'] satisfies ('Encounter:encounter' | 'Patient:subject')[],
+    _include: includeRelatedResources
+      ? (['Encounter:encounter', 'Patient:subject'] satisfies ('Encounter:encounter' | 'Patient:subject')[])
+      : undefined,
     ...getPMSIFilters(filters, fetchParams, groupId),
     _sort: fetchParams.orderBy.orderBy === Order.CODE ? Order.CODE : Order.ONSET_DATE,
     signal
@@ -46,20 +57,32 @@ export const fetchConditionList = (
     ...getCommonParamsAll(groupId),
     signal
   }
-  return fetcherWithParams(
-    () => fetchCondition(params),
-    () => fetchCondition(paramsFetchAll),
-    { ...fetchParams, filters, deidentified, patient, groupId }
-  )
+  const fetchList = includeRelatedResources
+    ? () =>
+        fetchInPages<Condition>(
+          (size, offset) => fetchCondition({ ...params, size, offset }),
+          params.size,
+          params.offset
+        )
+    : () => fetchCondition(params)
+  return fetcherWithParams(fetchList, () => fetchCondition(paramsFetchAll), {
+    ...fetchParams,
+    filters,
+    deidentified,
+    patient,
+    groupId
+  })
 }
 
+/** @param includeRelatedResources See `fetchConditionList`'s doc — same rationale. */
 export const fetchProcedureList = (
   fetchParams: FetchParams,
   { filters }: FetchOptions<PMSIFilters>,
   patient: Patient | null,
   deidentified: boolean,
   groupId: string[],
-  signal?: AbortSignal
+  signal?: AbortSignal,
+  includeRelatedResources = true
 ): Promise<ExplorationResults<Procedure>> => {
   const { source, code, durationRange } = filters
   const params = {
@@ -69,7 +92,9 @@ export const fetchProcedureList = (
     maxDate: durationRange?.[1] ?? '',
     uniqueFacet: ['subject'],
     subject: patient?.id,
-    _include: ['Encounter:encounter', 'Patient:subject'] satisfies ('Encounter:encounter' | 'Patient:subject')[],
+    _include: includeRelatedResources
+      ? (['Encounter:encounter', 'Patient:subject'] satisfies ('Encounter:encounter' | 'Patient:subject')[])
+      : undefined,
     ...getPMSIFilters(filters, fetchParams, groupId),
     _sort: fetchParams.orderBy.orderBy === Order.CODE ? Order.CODE : Order.DATE,
     signal
@@ -80,11 +105,21 @@ export const fetchProcedureList = (
     ...getCommonParamsAll(groupId),
     signal
   }
-  return fetcherWithParams(
-    () => fetchProcedure(params),
-    () => fetchProcedure(paramsFetchAll),
-    { ...fetchParams, filters, deidentified, patient, groupId }
-  )
+  const fetchList = includeRelatedResources
+    ? () =>
+        fetchInPages<Procedure>(
+          (size, offset) => fetchProcedure({ ...params, size, offset }),
+          params.size,
+          params.offset
+        )
+    : () => fetchProcedure(params)
+  return fetcherWithParams(fetchList, () => fetchProcedure(paramsFetchAll), {
+    ...fetchParams,
+    filters,
+    deidentified,
+    patient,
+    groupId
+  })
 }
 
 export const fetchClaimList = (
@@ -140,19 +175,38 @@ export const fetchLastPmsi = async ({ patient, groupId }: { patient: Patient; gr
       durationRange: [null, null]
     }
     const groupIds = groupId ? [groupId] : []
+    const includeRelatedResources = false // see fetchConditionList's doc
     const pmsiTotal = await Promise.all([
-      fetchConditionList(fetchParams, { filters }, patient, deidentified, groupIds),
-      fetchProcedureList(fetchParams, { filters }, patient, deidentified, groupIds)
+      fetchConditionList(fetchParams, { filters }, patient, deidentified, groupIds, undefined, includeRelatedResources),
+      fetchProcedureList(fetchParams, { filters }, patient, deidentified, groupIds, undefined, includeRelatedResources)
     ])
     const diagSize = pmsiTotal[0].totalAllResults
     const procSize = pmsiTotal[1].totalAllResults
 
+    // `_count` is set to the full diagSize/procSize below — exactly the combination
+    // that triggers HAPI-0389 if `_include` is left on, hence includeRelatedResources: false.
     const fetchPatientResponse = await Promise.all([
       diagSize
-        ? fetchConditionList({ ...fetchParams, size: diagSize }, { filters }, patient, deidentified, groupIds)
+        ? fetchConditionList(
+            { ...fetchParams, size: diagSize },
+            { filters },
+            patient,
+            deidentified,
+            groupIds,
+            undefined,
+            includeRelatedResources
+          )
         : { list: [] },
       procSize
-        ? fetchProcedureList({ ...fetchParams, size: procSize }, { filters }, patient, deidentified, groupIds)
+        ? fetchProcedureList(
+            { ...fetchParams, size: procSize },
+            { filters },
+            patient,
+            deidentified,
+            groupIds,
+            undefined,
+            includeRelatedResources
+          )
         : { list: [] }
       // fetchClaimList({ ...fetchParams, size: 1 }, { filters }, patient, deidentified, groupIds)
     ])

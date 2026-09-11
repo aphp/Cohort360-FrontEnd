@@ -66,6 +66,13 @@ export enum URLS {
 
 export const GAP = '16px'
 
+// Bounded page size for any PMSI (Condition/Procedure) FHIR search that still
+// requests `_include`: HAPI FHIR rejects a search (HAPI-0389) when too many base
+// resources must be resolved for `_include` in a single query. Distinct from
+// ExplorationBoard's own RESULTS_PER_PAGE (components/ExplorationBoard/useData.ts),
+// which sizes the UI table's page and is unrelated to this guard.
+export const PMSI_INCLUDE_PAGE_SIZE = 500
+
 export type DisplayOptions = {
   myFilters: boolean
   filterBy: boolean
