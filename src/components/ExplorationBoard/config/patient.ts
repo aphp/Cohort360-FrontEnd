@@ -272,13 +272,7 @@ const fetchList = (
     deceased,
     deidentified,
     _elements: ['gender', 'name', 'birthDate', 'deceased', 'identifier', 'extension'] as (
-      | 'id'
-      | 'gender'
-      | 'name'
-      | 'birthDate'
-      | 'deceased'
-      | 'identifier'
-      | 'extension'
+      'id' | 'gender' | 'name' | 'birthDate' | 'deceased' | 'identifier' | 'extension'
     )[],
     ...getCommonParamsList(fetchParams, groupId),
     signal
