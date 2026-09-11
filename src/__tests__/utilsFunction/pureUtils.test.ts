@@ -44,7 +44,7 @@ describe('jsonValidation.formatAjvErrors', () => {
   it('formate le premier message d’erreur avec le path et les params', () => {
     const result = formatAjvErrors([
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      { message: 'should be object', dataPath: '.foo', params: { type: 'object' } } as any
+      { message: 'should be object', instancePath: '.foo', params: { type: 'object' } } as any
     ])
     expect(result).toHaveLength(1)
     expect(result[0]).toContain('.foo')
