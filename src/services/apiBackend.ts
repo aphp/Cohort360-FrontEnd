@@ -1,6 +1,8 @@
-import axios, { InternalAxiosRequestConfig } from 'axios'
+import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios'
 import { ACCESS_TOKEN } from '../constants'
 import { getConfig, onUpdateConfig } from 'config'
+
+const REFRESH_TOKEN_URL = '/auth/refresh/'
 
 const apiBackend = axios.create({
   baseURL: getConfig().system.backendUrl,
@@ -35,13 +37,17 @@ apiBackend.interceptors.request.use((config) => {
   return config
 })
 
+// une 403 sur /auth/refresh/ signifie que l'access token a expiré, les autres 403 sont des refus de droits
+const isSessionLost = (error: AxiosError) =>
+  error.response?.status === 401 || (error.response?.status === 403 && !!error.config?.url?.includes(REFRESH_TOKEN_URL))
+
 apiBackend.interceptors.response.use(
   (response) => {
     return response
   },
   function (error) {
     if (error.response) {
-      if ((error.response.status === 401 || error.response.status === 403) && window.location.pathname !== '/') {
+      if (isSessionLost(error) && window.location.pathname !== '/') {
         localStorage.clear()
         window.location.assign('/')
       }

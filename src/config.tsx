@@ -3,13 +3,6 @@ import { Root } from 'react-dom/client'
 import * as R from 'ramda'
 import { CONFIG_URL } from 'constants.js'
 import { LabelObject } from 'types/searchCriterias'
-import {
-  birthStatusData,
-  booleanFieldsData,
-  booleanOpenChoiceFieldsData,
-  ultrasoundMonitoringData,
-  vmeData
-} from 'data/questionnaire_data'
 
 type DeepPartial<T> = {
   [P in keyof T]?: T[P] extends object ? DeepPartial<T[P]> : T[P]
@@ -158,6 +151,9 @@ export type AppConfig = {
     maintenancePopup: FeatureConfig & {
       exceptionAphCodes: string[]
     }
+    onboarding: FeatureConfig & {
+      allowedAphCodes: string[]
+    }
   }
   core: {
     fhir: {
@@ -222,6 +218,7 @@ export type AppConfig = {
     jToolUsers: string[]
     userTrackingBlacklist: string[]
     mailSupport?: string
+    mailDataProtection: string
     urlDoc?: string
   }
 }
@@ -404,26 +401,11 @@ let config: AppConfig = {
         presentationAtDelivery: { url: '' },
         risksOrComplicationsOfPregnancy: { url: '' },
         risksRelatedToObstetricHistory: { url: '' },
-        booleanOpenChoiceFields: {
-          url: 'booleanOpenChoiceFields',
-          data: booleanOpenChoiceFieldsData
-        },
-        booleanFields: {
-          url: 'booleanFields',
-          data: booleanFieldsData
-        },
-        ultrasoundMonitoring: {
-          url: 'ultrasoundMonitoring',
-          data: ultrasoundMonitoringData
-        },
-        vme: {
-          url: 'vme',
-          data: vmeData
-        },
-        birthStatus: {
-          url: 'birthStatus',
-          data: birthStatusData
-        }
+        booleanOpenChoiceFields: { url: '' },
+        booleanFields: { url: '' },
+        ultrasoundMonitoring: { url: '' },
+        vme: { url: '' },
+        birthStatus: { url: '' }
       }
     },
     locationMap: {
@@ -443,6 +425,10 @@ let config: AppConfig = {
     maintenancePopup: {
       enabled: false,
       exceptionAphCodes: []
+    },
+    onboarding: {
+      enabled: false,
+      allowedAphCodes: []
     }
   },
   system: {
@@ -456,7 +442,8 @@ let config: AppConfig = {
     displayOidcLogin: true,
     codeDisplayJWT: 'ArrowUp,ArrowUp,ArrowDown,ArrowDown,ArrowLeft,ArrowRight,ArrowLeft,ArrowRight,b,a,Enter',
     jToolUsers: [],
-    userTrackingBlacklist: []
+    userTrackingBlacklist: [],
+    mailDataProtection: 'protection.donnees.dsi@aphp.fr'
   }
 }
 

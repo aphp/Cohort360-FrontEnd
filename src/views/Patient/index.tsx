@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { useParams, useSearchParams } from 'react-router-dom'
+import { useParams, useSearchParams } from 'react-router'
 import { Grid, CircularProgress } from '@mui/material'
 import PatientNotExist from 'components/ErrorView/PatientNotExist'
 import { getCleanGroupId } from 'utils/paginationUtils'

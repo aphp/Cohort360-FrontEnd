@@ -9,7 +9,7 @@ const createSnapshot = vi.fn()
 vi.mock('services/aphp', () => ({
   default: {
     cohortCreation: {
-      createSnapshot: (...args: unknown[]) => createSnapshot(...args)
+      createSnapshot: (...args: any[]) => createSnapshot(...args)
     }
   }
 }))

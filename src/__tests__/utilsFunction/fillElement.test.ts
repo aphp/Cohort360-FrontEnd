@@ -1,10 +1,14 @@
 import { form } from '__tests__/data/explorationData/questionnaires'
-import { Encounter, Patient } from 'fhir/r4'
+import { Bundle, Condition, Encounter, Patient } from 'fhir/r4'
 import {
+  getBundleResources,
   getEncounterIdPath,
   getLinkedEncounter,
   getLinkedPatient,
   getPatientIdPath,
+  getResourceInfosFromBundle,
+  isEncounterResource,
+  isPatientResource,
   retrieveEncounterIds,
   retrievePatientIds
 } from 'utils/fillElement'
@@ -80,5 +84,105 @@ describe('test of getLinkedEncounter function', () => {
   })
   it("should return undefined if no encounter id matches the entry's", () => {
     expect(getLinkedEncounter([], _form)).toBeUndefined()
+  })
+})
+
+describe('test of isPatientResource function', () => {
+  const patient: Patient = { resourceType: 'Patient', id: '1' }
+  const encounter: Encounter = { resourceType: 'Encounter', id: '1', status: 'finished', class: {} }
+  it('should return true for a Patient resource', () => {
+    expect(isPatientResource(patient)).toBe(true)
+  })
+  it('should return false for a non-Patient resource', () => {
+    expect(isPatientResource(encounter)).toBe(false)
+  })
+  it('should return false for undefined', () => {
+    expect(isPatientResource(undefined)).toBe(false)
+  })
+})
+
+describe('test of isEncounterResource function', () => {
+  const patient: Patient = { resourceType: 'Patient', id: '1' }
+  const encounter: Encounter = { resourceType: 'Encounter', id: '1', status: 'finished', class: {} }
+  it('should return true for an Encounter resource', () => {
+    expect(isEncounterResource(encounter)).toBe(true)
+  })
+  it('should return false for a non-Encounter resource', () => {
+    expect(isEncounterResource(patient)).toBe(false)
+  })
+  it('should return false for undefined', () => {
+    expect(isEncounterResource(undefined)).toBe(false)
+  })
+})
+
+describe('test of getBundleResources function', () => {
+  const makeBundleResponse = (bundle: Partial<Bundle>) => ({ data: bundle as never })
+
+  it('should return an empty array when data is not a Bundle', () => {
+    expect(getBundleResources({ data: { resourceType: 'OperationOutcome' } as never })).toEqual([])
+  })
+
+  it('should return an empty array when the Bundle has no entry', () => {
+    expect(getBundleResources(makeBundleResponse({ resourceType: 'Bundle' }))).toEqual([])
+  })
+
+  it('should extract the resources from the Bundle entries', () => {
+    const patient: Patient = { resourceType: 'Patient', id: 'p1' }
+    const encounter: Encounter = { resourceType: 'Encounter', id: 'e1', status: 'finished', class: {} }
+    const response = makeBundleResponse({
+      resourceType: 'Bundle',
+      entry: [{ resource: patient }, { resource: encounter }]
+    })
+    const resources = getBundleResources(response)
+    expect(resources).toHaveLength(2)
+    expect(resources).toEqual([patient, encounter])
+  })
+
+  it('should filter out entries without a resource', () => {
+    const patient: Patient = { resourceType: 'Patient', id: 'p1' }
+    const response = makeBundleResponse({
+      resourceType: 'Bundle',
+      entry: [{ resource: patient }, {}]
+    })
+    const resources = getBundleResources(response)
+    expect(resources).toHaveLength(1)
+    expect(resources[0]).toBe(patient)
+  })
+})
+
+describe('test of getResourceInfosFromBundle function (deidentified)', () => {
+  const makeCondition = (id: string, patientId: string, encounterId: string): Condition => ({
+    resourceType: 'Condition',
+    id,
+    subject: { reference: `Patient/${patientId}` },
+    encounter: { reference: `Encounter/${encounterId}` }
+  })
+
+  it('enriches entries from the included Patient/Encounter without extra fetch', async () => {
+    const condition = makeCondition('c1', 'p1', 'e1')
+    const encounter: Encounter = {
+      resourceType: 'Encounter',
+      id: 'e1',
+      status: 'finished',
+      class: {},
+      serviceProvider: { display: 'UF Test' }
+    }
+
+    const result = await getResourceInfosFromBundle([condition], true, [], [encounter])
+
+    expect(result).toHaveLength(1)
+    const enriched = result[0] as unknown as { idPatient: string; NDA: string; serviceProvider: string }
+    expect(enriched.idPatient).toBe('p1')
+    expect(enriched.NDA).toBe('e1')
+    expect(enriched.serviceProvider).toBe('UF Test')
+  })
+
+  it('defaults serviceProvider when no matching encounter is included', async () => {
+    const condition = makeCondition('c1', 'p1', 'e1')
+
+    const result = await getResourceInfosFromBundle([condition], true, [], [])
+
+    const enriched = result[0] as unknown as { serviceProvider: string }
+    expect(enriched.serviceProvider).toBe('Non renseigné')
   })
 })

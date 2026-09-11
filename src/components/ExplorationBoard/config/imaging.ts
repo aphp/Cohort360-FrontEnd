@@ -260,6 +260,7 @@ const fetchList = (
     encounterStatus: encounterStatus.map(({ id }) => id),
     uniqueFacet: ['subject'],
     patient: patient?.id,
+    _include: ['Encounter:encounter', 'Patient:patient'] satisfies ('Encounter:encounter' | 'Patient:patient')[],
     ...getCommonParamsList(fetchParams, groupId),
     signal
   }

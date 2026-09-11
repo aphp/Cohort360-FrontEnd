@@ -1,25 +1,24 @@
-import { configureStore, combineReducers } from '@reduxjs/toolkit'
-import { persistReducer, persistStore, FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER } from 'redux-persist'
-import { createStateSyncMiddleware, initStateWithPrevTab } from 'redux-state-sync'
+import { combineReducers, configureStore } from '@reduxjs/toolkit'
 import localforage from 'localforage'
-
 import { createLogger } from 'redux-logger'
-
+import { FLUSH, PAUSE, PERSIST, PURGE, persistReducer, persistStore, REGISTER, REHYDRATE } from 'redux-persist'
+import { createStateSyncMiddleware, initStateWithPrevTab } from 'redux-state-sync'
+import autoLogout from './autoLogout'
 // Import reducers
 import cohortCreation from './cohortCreation'
-import exploredCohort from './exploredCohort'
-import autoLogout from './autoLogout'
 import criteria from './criteria'
+import drawer from './drawer'
+import exploredCohort from './exploredCohort'
+import me from './me'
 import message from './message'
+import { temporalConstraintsMiddleware } from './middlewares'
+import preferences from './preferences'
 import project from './project'
 import request from './request'
-import drawer from './drawer'
 import scope from './scope'
-import me from './me'
-import warningDialog from './warningDialog'
 import valueSets from './valueSets'
-import preferences from './preferences'
-import { temporalConstraintsMiddleware } from './middlewares'
+import questionnairesFormData from './questionnairesFormData'
+import warningDialog from './warningDialog'
 
 // Combine reducers
 export const rootReducer = combineReducers({
@@ -30,6 +29,7 @@ export const rootReducer = combineReducers({
     request: cohortCreation
   }),
   valueSets,
+  questionnairesFormData,
   exploredCohort,
   drawer,
   message,
@@ -44,7 +44,7 @@ export const rootReducer = combineReducers({
 const persistConfig = {
   key: 'root',
   storage: localforage,
-  blacklist: ['message', 'warningDialog']
+  blacklist: ['message', 'warningDialog', 'questionnairesFormData']
 }
 
 /**

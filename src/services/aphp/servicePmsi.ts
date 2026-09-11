@@ -35,6 +35,7 @@ export const fetchConditionList = (
     'max-recorded-date': durationRange?.[1] ?? '',
     uniqueFacet: ['subject'],
     subject: patient?.infos?.id,
+    _include: ['Encounter:encounter', 'Patient:subject'] satisfies ('Encounter:encounter' | 'Patient:subject')[],
     ...getPMSIFilters(filters, fetchParams, groupId),
     _sort: fetchParams.orderBy.orderBy === Order.CODE ? Order.CODE : Order.ONSET_DATE,
     signal
@@ -68,6 +69,7 @@ export const fetchProcedureList = (
     maxDate: durationRange?.[1] ?? '',
     uniqueFacet: ['subject'],
     subject: patient?.id,
+    _include: ['Encounter:encounter', 'Patient:subject'] satisfies ('Encounter:encounter' | 'Patient:subject')[],
     ...getPMSIFilters(filters, fetchParams, groupId),
     _sort: fetchParams.orderBy.orderBy === Order.CODE ? Order.CODE : Order.DATE,
     signal
@@ -100,6 +102,7 @@ export const fetchClaimList = (
     maxCreated: durationRange?.[1] ?? '',
     uniqueFacet: ['patient'],
     patient: patient?.id,
+    _include: ['Encounter:encounter', 'Patient:patient'] satisfies ('Encounter:encounter' | 'Patient:patient')[],
     ...getPMSIFilters(filters, fetchParams, groupId),
     _sort: fetchParams.orderBy.orderBy === Order.CODE ? Order.DIAGNOSIS : Order.CREATED,
     signal

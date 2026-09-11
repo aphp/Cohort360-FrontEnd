@@ -1,5 +1,5 @@
 import React from 'react'
-import { Link as RouterLink } from 'react-router-dom'
+import { Link as RouterLink } from 'react-router'
 import useBreadcrumbs from 'hooks/researches/useBreadcrumbs'
 import { Link, Typography } from '@mui/material'
 import { StyledBreadcrumbs } from './style'

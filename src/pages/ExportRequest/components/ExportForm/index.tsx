@@ -39,7 +39,7 @@ import {
 
 import { Cohort } from 'types'
 import { TableSetting, TableInfo } from 'types/export'
-import { useNavigate, useSearchParams } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router'
 import { sortTables } from 'pages/ExportRequest/components/exportUtils'
 import { useDebounceAction } from 'hooks/useDebounceAction'
 
@@ -504,7 +504,7 @@ const ExportForm: React.FC = () => {
                   window.open(
                     'https://id.pages.data.aphp.fr/isd/data-engineering/eds-central-database/latest/data_catalog/',
                     '_blank',
-                    'noopener,noreferrer'
+                    'noopener'
                   )
                 }
               >

@@ -1,39 +1,40 @@
 name: Publish Docker frontend
 
 run-name: >-
-  Publish Docker frontend - ${{ github.event.workflow_run.head_branch }}
-  - ${{ github.event.workflow_run.display_title }}
+  Publish Docker frontend - ${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_branch || github.ref_name }}
+  - ${{ github.event_name == 'workflow_run' && github.event.workflow_run.display_title || github.event.head_commit.message }}
 
 on:
+  push:
+    branches:
+      - frontend-frigo
+      - frigo
   workflow_run:
     workflows: [cohort360-frontend-test]
     types: [completed]
     branches:
       - main
       - develop
+      - frontend-frigo
+      - frigo
       - 'release/**'
 
 jobs:
   publish:
-    name: Build and push frontend Docker image - ${{ github.event.workflow_run.head_branch }}
+    name: Build and push frontend Docker image - ${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_branch || github.ref_name }}
     runs-on: ubuntu-latest
-    if: >-
-      github.event.workflow_run.conclusion == 'success'
-      && github.event.workflow_run.event == 'push'
-      && github.event.workflow_run.head_repository.full_name == github.repository
-    permissions:
-      contents: read
+    if: github.event_name == 'push' || (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push')
 
     steps:
       - name: Checkout code
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
         with:
-          ref: ${{ github.event.workflow_run.head_sha }}
+          ref: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_sha || github.sha }}
 
       - name: Définir VERSION et les tags Docker
         env:
-          HEAD_BRANCH: ${{ github.event.workflow_run.head_branch }}
-          GIT_SHA: ${{ github.event.workflow_run.head_sha }}
+          HEAD_BRANCH: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_branch || github.ref_name }}
+          GIT_SHA: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_sha || github.sha }}
           DOCKER_REPO: aphpid/cohort360-frontend
         run: |
           set -euo pipefail
@@ -55,6 +56,9 @@ jobs:
               ;;
             develop)
               echo "IMAGE_TAGS=${DOCKER_REPO}:develop" >> "$GITHUB_ENV"
+              ;;
+            frontend-frigo|frigo)
+              echo "IMAGE_TAGS=${DOCKER_REPO}:frontend-frigo" >> "$GITHUB_ENV"
               ;;
             release/*)
               echo "IMAGE_TAGS=${DOCKER_REPO}:${VERSION}-rc,${DOCKER_REPO}:${VERSION}-rc.${SHORT_SHA}" >> "$GITHUB_ENV"

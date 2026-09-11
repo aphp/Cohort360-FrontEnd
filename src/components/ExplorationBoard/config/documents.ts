@@ -26,7 +26,7 @@ import { Table, Row, CellType, Column } from 'types/table'
 import { getDocumentStatus } from 'utils/documentsFormatter'
 import CheckIcon from 'assets/icones/check.svg?react'
 import CancelIcon from 'assets/icones/times.svg?react'
-import { DocumentReference, Encounter, Patient as FhirPatient, Resource } from 'fhir/r4'
+import { DocumentReference, Resource } from 'fhir/r4'
 import { fetchDocumentReference } from 'services/aphp/callApi'
 import { ResourceType } from 'types/requestCriterias'
 import { getConfig } from 'config'
@@ -40,7 +40,13 @@ import {
 import { FhirItem } from 'types/valueSet'
 import { Buffer } from 'buffer'
 import { SourceType } from 'types/scope'
-import { getResourceInfos, getResourceInfosFromBundle } from 'utils/fillElement'
+import {
+  getBundleResources,
+  getResourceInfos,
+  getResourceInfosFromBundle,
+  isEncounterResource,
+  isPatientResource
+} from 'utils/fillElement'
 import { getExtension } from 'utils/fhir'
 import { linkElementWithEncounter } from 'utils/encounter'
 import { getDocTypeLabel } from '../../../utils/docTypesHelper'
@@ -58,6 +64,7 @@ const initSearchCriterias = (search: string): SearchCriterias<DocumentsFilters> 
     docStatuses: [],
     docTypes: [],
     onlyPdfAvailable: true,
+    excludeImportedDocuments: true,
     durationRange: [null, null],
     executiveUnits: [],
     encounterStatus: []
@@ -72,7 +79,17 @@ const fetchList = (
   groupId: string[],
   signal?: AbortSignal
 ): Promise<ExplorationResults<DocumentReference>> => {
-  const { nda, ipp, executiveUnits, encounterStatus, durationRange, docStatuses, docTypes, onlyPdfAvailable } = filters
+  const {
+    nda,
+    ipp,
+    executiveUnits,
+    encounterStatus,
+    durationRange,
+    docStatuses,
+    docTypes,
+    onlyPdfAvailable,
+    excludeImportedDocuments
+  } = filters
   const { searchInput } = fetchParams
   const params = {
     searchBy: searchBy,
@@ -84,6 +101,7 @@ const fetchList = (
     'encounter-identifier': nda,
     'patient-identifier': ipp,
     onlyPdfAvailable,
+    excludeImportedDocuments,
     uniqueFacet: ['subject'] as 'subject'[],
     executiveUnits: executiveUnits.map((unit) => unit.id),
     encounterStatus: encounterStatus?.map(({ id }) => id),
@@ -94,10 +112,11 @@ const fetchList = (
   }
   const paramsWithInclude = {
     ...params,
-    _include: ['Encounter:encounter', 'Patient:patient'] as ('Encounter:encounter' | 'Patient:patient')[]
+    _include: ['Encounter:encounter', 'Patient:patient'] satisfies ('Encounter:encounter' | 'Patient:patient')[]
   }
   const paramsFetchAll = {
     patient: patient?.id,
+    excludeImportedDocuments,
     uniqueFacet: ['subject'] as 'subject'[],
     ...getCommonParamsAll(groupId),
     signal
@@ -123,24 +142,6 @@ const isDocumentReference = (resource: Resource | undefined): resource is Docume
   return resource?.resourceType === 'DocumentReference'
 }
 
-const isEncounter = (resource: Resource | undefined): resource is Encounter => {
-  return resource?.resourceType === 'Encounter'
-}
-
-const isPatientResource = (resource: Resource | undefined): resource is FhirPatient => {
-  return resource?.resourceType === 'Patient'
-}
-
-const getBundleResources = (response: { data: FHIR_Bundle_Response<DocumentReference> }): Resource[] => {
-  if (response.data.resourceType !== 'Bundle') return []
-
-  return (
-    response.data.entry
-      ?.map((entry) => entry.resource as unknown as Resource | undefined)
-      .filter((resource): resource is Resource => !!resource) ?? []
-  )
-}
-
 const fetchDocumentsList = async (
   paramsWithInclude: Parameters<typeof fetchDocumentReference>[0],
   paramsFetchAll: Parameters<typeof fetchDocumentReference>[0] | null,
@@ -157,7 +158,7 @@ const fetchDocumentsList = async (
   const resources = getBundleResources(list)
   const documents = resources.filter(isDocumentReference)
   const includedPatients = resources.filter(isPatientResource)
-  const includedEncounters = resources.filter(isEncounter)
+  const includedEncounters = resources.filter(isEncounterResource)
 
   let listResources
   if (patient) {

@@ -193,15 +193,6 @@ const criteriaList: () => CriteriaItemType[] = () => {
   ]
 }
 
-export const getAllCriteriaItems = (criteria: readonly CriteriaItemType[]): CriteriaItemType[] => {
-  const allCriteriaItems: CriteriaItemType[] = []
-  for (const criterion of criteria) {
-    allCriteriaItems.push(criterion)
-    if (criterion.subItems && criterion.subItems.length > 0) {
-      allCriteriaItems.push(...getAllCriteriaItems(criterion.subItems))
-    }
-  }
-  return allCriteriaItems
-}
+export { getAllCriteriaItems } from 'utils/cohortCreation'
 
 export default criteriaList

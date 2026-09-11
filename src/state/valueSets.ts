@@ -3,10 +3,9 @@ import { CriteriaItemType } from 'types'
 import { CodesCache, Hierarchy } from 'types/hierarchy'
 import { logout } from './me'
 import { LabelObject } from 'types/searchCriterias'
-import { RootState } from 'state'
+import type { RootState } from 'state'
 import { mapCacheToCodes } from 'utils/hierarchy'
 import { FhirItem } from 'types/valueSet'
-import { getAllCriteriaItems } from 'components/CreationCohort/DataList_Criteria'
 import { getCodeList } from 'services/aphp/serviceValueSets'
 
 const valueSetsAdapter = createEntityAdapter<CodesCache<FhirItem>>()
@@ -18,6 +17,7 @@ export type ValueSetStore = { entities: { [id: string]: CodesCache<FhirItem> | u
 export const prefetchSmallValueSets = async (
   criteriaTree: CriteriaItemType[]
 ): Promise<Array<CodesCache<FhirItem>>> => {
+  const { getAllCriteriaItems } = await import('components/CreationCohort/DataList_Criteria')
   const criteriaList = getAllCriteriaItems(criteriaTree)
 
   // fetch all unique valueSetIds from the criteriaList

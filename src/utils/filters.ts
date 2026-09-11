@@ -81,6 +81,9 @@ export const removeFilter = <F>(key: FilterKeys, value: FilterValue, filters: F)
       case FilterKeys.ONLY_PDF_AVAILABLE:
         castedFilters[key] = false
         break
+      case FilterKeys.EXCLUDE_IMPORTED_DOCUMENTS:
+        castedFilters[key] = false
+        break
     }
   }
   return { ...castedFilters }
@@ -128,7 +131,8 @@ export const getFilterLabel = (key: FilterKeys, value: FilterValue): string => {
     [FilterKeys.ENCOUNTER_STATUS]: (value) =>
       `Statut de la visite associée : ${capitalizeFirstLetter((value as LabelObject)?.label ?? '')}`,
     [FilterKeys.VALIDATED_STATUS]: () => `Analyses dont les résultats ont été validés`,
-    [FilterKeys.ONLY_PDF_AVAILABLE]: () => `Documents dont les PDF sont disponibles`
+    [FilterKeys.ONLY_PDF_AVAILABLE]: () => `Documents dont les PDF sont disponibles`,
+    [FilterKeys.EXCLUDE_IMPORTED_DOCUMENTS]: () => `Documents importés exclus`
   }
 
   const filterLabel = filterLabelMapper[key]
@@ -213,6 +217,13 @@ export const selectFiltersAsArray = (filters: Filters, searchInput: string | und
             value: value as FilterValue,
             label: getFilterLabel(key, value)
           })
+          break
+        case FilterKeys.EXCLUDE_IMPORTED_DOCUMENTS:
+          result.push({
+            category: key,
+            value: value as FilterValue,
+            label: getFilterLabel(key, value)
+          })
       }
     }
   }
@@ -238,6 +249,7 @@ export const atLeastOneSearchCriteria = (searchCriterias: SearchCriterias<Filter
     ('docTypes' in filters && filters.docTypes?.length > 0) ||
     ('docStatuses' in filters && filters.docStatuses?.length > 0) ||
     ('onlyPdfAvailable' in filters && !!filters.onlyPdfAvailable) ||
+    ('excludeImportedDocuments' in filters && !!filters.excludeImportedDocuments) ||
     ('formName' in filters && filters.formName.length > 0) ||
     ('administrationRoutes' in filters && filters.administrationRoutes && filters.administrationRoutes.length > 0) ||
     ('prescriptionTypes' in filters && filters.prescriptionTypes && filters.prescriptionTypes.length > 0) ||

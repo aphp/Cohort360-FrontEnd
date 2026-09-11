@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState, useContext } from 'react'
-import { useNavigate, useSearchParams } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router'
 import { useAppSelector } from 'state'
 import { AppConfig } from 'config'
 

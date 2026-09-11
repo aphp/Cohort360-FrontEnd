@@ -18,17 +18,27 @@
  * @since 1.0.0
  */
 
-import React, { useContext, useEffect, useState } from 'react'
-import { Outlet, Navigate, useLocation } from 'react-router-dom'
-
-import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button } from '@mui/material'
-
-import { isAccessTokenValid } from 'utils/tokens'
-
-import { useAppSelector, useAppDispatch } from '../../state'
+import {
+  Box,
+  Button,
+  CircularProgress,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle
+} from '@mui/material'
 import { AppConfig } from 'config'
 import { throttle } from 'lodash'
+import type React from 'react'
+import { useContext, useEffect, useState } from 'react'
+import { Navigate, Outlet, useLocation } from 'react-router'
+import useOnboardingEnabled from 'hooks/onboarding/useOnboardingEnabled'
+import useOnboardingStatus from 'hooks/onboarding/useOnboardingStatus'
 import { updateConfigFromFhirMetadata } from 'services/aphp/serviceFhirConfig'
+import { isAccessTokenValid } from 'utils/tokens'
+import { ONBOARDING_ROUTE } from 'views/Onboarding/route'
+import { useAppSelector } from '../../state'
 
 /**
  * Global window object type declaration to access Microsoft Clarity tracking.
@@ -73,10 +83,13 @@ declare const window: any
  */
 const PrivateRoute: React.FC = () => {
   const me = useAppSelector((state) => state.me)
-  const dispatch = useAppDispatch()
   const appConfig = useContext(AppConfig)
   const location = useLocation()
   const hasValidToken = isAccessTokenValid()
+  const onboardingEnabled = useOnboardingEnabled()
+  const { status: onboardingStatus, statusPending: onboardingStatusPending } = useOnboardingStatus(
+    !!me && hasValidToken && onboardingEnabled
+  )
   const [fetchedFhirMetadata, setFetchedFhirMetadata] = useState(false)
 
   /** State to control when redirection to login page is allowed */
@@ -97,7 +110,6 @@ const PrivateRoute: React.FC = () => {
    * Dependencies:
    * - me: Current user authentication state
    * - appConfig.system.userTrackingBlacklist: List of user IDs to exclude from tracking
-   * - dispatch: Redux dispatch function (for consistency in dependency array)
    */
   useEffect(() => {
     if (window.clarity && me?.id) {
@@ -106,7 +118,7 @@ const PrivateRoute: React.FC = () => {
         window.clarity('set', 'exclude', 'true')
       }
     }
-  }, [me, appConfig.system.userTrackingBlacklist, dispatch])
+  }, [me, appConfig.system.userTrackingBlacklist])
 
   useEffect(() => {
     const callFetchFhirMetadata = throttle(async () => {
@@ -152,6 +164,22 @@ const PrivateRoute: React.FC = () => {
         </DialogActions>
       </Dialog>
     )
+  } else if (!onboardingEnabled) {
+    // Feature flag off (globally, or the user's APH code is outside the restricted allow-list):
+    // the app behaves as before, no status fetch and no redirect to the journey.
+    return <Outlet />
+  } else if (onboardingStatusPending) {
+    // Never gate on an unconfirmed status. The status query keeps retrying in the background on
+    // failure, so a returning session is never judged on the default (not-onboarded) state and an
+    // already-onboarded account is never restarted on a transient error.
+    return (
+      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh' }}>
+        <CircularProgress />
+      </Box>
+    )
+  } else if (onboardingStatus?.onboarding_completed_at == null && !location.pathname.startsWith(ONBOARDING_ROUTE)) {
+    // Status confirmed and onboarding not completed: gate the app behind the journey
+    return <Navigate to={ONBOARDING_ROUTE} replace />
   } else {
     // User is authenticated, render the protected route content
     return <Outlet />

@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router'
 
 import AddOrEditItem from './Modals/AddOrEditItem'
 import ConfirmDeletion from './Modals/ConfirmDeletion'

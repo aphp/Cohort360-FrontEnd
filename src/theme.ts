@@ -1,12 +1,14 @@
 import { createTheme } from '@mui/material'
 
+import { aphp, eds } from 'styles/palette'
+
 export default createTheme({
   palette: {
     common: {
-      black: '#153D8A'
+      black: eds.blue[600]
     },
     primary: {
-      main: '#0063AF'
+      main: aphp.bleu[600]
     },
     secondary: {
       main: '#ED6D91'
@@ -15,7 +17,7 @@ export default createTheme({
       active: '#5BC5F2'
     },
     text: {
-      primary: '#153D8A'
+      primary: eds.blue[600]
     },
     background: {
       default: '#fff'
@@ -71,7 +73,7 @@ export default createTheme({
         root: {
           fontSize: '18px',
           fontFamily: "'Montserrat', sans-serif",
-          color: '#0063AF',
+          color: aphp.bleu[600],
           textTransform: 'none',
           lineHeight: 2
         }

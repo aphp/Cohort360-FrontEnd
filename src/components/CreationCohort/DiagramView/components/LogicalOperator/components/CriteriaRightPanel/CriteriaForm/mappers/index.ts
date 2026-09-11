@@ -236,6 +236,16 @@ export const constructFhirFilterForType = <T extends SelectedCriteriaType>(
       criteriaForm.buildInfo.defaultFilter ?? ''
     )
 }
+const resetPresenceBasedBooleans = <T extends SelectedCriteriaType>(
+  criterion: T,
+  items: Array<{ valueKey?: keyof T; buildInfo?: { unbuildMethod?: string } }>
+): void => {
+  for (const item of items) {
+    if (item.valueKey && item.buildInfo?.unbuildMethod === 'unbuildBooleanFromDataNonNullStatus') {
+      criterion[item.valueKey] = false as T[keyof T]
+    }
+  }
+}
 
 export const unbuildCriteriaDataFromDefinition = async <T extends SelectedCriteriaType>(
   element: RequeteurCriteriaType,
@@ -262,6 +272,7 @@ export const unbuildCriteriaDataFromDefinition = async <T extends SelectedCriter
   }
 
   const criteriaItems = criteriaDefinition.itemSections.flatMap((section) => section.items)
+  resetPresenceBasedBooleans(emptyCriterion, criteriaItems)
   if (element.filterFhir) {
     const filters = element.filterFhir.split('&').map((elem) => elem.split('='))
     try {

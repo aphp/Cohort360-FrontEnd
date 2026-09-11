@@ -1,5 +1,6 @@
-import { ReactElement, ReactNode } from 'react'
-import {
+import type { AxiosResponse } from 'axios'
+import type { CriteriaForm } from 'components/CreationCohort/DiagramView/components/LogicalOperator/components/CriteriaRightPanel/CriteriaForm/types'
+import type {
   Bundle,
   Claim,
   Condition,
@@ -22,10 +23,9 @@ import {
   Reference,
   Resource
 } from 'fhir/r4'
-import { AxiosResponse } from 'axios'
-import { Comparators, CriteriaType, ResourceType, SelectedCriteriaType } from 'types/requestCriterias'
-import { CriteriaForm } from 'components/CreationCohort/DiagramView/components/LogicalOperator/components/CriteriaRightPanel/CriteriaForm/types'
-import { ScopeElement } from 'types/scope'
+import type { ReactElement, ReactNode } from 'react'
+import type { Comparators, CriteriaType, ResourceType, SelectedCriteriaType } from 'types/requestCriterias'
+import type { ScopeElement } from 'types/scope'
 
 export type PartialBy<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>
 
@@ -111,6 +111,9 @@ export type User = {
   firstname?: string
   lastname?: string
   display_name?: string
+  onboarding_step?: number
+  onboarding_completed_at?: string | null
+  charter_signed_at?: string | null
 }
 
 export type CohortComposition = DocumentReference & {
@@ -570,6 +573,30 @@ export type AccessExpiration = {
   end_datetime: Date
   profile: string
   perimeter: string
+}
+
+// The role carries a boolean flag per right (right_*); the catalog below provides their labels.
+export type MyAccessRole = {
+  name: string | null
+} & Record<string, boolean | string | null>
+
+export type MyAccess = {
+  id: number
+  role: MyAccessRole
+  perimeter: { source_value: string; name: string } | null
+  end_datetime: string | null
+}
+
+export type RightCatalogItem = {
+  name: string
+  label: string
+  depends_on: string | null
+}
+
+export type RightCatalogCategory = {
+  name: string
+  is_global: boolean
+  rights: RightCatalogItem[]
 }
 
 // this is an incomplete type, it should be completed with the other fields

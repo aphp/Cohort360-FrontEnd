@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router'
 
 import CenteredCircularProgress from 'components/ui/CenteredCircularProgress'
 import DataTable from 'components/ui/Table'

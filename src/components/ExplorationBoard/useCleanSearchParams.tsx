@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { useSearchParams, useNavigate, useLocation } from 'react-router-dom'
+import { useSearchParams, useNavigate, useLocation } from 'react-router'
 import { getCleanGroupId } from 'utils/paginationUtils'
 
 const ALLOWED_PARAMS = ['page', 'groupId', 'subtab']

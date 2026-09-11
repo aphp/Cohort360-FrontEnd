@@ -1,6 +1,6 @@
 /* eslint-disable max-statements */
 import React, { useEffect, useState, useRef } from 'react'
-import { Outlet, useLocation, useNavigate, useSearchParams } from 'react-router-dom'
+import { Outlet, useLocation, useNavigate, useSearchParams } from 'react-router'
 
 import { Box, Grid, Slide, Tab } from '@mui/material'
 import Badge from 'components/ui/Badge'

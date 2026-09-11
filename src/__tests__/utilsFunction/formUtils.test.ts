@@ -5,14 +5,28 @@ import {
   getDataFromForm,
   getFormDetails,
   getFormLabel,
-  getFormName
+  getFormName,
+  FormItemsByLinkId
 } from 'utils/formUtils'
 import { Questionnaire, QuestionnaireResponseItemAnswer } from 'fhir/r4'
 import { CohortQuestionnaireResponse } from 'types'
 import { FormNames } from 'types/searchCriterias'
 import labels from 'labels.json'
-import { hospitForm } from 'data/hospitData'
+import { FormItem } from 'utils/questionnaireFormData'
 import { endDate, form, questionnaireList, startDate } from '__tests__/data/explorationData/questionnaires'
+
+const makeFormItem = (linkId: string, itemType: FormItem['itemType'], formName = FormNames.HOSPIT): FormItem => ({
+  id: `${formName}-${linkId}`,
+  formName,
+  linkId,
+  itemType,
+  title: linkId
+})
+
+const birthDeliveryStartDateItem = makeFormItem('F_MATER_004961', 'valueDateTime')
+const hospitFormItems: FormItemsByLinkId = {
+  [birthDeliveryStartDateItem.linkId]: birthDeliveryStartDateItem
+}
 
 describe('test of getFormName function', () => {
   it('should return form name unknown if no questionnaire id match', () => {
@@ -60,11 +74,11 @@ describe('test of getFormLabel function', () => {
 describe('test of getFormDetails', () => {
   it('should return hospit details if FormNames = FormNames.HOSPIT', () => {
     const formName = FormNames.HOSPIT
-    expect(getFormDetails(form, formName)).toStrictEqual(generateHospitDetails(form))
+    expect(getFormDetails(form, formName, hospitFormItems)).toStrictEqual(generateHospitDetails(form, hospitFormItems))
   })
   it('should return empty string if formName is unknown', () => {
     const formName = FormNames.UNKNOWN
-    expect(getFormDetails(form, formName)).toStrictEqual([])
+    expect(getFormDetails(form, formName, hospitFormItems)).toStrictEqual([])
   })
 })
 
@@ -84,10 +98,10 @@ describe('test of getBirthDeliveryDate', () => {
       ]
     }
 
-    expect(getBirthDeliveryDate(_form, hospitForm)).toBe('Accouchement le 12/03/2023 à 07:44')
+    expect(getBirthDeliveryDate(_form, hospitFormItems)).toBe('Accouchement le 12/03/2023 à 07:44')
   })
   it('should return undefined if form item is empty', () => {
-    expect(getBirthDeliveryDate(form, hospitForm)).toBeUndefined()
+    expect(getBirthDeliveryDate(form, hospitFormItems)).toBeUndefined()
   })
   it('should return undefined if the item is not found', () => {
     const _form = {
@@ -99,7 +113,7 @@ describe('test of getBirthDeliveryDate', () => {
       ]
     }
 
-    expect(getBirthDeliveryDate(_form, hospitForm)).toBeUndefined()
+    expect(getBirthDeliveryDate(_form, hospitFormItems)).toBeUndefined()
   })
 })
 

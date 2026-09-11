@@ -1,18 +1,86 @@
-import { hospitForm } from 'data/hospitData'
-import { pregnancyForm } from 'data/pregnancyData'
 import { Questionnaire, QuestionnaireResponse, QuestionnaireResponseItemAnswer } from 'fhir/r4'
 import moment from 'moment'
 import { CohortQuestionnaireResponse } from 'types'
 import { FormNames } from 'types/searchCriterias'
 import labels from 'labels.json'
+import { FormItem } from 'utils/questionnaireFormData'
+import { HOSPIT_LINK_IDS, PREGNANCY_LINK_IDS } from 'constants/maternityLinkIds'
 
-export const getDataFromForm = (
-  form: QuestionnaireResponse,
-  pregnancyDataName: { id: string; type: keyof QuestionnaireResponseItemAnswer }
-) => {
-  const itemValue = form.item?.find((item) => item.linkId === pregnancyDataName.id)?.answer
+export type FormItemsByLinkId = Record<string, FormItem>
 
-  switch (pregnancyDataName.type) {
+export const buildFormItemsByLinkId = (formItems: FormItem[]): FormItemsByLinkId =>
+  formItems.reduce<FormItemsByLinkId>((acc, item) => {
+    acc[item.linkId] = item
+    return acc
+  }, {})
+
+type DisplayField = { linkId: string; name: string }
+
+const HOSPIT_DISPLAY_FIELDS: DisplayField[] = [
+  { linkId: HOSPIT_LINK_IDS.hospitReason, name: "Motif d'hospitalisation" },
+  { linkId: HOSPIT_LINK_IDS.inUteroTransfer, name: 'Transfert in utero' },
+  { linkId: HOSPIT_LINK_IDS.maturationCorticotherapie, name: 'Corticothérapie pour maturation foetale faite' },
+  { linkId: HOSPIT_LINK_IDS.chirurgicalGestureDate, name: 'Date geste ou chirurgie' },
+  { linkId: HOSPIT_LINK_IDS.chirurgicalGesture, name: 'Type de geste ou chirurgie' },
+  { linkId: HOSPIT_LINK_IDS.childbirth, name: 'Accouchement' },
+  { linkId: HOSPIT_LINK_IDS.hospitalChildBirthPlace, name: "Accouchement à l'hôpital" },
+  { linkId: HOSPIT_LINK_IDS.homeChildBirthPlace, name: 'Accouchement à domicile' },
+  { linkId: HOSPIT_LINK_IDS.otherHospitalChildBirthPlace, name: "Lieu d'accouchement autre" },
+  { linkId: HOSPIT_LINK_IDS.childbirthMode, name: 'Mode de mise en travail' },
+  { linkId: HOSPIT_LINK_IDS.maturationReason, name: 'Motif de maturation / déclenchement' },
+  { linkId: HOSPIT_LINK_IDS.maturationModality, name: 'Modalités de maturation cervicale initiale' },
+  { linkId: HOSPIT_LINK_IDS.foetusPresentation, name: 'Présentation du foetus - liste' },
+  {
+    linkId: HOSPIT_LINK_IDS.laborOrCesareanEntry,
+    name: "Présentation à l'entrée en travail ou en début de césarienne"
+  },
+  { linkId: HOSPIT_LINK_IDS.analgesieType, name: 'Analgésie / anesthésie - type' },
+  { linkId: HOSPIT_LINK_IDS.birthDeliveryStartDate, name: 'Accouchement - Date/heure' },
+  { linkId: HOSPIT_LINK_IDS.birthDeliveryWeeks, name: 'Accouchement - Terme - Semaines' },
+  { linkId: HOSPIT_LINK_IDS.birthDeliveryDays, name: 'Accouchement - Terme - Jours' },
+  { linkId: HOSPIT_LINK_IDS.birthDeliveryWay, name: "Voie d'accouchement" },
+  { linkId: HOSPIT_LINK_IDS.cSectionModality, name: 'Modalités de la césarienne' },
+  { linkId: HOSPIT_LINK_IDS.gender, name: 'Identité - Sexe' },
+  { linkId: HOSPIT_LINK_IDS.birthMensurationsGrams, name: 'Mensurations naissance - Poids (g)' },
+  { linkId: HOSPIT_LINK_IDS.birthMensurationsPercentil, name: 'Mensurations naissance - Poids percentile' },
+  { linkId: HOSPIT_LINK_IDS.birthStatus, name: 'Statut vital à la naissance' },
+  { linkId: HOSPIT_LINK_IDS.postpartumHemorrhage, name: 'Hémorragie du post-partum' },
+  { linkId: HOSPIT_LINK_IDS.conditionPerineum, name: 'Périnée - État' },
+  { linkId: HOSPIT_LINK_IDS.bloodLossEstimation, name: 'Pertes sanguines estimées totales (mL)' },
+  { linkId: HOSPIT_LINK_IDS.exitPlaceType, name: 'Lieu de sortie - Type' },
+  { linkId: HOSPIT_LINK_IDS.feedingType, name: "Type d'allaitement" }
+]
+
+const PREGNANCY_DISPLAY_FIELDS: DisplayField[] = [
+  { linkId: PREGNANCY_LINK_IDS.pregnancyStartDate, name: 'Date de début de grossesse' },
+  { linkId: PREGNANCY_LINK_IDS.foetus, name: 'Nombre de foetus' },
+  { linkId: PREGNANCY_LINK_IDS.pregnancyType, name: 'Type de grossesse' },
+  { linkId: PREGNANCY_LINK_IDS.twinPregnancyType, name: 'Type de grossesse gémellaire' },
+  { linkId: PREGNANCY_LINK_IDS.parity, name: 'Parité' },
+  { linkId: PREGNANCY_LINK_IDS.ultrasoundMonitoring, name: 'Suivi échographique - Précision' },
+  { linkId: PREGNANCY_LINK_IDS.corticotherapie, name: 'Corticothérapie pour maturation pulmonaire foetale' },
+  {
+    linkId: PREGNANCY_LINK_IDS.reasonsOfPrenatalDiagnosticMonitoring,
+    name: 'Raisons du suivi au diagnostic prénatal'
+  }
+]
+
+type FieldDescriptor = { id: string; type: keyof QuestionnaireResponseItemAnswer } | FormItem
+
+const resolveLinkIdAndType = (
+  descriptor: FieldDescriptor
+): { linkId: string; type: keyof QuestionnaireResponseItemAnswer } => {
+  if ('linkId' in descriptor) {
+    return { linkId: descriptor.linkId, type: descriptor.itemType }
+  }
+  return { linkId: descriptor.id, type: descriptor.type }
+}
+
+export const getDataFromForm = (form: QuestionnaireResponse, descriptor: FieldDescriptor) => {
+  const { linkId, type } = resolveLinkIdAndType(descriptor)
+  const itemValue = form.item?.find((item) => item.linkId === linkId)?.answer
+
+  switch (type) {
     case 'valueString':
       return itemValue?.map((answer) => answer.valueString).join(' - ') ?? 'N/A'
     case 'valueDate':
@@ -66,27 +134,42 @@ export const getFormLabel = (formName: FormNames = FormNames.UNKNOWN) => {
   }
 }
 
-export const getFormDetails = (form: CohortQuestionnaireResponse, formName: FormNames) => {
+const generateDetails = (
+  form: CohortQuestionnaireResponse,
+  fields: DisplayField[],
+  formItemsByLinkId: FormItemsByLinkId
+) =>
+  fields
+    .map((field) => {
+      const formItem = formItemsByLinkId[field.linkId]
+      if (!formItem) {
+        return undefined
+      }
+      return { name: field.name, value: getDataFromForm(form, formItem) }
+    })
+    .filter((detail): detail is { name: string; value: string } => detail !== undefined)
+
+export const getFormDetails = (
+  form: CohortQuestionnaireResponse,
+  formName: FormNames,
+  formItemsByLinkId: FormItemsByLinkId
+) => {
   const mapToFormDetails = {
-    [FormNames.HOSPIT]: generateHospitDetails(form),
-    [FormNames.PREGNANCY]: generatePregnancyDetails(form),
-    [FormNames.UNKNOWN]: []
+    [FormNames.HOSPIT]: () => generateHospitDetails(form, formItemsByLinkId),
+    [FormNames.PREGNANCY]: () => generatePregnancyDetails(form, formItemsByLinkId),
+    [FormNames.UNKNOWN]: () => []
   }
 
-  return mapToFormDetails[formName]
+  return mapToFormDetails[formName]()
 }
 
-export const getBirthDeliveryDate = (
-  form: QuestionnaireResponse,
-  hospitForm: {
-    [key: string]: {
-      id: string
-      type: keyof QuestionnaireResponseItemAnswer
-    }
+export const getBirthDeliveryDate = (form: QuestionnaireResponse, formItemsByLinkId: FormItemsByLinkId) => {
+  const formItem = formItemsByLinkId[HOSPIT_LINK_IDS.birthDeliveryStartDate]
+  if (!formItem) {
+    return undefined
   }
-) => {
-  const item = form.item?.find((item) => item.linkId === hospitForm.birthDeliveryStartDate.id)
-  return item ? `Accouchement le ${getDataFromForm(form, hospitForm.birthDeliveryStartDate)}` : undefined
+  const item = form.item?.find((item) => item.linkId === formItem.linkId)
+  return item ? `Accouchement le ${getDataFromForm(form, formItem)}` : undefined
 }
 
 export const formatHospitalisationDates = (start?: string, end?: string) => {
@@ -99,151 +182,8 @@ export const formatHospitalisationDates = (start?: string, end?: string) => {
   }
 }
 
-export const generateHospitDetails = (form: CohortQuestionnaireResponse) => {
-  return [
-    {
-      name: "Motif d'hospitalisation",
-      value: getDataFromForm(form, hospitForm.hospitReason)
-    },
-    {
-      name: 'Transfert in utero',
-      value: getDataFromForm(form, hospitForm.inUteroTransfer)
-    },
-    {
-      name: 'Corticothérapie pour maturation foetale faite',
-      value: getDataFromForm(form, hospitForm.maturationCorticotherapie)
-    },
-    {
-      name: 'Date geste ou chirurgie',
-      value: getDataFromForm(form, hospitForm.chirurgicalGestureDate)
-    },
-    { name: 'Type de geste ou chirurgie', value: getDataFromForm(form, hospitForm.chirurgicalGesture) },
-    {
-      name: 'Accouchement',
-      value: getDataFromForm(form, hospitForm.childbirth)
-    },
-    {
-      name: "Accouchement à l'hôpital",
-      value: getDataFromForm(form, hospitForm.hospitalChildBirthPlace)
-    },
-    {
-      name: 'Accouchement à domicile',
-      value: getDataFromForm(form, hospitForm.homeChildBirthPlace)
-    },
-    {
-      name: "Lieu d'accouchement autre",
-      value: getDataFromForm(form, hospitForm.otherHospitalChildBirthPlace)
-    },
-    {
-      name: 'Mode de mise en travail',
-      value: getDataFromForm(form, hospitForm.childbirthMode)
-    },
-    {
-      name: 'Motif de maturation / déclenchement',
-      value: getDataFromForm(form, hospitForm.maturationReason)
-    },
-    {
-      name: 'Modalités de maturation cervicale initiale',
-      value: getDataFromForm(form, hospitForm.maturationModality)
-    },
-    {
-      name: 'Présentation du foetus - liste',
-      value: getDataFromForm(form, hospitForm.foetusPresentation)
-    },
-    {
-      name: "Présentation à l'entrée en travail ou en début de césarienne",
-      value: getDataFromForm(form, hospitForm.laborOrCesareanEntry)
-    },
-    {
-      name: 'Analgésie / anesthésie - type',
-      value: getDataFromForm(form, hospitForm.analgesieType)
-    },
-    {
-      name: 'Accouchement - Date/heure',
-      value: getDataFromForm(form, hospitForm.birthDeliveryStartDate)
-    },
-    {
-      name: 'Accouchement - Terme - Semaines',
-      value: getDataFromForm(form, hospitForm.birthDeliveryWeeks)
-    },
-    {
-      name: 'Accouchement - Terme - Jours',
-      value: getDataFromForm(form, hospitForm.birthDeliveryDays)
-    },
-    {
-      name: "Voie d'accouchement",
-      value: getDataFromForm(form, hospitForm.birthDeliveryWay)
-    },
-    {
-      name: 'Modalités de la césarienne',
-      value: getDataFromForm(form, hospitForm.cSectionModality)
-    },
-    {
-      name: 'Identité - Sexe',
-      value: getDataFromForm(form, hospitForm.gender)
-    },
-    {
-      name: 'Mensurations naissance - Poids (g)',
-      value: getDataFromForm(form, hospitForm.birthMensurationsGrams)
-    },
-    {
-      name: 'Mensurations naissance - Poids percentile',
-      value: getDataFromForm(form, hospitForm.birthMensurationsPercentil)
-    },
-    {
-      name: 'Statut vital à la naissance',
-      value: getDataFromForm(form, hospitForm.birthStatus)
-    },
-    {
-      name: 'Hémorragie du post-partum',
-      value: getDataFromForm(form, hospitForm.postpartumHemorrhage)
-    },
-    {
-      name: 'Périnée - État',
-      value: getDataFromForm(form, hospitForm.conditionPerineum)
-    },
-    {
-      name: 'Pertes sanguines estimées totales (mL)',
-      value: getDataFromForm(form, hospitForm.bloodLossEstimation)
-    },
-    {
-      name: 'Lieu de sortie - Type',
-      value: getDataFromForm(form, hospitForm.exitPlaceType)
-    },
-    {
-      name: "Type d'allaitement",
-      value: getDataFromForm(form, hospitForm.feedingType)
-    }
-  ]
-}
+export const generateHospitDetails = (form: CohortQuestionnaireResponse, formItemsByLinkId: FormItemsByLinkId) =>
+  generateDetails(form, HOSPIT_DISPLAY_FIELDS, formItemsByLinkId)
 
-export const generatePregnancyDetails = (form: CohortQuestionnaireResponse) => {
-  return [
-    {
-      name: 'Date de début de grossesse',
-      value: getDataFromForm(form, pregnancyForm.pregnancyStartDate)
-    },
-    {
-      name: 'Nombre de foetus',
-      value: getDataFromForm(form, pregnancyForm.foetus)
-    },
-    { name: 'Type de grossesse', value: getDataFromForm(form, pregnancyForm.pregnancyType) },
-    {
-      name: 'Type de grossesse gémellaire',
-      value: getDataFromForm(form, pregnancyForm.twinPregnancyType)
-    },
-    { name: 'Parité', value: getDataFromForm(form, pregnancyForm.parity) },
-    {
-      name: 'Suivi échographique - Précision',
-      value: getDataFromForm(form, pregnancyForm.ultrasoundMonitoring)
-    },
-    {
-      name: 'Corticothérapie pour maturation pulmonaire foetale',
-      value: getDataFromForm(form, pregnancyForm.corticotherapie)
-    },
-    {
-      name: 'Raisons du suivi au diagnostic prénatal',
-      value: getDataFromForm(form, pregnancyForm.reasonsOfPrenatalDiagnosticMonitoring)
-    }
-  ]
-}
+export const generatePregnancyDetails = (form: CohortQuestionnaireResponse, formItemsByLinkId: FormItemsByLinkId) =>
+  generateDetails(form, PREGNANCY_DISPLAY_FIELDS, formItemsByLinkId)

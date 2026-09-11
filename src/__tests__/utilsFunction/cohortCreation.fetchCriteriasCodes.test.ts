@@ -6,16 +6,11 @@ const servicesMocks = vi.hoisted(() => ({
   HIERARCHY_ROOT: '__HIERARCHY_ROOT__'
 }))
 
-const criteriaMocks = vi.hoisted(() => ({
-  getAllCriteriaItems: vi.fn()
-}))
-
 const valueSetMocks = vi.hoisted(() => ({
   getValueSetFromCodeSystem: vi.fn()
 }))
 
 vi.mock('services/aphp/serviceValueSets', () => servicesMocks)
-vi.mock('components/CreationCohort/DataList_Criteria', () => criteriaMocks)
 vi.mock('utils/valueSets', () => valueSetMocks)
 
 import { fetchCriteriasCodes } from 'utils/cohortCreation'
@@ -29,28 +24,29 @@ const mkCode = (id: string, valueSetUrl: string): Hierarchy<any> => ({
   inferior_levels_ids: ''
 })
 
-describe('fetchCriteriasCodes real module coverage', () => {
-  beforeEach(() => {
-    vi.clearAllMocks()
-
-    criteriaMocks.getAllCriteriaItems.mockReturnValue([
-      {
-        id: 'TYPE_A',
-        formDefinition: {
-          itemSections: [
+// Criteria definitions passed directly and flattened via getAllCriteriaItems.
+const criteriaList = [
+  {
+    id: 'TYPE_A',
+    formDefinition: {
+      itemSections: [
+        {
+          items: [
             {
-              items: [
-                {
-                  type: 'codeSearch',
-                  valueKey: 'codesA',
-                  valueSetsInfo: [{ url: 'https://default-valueset' }]
-                }
-              ]
+              type: 'codeSearch',
+              valueKey: 'codesA',
+              valueSetsInfo: [{ url: 'https://default-valueset' }]
             }
           ]
         }
-      }
-    ])
+      ]
+    }
+  }
+] as any
+
+describe('fetchCriteriasCodes', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
 
     valueSetMocks.getValueSetFromCodeSystem.mockImplementation((system: string) => {
       if (system === 'https://system-mapped') return 'https://mapped-valueset'
@@ -70,7 +66,7 @@ describe('fetchCriteriasCodes real module coverage', () => {
       }
     ] as any
 
-    const cache = await fetchCriteriasCodes([] as any, selectedCriteria)
+    const cache = await fetchCriteriasCodes(criteriaList, selectedCriteria)
 
     expect(cache['https://mapped-valueset']).toBeDefined()
     expect(cache['https://mapped-valueset'][0].id).toBe('A1')
@@ -84,7 +80,7 @@ describe('fetchCriteriasCodes real module coverage', () => {
       }
     ] as any
 
-    const cache = await fetchCriteriasCodes([] as any, selectedCriteria)
+    const cache = await fetchCriteriasCodes(criteriaList, selectedCriteria)
 
     expect(cache['https://default-valueset']).toBeDefined()
     expect(cache['https://default-valueset'][0].id).toBe('A2')
@@ -102,7 +98,7 @@ describe('fetchCriteriasCodes real module coverage', () => {
       'https://default-valueset': [mkCode('A3', 'https://default-valueset')]
     }
 
-    const cache = await fetchCriteriasCodes([] as any, selectedCriteria, oldCache as any)
+    const cache = await fetchCriteriasCodes(criteriaList, selectedCriteria, oldCache as any)
 
     expect(servicesMocks.getChildrenFromCodes).not.toHaveBeenCalledWith('https://default-valueset', ['A3'])
     expect(cache['https://default-valueset']).toHaveLength(1)
@@ -116,7 +112,7 @@ describe('fetchCriteriasCodes real module coverage', () => {
       }
     ] as any
 
-    const cache = await fetchCriteriasCodes([] as any, selectedCriteria)
+    const cache = await fetchCriteriasCodes(criteriaList, selectedCriteria)
 
     expect(servicesMocks.getChildrenFromCodes).not.toHaveBeenCalled()
     expect(cache['https://mapped-valueset'][0].id).toBe('__HIERARCHY_ROOT__')

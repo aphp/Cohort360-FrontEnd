@@ -20,7 +20,6 @@ import {
   Snackbar
 } from '@mui/material'
 
-import DescriptionIcon from '@mui/icons-material/Description'
 import HighlightOffIcon from '@mui/icons-material/HighlightOff'
 import PlayArrowIcon from '@mui/icons-material/PlayArrow'
 import InfoIcon from '@mui/icons-material/Info'
@@ -58,7 +57,6 @@ import useStyle from './styles'
 
 import { format } from 'utils/numbers'
 import services from 'services/aphp'
-import ValidationDialog from 'components/ui/ValidationDialog'
 import { WebSocketContext } from 'components/WebSocket/WebSocketProvider'
 import { AppConfig } from 'config'
 import { setRequestDetailedMode } from 'state/preferences'
@@ -78,9 +76,6 @@ const ControlPanel: React.FC<{
   const [oldCount, setOldCount] = useState<CohortCount | null>(null)
   const [openShareRequestModal, setOpenShareRequestModal] = useState<boolean>(false)
   const [countLoading, setCountLoading] = useState<LoadingStatus>(LoadingStatus.IDDLE)
-  const [reportLoading, setReportLoading] = useState<LoadingStatus>(LoadingStatus.IDDLE)
-  const [reportError, setReportError] = useState(false)
-  const [openReportConfirmation, setOpenReportConfirmation] = useState<boolean>(false)
   const [openVersionsDialog, setOpenVersionsDialog] = useState<boolean>(false)
 
   const {
@@ -224,24 +219,6 @@ const ControlPanel: React.FC<{
     }
   }
 
-  const handleGenerateReport = async () => {
-    try {
-      setOpenReportConfirmation(true)
-      setReportLoading(LoadingStatus.FETCHING)
-      const sendReport = await services.cohortCreation.createReport(currentSnapshot.uuid)
-      if (sendReport?.status) {
-        setReportError(false)
-      } else {
-        setReportError(true)
-      }
-      setReportLoading(LoadingStatus.SUCCESS)
-    } catch (error) {
-      console.error(error)
-      setReportLoading(LoadingStatus.IDDLE)
-      setReportError(true)
-    }
-  }
-
   useCountReconciliation(count)
 
   const isLoading = loading || countLoading === LoadingStatus.FETCHING || saveLoading
@@ -343,27 +320,6 @@ const ControlPanel: React.FC<{
               <>Créer la cohorte</>
             )}
           </Button>
-          {appConfig.features.feasibilityReport.enabled && (
-            <Button
-              disabled={
-                isLoading || typeof onExecute !== 'function' || maintenanceIsActive || count_outdated || hasClaim
-              }
-              onClick={handleGenerateReport}
-              className={classes.requestExecution}
-              startIcon={<DescriptionIcon color="action" className={classes.iconBorder} />}
-              style={{ marginBottom: 12 }}
-            >
-              {isLoading ? (
-                <>
-                  Veuillez patienter
-                  <CircularProgress style={{ marginLeft: '15px' }} size={30} />
-                </>
-              ) : (
-                <>Générer un rapport</>
-              )}
-            </Button>
-          )}
-
           <Button
             onClick={() => {
               handleOpenSharedModal()
@@ -594,18 +550,6 @@ const ControlPanel: React.FC<{
           onClose={() => setOpenModal(null)}
           longCohort={includePatient ? includePatient > cohortLimit : false}
           cohortLimit={cohortLimit}
-        />
-      )}
-
-      {openReportConfirmation && (
-        <ValidationDialog
-          open
-          loading={reportLoading}
-          onClose={() => setOpenReportConfirmation(false)}
-          error={reportError}
-          message={
-            'Votre demande a bien été prise en compte. Vous recevrez un email de confirmation lorsque le rapport sera prêt.'
-          }
         />
       )}
 

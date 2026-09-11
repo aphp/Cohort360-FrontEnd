@@ -1,5 +1,5 @@
 import React, { PropsWithChildren, useEffect } from 'react'
-import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom'
+import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router'
 
 import { useAppSelector } from 'state/index'
 

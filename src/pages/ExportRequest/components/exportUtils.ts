@@ -248,8 +248,16 @@ const fetchDocumentsCount = async (cohortId: string, documentsFilters?: SearchCr
   try {
     let docResp
     if (documentsFilters && documentsFilters !== null) {
-      const { nda, durationRange, executiveUnits, encounterStatus, ipp, docTypes, docStatuses } =
-        documentsFilters.filters
+      const {
+        nda,
+        durationRange,
+        executiveUnits,
+        encounterStatus,
+        ipp,
+        docTypes,
+        docStatuses,
+        excludeImportedDocuments
+      } = documentsFilters.filters
 
       docResp = await fetchDocumentReference({
         size: 0,
@@ -260,6 +268,7 @@ const fetchDocumentsCount = async (cohortId: string, documentsFilters?: SearchCr
         type: docTypes.map((docType) => docType.code).join(),
         'encounter-identifier': nda,
         'patient-identifier': ipp,
+        excludeImportedDocuments,
         minDate: durationRange[0] ?? '',
         maxDate: durationRange[1] ?? '',
         executiveUnits: executiveUnits.map((unit) => unit.id),

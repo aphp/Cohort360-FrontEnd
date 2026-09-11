@@ -5,7 +5,7 @@
  */
 
 import { createSlice, PayloadAction, createAsyncThunk } from '@reduxjs/toolkit'
-import { RootState } from 'state'
+import type { RootState } from 'state'
 import {
   CohortCount,
   CriteriaGroup,
@@ -424,7 +424,7 @@ const buildCohortCreation = createAsyncThunk<BuildCohortReturn, BuildCohortParam
           ? state.cohortCreation.request.criteriaGroup
           : defaultInitialState().criteriaGroup
 
-      const json = buildRequest(_selectedPopulation, _selectedCriteria, _criteriaGroup, _temporalConstraints)
+      const json = await buildRequest(_selectedPopulation, _selectedCriteria, _criteriaGroup, _temporalConstraints)
       if (json !== state?.cohortCreation?.request?.json) {
         try {
           const saveJsonResponse = await dispatch(saveJson({ newJson: json })).unwrap()

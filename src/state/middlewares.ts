@@ -1,4 +1,4 @@
-import { RootState } from 'state'
+import type { RootState } from 'state'
 import { deleteSelectedCriteria, moveCriteria } from './cohortCreation'
 import { setMessage } from './message'
 import { isEqual } from 'lodash'
