@@ -1,4 +1,4 @@
-import type { ProxyOptions } from 'vite'
+import type { ProxyOptions, loadEnv } from 'vite'
 
 /**
  * Proxy dev : une URL par cible, vide = route désactivée (hybride local / k8s / etc.).
@@ -46,7 +46,6 @@ function withFhirAuthHeaderOverride(
 export function buildDevProxy(env: Record<string, string | undefined>): Record<string, ProxyOptions> {
   const secure = tlsVerify(env[E.secure])
   const proxy: Record<string, ProxyOptions> = {}
-
   const back = env[E.back]?.trim()
   const fhir = env[E.fhir]?.trim()
   const requestRaw = env[E.request]?.trim()
@@ -66,7 +65,8 @@ export function buildDevProxy(env: Record<string, string | undefined>): Record<s
   if (back) {
     proxy['/api/back/ws'] = {
       ...baseOpts(),
-      target: back,
+      // target: back || env.VITE_DEV_PROXY_BACK_WS?.trim(),
+      target: env.VITE_DEV_PROXY_BACK_WS?.trim(),
       ws: true,
       rewrite: (path) => path.replace(/^\/api\/back\/ws/, '/ws')
     }

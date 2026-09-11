@@ -1,0 +1,22 @@
+services:
+  front:
+    build: .
+    ports:
+      - ${FRONT_LOCAL_PORT}:3000
+    container_name: front
+    volumes:
+      - .env:/app/.env
+      - .:/app
+      - /app/node_modules
+    env_file:
+      - path: .env
+        required: true
+    command: npm start -- --host 0.0.0.0
+    networks:
+      - default
+      - cohort360-network  
+
+networks:
+  cohort360-network:
+    name: cohort360-network
+    external: true

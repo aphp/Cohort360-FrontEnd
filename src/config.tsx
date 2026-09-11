@@ -438,7 +438,7 @@ let config: AppConfig = {
     datamodelUrl: '/api/datamodel',
     sessionTimeout: 780000,
     refreshTokenInterval: 180000,
-    displayJwtLogin: false,
+    displayJwtLogin: true,
     displayOidcLogin: true,
     codeDisplayJWT: 'ArrowUp,ArrowUp,ArrowDown,ArrowDown,ArrowLeft,ArrowRight,ArrowLeft,ArrowRight,b,a,Enter',
     jToolUsers: [],
