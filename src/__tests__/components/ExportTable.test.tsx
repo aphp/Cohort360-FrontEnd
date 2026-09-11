@@ -100,15 +100,16 @@ describe('ExportTable', () => {
     expect(await screen.findByText('Patient')).toBeInTheDocument()
   })
 
-  it('signale la sous-table patient__identifier sur la table Patient', async () => {
+  it('ne mentionne pas patient__identifier sur la table Patient', async () => {
     renderTable({ exportTable: { ...tableInfo, name: 'Patient' } })
-    expect(await screen.findByText(/patient__identifier sera également exportée/)).toBeInTheDocument()
+    await screen.findAllByText('Patient')
+    expect(screen.queryByText(/patient__identifier/)).not.toBeInTheDocument()
   })
 
-  it('masque la mention de patient__identifier en export regroupé', async () => {
+  it('ne mentionne pas patient__identifier en export regroupé', async () => {
     renderTable({ exportTable: { ...tableInfo, name: 'Patient' }, oneFile: true })
     await screen.findAllByText('Patient')
-    expect(screen.queryByText(/patient__identifier sera également exportée/)).not.toBeInTheDocument()
+    expect(screen.queryByText(/patient__identifier/)).not.toBeInTheDocument()
   })
 
 })
