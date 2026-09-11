@@ -11,10 +11,17 @@ import {
   Claim,
   Condition,
   Procedure,
-  Bundle
+  Bundle,
+  BundleEntry
 } from 'fhir/r4'
 import { FHIR_Bundle_Promise_Response, FHIR_API_Response } from 'types'
-import { ExplorationResults, FetchOptions, FetchParams, Patient as PatientType } from 'types/exploration'
+import {
+  ExplorationResults,
+  FetchOptions,
+  FetchParams,
+  Patient as PatientType,
+  PMSI_INCLUDE_PAGE_SIZE
+} from 'types/exploration'
 import { getCodeList } from 'services/aphp/serviceValueSets'
 import { getApiResponseResources } from './apiHelpers'
 import {
@@ -109,6 +116,62 @@ type NonPatientResource =
   | MedicationRequest
   | MedicationAdministration
   | DocumentReference
+
+/**
+ * Fetches a FHIR search in bounded `pageSize` chunks (via `_count`/`_offset`) and
+ * concatenates the pages into a single Bundle-shaped response, instead of requesting
+ * `size` results in one shot. Required for any request that also uses `_include`:
+ * HAPI FHIR rejects a search (HAPI-0389) when too many base resources must be
+ * resolved for `_include` in a single query, regardless of how large `size` is.
+ *
+ * When `size` already fits in one page, this issues the exact same single request
+ * as before (no behavior change for existing bounded callers).
+ */
+export const fetchInPages = async <T extends Patient | NonPatientResource>(
+  fetchPage: (size: number, offset: number) => FHIR_Bundle_Promise_Response<T>,
+  size: number,
+  offset = 0,
+  pageSize: number = PMSI_INCLUDE_PAGE_SIZE
+): FHIR_Bundle_Promise_Response<T> => {
+  if (size <= pageSize) {
+    return fetchPage(size, offset)
+  }
+
+  const targetOffset = offset + size
+  let currentOffset = offset
+  let combinedEntries: BundleEntry<T>[] = []
+
+  // `size > pageSize` here, so `targetOffset > offset`: the loop always runs at
+  // least once and `firstResponse` is always assigned before it is read below.
+  const firstPageSize = Math.min(pageSize, targetOffset - currentOffset)
+  const firstResponse = await fetchPage(firstPageSize, currentOffset)
+  if (firstResponse.data.resourceType !== 'Bundle') return firstResponse
+  combinedEntries = combinedEntries.concat(firstResponse.data.entry ?? [])
+  currentOffset += firstPageSize
+
+  // The real total (from the first page) bounds pagination independently of the
+  // originally requested `size`, so a stale/over-estimated total never causes
+  // over-fetching once the actual data is exhausted.
+  const total = firstResponse.data.total ?? combinedEntries.length
+
+  while (currentOffset < targetOffset && currentOffset < total) {
+    const currentSize = Math.min(pageSize, targetOffset - currentOffset)
+    const response = await fetchPage(currentSize, currentOffset)
+
+    if (response.data.resourceType !== 'Bundle') return response
+
+    combinedEntries = combinedEntries.concat(response.data.entry ?? [])
+    currentOffset += currentSize
+  }
+
+  return {
+    ...firstResponse,
+    data: {
+      ...firstResponse.data,
+      entry: combinedEntries
+    }
+  }
+}
 
 export const fetcherWithParams = async <T extends Patient | NonPatientResource, F extends Filters>(
   fetchList: () => FHIR_Bundle_Promise_Response<T>,
