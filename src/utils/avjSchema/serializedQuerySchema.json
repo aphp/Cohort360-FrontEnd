@@ -1,8 +1,6 @@
 
 {
-  "_meta": {
-    "description": "This file defines the cohort search request format"
-  },
+  "$comment": "This file defines the cohort search request format",
   "title": "RequeteurJsonType",
   "type": "object",
   "additionalProperties": false,
