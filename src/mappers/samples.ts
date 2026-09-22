@@ -1,10 +1,10 @@
 import { AppConfig } from 'config'
 import { Cohort } from 'types'
-import { CohortCallbacks, ResearchesTableLabels } from 'types/cohorts'
+import { CohortCallbacks, DataAccessLabels, ResearchesTableLabels } from 'types/cohorts'
 import { Order } from 'types/searchCriterias'
 import { Action, CellType, Column, Favorite, Row, Table } from 'types/table'
 import {
-  getCohortSensitivity,
+  getCohortDataAccess,
   getExportTooltip,
   getGlobalEstimation,
   isCohortExportable,
@@ -27,7 +27,8 @@ const getSamplesInfos = (cohort: Cohort) => {
   const createdAt = formatDate(cohort.created_at)
   const samples = cohort.sample_cohorts?.length ?? 0
   const samplingRatio = formatPercentage(cohort.sampling_ratio)
-  const sensitivity = getCohortSensitivity(cohort.rights) ?? ''
+  const cohortDataAccess = getCohortDataAccess(cohort.rights)
+  const dataAccess = cohortDataAccess ? DataAccessLabels[cohortDataAccess] : ''
   return {
     name,
     parentName,
@@ -37,7 +38,7 @@ const getSamplesInfos = (cohort: Cohort) => {
     createdAt,
     samples,
     samplingRatio,
-    sensitivity
+    dataAccess
   }
 }
 
@@ -51,7 +52,7 @@ const mapSamplesToRows = (
 ) => {
   const rows: Row[] = []
   list.forEach((cohort) => {
-    const { name, parentName, statusChip, total, createdAt, samplingRatio, sensitivity } = getSamplesInfos(cohort)
+    const { name, parentName, statusChip, total, createdAt, samplingRatio, dataAccess } = getSamplesInfos(cohort)
     const { onClickRow, onClickFav, onClickExport, onClickEdit, onSelectCohort, onClickCohortVersion } = callbacks
     const actions = [
       {
@@ -111,8 +112,8 @@ const mapSamplesToRows = (
         type: CellType.STATUS_CHIP
       },
       {
-        id: `${cohort.uuid}-sensitivity`,
-        value: sensitivity,
+        id: `${cohort.uuid}-dataAccess`,
+        value: dataAccess,
         type: CellType.TEXT,
         sx: { width: 150 }
       },
@@ -163,7 +164,7 @@ const mapSamplesToColumns = (
     { label: '' },
     ...(cohortId ? [] : [{ label: ResearchesTableLabels.PARENT_COHORT, code: Order.REQUEST }]),
     { label: ResearchesTableLabels.STATUS },
-    { label: ResearchesTableLabels.SENSITIVITY },
+    { label: ResearchesTableLabels.DATA },
     { label: ResearchesTableLabels.PATIENT_TOTAL, code: Order.RESULT_SIZE },
     { label: ResearchesTableLabels.TOTAL_PERCENTAGE },
     { label: ResearchesTableLabels.CREATED_AT, code: Order.CREATED_AT }
