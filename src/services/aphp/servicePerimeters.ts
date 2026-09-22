@@ -19,11 +19,10 @@ import { fetchAccessExpirations, fetchEncounter, fetchPatient, fetchPerimeterAcc
 
 import { AxiosResponse } from 'axios'
 import apiBackend from '../apiBackend'
-import { FetchScopeOptions, Rights, ScopeElement, SourceType, System } from 'types/scope'
+import { accessType, FetchScopeOptions, Rights, ScopeElement, SourceType, System } from 'types/scope'
 import { scopeLevelsToRequestParam } from 'utils/perimeters'
 import { mapParamsToNetworkParams } from 'utils/url'
 import { Hierarchy } from 'types/hierarchy'
-import { accessType } from 'types/scope'
 import { getExtension } from 'utils/fhir'
 
 export interface IServicePerimeters {

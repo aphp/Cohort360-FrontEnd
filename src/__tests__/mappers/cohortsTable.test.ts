@@ -3,7 +3,6 @@ import { mapCohortsToTable } from 'mappers/cohorts'
 import { getConfig } from 'config'
 import { Cohort, JobStatus } from 'types'
 import { CohortCallbacks, ResearchesTableLabels } from 'types/cohorts'
-import { accessType } from 'types/scope'
 import { CellType } from 'types/table'
 
 const appConfig = getConfig()
@@ -57,25 +56,25 @@ describe('mappers/cohorts.mapCohortsToTable', () => {
     expect(table.rows).toHaveLength(3)
   })
 
-  describe('colonne sensibilité (CNIL)', () => {
-    const sensitivityCell = (table: ReturnType<typeof mapCohortsToTable>, uuid: string) =>
-      table.rows[0].find((cell) => cell.id === `${uuid}-sensitivity`)
+  describe('colonne données (CNIL)', () => {
+    const dataAccessCell = (table: ReturnType<typeof mapCohortsToTable>, uuid: string) =>
+      table.rows[0].find((cell) => cell.id === `${uuid}-dataAccess`)
 
-    it('ajoute une colonne "sensibilité" après le statut', () => {
+    it('ajoute une colonne "données" après le statut', () => {
       const table = mapCohortsToTable([cohort()], false, appConfig, callbacks, [], undefined, false)
       const labels = table.columns.map((col) => col.label)
-      expect(labels).toContain(ResearchesTableLabels.SENSITIVITY)
-      expect(labels.indexOf(ResearchesTableLabels.SENSITIVITY)).toBe(
+      expect(labels).toContain(ResearchesTableLabels.DATA)
+      expect(labels.indexOf(ResearchesTableLabels.DATA)).toBe(
         labels.indexOf(ResearchesTableLabels.STATUS) + 1
       )
     })
 
-    it('rend la cellule sensibilité, y compris en mode simplifié', () => {
+    it('rend la cellule données, y compris en mode simplifié', () => {
       const table = mapCohortsToTable([cohort()], true, appConfig, callbacks, [], 'req-1', false)
-      expect(sensitivityCell(table, 'c1')?.type).toBe(CellType.TEXT)
+      expect(dataAccessCell(table, 'c1')?.type).toBe(CellType.TEXT)
     })
 
-    it('affiche "Nominatif" quand l\'utilisateur a le droit de lecture nominative (read_patient_nomi)', () => {
+    it('affiche "Nominatives" quand l\'utilisateur a le droit de lecture nominative (read_patient_nomi)', () => {
       const table = mapCohortsToTable(
         [cohort({ rights: { read_patient_nomi: true, read_patient_pseudo: true } })],
         false,
@@ -85,10 +84,10 @@ describe('mappers/cohorts.mapCohortsToTable', () => {
         undefined,
         false
       )
-      expect(sensitivityCell(table, 'c1')?.value).toBe(accessType.NOMINAL)
+      expect(dataAccessCell(table, 'c1')?.value).toBe('Nominatives')
     })
 
-    it('affiche "Pseudonymisé" quand seule la lecture pseudonymisée est autorisée', () => {
+    it('affiche "Pseudonymisées" quand seule la lecture pseudonymisée est autorisée', () => {
       const table = mapCohortsToTable(
         [cohort({ rights: { read_patient_nomi: false, read_patient_pseudo: true } })],
         false,
@@ -98,10 +97,10 @@ describe('mappers/cohorts.mapCohortsToTable', () => {
         undefined,
         false
       )
-      expect(sensitivityCell(table, 'c1')?.value).toBe(accessType.PSEUDO)
+      expect(dataAccessCell(table, 'c1')?.value).toBe('Pseudonymisées')
     })
 
-    it("ne se fie pas au droit d'export : export nominatif sans lecture nominative => Pseudonymisé", () => {
+    it("ne se fie pas au droit d'export : export nominatif sans lecture nominative => Pseudonymisées", () => {
       const table = mapCohortsToTable(
         [cohort({ rights: { export_csv_xlsx_nomi: true, read_patient_nomi: false, read_patient_pseudo: true } })],
         false,
@@ -111,12 +110,12 @@ describe('mappers/cohorts.mapCohortsToTable', () => {
         undefined,
         false
       )
-      expect(sensitivityCell(table, 'c1')?.value).toBe(accessType.PSEUDO)
+      expect(dataAccessCell(table, 'c1')?.value).toBe('Pseudonymisées')
     })
 
     it('reste indéterminée (valeur vide) quand les droits sont absents', () => {
       const table = mapCohortsToTable([cohort()], false, appConfig, callbacks, [], undefined, false)
-      expect(sensitivityCell(table, 'c1')?.value).toBe('')
+      expect(dataAccessCell(table, 'c1')?.value).toBe('')
     })
   })
 })

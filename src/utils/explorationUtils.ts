@@ -115,9 +115,9 @@ export const isCohortExportable = (cohort: Cohort, appConfig: AppConfig) => {
  * repose donc sur les droits de LECTURE (`read_patient_nomi` / `read_patient_pseudo`) et non sur
  * le droit d'export (`export_csv_xlsx_nomi`).
  * Retourne `undefined` quand les droits sont inconnus ou absents : on préfère n'afficher aucune
- * mention plutôt qu'une mention « Pseudonymisé » qui sous-estimerait les obligations.
+ * mention plutôt qu'une mention « Pseudonymisées » qui sous-estimerait les obligations.
  */
-export const getCohortSensitivity = (rights?: GroupRights): accessType | undefined => {
+export const getCohortDataAccess = (rights?: GroupRights): accessType | undefined => {
   if (!rights || (!rights.read_patient_nomi && !rights.read_patient_pseudo)) return undefined
   return rights.read_patient_nomi ? accessType.NOMINAL : accessType.PSEUDO
 }

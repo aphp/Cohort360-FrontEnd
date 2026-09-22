@@ -1,9 +1,9 @@
 import { Cohort, JobStatus } from 'types'
-import { CohortCallbacks, ResearchesTableLabels, SubItemType } from 'types/cohorts'
+import { CohortCallbacks, DataAccessLabels, ResearchesTableLabels, SubItemType } from 'types/cohorts'
 import { Order } from 'types/searchCriterias'
 import { Action, CellType, Column, Favorite, Row, SubItem, Table } from 'types/table'
 import {
-  getCohortSensitivity,
+  getCohortDataAccess,
   getExportTooltip,
   getGlobalEstimation,
   isCohortExportable,
@@ -27,9 +27,10 @@ const getCohortInfos = (cohort: Cohort) => {
   const globalTotal = getGlobalEstimation(cohort)
   const createdAt = formatDate(cohort.created_at)
   const samples = cohort.sample_cohorts?.length ?? 0
-  const sensitivity = getCohortSensitivity(cohort.rights) ?? ''
+  const cohortDataAccess = getCohortDataAccess(cohort.rights)
+  const dataAccess = cohortDataAccess ? DataAccessLabels[cohortDataAccess] : ''
 
-  return { name, parentName, statusChip, total, globalTotal, createdAt, samples, sensitivity }
+  return { name, parentName, statusChip, total, globalTotal, createdAt, samples, dataAccess }
 }
 
 const mapCohortsToRows = (
@@ -43,7 +44,7 @@ const mapCohortsToRows = (
 ) => {
   const rows: Row[] = []
   list.forEach((cohort) => {
-    const { name, parentName, statusChip, total, globalTotal, createdAt, samples, sensitivity } = getCohortInfos(cohort)
+    const { name, parentName, statusChip, total, globalTotal, createdAt, samples, dataAccess } = getCohortInfos(cohort)
     const {
       onClickCreateSample,
       onClickRow,
@@ -142,8 +143,8 @@ const mapCohortsToRows = (
         type: CellType.STATUS_CHIP
       },
       {
-        id: `${cohort.uuid}-sensitivity`,
-        value: sensitivity,
+        id: `${cohort.uuid}-dataAccess`,
+        value: dataAccess,
         type: CellType.TEXT,
         sx: { width: 150 }
       },
@@ -207,7 +208,7 @@ const mapCohortsToColumns = (
       ? []
       : [{ label: ResearchesTableLabels.PARENT_REQUEST, code: simplified ? undefined : Order.REQUEST }]),
     { label: ResearchesTableLabels.STATUS },
-    { label: ResearchesTableLabels.SENSITIVITY },
+    { label: ResearchesTableLabels.DATA },
     { label: ResearchesTableLabels.PATIENT_TOTAL, code: simplified ? undefined : Order.RESULT_SIZE },
     {
       label: ResearchesTableLabels.APHP_TOTAL,

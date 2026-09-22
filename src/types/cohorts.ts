@@ -1,4 +1,5 @@
 import { Cohort, RequestType } from 'types'
+import { accessType } from 'types/scope'
 
 export enum CohortsType {
   FAVORITE = 'FAVORITE',
@@ -19,13 +20,19 @@ export enum ResearchesTableLabels {
   PARENT_COHORT = 'cohorte parent',
   TOTAL_PERCENTAGE = 'pourcentage du total',
   STATUS = 'statut',
-  SENSITIVITY = 'sensibilité',
+  DATA = 'données',
   PATIENT_TOTAL = 'nb de patients',
   APHP_TOTAL = 'estimation du nb de patients ap-hp',
   CREATED_AT = 'date de création',
   MODIFIED_AT = 'date de modification',
   SAMPLES = 'échantillons',
   COHORTS = 'nb de cohortes'
+}
+
+/** Valeurs affichées dans la colonne « Données », accordées au pluriel avec l'en-tête. */
+export const DataAccessLabels: Record<accessType, string> = {
+  [accessType.NOMINAL]: 'Nominatives',
+  [accessType.PSEUDO]: 'Pseudonymisées'
 }
 
 export enum SubItemType {
