@@ -53,9 +53,11 @@ jobs:
               fi
               ;;
             release/*)
+              # Le suffixe de branche fait foi : package.json n'est bumpé
+              # qu'au go MEP (tag final), pas à chaque itération du hotfix.
               BRANCH_VER="${HEAD_BRANCH#release/}"
-              if [ "${BRANCH_VER}" != "${VERSION}" ]; then
-                echo "::error title=Version mismatch::Le suffixe release '${BRANCH_VER}' doit égaler la version dans package.json '${VERSION}'."
+              if ! [[ "$BRANCH_VER" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+                echo "::error title=Version invalide::Le suffixe release '${BRANCH_VER}' doit être de la forme X.Y.Z."
                 exit 1
               fi
               ;;
