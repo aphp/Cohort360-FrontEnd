@@ -69,7 +69,7 @@ jobs:
               echo "IMAGE_TAGS=${DOCKER_REPO}:${VERSION},${DOCKER_REPO}:latest" >> "$GITHUB_ENV"
               ;;
             develop)
-              echo "IMAGE_TAGS=${DOCKER_REPO}:develop" >> "$GITHUB_ENV"
+              echo "IMAGE_TAGS=${DOCKER_REPO}:develop,${DOCKER_REPO}:develop-${SHORT_SHA}" >> "$GITHUB_ENV"
               ;;
             frontend-frigo|frigo)
               echo "IMAGE_TAGS=${DOCKER_REPO}:frontend-frigo" >> "$GITHUB_ENV"
