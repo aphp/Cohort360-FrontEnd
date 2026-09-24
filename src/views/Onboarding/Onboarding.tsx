@@ -4,10 +4,11 @@ import { Button, GlobalStyles, Typography } from '@mui/material'
 import logo from 'assets/images/logo-login.png'
 import useOnboardingEnabled from 'hooks/onboarding/useOnboardingEnabled'
 import useOnboardingStatus from 'hooks/onboarding/useOnboardingStatus'
-import React, { useEffect } from 'react'
-import { Navigate } from 'react-router'
+import React, { useCallback, useEffect, useState } from 'react'
+import { Navigate, useLocation, useNavigate } from 'react-router'
 
 import { OnboardingProvider, useOnboarding } from './OnboardingContext'
+import type { OnboardingRouteState } from './route'
 import ScreenTag from './ScreenTag'
 import { ONBOARDING_STEPS } from './steps'
 import useStyles from './styles'
@@ -22,6 +23,8 @@ const OnboardingLayout = () => {
   const { classes, cx } = useStyles()
   const {
     screen,
+    isReview,
+    isFirstStep,
     currentStep,
     subStep,
     screenConfig,
@@ -49,7 +52,7 @@ const OnboardingLayout = () => {
 
   const footer = (
     <>
-      {screen === 'steps' && (
+      {screen === 'steps' && !(isReview && isFirstStep) && (
         <Button
           className={cx(classes.button, classes.backButton)}
           variant="outlined"
@@ -107,17 +110,26 @@ const OnboardingLayout = () => {
 const Onboarding = () => {
   const onboardingEnabled = useOnboardingEnabled()
   const { status } = useOnboardingStatus(onboardingEnabled)
+  const navigate = useNavigate()
+  const location = useLocation()
+  const [isReplay] = useState(() => status?.onboarding_completed_at != null)
+  const from = (location.state as OnboardingRouteState | null)?.from ?? '/home'
+  const onFinish = useCallback(() => navigate(from, { replace: true }), [navigate, from])
 
   if (!onboardingEnabled) {
     return <Navigate to="/home" replace />
   }
 
-  if (status?.onboarding_completed_at != null) {
+  if (!isReplay && status?.onboarding_completed_at != null) {
     return <Navigate to="/home" replace />
   }
 
   return (
-    <OnboardingProvider initialStep={status?.onboarding_step ?? 0}>
+    <OnboardingProvider
+      initialStep={isReplay ? 2 : (status?.onboarding_step ?? 0)}
+      mode={isReplay ? 'review' : 'journey'}
+      onFinish={onFinish}
+    >
       <OnboardingLayout />
     </OnboardingProvider>
   )

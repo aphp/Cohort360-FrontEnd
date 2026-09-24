@@ -13,7 +13,7 @@ export const CHARTER_CONSENT_TEXT =
 
 const CommitmentsSummary = () => {
   const { classes } = useStyles()
-  const { acknowledged, setAcknowledged } = useOnboarding()
+  const { acknowledged, setAcknowledged, isReview } = useOnboarding()
 
   return (
     <Box>
@@ -37,7 +37,8 @@ const CommitmentsSummary = () => {
         control={
           <Checkbox
             className={classes.consentCheckbox}
-            checked={acknowledged}
+            checked={isReview || acknowledged}
+            disabled={isReview}
             onChange={(event) => setAcknowledged(event.target.checked)}
           />
         }

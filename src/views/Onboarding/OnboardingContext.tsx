@@ -14,8 +14,11 @@ import {
 
 type OnboardingScreen = 'welcome' | 'steps'
 
+type OnboardingMode = 'journey' | 'review'
+
 type OnboardingContextValue = {
   screen: OnboardingScreen
+  isReview: boolean
   currentStep: number
   subStep: number
   totalSteps: number
@@ -35,16 +38,28 @@ type OnboardingContextValue = {
   goBack: () => void
 }
 
+type PrimaryLabel = 'Commencer' | 'Terminer' | 'Continuer'
+
 const OnboardingContext = createContext<OnboardingContextValue | null>(null)
 
 const clampStep = (step: number) => Math.min(Math.max(step, 0), ONBOARDING_TOTAL_STEPS - 1)
 
+const getDefaultLabel = (screen: OnboardingScreen, isLastStep: boolean): PrimaryLabel => {
+  if (screen === 'welcome') {
+    return 'Commencer'
+  }
+  return isLastStep ? 'Terminer' : 'Continuer'
+}
+
 type ProviderProps = {
   initialStep: number
+  mode?: OnboardingMode
+  onFinish?: () => void
   children: React.ReactNode
 }
 
-export const OnboardingProvider = ({ initialStep, children }: ProviderProps) => {
+export const OnboardingProvider = ({ initialStep, mode = 'journey', onFinish, children }: ProviderProps) => {
+  const isReview = mode === 'review'
   const {
     mutate: persistStep,
     reset: resetAdvance,
@@ -63,7 +78,7 @@ export const OnboardingProvider = ({ initialStep, children }: ProviderProps) => 
 
   const [currentStep, setCurrentStep] = useState(() => clampStep(initialStep))
   const [subStep, setSubStep] = useState(0)
-  const [screen, setScreen] = useState<OnboardingScreen>(() => (initialStep <= 0 ? 'welcome' : 'steps'))
+  const [screen, setScreen] = useState<OnboardingScreen>(() => (!isReview && initialStep <= 0 ? 'welcome' : 'steps'))
   const [acknowledged, setAcknowledged] = useState(false)
 
   const value = useMemo<OnboardingContextValue>(() => {
@@ -72,7 +87,7 @@ export const OnboardingProvider = ({ initialStep, children }: ProviderProps) => 
     const isFirstStep = currentStep === 0 && subStep === 0
     const isLastStep = isLastMacroStep && subStep === screenCount - 1
     const screenConfig = screen === 'steps' ? getScreenConfig(currentStep, subStep) : undefined
-    const canProceed = !screenConfig?.requiresAcknowledgement || acknowledged
+    const canProceed = isReview || !screenConfig?.requiresAcknowledgement || acknowledged
 
     const advance = () => {
       // A fresh screen must earn its own acknowledgement again.
@@ -80,6 +95,15 @@ export const OnboardingProvider = ({ initialStep, children }: ProviderProps) => 
       // Progress is persisted per macro step, only once its last screen is left.
       if (subStep < screenCount - 1) {
         setSubStep((step) => step + 1)
+        return
+      }
+      if (isReview) {
+        if (isLastMacroStep) {
+          onFinish?.()
+          return
+        }
+        setCurrentStep((step) => step + 1)
+        setSubStep(0)
         return
       }
       persistStep(currentStep + 1)
@@ -97,7 +121,7 @@ export const OnboardingProvider = ({ initialStep, children }: ProviderProps) => 
         setScreen('steps')
         return
       }
-      const run = screenConfig?.primaryAction?.run
+      const run = isReview ? undefined : screenConfig?.primaryAction?.run
       if (run) {
         // On rejection the error message is raised and the user stays on the screen.
         run({ signCharter }).then(advance, () => undefined)
@@ -107,7 +131,7 @@ export const OnboardingProvider = ({ initialStep, children }: ProviderProps) => 
     }
 
     const goBack = () => {
-      if (screen === 'welcome') {
+      if (screen === 'welcome' || (isReview && isFirstStep)) {
         return
       }
       setAcknowledged(false)
@@ -128,10 +152,11 @@ export const OnboardingProvider = ({ initialStep, children }: ProviderProps) => 
       setSubStep(getStepScreenCount(previousStep) - 1)
     }
 
-    const defaultLabel = screen === 'welcome' ? 'Commencer' : isLastStep ? 'Terminer' : 'Continuer'
+    const defaultLabel = getDefaultLabel(screen, isLastStep)
 
     return {
       screen,
+      isReview,
       currentStep,
       subStep,
       totalSteps: ONBOARDING_STEPS.length,
@@ -141,14 +166,27 @@ export const OnboardingProvider = ({ initialStep, children }: ProviderProps) => 
       isLastStep,
       stepProgress: screen === 'welcome' ? 0 : subStep / screenCount,
       screenConfig,
-      primaryLabel: screenConfig?.primaryAction?.label ?? defaultLabel,
+      primaryLabel: (isReview ? undefined : screenConfig?.primaryAction?.label) ?? defaultLabel,
       canProceed,
       acknowledged,
       setAcknowledged,
       goNext,
       goBack
     }
-  }, [screen, currentStep, subStep, acknowledged, saving, error, persistStep, signCharter, resetAdvance, resetCharter])
+  }, [
+    screen,
+    isReview,
+    onFinish,
+    currentStep,
+    subStep,
+    acknowledged,
+    saving,
+    error,
+    persistStep,
+    signCharter,
+    resetAdvance,
+    resetCharter
+  ])
 
   return <OnboardingContext.Provider value={value}>{children}</OnboardingContext.Provider>
 }

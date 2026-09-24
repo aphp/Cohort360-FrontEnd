@@ -96,6 +96,15 @@ const useStyles = makeStyles()((theme: Theme) => ({
     fontSize: '15px',
     lineHeight: '35px'
   },
+  // For labels too long for the open drawer: wraps instead of being cut, the item growing with it.
+  listItemMultiline: {
+    height: 'auto',
+    minHeight: 56
+  },
+  titleWrap: {
+    whiteSpace: 'normal',
+    lineHeight: '20px'
+  },
   nestedList: {
     marginLeft: '36px'
   },

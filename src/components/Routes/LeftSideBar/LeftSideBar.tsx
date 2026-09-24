@@ -1,5 +1,5 @@
 import React, { useState, useEffect, ReactElement, useContext } from 'react'
-import { useNavigate } from 'react-router'
+import { useLocation, useNavigate } from 'react-router'
 
 import {
   Box,
@@ -27,6 +27,7 @@ import ExpandLess from '@mui/icons-material/ExpandLess'
 import ExpandMore from '@mui/icons-material/ExpandMore'
 import HelpIcon from '@mui/icons-material/Help'
 import MenuBookIcon from '@mui/icons-material/MenuBook'
+import ManageAccountsOutlinedIcon from '@mui/icons-material/ManageAccountsOutlined'
 
 import cohortLogo from 'assets/images/logo_v3.1_ld.png'
 import HomeIcon from 'assets/icones/home-lg.svg?react'
@@ -46,6 +47,8 @@ import Impersonation from 'components/Impersonation'
 import ShimmerBadge from 'components/ui/ShimmerBadge'
 import { AppConfig } from 'config'
 import useMaintenanceIsActive from 'hooks/maintenance/useMaintenanceIsActive'
+import useOnboardingEnabled from 'hooks/onboarding/useOnboardingEnabled'
+import { ONBOARDING_ROUTE, type OnboardingRouteState } from 'views/Onboarding/route'
 
 const smallDrawerWidth = 52
 const largeDrawerWidth = 260
@@ -54,6 +57,7 @@ export { smallDrawerWidth, largeDrawerWidth }
 const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
   const { classes, cx } = useStyles()
   const navigate = useNavigate()
+  const location = useLocation()
   const dispatch = useAppDispatch()
 
   const appConfig = useContext(AppConfig)
@@ -61,6 +65,7 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
   const open = useAppSelector((state) => state.drawer)
   const cohortCreation = useAppSelector((state) => state.cohortCreation)
   const maintenanceIsActive = useMaintenanceIsActive()
+  const onboardingEnabled = useOnboardingEnabled()
   // v-- just for zoom transition..
   const [allreadyOpen, setAllreadyOpen] = useState(false)
 
@@ -413,6 +418,29 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
               </ListItem>
             </List>
           </Collapse>
+
+          {onboardingEnabled && (
+            <ListItemButton
+              id="onboarding-guide"
+              className={cx(classes.listItem, { [classes.listItemMultiline]: open })}
+              onClick={() =>
+                navigate(ONBOARDING_ROUTE, {
+                  state: { from: location.pathname + location.search } satisfies OnboardingRouteState
+                })
+              }
+            >
+              <Tooltip title={open ? '' : 'Comprendre mes accès à Cohort360'}>
+                <ListItemIcon className={classes.listIcon}>
+                  <ManageAccountsOutlinedIcon width="20px" htmlColor="#FFF" />
+                </ListItemIcon>
+              </Tooltip>
+
+              <ListItemText
+                className={cx(classes.title, { [classes.titleWrap]: open })}
+                primary="Comprendre mes accès à Cohort360"
+              />
+            </ListItemButton>
+          )}
 
           {appConfig.system.urlDoc && (
             <ListItem
