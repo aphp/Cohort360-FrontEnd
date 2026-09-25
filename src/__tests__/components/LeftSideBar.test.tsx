@@ -5,6 +5,7 @@ import { AppConfig, getConfig } from 'config'
 
 const dispatch = vi.fn()
 const navigate = vi.fn()
+const { mockUseOnboardingEnabled } = vi.hoisted(() => ({ mockUseOnboardingEnabled: vi.fn() }))
 
 vi.mock('react-router', async (importOriginal) => {
   const actual = await importOriginal<typeof import('react-router')>()
@@ -26,15 +27,17 @@ vi.mock('state/me', () => ({ logout: vi.fn(() => ({ type: 'logout' })) }))
 vi.mock('state/drawer', () => ({ open: vi.fn(() => ({ type: 'open' })), close: vi.fn(() => ({ type: 'close' })) }))
 vi.mock('state/cohortCreation', () => ({ resetCohortCreation: vi.fn(() => ({ type: 'reset' })) }))
 
+vi.mock('hooks/onboarding/useOnboardingEnabled', () => ({ default: () => mockUseOnboardingEnabled() }))
+
 vi.mock('components/Impersonation', () => ({ default: () => <div data-testid="impersonation" /> }))
 vi.mock('components/ui/ShimmerBadge', () => ({ default: ({ children }: { children?: unknown }) => <div>{children as never}</div> }))
 
 import LeftSideBar from 'components/Routes/LeftSideBar/LeftSideBar'
 
-const renderBar = (open = true) =>
+const renderBar = (open = true, path = '/') =>
   render(
     <AppConfig.Provider value={getConfig()}>
-      <MemoryRouter>
+      <MemoryRouter initialEntries={[path]}>
         <LeftSideBar open={open} />
       </MemoryRouter>
     </AppConfig.Provider>
@@ -43,6 +46,7 @@ const renderBar = (open = true) =>
 beforeEach(() => {
   vi.clearAllMocks()
   state.me.maintenance.active = false
+  mockUseOnboardingEnabled.mockReturnValue(false)
 })
 
 describe('LeftSideBar', () => {
@@ -77,5 +81,27 @@ describe('LeftSideBar', () => {
   it('affiche la requête en cours', () => {
     renderBar()
     expect(screen.getByText('Ma requête')).toBeInTheDocument()
+  })
+
+  describe('entrée « Comprendre mes accès à Cohort360 »', () => {
+    const LABEL = 'Comprendre mes accès à Cohort360'
+
+    it('est masquée quand le feature flag onboarding est désactivé', () => {
+      renderBar()
+      expect(screen.queryByText(LABEL)).not.toBeInTheDocument()
+    })
+
+    it('est affichée quand le feature flag onboarding est actif', () => {
+      mockUseOnboardingEnabled.mockReturnValue(true)
+      renderBar()
+      expect(screen.getByText(LABEL)).toBeInTheDocument()
+    })
+
+    it('ouvre l’onboarding en mémorisant la page courante, paramètres compris', () => {
+      mockUseOnboardingEnabled.mockReturnValue(true)
+      renderBar(true, '/my-patients?tab=list')
+      fireEvent.click(screen.getByText(LABEL))
+      expect(navigate).toHaveBeenCalledWith('/onboarding', { state: { from: '/my-patients?tab=list' } })
+    })
   })
 })

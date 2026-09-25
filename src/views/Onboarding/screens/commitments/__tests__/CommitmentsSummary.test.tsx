@@ -8,11 +8,11 @@ import { COMMITMENTS } from '../../../commitments'
 import { OnboardingProvider } from '../../../OnboardingContext'
 import CommitmentsSummary from '../CommitmentsSummary'
 
-const renderSummary = () => {
+const renderSummary = (mode?: 'journey' | 'review') => {
   const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
   return render(
     <QueryClientProvider client={queryClient}>
-      <OnboardingProvider initialStep={1}>
+      <OnboardingProvider initialStep={1} mode={mode}>
         <CommitmentsSummary />
       </OnboardingProvider>
     </QueryClientProvider>
@@ -48,6 +48,19 @@ describe('CommitmentsSummary (RG3429.05)', () => {
 
     const consent = screen.getByRole('checkbox', { name: /Je certifie avoir pris connaissance/ })
     expect(consent).not.toBeChecked()
+
+    await user.click(consent)
+    expect(consent).toBeChecked()
+  })
+
+  it('shows the certification ticked and locked when the journey is replayed', async () => {
+    // A disabled checkbox ignores pointer events: the click is forced to prove it changes nothing.
+    const user = userEvent.setup({ pointerEventsCheck: 0 })
+    renderSummary('review')
+
+    const consent = screen.getByRole('checkbox', { name: /Je certifie avoir pris connaissance/ })
+    expect(consent).toBeChecked()
+    expect(consent).toBeDisabled()
 
     await user.click(consent)
     expect(consent).toBeChecked()
