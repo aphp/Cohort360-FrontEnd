@@ -155,7 +155,7 @@ const useStyles = makeStyles()((theme: Theme) => ({
   },
   card: {
     width: '100%',
-    padding: theme.spacing(5, 5, 4),
+    padding: theme.spacing(5, 3, 4),
     borderRadius: 6,
     border: `1px solid ${T.cardBorder}`,
     backgroundColor: T.surface,
@@ -329,6 +329,28 @@ const useStyles = makeStyles()((theme: Theme) => ({
     marginTop: theme.spacing(5),
     '& + &': {
       marginTop: theme.spacing(7)
+    }
+  },
+  deniedAlert: {
+    color: T.deniedInk,
+    backgroundColor: T.deniedBg,
+    padding: '6px 4px',
+    marginTop: 8,
+    '& .MuiAlert-icon': {
+      color: T.deniedInk,
+      padding: 0,
+      marginRight: 6,
+      fontSize: 18,
+      height: 24,
+      alignItems: 'center'
+    },
+    '& .MuiAlert-message': {
+      padding: 0,
+      fontFamily: FONT,
+      fontWeight: 400,
+      fontSize: 16,
+      lineHeight: '24px',
+      letterSpacing: 0
     }
   },
   commitmentList: {

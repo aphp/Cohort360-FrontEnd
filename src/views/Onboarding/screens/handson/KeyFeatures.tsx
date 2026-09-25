@@ -1,10 +1,12 @@
-import { Box, Typography } from '@mui/material'
+import { Alert, Box, Typography } from '@mui/material'
 import React from 'react'
 
 import { useAppSelector } from 'state'
 
 import FeatureVideo from '../../FeatureVideo'
 import useStyles from '../../styles'
+import { useUserAccesses } from '../environment/useUserAccesses'
+import WarningIcon from '@mui/icons-material/Warning'
 
 // Positions des chapitres dans le tutoriel, en secondes.
 const TUTORIALS = {
@@ -17,6 +19,8 @@ const KeyFeatures = () => {
   const { classes } = useStyles()
   // Unknown access falls back to the pseudonymised journey, which hides the export video (RG3310.02).
   const deidentified = useAppSelector((state) => state.me?.deidentified ?? true)
+  const { loading, hasError, canExportCsvXlsx } = useUserAccesses()
+  const showExportDenied = !loading && !hasError && !canExportCsvXlsx
 
   return (
     <Box>
@@ -55,6 +59,11 @@ const KeyFeatures = () => {
           <Typography variant="h5" className={classes.sectionTitle}>
             Comment exporter des données ?
           </Typography>
+          {!!showExportDenied && (
+            <Alert icon={<WarningIcon fontSize="inherit" />} severity="error" className={classes.deniedAlert}>
+              Votre habilitation ne vous permet pas d’accéder à cette fonctionnalité
+            </Alert>
+          )}
           <Typography className={classes.sectionText}>
             La fonctionnalité d'export de cohortes sur votre ordinateur (en .csv et en .xlsx) est disponible uniquement
             pour certaines habilitations et limitée à 20 000 patients par export.
