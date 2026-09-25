@@ -31,11 +31,13 @@ type UserAccessesState = {
   loading: boolean
   hasError: boolean
   accesses: UserAccess[]
+  canExportCsvXlsx: boolean
 }
 
 // Profile is the habilitation name and rights are labelled from the catalog, to mirror the admin portal.
 export const useUserAccesses = (): UserAccessesState => {
   const [accesses, setAccesses] = useState<UserAccess[]>([])
+  const [canExportCsvXlsx, setCanExportCsvXlsx] = useState(false)
   const [loading, setLoading] = useState(true)
   const [hasError, setHasError] = useState(false)
 
@@ -46,6 +48,7 @@ export const useUserAccesses = (): UserAccessesState => {
         if (active) {
           const flatCatalog = flattenCatalog(catalog)
           setAccesses(myAccesses.map((access) => toUserAccess(access, flatCatalog)))
+          setCanExportCsvXlsx(myAccesses.some((access) => access.role?.right_export_csv_xlsx_nominative === true))
         }
       })
       .catch(() => {
@@ -63,5 +66,5 @@ export const useUserAccesses = (): UserAccessesState => {
     }
   }, [])
 
-  return { loading, hasError, accesses }
+  return { loading, hasError, accesses, canExportCsvXlsx }
 }
