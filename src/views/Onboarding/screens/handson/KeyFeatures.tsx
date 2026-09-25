@@ -1,10 +1,9 @@
 import { Box, Typography } from '@mui/material'
 import React from 'react'
 
-import { useAppSelector } from 'state'
-
 import FeatureVideo from '../../FeatureVideo'
 import useStyles from '../../styles'
+import ExportDeniedAlert from './ExportDeniedAlert'
 
 // Positions des chapitres dans le tutoriel, en secondes.
 const TUTORIALS = {
@@ -15,8 +14,6 @@ const TUTORIALS = {
 
 const KeyFeatures = () => {
   const { classes } = useStyles()
-  // Unknown access falls back to the pseudonymised journey, which hides the export video (RG3310.02).
-  const deidentified = useAppSelector((state) => state.me?.deidentified ?? true)
 
   return (
     <Box>
@@ -50,18 +47,16 @@ const KeyFeatures = () => {
         <FeatureVideo startAt={TUTORIALS.exploration} label="Explorer les données d'un patient ou groupe de patients" />
       </Box>
 
-      {!deidentified && (
-        <Box className={classes.featureSection}>
-          <Typography variant="h5" className={classes.sectionTitle}>
-            Comment exporter des données ?
-          </Typography>
-          <Typography className={classes.sectionText}>
-            La fonctionnalité d'export de cohortes sur votre ordinateur (en .csv et en .xlsx) est disponible uniquement
-            pour certaines habilitations et limitée à 20 000 patients par export.
-          </Typography>
-          <FeatureVideo startAt={TUTORIALS.export} label="Exporter des données" />
-        </Box>
-      )}
+      <Box className={classes.featureSection}>
+        <Typography variant="h5" className={classes.sectionTitle}>
+          Comment exporter des données ?
+        </Typography>
+        <ExportDeniedAlert />
+        <Typography className={classes.sectionText}>
+          Cohort360 permet d'exporter les données de jusqu’à 20 000 patients sur votre ordinateur (en .csv et en .xlsx).
+        </Typography>
+        <FeatureVideo startAt={TUTORIALS.export} label="Exporter des données" />
+      </Box>
     </Box>
   )
 }

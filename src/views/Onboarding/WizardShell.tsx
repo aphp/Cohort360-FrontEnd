@@ -15,7 +15,7 @@ type Props = {
 }
 
 const WizardShell = ({ header, steps, activeStep, stepProgress, layout = 'card', children, footer }: Props) => {
-  const { classes } = useStyles()
+  const { classes, cx } = useStyles()
 
   return (
     <Box className={classes.page}>
@@ -26,7 +26,7 @@ const WizardShell = ({ header, steps, activeStep, stepProgress, layout = 'card',
             <StepperRail steps={steps} activeStep={activeStep} stepProgress={stepProgress} />
           </Box>
           <Box className={classes.contentCol}>
-            {layout === 'card' ? <Box className={classes.card}>{children}</Box> : children}
+            {layout === 'card' ? <Box className={cx(classes.card, classes.cardOnboarding)}>{children}</Box> : children}
             {footer && <Box className={classes.footer}>{footer}</Box>}
           </Box>
         </Box>

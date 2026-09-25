@@ -166,6 +166,9 @@ const useStyles = makeStyles()((theme: Theme) => ({
       fontWeight: 500
     }
   },
+  cardOnboarding: {
+    padding: theme.spacing(5, 3, 4)
+  },
   footer: {
     display: 'flex',
     justifyContent: 'flex-end',
@@ -329,6 +332,28 @@ const useStyles = makeStyles()((theme: Theme) => ({
     marginTop: theme.spacing(5),
     '& + &': {
       marginTop: theme.spacing(7)
+    }
+  },
+  deniedAlert: {
+    color: T.deniedInk,
+    backgroundColor: T.deniedBg,
+    padding: '6px 4px',
+    marginTop: 8,
+    '& .MuiAlert-icon': {
+      color: T.deniedInk,
+      padding: 0,
+      marginRight: 6,
+      fontSize: 18,
+      height: 24,
+      alignItems: 'center'
+    },
+    '& .MuiAlert-message': {
+      padding: 0,
+      fontFamily: FONT,
+      fontWeight: 400,
+      fontSize: 16,
+      lineHeight: '24px',
+      letterSpacing: 0
     }
   },
   commitmentList: {
