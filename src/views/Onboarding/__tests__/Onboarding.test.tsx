@@ -215,7 +215,7 @@ describe('Onboarding page', () => {
     renderAt({ ...baseStatus, onboarding_step: 2 })
 
     await user.click(screen.getByRole('button', { name: /Accéder à Cohort360/ }))
-    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent(/enregistrement de votre progression/))
+    expect(await screen.findByText(/enregistrement de votre progression/)).toHaveAttribute('role', 'alert')
   })
 
   it('disables both buttons while a request is in flight', async () => {

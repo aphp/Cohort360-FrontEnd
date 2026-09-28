@@ -16,6 +16,8 @@ export const onboardingTokens = {
   rightBadgeBg: aphp.vertClair[500],
   rightBadgeFg: aphp.vert[600],
   warning: eds.fuchsia[600],
+  deniedInk: aphp.violet[600],
+  deniedBg: aphp.violet[50],
   documentBg: '#7F7F7F',
   primaryAction: eds.blue[300],
   primaryActionHover: eds.blue[400],
