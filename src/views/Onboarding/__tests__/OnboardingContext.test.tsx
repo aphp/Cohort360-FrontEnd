@@ -15,12 +15,7 @@ import { OnboardingProvider, useOnboarding } from '../OnboardingContext'
 
 const SUMMARY_SUBSTEP = 11
 
-type RenderOptions = {
-  mode?: 'journey' | 'review'
-  onFinish?: () => void
-}
-
-const renderOnboarding = (initialStep: number, { mode, onFinish }: RenderOptions = {}) => {
+const renderOnboarding = (initialStep: number, mode?: 'journey' | 'review') => {
   const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
   queryClient.setQueryData(ONBOARDING_STATUS_QUERY_KEY, {
     onboarding_step: initialStep,
@@ -29,7 +24,7 @@ const renderOnboarding = (initialStep: number, { mode, onFinish }: RenderOptions
   })
   const wrapper = ({ children }: { children: React.ReactNode }) => (
     <QueryClientProvider client={queryClient}>
-      <OnboardingProvider initialStep={initialStep} mode={mode} onFinish={onFinish}>
+      <OnboardingProvider initialStep={initialStep} mode={mode}>
         {children}
       </OnboardingProvider>
     </QueryClientProvider>
@@ -260,83 +255,8 @@ describe('OnboardingContext', () => {
     expect(result.current.isReview).toBe(false)
   })
 
-  describe('review mode', () => {
-    it('skips the welcome screen, even from the first step', () => {
-      const { result } = renderOnboarding(0, { mode: 'review' })
-      expect(result.current.isReview).toBe(true)
-      expect(result.current.screen).toBe('steps')
-      expect(result.current.currentStep).toBe(0)
-      expect(result.current.subStep).toBe(0)
-    })
-
-    it('moves across macro steps without persisting anything', async () => {
-      const { result } = renderOnboarding(0, { mode: 'review' })
-      // The environment step is made of three screens: the third goNext leaves it.
-      for (let i = 0; i < 3; i++) {
-        // eslint-disable-next-line no-await-in-loop
-        await act(async () => {
-          result.current.goNext()
-        })
-      }
-      expect(result.current.currentStep).toBe(1)
-      expect(result.current.subStep).toBe(0)
-      expect(updateStep).not.toHaveBeenCalled()
-    })
-
-    it('lets the summary through without ticking, and never signs the charter again', async () => {
-      const { result } = renderOnboarding(1, { mode: 'review' })
-      await goToSummary(result)
-      expect(result.current.subStep).toBe(SUMMARY_SUBSTEP)
-      expect(result.current.acknowledged).toBe(false)
-      expect(result.current.canProceed).toBe(true)
-
-      await act(async () => {
-        result.current.goNext()
-      })
-      expect(signCharterCall).not.toHaveBeenCalled()
-      expect(updateStep).not.toHaveBeenCalled()
-      expect(result.current.currentStep).toBe(2)
-    })
-
-    it('keeps the default labels instead of the journey ones', async () => {
-      const { result } = renderOnboarding(1, { mode: 'review' })
-      act(() => result.current.goNext()) // usage rules -> first commitment
-      expect(result.current.subStep).toBe(1)
-      expect(result.current.primaryLabel).toBe('Continuer')
-
-      // Nine more commitments, then the summary.
-      for (let i = 1; i < SUMMARY_SUBSTEP; i++) {
-        act(() => result.current.goNext())
-      }
-      expect(result.current.subStep).toBe(SUMMARY_SUBSTEP)
-      expect(result.current.primaryLabel).toBe('Continuer')
-    })
-
-    it('labels the last screen `Terminer` and calls onFinish when it is left', async () => {
-      const onFinish = vi.fn()
-      const { result } = renderOnboarding(2, { mode: 'review', onFinish })
-      expect(result.current.primaryLabel).toBe('Terminer')
-
-      await act(async () => {
-        result.current.goNext()
-      })
-      expect(onFinish).toHaveBeenCalledTimes(1)
-      expect(updateStep).not.toHaveBeenCalled()
-    })
-
-    it('ignores goBack on its first screen, as there is no welcome screen', () => {
-      const { result } = renderOnboarding(0, { mode: 'review' })
-      act(() => result.current.goBack())
-      expect(result.current.screen).toBe('steps')
-      expect(result.current.currentStep).toBe(0)
-      expect(result.current.subStep).toBe(0)
-    })
-
-    it('steps back to the previous macro step', () => {
-      const { result } = renderOnboarding(2, { mode: 'review' })
-      act(() => result.current.goBack())
-      expect(result.current.currentStep).toBe(1)
-      expect(result.current.subStep).toBe(SUMMARY_SUBSTEP)
-    })
+  it('flags the review mode, where a single screen is consulted again', () => {
+    const { result } = renderOnboarding(0, 'review')
+    expect(result.current.isReview).toBe(true)
   })
 })

@@ -12,7 +12,7 @@ const { updateStep, signCharter, getStatus, getMyAccesses, getRightsCatalog, moc
     updateStep: vi.fn(),
     signCharter: vi.fn(),
     getStatus: vi.fn(),
-    // Read by the user rights screen, met when the replay is walked back.
+    // Read by the user rights screen, opened from the side menu.
     getMyAccesses: vi.fn(() => Promise.resolve([])),
     getRightsCatalog: vi.fn(() => Promise.resolve([])),
     mockUseOnboardingEnabled: vi.fn()
@@ -30,16 +30,16 @@ import { ONBOARDING_STATUS_QUERY_KEY } from 'hooks/onboarding/useOnboardingStatu
 import type { OnboardingStatus } from 'services/aphp/serviceOnboarding'
 import meReducer, { type MeState } from 'state/me'
 import Onboarding from '../Onboarding'
-import { ONBOARDING_ROUTE } from '../route'
+import { ONBOARDING_ROUTE, type OnboardingRouteState } from '../route'
 
-const renderAt = (status: OnboardingStatus, me: MeState = null, from?: string) => {
+const renderAt = (status: OnboardingStatus, me: MeState = null, state: OnboardingRouteState | null = null) => {
   const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false, staleTime: Infinity } } })
   queryClient.setQueryData(ONBOARDING_STATUS_QUERY_KEY, status)
   const store = configureStore({ reducer: { me: meReducer }, preloadedState: { me } })
   return render(
     <Provider store={store}>
       <QueryClientProvider client={queryClient}>
-        <MemoryRouter initialEntries={[{ pathname: ONBOARDING_ROUTE, state: from ? { from } : null }]}>
+        <MemoryRouter initialEntries={[{ pathname: ONBOARDING_ROUTE, state }]}>
           <Routes>
             <Route path={ONBOARDING_ROUTE} element={<Onboarding />} />
             <Route path="/home" element={<div>home page</div>} />
@@ -65,21 +65,6 @@ const completedStatus: OnboardingStatus = {
 
 const connectedUser = { displayName: 'Cesar RICHARD', deidentified: false } as MeState
 
-/**
- * Walks the replay down to its last screen, whatever step it opens on, and returns the labels of the
- * primary buttons met on the way.
- */
-const walkReplayToTheEnd = async (user: ReturnType<typeof userEvent.setup>) => {
-  const labels: string[] = []
-  for (let i = 0; i < 30 && !screen.queryByRole('button', { name: /Terminer/ }); i++) {
-    const next = screen.getByRole('button', { name: /Continuer/ })
-    labels.push(next.textContent ?? '')
-    // eslint-disable-next-line no-await-in-loop
-    await user.click(next)
-  }
-  return labels
-}
-
 describe('Onboarding page', () => {
   beforeEach(() => {
     updateStep.mockReset()
@@ -95,14 +80,6 @@ describe('Onboarding page', () => {
     expect(screen.getByText('home page')).toBeInTheDocument()
   })
 
-  it('replays the journey, full page with its header, when it is already completed', () => {
-    renderAt(completedStatus, connectedUser)
-    expect(screen.queryByText('home page')).not.toBeInTheDocument()
-    expect(screen.getByAltText('Logo Cohort360')).toBeInTheDocument()
-    expect(screen.getByText('Cesar RICHARD')).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /Continuer|Terminer/ })).toBeInTheDocument()
-  })
-
   it('still sends home a new user who completes the journey during the visit', async () => {
     updateStep.mockResolvedValue({ onboarding_step: 3, onboarding_completed_at: '2026-01-01T00:00:00Z' })
     const user = userEvent.setup()
@@ -110,38 +87,6 @@ describe('Onboarding page', () => {
 
     await user.click(screen.getByRole('button', { name: /Accéder à Cohort360/ }))
     await waitFor(() => expect(screen.getByText('home page')).toBeInTheDocument())
-  })
-
-  it('brings the replay back to the page it was opened from', async () => {
-    const user = userEvent.setup()
-    renderAt(completedStatus, connectedUser, '/my-patients')
-
-    await walkReplayToTheEnd(user)
-    await user.click(screen.getByRole('button', { name: /Terminer/ }))
-    expect(screen.getByText('my patients page')).toBeInTheDocument()
-  })
-
-  it('brings the replay back to /home when it was reached by its URL', async () => {
-    const user = userEvent.setup()
-    renderAt(completedStatus, connectedUser)
-
-    await walkReplayToTheEnd(user)
-    await user.click(screen.getByRole('button', { name: /Terminer/ }))
-    expect(screen.getByText('home page')).toBeInTheDocument()
-  })
-
-  it('replays the journey without recording the progress nor signing the charter again', async () => {
-    const user = userEvent.setup()
-    renderAt(completedStatus, connectedUser, '/my-patients')
-
-    const labels = await walkReplayToTheEnd(user)
-    // The journey actions give way to plain navigation, down to the last screen.
-    expect(labels.every((label) => label === 'Continuer')).toBe(true)
-    expect(screen.queryByRole('button', { name: /Accéder à Cohort360/ })).not.toBeInTheDocument()
-
-    await user.click(screen.getByRole('button', { name: /Terminer/ }))
-    expect(updateStep).not.toHaveBeenCalled()
-    expect(signCharter).not.toHaveBeenCalled()
   })
 
   it('shows the welcome screen when the journey is not completed', () => {
@@ -239,24 +184,68 @@ describe('Onboarding page', () => {
     expect(screen.getByText('JP')).toBeInTheDocument()
   })
 
-  it('hides the back button on the first screen of the replay, which has no welcome screen before it', async () => {
-    const user = userEvent.setup()
-    renderAt(completedStatus, connectedUser)
-
-    // Walk back to the first screen, whatever step the replay opens on.
-    for (let i = 0; i < 30 && screen.queryByRole('button', { name: 'Revenir' }); i++) {
-      // eslint-disable-next-line no-await-in-loop
-      await user.click(screen.getByRole('button', { name: 'Revenir' }))
-    }
-
-    expect(screen.getByText("Qu'est-ce que Cohort360 ?")).toBeInTheDocument()
-    expect(screen.queryByRole('button', { name: 'Revenir' })).not.toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /Continuer/ })).toBeInTheDocument()
-  })
-
   it('hides the back button on the welcome screen', () => {
     renderAt(baseStatus)
     expect(screen.getByRole('button', { name: /Commencer/ })).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Revenir' })).not.toBeInTheDocument()
+  })
+
+  it('shows no « Revenir à Cohort360 » button during the journey', () => {
+    renderAt(baseStatus, connectedUser)
+    expect(screen.queryByRole('button', { name: 'Revenir à Cohort360' })).not.toBeInTheDocument()
+  })
+
+  describe('consultation from the side menu, once the journey is completed', () => {
+    it('sends home when no screen is picked, as when the URL is typed', () => {
+      renderAt(completedStatus, connectedUser)
+      expect(screen.getByText('home page')).toBeInTheDocument()
+    })
+
+    it.each([
+      ['habilitations', /Comprendre votre (habilitation|accès)/],
+      ['engagements', 'Synthèse de vos engagements'],
+      ['tutoriels', "Prendre en main l'outil"]
+    ] as const)('opens « %s » on its own screen', (section, heading) => {
+      renderAt(completedStatus, connectedUser, { section })
+      expect(screen.getByRole('heading', { name: heading })).toBeInTheDocument()
+    })
+
+    it('shows neither the steps rail nor the navigation buttons', () => {
+      renderAt(completedStatus, connectedUser, { section: 'engagements' })
+      expect(screen.queryByText('Découvrir votre environnement')).not.toBeInTheDocument()
+      expect(screen.queryByRole('button', { name: 'Revenir' })).not.toBeInTheDocument()
+      expect(screen.queryByRole('button', { name: /Continuer|Valider|Terminer/ })).not.toBeInTheDocument()
+    })
+
+    it('keeps the header, with the user menu then a « Revenir à Cohort360 » button', () => {
+      renderAt(completedStatus, connectedUser, { section: 'tutoriels' })
+      expect(screen.getByAltText('Logo Cohort360')).toBeInTheDocument()
+      expect(screen.getByText('Cesar RICHARD')).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: 'Revenir à Cohort360' })).toBeInTheDocument()
+    })
+
+    it('shows the commitments without the certification block', () => {
+      renderAt(completedStatus, connectedUser, { section: 'engagements' })
+      expect(screen.getByRole('heading', { name: 'Synthèse de vos engagements' })).toBeInTheDocument()
+      expect(screen.queryByText(/Je certifie avoir pris connaissance/)).not.toBeInTheDocument()
+    })
+
+    it('goes back to the page it was opened from', async () => {
+      const user = userEvent.setup()
+      renderAt(completedStatus, connectedUser, { section: 'engagements', from: '/my-patients' })
+
+      await user.click(screen.getByRole('button', { name: 'Revenir à Cohort360' }))
+      expect(screen.getByText('my patients page')).toBeInTheDocument()
+      expect(updateStep).not.toHaveBeenCalled()
+      expect(signCharter).not.toHaveBeenCalled()
+    })
+
+    it('goes back to /home when the page it was opened from is unknown', async () => {
+      const user = userEvent.setup()
+      renderAt(completedStatus, connectedUser, { section: 'tutoriels' })
+
+      await user.click(screen.getByRole('button', { name: 'Revenir à Cohort360' }))
+      expect(screen.getByText('home page')).toBeInTheDocument()
+    })
   })
 })

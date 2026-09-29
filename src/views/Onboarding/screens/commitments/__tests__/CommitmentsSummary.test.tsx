@@ -53,16 +53,11 @@ describe('CommitmentsSummary (RG3429.05)', () => {
     expect(consent).toBeChecked()
   })
 
-  it('shows the certification ticked and locked when the journey is replayed', async () => {
-    // A disabled checkbox ignores pointer events: the click is forced to prove it changes nothing.
-    const user = userEvent.setup({ pointerEventsCheck: 0 })
+  it('drops the certification when the summary is consulted again, the charter being signed', () => {
     renderSummary('review')
 
-    const consent = screen.getByRole('checkbox', { name: /Je certifie avoir pris connaissance/ })
-    expect(consent).toBeChecked()
-    expect(consent).toBeDisabled()
-
-    await user.click(consent)
-    expect(consent).toBeChecked()
+    expect(screen.getByRole('heading', { name: 'Synthèse de vos engagements' })).toBeInTheDocument()
+    expect(screen.queryByRole('checkbox')).not.toBeInTheDocument()
+    expect(screen.queryByText(/Je certifie avoir pris connaissance/)).not.toBeInTheDocument()
   })
 })

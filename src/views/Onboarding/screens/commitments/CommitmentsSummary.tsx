@@ -31,19 +31,22 @@ const CommitmentsSummary = () => {
       <Link className={classes.downloadLink} href={COMMITMENTS_SUMMARY_URL} download>
         Télécharger un récapitulatif de vos engagements
       </Link>
-      <Divider className={classes.divider} />
-      <FormControlLabel
-        className={classes.consentRow}
-        control={
-          <Checkbox
-            className={classes.consentCheckbox}
-            checked={isReview || acknowledged}
-            disabled={isReview}
-            onChange={(event) => setAcknowledged(event.target.checked)}
+      {!isReview && (
+        <>
+          <Divider className={classes.divider} />
+          <FormControlLabel
+            className={classes.consentRow}
+            control={
+              <Checkbox
+                className={classes.consentCheckbox}
+                checked={acknowledged}
+                onChange={(event) => setAcknowledged(event.target.checked)}
+              />
+            }
+            label={<Typography className={classes.consentText}>{CHARTER_CONSENT_TEXT}</Typography>}
           />
-        }
-        label={<Typography className={classes.consentText}>{CHARTER_CONSENT_TEXT}</Typography>}
-      />
+        </>
+      )}
     </Box>
   )
 }
