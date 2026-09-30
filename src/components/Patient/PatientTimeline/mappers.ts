@@ -4,6 +4,7 @@ import { Procedure, Condition } from 'fhir/r4'
 import { CohortEncounter, PMSIEntry } from 'types'
 import { LabelObject } from 'types/searchCriterias'
 import { getExtension } from 'utils/fhir'
+import { ISO_DATE_FORMAT } from 'utils/dates'
 // @ts-ignore
 import moment from 'moment'
 import { TimelineMonth, TimelineOutput, TimelineType, YearData } from './types'
@@ -14,7 +15,7 @@ const getTimelineFormattedDataItem = (item: CohortEncounter | PMSIEntry<Procedur
     end?: string
   } = {}
   let date = moment()
-  const dateFormat = 'YYYY-MM-DD'
+  const dateFormat = ISO_DATE_FORMAT
   if (item.resourceType === 'Encounter') {
     date = moment(item.period?.start ?? item.meta?.lastUpdated, dateFormat)
   } else if (item.resourceType === 'Procedure') {

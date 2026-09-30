@@ -10,6 +10,7 @@ import { BlockWrapper } from 'components/ui/Layout'
 import { ErrorType } from 'types/error'
 import { ErrorMessage } from '../Errors'
 import { frFR } from '@mui/x-date-pickers/locales'
+import { ISO_DATE_FORMAT } from 'utils/dates'
 
 interface CalendarInputProps {
   value: string | null
@@ -25,7 +26,7 @@ const CalendarInput = ({ value, label, disabled = false, onChange }: CalendarInp
   useEffect(() => {
     setError({ isError: false, errorMessage: '' })
     if (date && moment(date).isValid()) {
-      onChange(moment(date).format('YYYY-MM-DD'))
+      onChange(moment(date).format(ISO_DATE_FORMAT))
     } else {
       if (date === null) onChange(null)
       else setError({ isError: true, errorMessage: 'La date sélectionnée est invalide.' })

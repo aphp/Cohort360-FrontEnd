@@ -3,7 +3,7 @@
  * @module utils/dates
  */
 
-import moment from 'moment'
+import moment, { Moment } from 'moment'
 import { Month } from 'types'
 
 /**
@@ -47,6 +47,19 @@ export function groupByDate<T>(items: T[], dateKey: keyof T, dateFormat = 'DD/MM
   })
 }
 
+export const ISO_DATE_FORMAT = 'YYYY-MM-DD'
+
+/**
+ * Formats a Moment as an ISO date string (YYYY-MM-DD)
+ *
+ * @param date - The date to format
+ * @returns The formatted date, or null if the date is missing or invalid
+ */
+export const toIsoDate = (date: Moment | null) => {
+  if (!date?.isValid()) return null
+  return date.format(ISO_DATE_FORMAT)
+}
+
 /**
  * Validates if a date string is valid according to the specified format
  *
@@ -61,7 +74,7 @@ export function groupByDate<T>(items: T[], dateKey: keyof T, dateFormat = 'DD/MM
  * isDateValid('25/12/2023', 'DD/MM/YYYY') // returns true
  * ```
  */
-export const isDateValid = (date?: string | null, format = 'YYYY-MM-DD') => {
+export const isDateValid = (date?: string | null, format = ISO_DATE_FORMAT) => {
   if (!date) return false
   return moment(date, format, true).isValid()
 }

@@ -51,8 +51,8 @@ const MenuButtonFilter: React.FC<MenuButtonFilterProps> = ({
         {getLabel(startDate, endDate)}
       </Button>
       <Menu anchorEl={anchorEl} open={!!anchorEl} onClose={() => setAnchorEl(null)} className={classes.dateFilterMenu}>
-        <DatePicker buttonLabel="À partir du :" value={innerStartDate} onChangeValue={setInnerStartDate} />
-        <DatePicker buttonLabel="Jusqu'au :" value={innerEndDate} onChangeValue={setInnerEndDate} />
+        <DatePicker buttonLabel="À partir du :" defaultValue={innerStartDate} onChangeValue={setInnerStartDate} />
+        <DatePicker buttonLabel="Jusqu'au :" defaultValue={innerEndDate} onChangeValue={setInnerEndDate} />
         <Box style={{ padding: '8px 12px' }}>
           <Button onClick={onConfirm} small>
             Appliquer
