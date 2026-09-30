@@ -1,10 +1,9 @@
 import React, { useState, useEffect, ReactElement, useContext } from 'react'
-import { useLocation, useNavigate } from 'react-router'
+import { useNavigate } from 'react-router'
 
 import {
   Box,
   Button,
-  Collapse,
   Divider,
   Drawer,
   Grid,
@@ -12,9 +11,7 @@ import {
   Link,
   List,
   ListItem,
-  ListItemButton,
   ListItemIcon,
-  ListItemText,
   Typography,
   Tooltip,
   Zoom
@@ -23,18 +20,16 @@ import {
 import AddIcon from '@mui/icons-material/Add'
 import EditIcon from '@mui/icons-material/Edit'
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft'
-import ExpandLess from '@mui/icons-material/ExpandLess'
-import ExpandMore from '@mui/icons-material/ExpandMore'
 import HelpIcon from '@mui/icons-material/Help'
+<<<<<<< Updated upstream
 import MenuBookIcon from '@mui/icons-material/MenuBook'
 import ManageAccountsOutlinedIcon from '@mui/icons-material/ManageAccountsOutlined'
+=======
+>>>>>>> Stashed changes
 
 import cohortLogo from 'assets/images/logo_v3.1_ld.png'
-import HomeIcon from 'assets/icones/home-lg.svg?react'
 import LogoutIcon from 'assets/icones/power-off.svg?react'
 import MenuIcon from 'assets/icones/bars.svg?react'
-import PatientIcon from 'assets/icones/user.svg?react'
-import ResearchIcon from 'assets/icones/chart-bar.svg?react'
 
 import { useAppSelector, useAppDispatch } from 'state'
 import { logout as logoutAction } from 'state/me'
@@ -42,13 +37,17 @@ import { open as openAction, close as closeAction } from 'state/drawer'
 import { resetCohortCreation } from 'state/cohortCreation'
 
 import useStyles from './styles'
+import MenuEntry from './MenuEntry'
+import useMenuItems from './useMenuItems'
 import versionInfo from 'data/version.json'
 import Impersonation from 'components/Impersonation'
-import ShimmerBadge from 'components/ui/ShimmerBadge'
 import { AppConfig } from 'config'
 import useMaintenanceIsActive from 'hooks/maintenance/useMaintenanceIsActive'
+<<<<<<< Updated upstream
 import useOnboardingEnabled from 'hooks/onboarding/useOnboardingEnabled'
 import { ONBOARDING_ROUTE, type OnboardingRouteState } from 'views/Onboarding/route'
+=======
+>>>>>>> Stashed changes
 
 const smallDrawerWidth = 52
 const largeDrawerWidth = 260
@@ -57,20 +56,22 @@ export { smallDrawerWidth, largeDrawerWidth }
 const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
   const { classes, cx } = useStyles()
   const navigate = useNavigate()
-  const location = useLocation()
   const dispatch = useAppDispatch()
 
   const appConfig = useContext(AppConfig)
-  const practitioner = useAppSelector((state) => state.me)
   const open = useAppSelector((state) => state.drawer)
   const cohortCreation = useAppSelector((state) => state.cohortCreation)
   const maintenanceIsActive = useMaintenanceIsActive()
-  const onboardingEnabled = useOnboardingEnabled()
+  const menuItems = useMenuItems()
   // v-- just for zoom transition..
   const [allreadyOpen, setAllreadyOpen] = useState(false)
 
+<<<<<<< Updated upstream
   const [displayPatientList, setDisplayPatientList] = useState(true)
   const [displaySearchList, setDisplaySearchList] = useState(true)
+=======
+  const [collapsedItems, setCollapsedItems] = useState<Record<string, boolean>>({})
+>>>>>>> Stashed changes
 
   useEffect(() => {
     if (props.open) {
@@ -90,13 +91,14 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
     }
   }
 
-  const handleDisplayPatientList = () => {
+  const handleToggleMenuItem = (id: string) => {
     dispatch(openAction())
     if (open) {
-      setDisplayPatientList(!displayPatientList)
+      setCollapsedItems({ ...collapsedItems, [id]: !collapsedItems[id] })
     }
   }
 
+<<<<<<< Updated upstream
   const handleDisplaySearchList = () => {
     dispatch(openAction())
     if (open) {
@@ -104,6 +106,8 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
     }
   }
 
+=======
+>>>>>>> Stashed changes
   const handleNewRequest = () => {
     dispatch(resetCohortCreation())
     navigate('/cohort/new')
@@ -272,6 +276,7 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
             </ListItem>
           )}
 
+<<<<<<< Updated upstream
           <ListItemButton id="accueil" className={classes.listItem} onClick={() => navigate('/home')}>
             <Tooltip title={open ? '' : 'Accueil'}>
               <ListItemIcon className={classes.listIcon}>
@@ -460,6 +465,17 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
               <ListItemText className={classes.title} primary={<ShimmerBadge>Documentation</ShimmerBadge>} />
             </ListItem>
           )}
+=======
+          {menuItems.map((item) => (
+            <MenuEntry
+              key={item.id}
+              item={item}
+              open={open}
+              expanded={!collapsedItems[item.id]}
+              onToggle={() => handleToggleMenuItem(item.id)}
+            />
+          ))}
+>>>>>>> Stashed changes
         </List>
 
         <Box className={classes.footer}>
