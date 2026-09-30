@@ -16,7 +16,6 @@ import useCounts from 'hooks/researches/useCounts'
 import { TabType } from 'types'
 import { ExplorationsSearchParams } from 'types/cohorts'
 import { cleanSearchParams, getPathDepth } from 'utils/explorationUtils'
-import moment from 'moment'
 
 const MyResearches = () => {
   const location = useLocation()
@@ -129,7 +128,7 @@ const MyResearches = () => {
 
   const handleDateChange = (date: string | null, key: ExplorationsSearchParams) => {
     if (date) {
-      searchParams.set(key, moment(date).isValid() ? moment(date).format('YYYY-MM-DD') : '')
+      searchParams.set(key, date)
     } else {
       searchParams.delete(key)
     }

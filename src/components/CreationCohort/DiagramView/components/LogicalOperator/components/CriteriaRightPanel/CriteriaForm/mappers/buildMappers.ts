@@ -8,6 +8,7 @@ import {
   convertTimestampToDuration
 } from 'utils/age'
 import moment from 'moment'
+import { ISO_DATE_FORMAT } from 'utils/dates'
 import { Comparators } from 'types/requestCriterias'
 import { comparatorToFilter, parseOccurence } from 'utils/valueComparator'
 import services from 'services/aphp'
@@ -158,7 +159,7 @@ const buildDateFilterValue = (
   withSpace = false
 ) => {
   const _withSpace = withSpace ? ' ' : ''
-  const dateFormat = `YYYY-MM-DD[T00:00:00${removeTimeZone ? '' : 'Z'}]`
+  const dateFormat = `${ISO_DATE_FORMAT}[T00:00:00${removeTimeZone ? '' : 'Z'}]`
 
   return criterion ? `${comparator}${_withSpace}${moment(criterion).format(dateFormat)}` : ''
 }
