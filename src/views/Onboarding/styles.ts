@@ -69,11 +69,9 @@ const useStyles = makeStyles()((theme: Theme) => ({
   body: {
     flex: 1,
     display: 'flex',
-    // Anchored to the top rather than centred: the rail must not drift when a card grows.
-    alignItems: 'flex-start',
+    alignItems: 'stretch',
     justifyContent: 'center',
-    // 116px below the banner, where the mockups place the top of the card.
-    padding: theme.spacing(14.5, 6, 6)
+    padding: theme.spacing(14.5, 6, 0)
   },
   group: {
     display: 'flex',
@@ -150,6 +148,7 @@ const useStyles = makeStyles()((theme: Theme) => ({
   contentCol: {
     display: 'flex',
     flexDirection: 'column',
+    alignSelf: 'stretch',
     width: CARD_WIDTH,
     maxWidth: '100%'
   },
@@ -167,13 +166,20 @@ const useStyles = makeStyles()((theme: Theme) => ({
     }
   },
   cardOnboarding: {
-    padding: theme.spacing(5, 3, 4)
+    padding: theme.spacing(5, 3, 4),
+    marginBottom: theme.spacing(4)
   },
   footer: {
+    position: 'sticky',
+    bottom: 0,
     display: 'flex',
     justifyContent: 'flex-end',
     gap: theme.spacing(2),
-    marginTop: theme.spacing(7)
+    marginTop: 'auto',
+    padding: theme.spacing(3, 0),
+    backgroundColor: T.surface,
+    boxShadow: `0 0 0 100vmax ${T.surface}`,
+    clipPath: 'inset(0 -100vmax)'
   },
   button: {
     padding: theme.spacing(1),
