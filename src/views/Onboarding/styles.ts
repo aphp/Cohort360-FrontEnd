@@ -76,8 +76,8 @@ const useStyles = makeStyles()((theme: Theme) => ({
     display: 'flex',
     alignItems: 'flex-start',
     justifyContent: 'center',
-    // 116px below the banner, where the mockups place the top of the card.
-    padding: theme.spacing(14.5, 6, 7)
+    // 58px below the banner, where the mockups place the top of the card.
+    padding: theme.spacing(7.25, 6, 7)
   },
   group: {
     display: 'flex',
