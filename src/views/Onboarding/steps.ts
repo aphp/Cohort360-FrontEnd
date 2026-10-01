@@ -136,3 +136,6 @@ export const getStepScreenCount = (stepIndex: number): number => ONBOARDING_STEP
 
 export const getScreenConfig = (stepIndex: number, screenIndex: number): OnboardingScreenConfig | undefined =>
   ONBOARDING_STEPS[stepIndex]?.screens[screenIndex]
+
+export const getScreenByKey = (key: string): OnboardingScreenConfig | undefined =>
+  ONBOARDING_STEPS.flatMap((step) => step.screens).find((screen) => screen.key === key)

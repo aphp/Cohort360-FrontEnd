@@ -30,4 +30,21 @@ describe('WizardShell', () => {
     )
     expect(screen.getByText('only body')).toBeInTheDocument()
   })
+
+  it('drops the stepper when no steps are given, keeping the content', () => {
+    const { rerender } = render(
+      <WizardShell header={<div>my header</div>} steps={steps} activeStep={0}>
+        <div>single screen</div>
+      </WizardShell>
+    )
+    expect(screen.getByText('Step A')).toBeInTheDocument()
+
+    rerender(
+      <WizardShell header={<div>my header</div>}>
+        <div>single screen</div>
+      </WizardShell>
+    )
+    expect(screen.queryByText('Step A')).not.toBeInTheDocument()
+    expect(screen.getByText('single screen')).toBeInTheDocument()
+  })
 })

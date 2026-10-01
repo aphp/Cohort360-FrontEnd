@@ -31,6 +31,11 @@ const useStyles = makeStyles()((theme: Theme) => ({
   logo: {
     height: 40
   },
+  headerActions: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: theme.spacing(1)
+  },
   userBox: {
     display: 'flex',
     alignItems: 'center',
@@ -80,6 +85,10 @@ const useStyles = makeStyles()((theme: Theme) => ({
     alignItems: 'flex-start',
     gap: RAIL_GAP,
     marginLeft: -(RAIL_WIDTH + RAIL_GAP)
+  },
+  // Without the rail there is nothing to offset: the card is centred on its own.
+  groupWithoutRail: {
+    marginLeft: 0
   },
   stepper: {
     marginTop: theme.spacing(5.5),
@@ -183,6 +192,11 @@ const useStyles = makeStyles()((theme: Theme) => ({
     lineHeight: '18px',
     '& .MuiButton-startIcon, & .MuiButton-endIcon': {
       margin: 0
+    }
+  },
+  returnButton: {
+    '& .MuiButton-startIcon > *:nth-of-type(1)': {
+      fontSize: 18
     }
   },
   backButton: {

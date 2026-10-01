@@ -34,10 +34,10 @@ vi.mock('components/ui/ShimmerBadge', () => ({ default: ({ children }: { childre
 
 import LeftSideBar from 'components/Routes/LeftSideBar/LeftSideBar'
 
-const renderBar = (open = true, path = '/') =>
+const renderBar = (open = true) =>
   render(
     <AppConfig.Provider value={getConfig()}>
-      <MemoryRouter initialEntries={[path]}>
+      <MemoryRouter>
         <LeftSideBar open={open} />
       </MemoryRouter>
     </AppConfig.Provider>
@@ -83,25 +83,10 @@ describe('LeftSideBar', () => {
     expect(screen.getByText('Ma requête')).toBeInTheDocument()
   })
 
-  describe('entrée « Comprendre mes accès à Cohort360 »', () => {
-    const LABEL = 'Comprendre mes accès à Cohort360'
-
-    it('est masquée quand le feature flag onboarding est désactivé', () => {
-      renderBar()
-      expect(screen.queryByText(LABEL)).not.toBeInTheDocument()
-    })
-
-    it('est affichée quand le feature flag onboarding est actif', () => {
-      mockUseOnboardingEnabled.mockReturnValue(true)
-      renderBar()
-      expect(screen.getByText(LABEL)).toBeInTheDocument()
-    })
-
-    it('ouvre l’onboarding en mémorisant la page courante, paramètres compris', () => {
-      mockUseOnboardingEnabled.mockReturnValue(true)
-      renderBar(true, '/my-patients?tab=list')
-      fireEvent.click(screen.getByText(LABEL))
-      expect(navigate).toHaveBeenCalledWith('/onboarding', { state: { from: '/my-patients?tab=list' } })
-    })
+  it('se termine par la section « À propos de Cohort360 » quand l’onboarding est actif', () => {
+    mockUseOnboardingEnabled.mockReturnValue(true)
+    renderBar()
+    expect(screen.getByText('À propos de Cohort360')).toBeInTheDocument()
+    expect(screen.getByText('Mes habilitations')).toBeInTheDocument()
   })
 })

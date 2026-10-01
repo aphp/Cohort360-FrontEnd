@@ -6,8 +6,9 @@ import useStyles from './styles'
 
 type Props = {
   header?: React.ReactNode
-  steps: StepperItem[]
-  activeStep: number
+  /** Left out to show a screen on its own, without the steps rail. */
+  steps?: StepperItem[]
+  activeStep?: number
   stepProgress?: number
   layout?: 'card' | 'bare'
   children: React.ReactNode
@@ -21,10 +22,12 @@ const WizardShell = ({ header, steps, activeStep, stepProgress, layout = 'card',
     <Box className={classes.page}>
       {header && <Box className={classes.header}>{header}</Box>}
       <Box className={classes.body}>
-        <Box className={classes.group}>
-          <Box className={classes.stepper}>
-            <StepperRail steps={steps} activeStep={activeStep} stepProgress={stepProgress} />
-          </Box>
+        <Box className={cx(classes.group, { [classes.groupWithoutRail]: !steps })}>
+          {steps && (
+            <Box className={classes.stepper}>
+              <StepperRail steps={steps} activeStep={activeStep ?? -1} stepProgress={stepProgress} />
+            </Box>
+          )}
           <Box className={classes.contentCol}>
             {layout === 'card' ? <Box className={cx(classes.card, classes.cardOnboarding)}>{children}</Box> : children}
             {footer && <Box className={classes.footer}>{footer}</Box>}

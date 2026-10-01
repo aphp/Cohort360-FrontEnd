@@ -4,13 +4,14 @@ import { Button, GlobalStyles, Typography } from '@mui/material'
 import logo from 'assets/images/logo-login.png'
 import useOnboardingEnabled from 'hooks/onboarding/useOnboardingEnabled'
 import useOnboardingStatus from 'hooks/onboarding/useOnboardingStatus'
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useEffect } from 'react'
 import { Navigate, useLocation, useNavigate } from 'react-router'
 
 import { OnboardingProvider, useOnboarding } from './OnboardingContext'
-import type { OnboardingRouteState } from './route'
+import OnboardingReview from './OnboardingReview'
+import type { OnboardingRouteState, OnboardingSection } from './route'
 import ScreenTag from './ScreenTag'
-import { ONBOARDING_STEPS } from './steps'
+import { getScreenByKey, ONBOARDING_STEPS } from './steps'
 import useStyles from './styles'
 import UserMenu from './UserMenu'
 import WelcomeScreen from './WelcomeScreen'
@@ -19,12 +20,17 @@ import WizardShell from './WizardShell'
 const PROGRESS_ERROR_MESSAGE =
   "Une erreur est survenue lors de l'enregistrement de votre progression. Veuillez réessayer."
 
+/** The screen each side menu entry opens again, by its key in `ONBOARDING_STEPS`. */
+const SECTION_SCREEN_KEYS: Record<OnboardingSection, string> = {
+  habilitations: 'user-rights',
+  engagements: 'commitments-summary',
+  tutoriels: 'key-features'
+}
+
 const OnboardingLayout = () => {
   const { classes, cx } = useStyles()
   const {
     screen,
-    isReview,
-    isFirstStep,
     currentStep,
     subStep,
     screenConfig,
@@ -52,7 +58,7 @@ const OnboardingLayout = () => {
 
   const footer = (
     <>
-      {screen === 'steps' && !(isReview && isFirstStep) && (
+      {screen === 'steps' && (
         <Button
           className={cx(classes.button, classes.backButton)}
           variant="outlined"
@@ -112,24 +118,28 @@ const Onboarding = () => {
   const { status } = useOnboardingStatus(onboardingEnabled)
   const navigate = useNavigate()
   const location = useLocation()
-  const [isReplay] = useState(() => status?.onboarding_completed_at != null)
-  const from = (location.state as OnboardingRouteState | null)?.from ?? '/home'
-  const onFinish = useCallback(() => navigate(from, { replace: true }), [navigate, from])
+  const { from = '/home', section } = (location.state as OnboardingRouteState | null) ?? {}
+  const reviewedScreen = section ? getScreenByKey(SECTION_SCREEN_KEYS[section]) : undefined
 
   if (!onboardingEnabled) {
     return <Navigate to="/home" replace />
   }
 
-  if (!isReplay && status?.onboarding_completed_at != null) {
-    return <Navigate to="/home" replace />
+  if (status?.onboarding_completed_at != null) {
+    // A completed journey is only reopened on a screen picked from the side menu; a new user who has
+    // just completed it, or anyone typing the URL, is sent home.
+    if (!reviewedScreen) {
+      return <Navigate to="/home" replace />
+    }
+    return (
+      <OnboardingProvider initialStep={0} mode="review">
+        <OnboardingReview screenConfig={reviewedScreen} onReturn={() => navigate(from, { replace: true })} />
+      </OnboardingProvider>
+    )
   }
 
   return (
-    <OnboardingProvider
-      initialStep={isReplay ? 2 : (status?.onboarding_step ?? 0)}
-      mode={isReplay ? 'review' : 'journey'}
-      onFinish={onFinish}
-    >
+    <OnboardingProvider initialStep={status?.onboarding_step ?? 0}>
       <OnboardingLayout />
     </OnboardingProvider>
   )
