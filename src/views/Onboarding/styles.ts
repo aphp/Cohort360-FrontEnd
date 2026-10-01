@@ -74,9 +74,10 @@ const useStyles = makeStyles()((theme: Theme) => ({
   body: {
     flex: 1,
     display: 'flex',
-    alignItems: 'stretch',
+    alignItems: 'flex-start',
     justifyContent: 'center',
-    padding: theme.spacing(14.5, 6, 0)
+    // 116px below the banner, where the mockups place the top of the card.
+    padding: theme.spacing(14.5, 6, 7)
   },
   group: {
     display: 'flex',
@@ -157,7 +158,6 @@ const useStyles = makeStyles()((theme: Theme) => ({
   contentCol: {
     display: 'flex',
     flexDirection: 'column',
-    alignSelf: 'stretch',
     width: CARD_WIDTH,
     maxWidth: '100%'
   },
@@ -175,20 +175,23 @@ const useStyles = makeStyles()((theme: Theme) => ({
     }
   },
   cardOnboarding: {
-    padding: theme.spacing(5, 3, 4),
-    marginBottom: theme.spacing(4)
+    padding: theme.spacing(5, 3, 4)
   },
   footer: {
     position: 'sticky',
     bottom: 0,
     display: 'flex',
+    justifyContent: 'center',
+    padding: theme.spacing(3, 6),
+    borderTop: `1px solid ${T.cardBorder}`,
+    backgroundColor: T.surface
+  },
+  footerActions: {
+    display: 'flex',
     justifyContent: 'flex-end',
     gap: theme.spacing(2),
-    marginTop: 'auto',
-    padding: theme.spacing(3, 0),
-    backgroundColor: T.surface,
-    boxShadow: `0 0 0 100vmax ${T.surface}`,
-    clipPath: 'inset(0 -100vmax)'
+    width: CARD_WIDTH,
+    maxWidth: '100%'
   },
   button: {
     padding: theme.spacing(1),

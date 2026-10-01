@@ -30,10 +30,14 @@ const WizardShell = ({ header, steps, activeStep, stepProgress, layout = 'card',
           )}
           <Box className={classes.contentCol}>
             {layout === 'card' ? <Box className={cx(classes.card, classes.cardOnboarding)}>{children}</Box> : children}
-            {footer && <Box className={classes.footer}>{footer}</Box>}
           </Box>
         </Box>
       </Box>
+      {footer && (
+        <Box className={classes.footer}>
+          <Box className={classes.footerActions}>{footer}</Box>
+        </Box>
+      )}
     </Box>
   )
 }
