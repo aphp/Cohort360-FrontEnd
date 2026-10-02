@@ -3,6 +3,7 @@ import { mapRequestParamsToSearchCriteria, mapSearchCriteriasToRequestParams } f
 import { ResourceType } from 'types/requestCriterias'
 import {
   Direction,
+  DocumentsFilters,
   GenderStatus,
   Order,
   PatientsFilters,
@@ -32,6 +33,7 @@ vi.mock('config', async (importOriginal) => {
     getConfig: vi.fn(() => ({
       system: { fhirUrl: 'http://localhost/fhir' },
       core: {
+        codeSystems: { docStatus: 'http://doc-status' },
         valueSets: { encounterStatus: { url: 'http://enc-status', codeSystemUrls: ['http://enc-status-cs'] } }
       }
     }))
@@ -105,6 +107,42 @@ describe('mapSearchCriteriasToRequestParams <-> mapRequestParamsToSearchCriteria
 
     expect(filters.genders).toEqual([GenderStatus.MALE, GenderStatus.FEMALE])
     expect(filters.vitalStatuses).toEqual([VitalStatus.DECEASED, VitalStatus.ALIVE])
+  })
+})
+
+describe('mapRequestParamsToSearchCriteria - DOCUMENTS (onlyPdfAvailable)', () => {
+  it('coche la case par défaut quand aucun état sauvegardé n’est fourni (anciens filtres)', async () => {
+    const result = await mapRequestParamsToSearchCriteria('', ResourceType.DOCUMENTS)
+    expect((result.filters as DocumentsFilters).onlyPdfAvailable).toBe(true)
+  })
+
+  it.each([true, false])('restitue l’état sauvegardé onlyPdfAvailable=%s', async (value) => {
+    const result = await mapRequestParamsToSearchCriteria('', ResourceType.DOCUMENTS, value)
+    expect((result.filters as DocumentsFilters).onlyPdfAvailable).toBe(value)
+  })
+
+  // la chaîne est exécutée telle quelle pour les exports: la case ne doit jamais la modifier
+  it('n’écrit jamais la case PDF dans la chaîne de filtre', () => {
+    const withCriterias = (onlyPdfAvailable: boolean): SearchCriterias<DocumentsFilters> => ({
+      searchBy: SearchByTypes.TEXT,
+      searchInput: '',
+      orderBy: { orderBy: Order.DATE, orderDirection: Direction.DESC },
+      filters: {
+        ipp: '',
+        nda: '',
+        docStatuses: [],
+        docTypes: [],
+        onlyPdfAvailable,
+        excludeImportedDocuments: false,
+        durationRange: [null, null],
+        executiveUnits: [],
+        encounterStatus: []
+      }
+    })
+    const checked = mapSearchCriteriasToRequestParams(withCriterias(true), ResourceType.DOCUMENTS, false)
+    const unchecked = mapSearchCriteriasToRequestParams(withCriterias(false), ResourceType.DOCUMENTS, false)
+    expect(checked).toBe(unchecked)
+    expect(checked).not.toMatch(/onlyPdfAvailable|contenttype/)
   })
 })
 

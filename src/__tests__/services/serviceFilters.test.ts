@@ -51,7 +51,7 @@ const mockIsIdentifying = vi.mocked(isIdentifyingFilter)
 const asAxios = <T,>(data: T, status = 200): AxiosResponse<T> =>
   ({ data, status, statusText: 'OK', headers: {}, config: {} }) as AxiosResponse<T>
 
-const criterias = {} as SearchCriterias<Filters>
+const criterias = { filters: {} } as SearchCriterias<Filters>
 
 beforeEach(() => {
   vi.clearAllMocks()
@@ -91,26 +91,40 @@ describe('serviceFilters.postFiltersService', () => {
     expect(result).toEqual({ uuid: 'created' })
     // en mode nominatif on vérifie le caractère identifiant
     expect(mockIsIdentifying).toHaveBeenCalledWith('ga=1&gb=2')
-    expect(mockPostFilters).toHaveBeenCalledWith(ResourceType.PATIENT, 'Mon filtre', 'ga=1&gb=2', false)
+    expect(mockPostFilters).toHaveBeenCalledWith(ResourceType.PATIENT, 'Mon filtre', 'ga=1&gb=2', false, undefined)
   })
 
   it('ne teste pas le caractère identifiant en mode pseudonymisé', async () => {
     mockPostFilters.mockResolvedValue(asAxios({ uuid: 'created' }) as never)
     await postFiltersService(ResourceType.PATIENT, 'f', criterias, true)
     expect(mockIsIdentifying).not.toHaveBeenCalled()
-    expect(mockPostFilters).toHaveBeenCalledWith(ResourceType.PATIENT, 'f', 'ga=1&gb=2', false)
+    expect(mockPostFilters).toHaveBeenCalledWith(ResourceType.PATIENT, 'f', 'ga=1&gb=2', false, undefined)
   })
 
   it('propage identifying=true quand le filtre est identifiant', async () => {
     mockIsIdentifying.mockReturnValue(true)
     mockPostFilters.mockResolvedValue(asAxios({ uuid: 'created' }) as never)
     await postFiltersService(ResourceType.PATIENT, 'f', criterias, false)
-    expect(mockPostFilters).toHaveBeenCalledWith(ResourceType.PATIENT, 'f', 'ga=1&gb=2', true)
+    expect(mockPostFilters).toHaveBeenCalledWith(ResourceType.PATIENT, 'f', 'ga=1&gb=2', true, undefined)
   })
 
   it('lève une erreur quand la réponse est hors 2xx (erreur API)', async () => {
     mockPostFilters.mockResolvedValue(asAxios({ uuid: 'x' }, 400) as never)
     await expect(postFiltersService(ResourceType.PATIENT, 'f', criterias, false)).rejects.toThrow()
+  })
+
+  it.each([true, false])('transmet onlyPdfAvailable=%s hors de la chaîne de filtre (documents)', async (value) => {
+    mockPostFilters.mockResolvedValue(asAxios({ uuid: 'created' }) as never)
+    const documentsCriterias = { filters: { onlyPdfAvailable: value } } as SearchCriterias<Filters>
+    await postFiltersService(ResourceType.DOCUMENTS, 'f', documentsCriterias, false)
+    expect(mockPostFilters).toHaveBeenCalledWith(ResourceType.DOCUMENTS, 'f', 'ga=1&gb=2', false, value)
+  })
+
+  it("n'envoie pas onlyPdfAvailable quand les filtres ne le contiennent pas", async () => {
+    mockPostFilters.mockResolvedValue(asAxios({ uuid: 'created' }) as never)
+    const patientCriterias = { filters: { genders: [] } } as unknown as SearchCriterias<Filters>
+    await postFiltersService(ResourceType.PATIENT, 'f', patientCriterias, false)
+    expect(mockPostFilters).toHaveBeenCalledWith(ResourceType.PATIENT, 'f', 'ga=1&gb=2', false, undefined)
   })
 })
 
@@ -166,11 +180,18 @@ describe('serviceFilters.patchFiltersService', () => {
     const res = await patchFiltersService(ResourceType.PATIENT, 'u1', 'nouveau nom', criterias, false)
     expect(res.data).toEqual({ uuid: 'u1' })
     expect(mockMapper).toHaveBeenCalled()
-    expect(mockPatchFilters).toHaveBeenCalledWith(ResourceType.PATIENT, 'u1', 'nouveau nom', 'ga=1&gb=2')
+    expect(mockPatchFilters).toHaveBeenCalledWith(ResourceType.PATIENT, 'u1', 'nouveau nom', 'ga=1&gb=2', undefined)
   })
 
   it('lève une erreur quand la réponse est hors 2xx', async () => {
     mockPatchFilters.mockResolvedValue(asAxios({ uuid: 'u1' }, 422) as never)
     await expect(patchFiltersService(ResourceType.PATIENT, 'u1', 'n', criterias, false)).rejects.toThrow()
+  })
+
+  it.each([true, false])('transmet onlyPdfAvailable=%s hors de la chaîne de filtre (documents)', async (value) => {
+    mockPatchFilters.mockResolvedValue(asAxios({ uuid: 'u1' }, 200) as never)
+    const documentsCriterias = { filters: { onlyPdfAvailable: value } } as SearchCriterias<Filters>
+    await patchFiltersService(ResourceType.DOCUMENTS, 'u1', 'n', documentsCriterias, false)
+    expect(mockPatchFilters).toHaveBeenCalledWith(ResourceType.DOCUMENTS, 'u1', 'n', 'ga=1&gb=2', value)
   })
 })
