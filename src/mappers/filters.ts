@@ -152,7 +152,10 @@ const mapPatientFromRequestParams = (parameters: URLSearchParams) => {
   return { genders, vitalStatuses, birthdatesRanges }
 }
 
-const mapDocumentsFromRequestParams = async (parameters: URLSearchParams) => {
+/**
+ * @param onlyPdfAvailable not part of the request params: stored beside the filter string, see `SavedFilter.only_pdf_available` in types/searchCriterias.ts
+ */
+const mapDocumentsFromRequestParams = async (parameters: URLSearchParams, onlyPdfAvailable: boolean) => {
   const docTypesParams = parameters.get(DocumentsParamsKeys.DOC_TYPES)
   const docStatusesParams = parameters.get(DocumentsParamsKeys.DOC_STATUSES)
   let docTypes: SimpleCodeType[] = []
@@ -185,7 +188,6 @@ const mapDocumentsFromRequestParams = async (parameters: URLSearchParams) => {
         label: mapDocumentStatusesFromRequestParam(e.split('|')?.[1])
       }))
   }
-  const onlyPdfAvailable = true
   const excludeImportedDocuments = parameters.has(`${DocumentsParamsKeys.DOC_TYPES}:not`)
   const { nda, durationRange, executiveUnits, encounterStatus } = await mapGenericFromRequestParams(
     parameters,
@@ -334,12 +336,16 @@ const mapImagingFromRequestParams = async (parameters: URLSearchParams) => {
   return { modality, bodySite, nda, durationRange, executiveUnits, encounterStatus, ipp }
 }
 
-const mapFiltersFromRequestParams = async (parameters: URLSearchParams, type: ResourceType): Promise<Filters> => {
+const mapFiltersFromRequestParams = async (
+  parameters: URLSearchParams,
+  type: ResourceType,
+  onlyPdfAvailable: boolean
+): Promise<Filters> => {
   switch (type) {
     case ResourceType.PATIENT:
       return mapPatientFromRequestParams(parameters)
     case ResourceType.DOCUMENTS:
-      return await mapDocumentsFromRequestParams(parameters)
+      return await mapDocumentsFromRequestParams(parameters, onlyPdfAvailable)
     case ResourceType.CONDITION:
       return await mapConditionFromRequestParams(parameters)
     case ResourceType.PROCEDURE:
@@ -359,13 +365,17 @@ const mapFiltersFromRequestParams = async (parameters: URLSearchParams, type: Re
   }
 }
 
+/**
+ * @param onlyPdfAvailable documents checkbox state, stored outside `filtersString` (see `SavedFilter.only_pdf_available` in types/searchCriterias.ts)
+ */
 export const mapRequestParamsToSearchCriteria = async (
   filtersString: string,
-  type: ResourceType
+  type: ResourceType,
+  onlyPdfAvailable = true
 ): Promise<SearchCriterias<Filters>> => {
   const parameters = new URLSearchParams(filtersString)
   const [searchBy, searchInput] = mapSearchByAndSearchInputFromRequestParams(parameters)
-  const filters = await mapFiltersFromRequestParams(parameters, type)
+  const filters = await mapFiltersFromRequestParams(parameters, type, onlyPdfAvailable)
   const orderBy = getDefaultOrderBy(type)
   return {
     orderBy,
