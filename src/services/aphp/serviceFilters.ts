@@ -5,6 +5,9 @@ import { deleteFilter, deleteFilters, getFilters, patchFilters, postFilters } fr
 import { Filters, SearchCriterias } from 'types/searchCriterias'
 import { isIdentifyingFilter } from '../../utils/fhirFilterParser'
 
+/** Not serialized into the filter string, see `SavedFilter.only_pdf_available` in types/searchCriterias.ts */
+const getOnlyPdfAvailable = (filters: Filters) => ('onlyPdfAvailable' in filters ? filters.onlyPdfAvailable : undefined)
+
 export const getProviderFilters = async (provider_source_value?: string, fhir_resource?: ResourceType) => {
   if (!provider_source_value || !fhir_resource) {
     return []
@@ -34,7 +37,8 @@ export const postFiltersService = async (
   // an identifying filter. Only check in case of nomi mode
   if (!deidentified) identifying = isIdentifyingFilter(criteriasString)
 
-  const response = await postFilters(fhir_resource, name, criteriasString, identifying)
+  const onlyPdfAvailable = getOnlyPdfAvailable(criterias.filters)
+  const response = await postFilters(fhir_resource, name, criteriasString, identifying, onlyPdfAvailable)
   if (response.status < 200 || response.status >= 300) throw new Error()
   return response.data
 }
@@ -67,7 +71,8 @@ export const patchFiltersService = async (
   deidentified: boolean
 ) => {
   const criteriasString = mapSearchCriteriasToRequestParams(criterias, fhir_resource, deidentified)
-  const response = await patchFilters(fhir_resource, uuid, name, criteriasString)
+  const onlyPdfAvailable = getOnlyPdfAvailable(criterias.filters)
+  const response = await patchFilters(fhir_resource, uuid, name, criteriasString, onlyPdfAvailable)
   if (response.status < 200 || response.status >= 300) throw new Error()
   return response
 }

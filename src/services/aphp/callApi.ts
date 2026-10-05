@@ -481,14 +481,16 @@ export const postFilters = async (
   fhir_resource: ResourceType,
   name: string,
   filter: string,
-  identifying: boolean
+  identifying: boolean,
+  onlyPdfAvailable?: boolean
 ): Promise<AxiosResponse<SavedFilter>> => {
   const res = await apiBackend.post('/cohort/fhir-filters/', {
     fhir_resource,
     fhir_version: '4.0',
     name,
     filter,
-    identifying
+    identifying,
+    only_pdf_available: onlyPdfAvailable
   })
   if (res instanceof AxiosError) throw { status: res.status }
   return res
@@ -525,13 +527,15 @@ export const patchFilters = async (
   fhir_resource: ResourceType,
   uuid: string,
   name: string,
-  filter: string
+  filter: string,
+  onlyPdfAvailable?: boolean
 ): Promise<AxiosResponse<SavedFilter>> => {
   const res = await apiBackend.patch(`/cohort/fhir-filters/${uuid}/`, {
     fhir_resource,
     fhir_version: '4.0',
     name,
-    filter
+    filter,
+    only_pdf_available: onlyPdfAvailable
   })
   if (res instanceof AxiosError) throw { status: res.status }
   return res

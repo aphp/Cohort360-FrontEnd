@@ -532,6 +532,8 @@ export type SavedFilter = {
   name: string
   owner: string
   uuid: string
+  /** Kept out of `filter`, which exports run as-is. Missing means true */
+  only_pdf_available?: boolean
 }
 
 export type SavedFiltersResults = {

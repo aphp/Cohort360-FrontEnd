@@ -107,7 +107,7 @@ export const useSavedFilters = (type: ResourceType) => {
     return {
       filterUuid: selectedItem.uuid,
       filterName: selectedItem.name,
-      filterParams: await mapRequestParamsToSearchCriteria(selectedItem.filter, type)
+      filterParams: await mapRequestParamsToSearchCriteria(selectedItem.filter, type, selectedItem.only_pdf_available)
     }
   }
 
