@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { getCohortDataAccess } from 'utils/explorationUtils'
+import { checkSearchParamsErrors, getCohortDataAccess } from 'utils/explorationUtils'
 import { accessType } from 'types/scope'
 import { GroupRights } from 'types'
 
@@ -27,5 +27,19 @@ describe('explorationUtils.getCohortDataAccess', () => {
     expect(getCohortDataAccess({ read_patient_nomi: false, read_patient_pseudo: false })).toBeUndefined()
     // un droit d'export seul ne suffit pas à qualifier la consultation
     expect(getCohortDataAccess({ export_csv_xlsx_nomi: true } as GroupRights)).toBeUndefined()
+  })
+})
+
+describe('explorationUtils.checkSearchParamsErrors - minPatients', () => {
+  it('conserve un nombre valide', () => {
+    const { changed, newSearchParams } = checkSearchParamsErrors(new URLSearchParams('minPatients=10'))
+    expect(changed).toBe(false)
+    expect(newSearchParams.get('minPatients')).toBe('10')
+  })
+
+  it.each(['abc', '-3', '2024-01-01'])('retire une valeur invalide (%s)', (value) => {
+    const { changed, newSearchParams } = checkSearchParamsErrors(new URLSearchParams(`minPatients=${value}`))
+    expect(changed).toBe(true)
+    expect(newSearchParams.has('minPatients')).toBe(false)
   })
 })
