@@ -2,7 +2,7 @@ import { act, renderHook, waitFor } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { useSavedFilters } from 'hooks/filters/useSavedFilters'
 import { mapRequestParamsToSearchCriteria } from 'mappers/filters'
-import { getFiltersService, postFiltersService } from 'services/aphp/serviceFilters'
+import { getFiltersService, patchFiltersService, postFiltersService } from 'services/aphp/serviceFilters'
 import { ResourceType } from 'types/requestCriterias'
 import { SavedFilter, SearchCriterias, Filters } from 'types/searchCriterias'
 
@@ -14,6 +14,11 @@ vi.mock('services/aphp/serviceFilters', () => ({
   patchFiltersService: vi.fn()
 }))
 
+vi.mock('config', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('config')>()),
+  getConfig: () => ({ system: { mailSupport: 'support@test.fr' } })
+}))
+
 vi.mock('mappers/filters', () => ({
   mapRequestParamsToSearchCriteria: vi.fn()
 }))
@@ -21,6 +26,7 @@ vi.mock('mappers/filters', () => ({
 const mockGetFilters = vi.mocked(getFiltersService)
 const mockMapper = vi.mocked(mapRequestParamsToSearchCriteria)
 const mockPostFilters = vi.mocked(postFiltersService)
+const mockPatchFilters = vi.mocked(patchFiltersService)
 
 const savedFilter = (overrides: Partial<SavedFilter> = {}) =>
   ({ uuid: 'u1', name: 'Mes CR', filter: 'type=abc', ...overrides }) as SavedFilter
@@ -70,5 +76,32 @@ describe('useSavedFilters.postSavedFilter', () => {
     await act(() => result.current.methods.postSavedFilter('IC', {} as SearchCriterias<Filters>, false))
 
     expect(result.current.fetchStatus?.message).toBe(message)
+  })
+})
+
+describe('useSavedFilters.patchSavedFilter', () => {
+  it('signale un critère vide refusé par le back', async () => {
+    mockPatchFilters.mockRejectedValue({ status: 400, data: { filter: ['Empty value for parameter `diagnosisType`'] } })
+    mockGetFilters.mockResolvedValue({ count: 1, next: null, previous: null, results: [savedFilter()] } as never)
+    const { result } = renderHook(() => useSavedFilters(ResourceType.CONDITION))
+    await waitFor(() => expect(result.current.allSavedFilters?.results).toHaveLength(1))
+    act(() => result.current.methods.selectFilter('u1'))
+    await waitFor(() => expect(result.current.selectedSavedFilter).not.toBeNull())
+
+    await act(() => result.current.methods.patchSavedFilter('IC', {} as SearchCriterias<Filters>, false))
+
+    expect(result.current.fetchStatus?.message).toBe(
+      "Erreur lors de l'enregistrement du filtre. Un des critères du filtre est vide."
+    )
+  })
+
+  it('renvoie vers le support pour les autres erreurs', async () => {
+    mockPostFilters.mockRejectedValue({ status: 500 })
+    const { result } = renderHook(() => useSavedFilters(ResourceType.CONDITION))
+    await waitFor(() => expect(mockGetFilters).toHaveBeenCalled())
+
+    await act(() => result.current.methods.postSavedFilter('IC', {} as SearchCriterias<Filters>, false))
+
+    expect(result.current.fetchStatus?.message).toContain('support@test.fr')
   })
 })

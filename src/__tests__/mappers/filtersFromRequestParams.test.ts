@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { getCodeList } from 'services/aphp/serviceValueSets'
 import { mapRequestParamsToSearchCriteria, mapSearchCriteriasToRequestParams } from 'mappers/filters'
 import { ResourceType } from 'types/requestCriterias'
 import {
@@ -167,8 +168,13 @@ describe('mapRequestParamsToSearchCriteria - CONDITION (types de diagnostic)', (
       (await mapRequestParamsToSearchCriteria(params, ResourceType.CONDITION)).filters as PMSIFilters
     ).diagnosticTypes?.map((type) => type.id)
 
-  it('relit les codes seuls', async () => {
-    expect(await diagnosticTypesIds('diagnosisType=DP%2CDAS')).toEqual(['DP', 'DAS'])
+  it('relit les codes seuls avec leur libellé', async () => {
+    vi.mocked(getCodeList).mockResolvedValueOnce({ results: [{ id: 'DP', label: 'Diagnostic Principal' }] } as never)
+    const result = await mapRequestParamsToSearchCriteria('diagnosisType=DP%2CDAS', ResourceType.CONDITION)
+    expect((result.filters as PMSIFilters).diagnosticTypes).toEqual([
+      { id: 'DP', label: 'Diagnostic Principal' },
+      { id: 'DAS', label: '' }
+    ])
   })
 
   it('relit les anciens filtres au format system|code', async () => {
