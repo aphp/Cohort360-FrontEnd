@@ -14,6 +14,7 @@ export type OnboardingStatus = {
   onboarding_step: number
   onboarding_completed_at: string | null
   charter_signed_at: string | null
+  is_pre_onboarding_user: boolean
 }
 
 export interface IServiceOnboarding {

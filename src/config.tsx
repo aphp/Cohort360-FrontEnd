@@ -153,6 +153,7 @@ export type AppConfig = {
     }
     onboarding: FeatureConfig & {
       allowedAphCodes: string[]
+      preOnboardingAphCodes: string[]
     }
   }
   core: {
@@ -428,7 +429,8 @@ let config: AppConfig = {
     },
     onboarding: {
       enabled: false,
-      allowedAphCodes: []
+      allowedAphCodes: [],
+      preOnboardingAphCodes: []
     }
   },
   system: {
