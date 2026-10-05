@@ -14,7 +14,11 @@ vi.mock('../../services/apiFhir', () => ({
 vi.mock('services/apiDatamodel', () => ({ default: { get: vi.fn(async () => ({ data: {} })) } }))
 
 vi.mock('../../services/apiBackend', () => ({
-  default: { get: vi.fn(async () => ({ data: {} })), post: vi.fn(async () => ({ data: {} })) }
+  default: {
+    get: vi.fn(async () => ({ data: {} })),
+    post: vi.fn(async () => ({ data: {} })),
+    patch: vi.fn(async () => ({ data: {} }))
+  }
 }))
 
 vi.mock('config', async (importOriginal) => {
@@ -34,8 +38,13 @@ import {
   fetchImaging,
   fetchDocumentReference,
   fetchBinary,
-  fetchForms
+  fetchForms,
+  postFilters,
+  patchFilters
 } from 'services/aphp/callApi'
+import apiBackend from '../../services/apiBackend'
+import { AxiosError, AxiosResponse } from 'axios'
+import { ResourceType } from 'types/requestCriterias'
 
 const optionsOf = () => fhirSearch.mock.calls[fhirSearch.mock.calls.length - 1][1] as string[]
 const resourceOf = () => fhirSearch.mock.calls[fhirSearch.mock.calls.length - 1][0] as string
@@ -253,5 +262,29 @@ describe('callApi - branches de filtres avancées', () => {
       encounterStatus: ['finished']
     } as never)
     expect(resourceOf()).toBe('Claim')
+  })
+})
+
+describe('postFilters / patchFilters', () => {
+  const refusal = () =>
+    new AxiosError('Bad Request', 'ERR_BAD_REQUEST', undefined, undefined, {
+      status: 400,
+      data: { filter: ['Empty value for parameter `diagnosisType`'] }
+    } as AxiosResponse)
+
+  it('remonte le statut et le corps du refus à la création', async () => {
+    vi.mocked(apiBackend.post).mockResolvedValueOnce(refusal())
+    await expect(postFilters(ResourceType.CONDITION, 'IC', 'diagnosisType=%2C', false)).rejects.toEqual({
+      status: 400,
+      data: { filter: ['Empty value for parameter `diagnosisType`'] }
+    })
+  })
+
+  it('remonte le statut et le corps du refus à la modification', async () => {
+    vi.mocked(apiBackend.patch).mockResolvedValueOnce(refusal())
+    await expect(patchFilters(ResourceType.CONDITION, 'u1', 'IC', 'diagnosisType=%2C')).rejects.toEqual({
+      status: 400,
+      data: { filter: ['Empty value for parameter `diagnosisType`'] }
+    })
   })
 })

@@ -492,7 +492,7 @@ export const postFilters = async (
     identifying,
     only_pdf_available: onlyPdfAvailable
   })
-  if (res instanceof AxiosError) throw { status: res.status }
+  if (res instanceof AxiosError) throw { status: res.status, data: res.response?.data }
   return res
 }
 
@@ -537,7 +537,7 @@ export const patchFilters = async (
     filter,
     only_pdf_available: onlyPdfAvailable
   })
-  if (res instanceof AxiosError) throw { status: res.status }
+  if (res instanceof AxiosError) throw { status: res.status, data: res.response?.data }
   return res
 }
 
