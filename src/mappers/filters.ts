@@ -214,7 +214,7 @@ const mapConditionFromRequestParams = async (parameters: URLSearchParams) => {
     diagnosticTypes = diagnosticTypesParams
       .split(',')
       .map((elem) => elem.split('|').pop() ?? '')
-      .filter((id) => id)
+      .filter(Boolean)
       .map((id) => ({
         id,
         label: (allDiagnosticTypes.results || []).find((diag) => diag.id === id)?.label ?? ''
@@ -455,7 +455,7 @@ const mapDocumentsToRequestParams = (filters: DocumentsFilters) => {
 const mapConditionToRequestParams = (filters: PMSIFilters) => {
   const { diagnosticTypes, code, source, nda, ipp, durationRange, executiveUnits, encounterStatus } = filters
   const requestParams: string[] = []
-  const diagnosticTypesIds = diagnosticTypes?.map((elem) => elem.id).filter((id) => id) ?? []
+  const diagnosticTypesIds = diagnosticTypes?.map((elem) => elem.id).filter(Boolean) ?? []
   if (diagnosticTypesIds.length > 0) {
     requestParams.push(`${ConditionParamsKeys.DIAGNOSTIC_TYPES}=${encodeURIComponent(diagnosticTypesIds.join(','))}`)
   }
