@@ -532,11 +532,7 @@ export type SavedFilter = {
   name: string
   owner: string
   uuid: string
-  /**
-   * State of the documents "PDF disponibles" checkbox. Stored beside `filter`, never inside it: `filter` is
-   * run as-is by the query executor for export cohort subsets, so adding `contenttype` there would change
-   * which notes get exported. Absent on backends that predate the field, in which case it means `true`.
-   */
+  /** Kept out of `filter`, which exports run as-is. Missing means true */
   only_pdf_available?: boolean
 }
 

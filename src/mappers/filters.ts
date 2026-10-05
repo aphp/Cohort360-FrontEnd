@@ -152,9 +152,6 @@ const mapPatientFromRequestParams = (parameters: URLSearchParams) => {
   return { genders, vitalStatuses, birthdatesRanges }
 }
 
-/**
- * @param onlyPdfAvailable not part of the request params: stored beside the filter string, see `SavedFilter.only_pdf_available` in types/searchCriterias.ts
- */
 const mapDocumentsFromRequestParams = async (parameters: URLSearchParams, onlyPdfAvailable: boolean) => {
   const docTypesParams = parameters.get(DocumentsParamsKeys.DOC_TYPES)
   const docStatusesParams = parameters.get(DocumentsParamsKeys.DOC_STATUSES)
