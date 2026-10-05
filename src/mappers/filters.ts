@@ -210,10 +210,15 @@ const mapConditionFromRequestParams = async (parameters: URLSearchParams) => {
   let diagnosticTypes: LabelObject[] = []
   if (diagnosticTypesParams) {
     const allDiagnosticTypes = await getCodeList(getConfig().features.condition.valueSets.conditionStatus.url)
-    diagnosticTypes = diagnosticTypesParams?.split(',')?.map((elem) => {
-      const toParse = elem.split('|')?.[1]
-      return { id: toParse, label: (allDiagnosticTypes.results || []).find((diag) => diag.id === toParse)?.label ?? '' }
-    })
+    // filtres d'avant décembre 2025 au format `system|code`, ceux d'après au format `code`
+    diagnosticTypes = diagnosticTypesParams
+      .split(',')
+      .map((elem) => elem.split('|').pop() ?? '')
+      .filter((id) => id)
+      .map((id) => ({
+        id,
+        label: (allDiagnosticTypes.results || []).find((diag) => diag.id === id)?.label ?? ''
+      }))
   }
   const source =
     parameters
@@ -450,9 +455,9 @@ const mapDocumentsToRequestParams = (filters: DocumentsFilters) => {
 const mapConditionToRequestParams = (filters: PMSIFilters) => {
   const { diagnosticTypes, code, source, nda, ipp, durationRange, executiveUnits, encounterStatus } = filters
   const requestParams: string[] = []
-  if (diagnosticTypes && diagnosticTypes.length > 0) {
-    const urlString = diagnosticTypes.map((elem) => elem.id).join(',')
-    requestParams.push(`${ConditionParamsKeys.DIAGNOSTIC_TYPES}=${encodeURIComponent(urlString)}`)
+  const diagnosticTypesIds = diagnosticTypes?.map((elem) => elem.id).filter((id) => id) ?? []
+  if (diagnosticTypesIds.length > 0) {
+    requestParams.push(`${ConditionParamsKeys.DIAGNOSTIC_TYPES}=${encodeURIComponent(diagnosticTypesIds.join(','))}`)
   }
   if (code.length)
     requestParams.push(

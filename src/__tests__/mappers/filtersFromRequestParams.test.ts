@@ -7,6 +7,7 @@ import {
   GenderStatus,
   Order,
   PatientsFilters,
+  PMSIFilters,
   SearchByTypes,
   SearchCriterias,
   VitalStatus
@@ -35,7 +36,8 @@ vi.mock('config', async (importOriginal) => {
       core: {
         codeSystems: { docStatus: 'http://doc-status' },
         valueSets: { encounterStatus: { url: 'http://enc-status', codeSystemUrls: ['http://enc-status-cs'] } }
-      }
+      },
+      features: { condition: { valueSets: { conditionStatus: { url: 'http://diagnosis-type' } } } }
     }))
   }
 })
@@ -156,5 +158,47 @@ describe('mapRequestParamsToSearchCriteria - ordre par défaut selon la ressourc
   it('CONDITION utilise date DESC', async () => {
     const result = await mapRequestParamsToSearchCriteria('', ResourceType.CONDITION)
     expect(result.orderBy).toEqual({ orderBy: Order.DATE, orderDirection: Direction.DESC })
+  })
+})
+
+describe('mapRequestParamsToSearchCriteria - CONDITION (types de diagnostic)', () => {
+  const diagnosticTypesIds = async (params: string) =>
+    (
+      (await mapRequestParamsToSearchCriteria(params, ResourceType.CONDITION)).filters as PMSIFilters
+    ).diagnosticTypes?.map((type) => type.id)
+
+  it('relit les codes seuls', async () => {
+    expect(await diagnosticTypesIds('diagnosisType=DP%2CDAS')).toEqual(['DP', 'DAS'])
+  })
+
+  it('relit les anciens filtres au format system|code', async () => {
+    const params = `diagnosisType=${encodeURIComponent('https://terminology.eds.aphp.fr/fhir/CodeSystem/DiagnosisType|dp')}`
+    expect(await diagnosticTypesIds(params)).toEqual(['dp'])
+  })
+
+  it('ignore les valeurs vides des filtres déjà abîmés', async () => {
+    expect(await diagnosticTypesIds('diagnosisType=%2C')).toEqual([])
+  })
+
+  it('conserve les types après un aller-retour', async () => {
+    const saved = await mapRequestParamsToSearchCriteria('diagnosisType=DP%2CDAS', ResourceType.CONDITION)
+    expect(mapSearchCriteriasToRequestParams(saved, ResourceType.CONDITION, false)).toContain('diagnosisType=DP%2CDAS')
+  })
+
+  it('n’écrit pas de type sans identifiant', () => {
+    const criterias: SearchCriterias<PMSIFilters> = {
+      searchBy: SearchByTypes.TEXT,
+      searchInput: '',
+      orderBy: { orderBy: Order.DATE, orderDirection: Direction.DESC },
+      filters: {
+        diagnosticTypes: [{ id: '', label: '' }],
+        code: [],
+        nda: '',
+        durationRange: [null, null],
+        executiveUnits: [],
+        encounterStatus: []
+      }
+    }
+    expect(mapSearchCriteriasToRequestParams(criterias, ResourceType.CONDITION, false)).not.toContain('diagnosisType')
   })
 })

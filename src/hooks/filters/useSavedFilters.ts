@@ -23,6 +23,15 @@ export type SelectedFilter<T> = {
   filterParams: SearchCriterias<T>
 }
 
+const getSaveErrorMessage = (error: { status?: number; data?: { filter?: unknown } }) => {
+  if (error.status === 400 && error.data?.filter)
+    return "Erreur lors de l'enregistrement du filtre. Un des critères du filtre est vide."
+  if (error.status === 400) return "Erreur lors de l'enregistrement du filtre. Nom déjà existant."
+  return `L'enregistrement du filtre a echoué. Veuillez réessayer ultérieurement. Si le problème persiste, veuillez contacter le support: ${
+    getConfig().system.mailSupport
+  }.`
+}
+
 export const useSavedFilters = (type: ResourceType) => {
   const [allSavedFilters, setAllSavedFilters] = useState<SavedFiltersResults | null>(null)
   const [fetchStatus, setFetchStatus] = useState<FetchResponse | null>(null)
@@ -56,15 +65,7 @@ export const useSavedFilters = (type: ResourceType) => {
       await getSavedFilters()
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
-      setFetchStatus({
-        status: FetchStatus.ERROR,
-        message:
-          error.status === 400
-            ? "Erreur lors de l'enregistrement du filtre. Nom déjà existant."
-            : `L'enregistrement du filtre a echoué. Veuillez réessayer ultérieurement. Si le problème persiste, veuillez contacter le support: ${
-                getConfig().system.mailSupport
-              }.`
-      })
+      setFetchStatus({ status: FetchStatus.ERROR, message: getSaveErrorMessage(error) })
     }
   }
 
@@ -90,15 +91,7 @@ export const useSavedFilters = (type: ResourceType) => {
         await getSavedFilters()
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (error: any) {
-        setFetchStatus({
-          status: FetchStatus.ERROR,
-          message:
-            error.status === 400
-              ? "Erreur lors de l'enregistrement du filtre. Nom déjà existant."
-              : `L'enregistrement du filtre a echoué. Veuillez réessayer ultérieurement. Si le problème persiste, veuillez contacter le support: ${
-                  getConfig().system.mailSupport
-                }.`
-        })
+        setFetchStatus({ status: FetchStatus.ERROR, message: getSaveErrorMessage(error) })
       }
     }
   }
