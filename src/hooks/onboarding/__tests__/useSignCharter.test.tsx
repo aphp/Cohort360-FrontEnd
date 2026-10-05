@@ -20,7 +20,8 @@ const renderSignCharter = (charterSignedAt: string | null) => {
   queryClient.setQueryData<OnboardingStatus>(ONBOARDING_STATUS_QUERY_KEY, {
     onboarding_step: 1,
     onboarding_completed_at: null,
-    charter_signed_at: charterSignedAt
+    charter_signed_at: charterSignedAt,
+    is_pre_onboarding_user: false
   })
   const wrapper = ({ children }: { children: ReactNode }) => (
     <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>

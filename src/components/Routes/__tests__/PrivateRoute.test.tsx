@@ -67,13 +67,15 @@ const setStatus = (status: OnboardingStatus | undefined, statusPending = false) 
 const completedStatus: OnboardingStatus = {
   onboarding_step: 3,
   onboarding_completed_at: '2026-01-01T00:00:00Z',
-  charter_signed_at: '2026-01-01T00:00:00Z'
+  charter_signed_at: '2026-01-01T00:00:00Z',
+  is_pre_onboarding_user: false
 }
 
 const pendingStatus: OnboardingStatus = {
   onboarding_step: 0,
   onboarding_completed_at: null,
-  charter_signed_at: null
+  charter_signed_at: null,
+  is_pre_onboarding_user: false
 }
 
 describe('PrivateRoute', () => {

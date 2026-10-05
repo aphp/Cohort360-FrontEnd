@@ -16,7 +16,8 @@ import { ONBOARDING_STATUS_QUERY_KEY } from '../useOnboardingStatus'
 const seededStatus: OnboardingStatus = {
   onboarding_step: 1,
   onboarding_completed_at: null,
-  charter_signed_at: null
+  charter_signed_at: null,
+  is_pre_onboarding_user: false
 }
 
 const renderAdvance = () => {
