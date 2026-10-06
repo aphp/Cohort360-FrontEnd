@@ -543,7 +543,12 @@ export const form: () => CriteriaForm<HospitDataType> = () => {
                 id: HOSPIT_LINK_IDS.birthDeliveryStartDate,
                 type: 'valueDateTime'
               },
-              chipDisplayMethodExtraArgs: [{ type: 'string', value: "Date/heure de l'accouchement :" }]
+              chipDisplayMethodExtraArgs: [{ type: 'string', value: "Date/heure de l'accouchement :" }],
+              buildMethodExtraArgs: [
+                { type: 'boolean', value: true }, // removeTimeZone : heure locale du serveur
+                { type: 'boolean', value: false }, // withSpace
+                { type: 'boolean', value: true } // borne de fin = 23:59:59
+              ]
             }
           },
           {

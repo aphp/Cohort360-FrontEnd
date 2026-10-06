@@ -41,7 +41,7 @@ const searchReducer = (accumulator: string, currentValue: string): string => {
 const COMPARATORS_REGEX = /(le|ge)/gi
 
 const replaceTime = (date?: string) => {
-  return date?.replace('T00:00:00Z', '') ?? null
+  return date?.replace(/T\d{2}:\d{2}:\d{2}Z?$/, '') ?? null
 }
 
 const unbuildMultiSelect = (value: string, existingValue?: string[]) => {
@@ -113,7 +113,8 @@ const buildDateFilter = (
   dateRange: NewDurationRangeType | null,
   fhirKey: FhirKey,
   removeTimeZone = false,
-  whithSpace = false
+  whithSpace = false,
+  inclusiveEndOfDay = false
 ): string[] | undefined | { filterValue: string; filterKey: string } => {
   let fhirKeyString: string
   if (typeof fhirKey === 'string') {
@@ -146,7 +147,7 @@ const buildDateFilter = (
       filterValues.push(buildDateFilterValue(dateRange.start, 'ge', removeTimeZone, whithSpace))
     }
     if (dateRange?.end) {
-      filterValues.push(buildDateFilterValue(dateRange.end, 'le', removeTimeZone, whithSpace))
+      filterValues.push(buildDateFilterValue(dateRange.end, 'le', removeTimeZone, whithSpace, inclusiveEndOfDay))
     }
     return filterValues
   }
@@ -156,10 +157,12 @@ const buildDateFilterValue = (
   criterion: string | null | undefined,
   comparator: 'le' | 'ge',
   removeTimeZone = false,
-  withSpace = false
+  withSpace = false,
+  endOfDay = false
 ) => {
   const _withSpace = withSpace ? ' ' : ''
-  const dateFormat = `${ISO_DATE_FORMAT}[T00:00:00${removeTimeZone ? '' : 'Z'}]`
+  const time = endOfDay ? 'T23:59:59' : 'T00:00:00'
+  const dateFormat = `${ISO_DATE_FORMAT}[${time}${removeTimeZone ? '' : 'Z'}]`
 
   return criterion ? `${comparator}${_withSpace}${moment(criterion).format(dateFormat)}` : ''
 }
@@ -377,7 +380,7 @@ export const BUILD_MAPPERS = {
     args: Array<DataTypes | BuilderMethod>
   ) => buildEncounterServiceFilter(val as Hierarchy<ScopeElement, string>[]),
   buildDate: (val: DataTypes, key: FhirKey, deidentified: boolean, args: Array<DataTypes | BuilderMethod>) =>
-    buildDateFilter(val as NewDurationRangeType, key, args[0] as boolean, args[1] as boolean),
+    buildDateFilter(val as NewDurationRangeType, key, args[0] as boolean, args[1] as boolean, args[2] as boolean),
   buildDuration: (val: DataTypes, key: FhirKey, deidentified: boolean, args: Array<DataTypes | BuilderMethod>) =>
     buildDurationFilters(val as NewDurationRangeType, deidentified),
   buildSearch: (val: DataTypes, key: FhirKey, deidentified: boolean, args: Array<DataTypes | BuilderMethod>) =>

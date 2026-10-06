@@ -66,6 +66,16 @@ describe('BUILD_MAPPERS.buildDate', () => {
     expect(result.filterKey).toBe('_filter')
     expect(result.filterValue).toContain('or not')
   })
+  it('conserve le format par défaut (T00:00:00Z sur les deux bornes)', () => {
+    const val = { start: '2026-07-01', end: '2026-07-31', includeNull: false }
+    const result = BUILD_MAPPERS.buildDate(val as never, 'date' as never, false, [false, false])
+    expect(result).toEqual(['ge2026-07-01T00:00:00Z', 'le2026-07-31T00:00:00Z'])
+  })
+  it('inclut toute la journée de fin, sans fuseau (date/heure accouchement)', () => {
+    const val = { start: '2026-07-01', end: '2026-07-31', includeNull: false }
+    const result = BUILD_MAPPERS.buildDate(val as never, 'date' as never, false, [true, false, true])
+    expect(result).toEqual(['ge2026-07-01T00:00:00', 'le2026-07-31T23:59:59'])
+  })
 })
 
 describe('BUILD_MAPPERS.buildSearch / buildRaw / noop', () => {
@@ -139,4 +149,15 @@ describe('UNBUILD_MAPPERS.unbuildDate', () => {
     expect(result.start).toContain('2020-01-01')
     expect(result.end).toContain('2020-12-31')
   })
+  it.each([['ge2026-07-01T00:00:00Z,le2026-07-31T00:00:00Z'], ['ge2026-07-01T00:00:00,le2026-07-31T23:59:59']])(
+    'retire l’heure pour retrouver les dates saisies (%s)',
+    async (filter) => {
+      const result = (await UNBUILD_MAPPERS.unbuildDate(filter, false, undefined as never, '', [])) as {
+        start: string | null
+        end: string | null
+      }
+      expect(result.start).toBe('2026-07-01')
+      expect(result.end).toBe('2026-07-31')
+    }
+  )
 })
