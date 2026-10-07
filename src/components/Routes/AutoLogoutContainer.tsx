@@ -33,6 +33,8 @@ import apiBackend from 'services/apiBackend'
 import useStyles from './styles'
 import { AppConfig } from 'config'
 
+const PROMPT_BEFORE_IDLE = 1 * 60 * 1000
+
 /**
  * AutoLogoutContainer Component
  *
@@ -120,7 +122,7 @@ const AutoLogoutContainer = () => {
     crossTab: true,
     syncTimers: 0,
     timeout: appConfig.system.sessionTimeout,
-    promptBeforeIdle: 1 * 60 * 1000,
+    promptBeforeIdle: PROMPT_BEFORE_IDLE,
     throttle: 1 * 60 * 1000,
     onPrompt: handleOnPrompt,
     onIdle: handleOnIdle,
@@ -231,11 +233,14 @@ const AutoLogoutContainer = () => {
   // Don't render the component if user is not authenticated
   if (!me) return <></>
 
+  // The prompt opens PROMPT_BEFORE_IDLE before sessionTimeout is reached
+  const idleMinutesAtPrompt = Math.round((appConfig.system.sessionTimeout - PROMPT_BEFORE_IDLE) / 60000)
+
   return (
     <Dialog open={isOpen}>
       <DialogContent>
         <DialogContentText variant="button" className={classes.title}>
-          Vous allez être déconnecté car vous avez été inactif pendant 14 minutes.
+          Vous allez être déconnecté car vous avez été inactif pendant {idleMinutesAtPrompt} minutes.
         </DialogContentText>
       </DialogContent>
       <DialogActions>
