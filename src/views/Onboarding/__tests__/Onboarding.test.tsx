@@ -26,41 +26,51 @@ vi.mock('hooks/onboarding/useOnboardingEnabled', () => ({
   default: () => mockUseOnboardingEnabled()
 }))
 
+import { AppConfig, getConfig, type AppConfig as AppConfigType } from 'config'
 import { ONBOARDING_STATUS_QUERY_KEY } from 'hooks/onboarding/useOnboardingStatus'
 import type { OnboardingStatus } from 'services/aphp/serviceOnboarding'
 import meReducer, { type MeState } from 'state/me'
 import Onboarding from '../Onboarding'
 import { ONBOARDING_ROUTE, type OnboardingRouteState } from '../route'
 
-const renderAt = (status: OnboardingStatus, me: MeState = null, state: OnboardingRouteState | null = null) => {
+const renderAt = (
+  status: OnboardingStatus,
+  me: MeState = null,
+  state: OnboardingRouteState | null = null,
+  appConfig: AppConfigType = getConfig()
+) => {
   const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false, staleTime: Infinity } } })
   queryClient.setQueryData(ONBOARDING_STATUS_QUERY_KEY, status)
   const store = configureStore({ reducer: { me: meReducer }, preloadedState: { me } })
   return render(
-    <Provider store={store}>
-      <QueryClientProvider client={queryClient}>
-        <MemoryRouter initialEntries={[{ pathname: ONBOARDING_ROUTE, state }]}>
-          <Routes>
-            <Route path={ONBOARDING_ROUTE} element={<Onboarding />} />
-            <Route path="/home" element={<div>home page</div>} />
-            <Route path="/my-patients" element={<div>my patients page</div>} />
-          </Routes>
-        </MemoryRouter>
-      </QueryClientProvider>
-    </Provider>
+    <AppConfig.Provider value={appConfig}>
+      <Provider store={store}>
+        <QueryClientProvider client={queryClient}>
+          <MemoryRouter initialEntries={[{ pathname: ONBOARDING_ROUTE, state }]}>
+            <Routes>
+              <Route path={ONBOARDING_ROUTE} element={<Onboarding />} />
+              <Route path="/home" element={<div>home page</div>} />
+              <Route path="/my-patients" element={<div>my patients page</div>} />
+            </Routes>
+          </MemoryRouter>
+        </QueryClientProvider>
+      </Provider>
+    </AppConfig.Provider>
   )
 }
 
 const baseStatus: OnboardingStatus = {
   onboarding_step: 0,
   onboarding_completed_at: null,
-  charter_signed_at: null
+  charter_signed_at: null,
+  is_pre_onboarding_user: false
 }
 
 const completedStatus: OnboardingStatus = {
   onboarding_step: 3,
   onboarding_completed_at: '2026-01-01T00:00:00Z',
-  charter_signed_at: '2026-01-01T00:00:00Z'
+  charter_signed_at: '2026-01-01T00:00:00Z',
+  is_pre_onboarding_user: false
 }
 
 const connectedUser = { displayName: 'Cesar RICHARD', deidentified: false } as MeState
@@ -92,6 +102,30 @@ describe('Onboarding page', () => {
   it('shows the welcome screen when the journey is not completed', () => {
     renderAt(baseStatus)
     expect(screen.getByText('Bienvenue !')).toBeInTheDocument()
+  })
+
+  it('shows the first-time message to a new user', () => {
+    renderAt(baseStatus)
+    expect(screen.getByText(/Avant de commencer à utiliser l'outil/)).toBeInTheDocument()
+  })
+
+  it('shows the evolution message to a pre-onboarding user', () => {
+    renderAt({ ...baseStatus, onboarding_step: -1, is_pre_onboarding_user: true })
+    expect(screen.getByText(/Le parcours d'embarquement à Cohort360 évolue/)).toBeInTheDocument()
+    expect(screen.queryByText(/Avant de commencer à utiliser l'outil/)).not.toBeInTheDocument()
+  })
+
+  it('forces the evolution message for an APH code listed in the config', () => {
+    const config = getConfig()
+    const appConfig = {
+      ...config,
+      features: {
+        ...config.features,
+        onboarding: { ...config.features.onboarding, preOnboardingAphCodes: ['1234567'] }
+      }
+    }
+    renderAt(baseStatus, { ...connectedUser, userName: '1234567' } as MeState, null, appConfig)
+    expect(screen.getByText(/Le parcours d'embarquement à Cohort360 évolue/)).toBeInTheDocument()
   })
 
   it('overrides the MUI button metrics with those of the mockups', () => {
