@@ -1,8 +1,6 @@
 import { Box, Typography } from '@mui/material'
-import { AppConfig } from 'config'
 import useOnboardingStatus from 'hooks/onboarding/useOnboardingStatus'
-import React, { useContext } from 'react'
-import { useAppSelector } from 'state'
+import React from 'react'
 
 import { ONBOARDING_STEPS } from './steps'
 import useStyles from './styles'
