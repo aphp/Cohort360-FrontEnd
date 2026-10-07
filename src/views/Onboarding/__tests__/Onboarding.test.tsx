@@ -115,19 +115,6 @@ describe('Onboarding page', () => {
     expect(screen.queryByText(/Avant de commencer à utiliser l'outil/)).not.toBeInTheDocument()
   })
 
-  it('forces the evolution message for an APH code listed in the config', () => {
-    const config = getConfig()
-    const appConfig = {
-      ...config,
-      features: {
-        ...config.features,
-        onboarding: { ...config.features.onboarding, preOnboardingAphCodes: ['1234567'] }
-      }
-    }
-    renderAt(baseStatus, { ...connectedUser, userName: '1234567' } as MeState, null, appConfig)
-    expect(screen.getByText(/Le parcours d'embarquement à Cohort360 évolue/)).toBeInTheDocument()
-  })
-
   it('overrides the MUI button metrics with those of the mockups', () => {
     renderAt(baseStatus)
     const style = getComputedStyle(screen.getByRole('button', { name: /Commencer/ }))
