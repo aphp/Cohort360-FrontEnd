@@ -110,7 +110,7 @@ describe('Onboarding page', () => {
   })
 
   it('shows the evolution message to a pre-onboarding user', () => {
-    renderAt({ ...baseStatus, is_pre_onboarding_user: true })
+    renderAt({ ...baseStatus, onboarding_step: -1, is_pre_onboarding_user: true })
     expect(screen.getByText(/Le parcours d'embarquement à Cohort360 évolue/)).toBeInTheDocument()
     expect(screen.queryByText(/Avant de commencer à utiliser l'outil/)).not.toBeInTheDocument()
   })
