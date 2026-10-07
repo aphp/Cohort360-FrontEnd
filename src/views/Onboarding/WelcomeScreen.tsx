@@ -10,10 +10,7 @@ import useStyles from './styles'
 const WelcomeScreen = () => {
   const { classes } = useStyles()
   const { status } = useOnboardingStatus()
-  const aphCode = useAppSelector((state) => state.me?.userName)
-  const { preOnboardingAphCodes } = useContext(AppConfig).features.onboarding
-  // The APH list forces the pre-onboarding user message, e.g. to check it in a test environment.
-  const isPreOnboardingUser = !!status?.is_pre_onboarding_user || (!!aphCode && preOnboardingAphCodes.includes(aphCode))
+  const isPreOnboardingUser = !!status?.is_pre_onboarding_user
 
   return (
     <Box>
