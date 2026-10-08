@@ -3,11 +3,8 @@ import {
   CommonCriteriaData,
   CriteriaForm,
   NumberAndComparatorDataType,
-  WithEncounterDateDataType,
-  WithEncounterStatusDataType,
   WithOccurenceCriteriaDataType
 } from '../CriteriaForm/types'
-import { SourceType } from 'types/scope'
 import { getConfig } from 'config'
 import { BiologyStatus } from 'types'
 import { getValueSetsByUrls } from 'utils/valueSets'
@@ -15,9 +12,7 @@ import { FhirItem } from 'types/valueSet'
 import { Hierarchy } from 'types/hierarchy'
 
 export type ObservationDataType = CommonCriteriaData &
-  WithOccurenceCriteriaDataType &
-  WithEncounterDateDataType &
-  WithEncounterStatusDataType & {
+  WithOccurenceCriteriaDataType & {
     type: CriteriaType.OBSERVATION
     code: Hierarchy<FhirItem & { isLeaf?: boolean }>[] | null
     searchByValue: NumberAndComparatorDataType | null
@@ -47,10 +42,6 @@ export const form: () => CriteriaForm<ObservationDataType> = () => ({
     encounterService: null,
     startOccurrence: null,
     endOccurrence: null,
-    encounterStartDate: null,
-    encounterEndDate: null,
-    encounterStatus: [],
-    encounterAgeRange: { start: null, end: null },
     code: null,
     searchByValue: null,
     enableSearchByValue: false
@@ -141,18 +132,6 @@ export const form: () => CriteriaForm<ObservationDataType> = () => ({
             chipDisplayMethodExtraArgs: [{ type: 'string', value: 'Valeur' }],
             unbuildIgnoreValues: getConfig().features.observation.useObservationValueRestriction ? ['le0,ge0'] : []
           }
-        },
-        {
-          valueKey: 'encounterStatus',
-          type: 'autocomplete',
-          label: 'Statut de la visite associée',
-          extraLabel: () => 'Statut de la visite',
-          valueSetId: getConfig().core.valueSets.encounterStatus.url,
-          noOptionsText: 'Veuillez entrer un statut de visite associée',
-          buildInfo: {
-            fhirKey: ObservationParamsKeys.ENCOUNTER_STATUS,
-            chipDisplayMethodExtraArgs: [{ type: 'string', value: 'Statut de la visite associée :' }]
-          }
         }
       ]
     },
@@ -160,49 +139,6 @@ export const form: () => CriteriaForm<ObservationDataType> = () => ({
       title: 'Options avancées',
       defaulCollapsed: true,
       items: [
-        {
-          valueKey: 'encounterAgeRange',
-          label: 'Âge au début de la prise en charge',
-          type: 'durationRange',
-          buildInfo: {
-            chipDisplayMethodExtraArgs: [{ type: 'string', value: 'Âge :' }]
-          }
-        },
-        {
-          valueKey: 'encounterService',
-          label: 'Unité exécutrice',
-          type: 'executiveUnit',
-          sourceType: SourceType.BIOLOGY,
-          buildInfo: {
-            fhirKey: ObservationParamsKeys.EXECUTIVE_UNITS
-          }
-        },
-        {
-          valueKey: 'encounterStartDate',
-          type: 'calendarRange',
-          errorType: 'ADVANCED_INPUTS_ERROR',
-          label: 'Début de prise en charge',
-          labelAltStyle: true,
-          extraLabel: () => 'Prise en charge',
-          extraInfo: 'Ne concerne pas les consultations.',
-          withOptionIncludeNull: true,
-          buildInfo: {
-            fhirKey: 'encounter.period-start',
-            chipDisplayMethodExtraArgs: [{ type: 'string', value: 'Date de début de prise en charge' }]
-          }
-        },
-        {
-          valueKey: 'encounterEndDate',
-          type: 'calendarRange',
-          label: 'Fin de prise en charge',
-          labelAltStyle: true,
-          errorType: 'ADVANCED_INPUTS_ERROR',
-          withOptionIncludeNull: true,
-          buildInfo: {
-            fhirKey: 'encounter.period-end',
-            chipDisplayMethodExtraArgs: [{ type: 'string', value: 'Date de fin de prise en charge' }]
-          }
-        },
         {
           valueKey: 'startOccurrence',
           type: 'calendarRange',
