@@ -1,0 +1,14 @@
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+    # Mises à jour de sécurité uniquement
+    open-pull-requests-limit: 0
+    groups:
+      security-minor-patch:
+        applies-to: security-updates
+        update-types:
+          - minor
+          - patch
