@@ -8,7 +8,7 @@ import Ajv from 'ajv'
 import { useDebounce } from 'utils/debounce'
 import JsonDefaultSchema from '../../../../../utils/avjSchema/serializedQuerySchema.json'
 import { editJson } from 'state/cohortCreation'
-import { formatAjvErrors, safeJsonParse } from 'utils/avjSchema/jsonValidation'
+import { findUnavailableBiologyParam, formatAjvErrors, safeJsonParse } from 'utils/avjSchema/jsonValidation'
 import { Container, EditorWrapper, ErrorMessage, MessageTitle, SuccessMessage } from './styles'
 import { Box } from '@mui/material'
 
@@ -24,6 +24,7 @@ const JsonView: React.FC<JsonEditorWithAjvProps> = ({ onJsonIssuesChange, minHei
   const request = useAppSelector((state) => state.cohortCreation.request || {})
   const [syntaxError, setSyntaxError] = useState<string | null>(null)
   const [schemaErrors, setSchemaErrors] = useState<string[]>([])
+  const [unavailableParam, setUnavailableParam] = useState<string | null>(null)
 
   const [editorValue, setEditorValue] = useState<string>(() => {
     if (!request.json) return ''
@@ -50,9 +51,10 @@ const JsonView: React.FC<JsonEditorWithAjvProps> = ({ onJsonIssuesChange, minHei
     return ajv.compile(JsonDefaultSchema)
   }, [])
 
-  const hasError = Boolean(syntaxError) || schemaErrors.length > 0
+  const hasError = Boolean(syntaxError) || schemaErrors.length > 0 || Boolean(unavailableParam)
 
   useEffect(() => {
+    setUnavailableParam(null)
     if (!debouncedValue) {
       setSyntaxError(null)
       setSchemaErrors([])
@@ -77,12 +79,15 @@ const JsonView: React.FC<JsonEditorWithAjvProps> = ({ onJsonIssuesChange, minHei
     setSchemaErrors(errors)
 
     if (!isSchemaValid) return
+
+    // Biology criteria are no longer linked to a stay
+    setUnavailableParam(findUnavailableBiologyParam(parsed.value))
   }, [debouncedValue, validate])
 
   useEffect(() => {
-    const hasIssues = !!syntaxError || schemaErrors.length > 0
+    const hasIssues = !!syntaxError || schemaErrors.length > 0 || !!unavailableParam
     onJsonIssuesChange(didJsonValueChanged.current ? hasIssues : true)
-  }, [syntaxError, schemaErrors, onJsonIssuesChange])
+  }, [syntaxError, schemaErrors, unavailableParam, onJsonIssuesChange])
 
   const handleMount: OnMount = (editor, monaco) => {
     editorRef.current = editor
@@ -141,7 +146,16 @@ const JsonView: React.FC<JsonEditorWithAjvProps> = ({ onJsonIssuesChange, minHei
           </ErrorMessage>
         )}
 
-        {!syntaxError && schemaErrors.length === 0 && <SuccessMessage>JSON valide</SuccessMessage>}
+        {!syntaxError && schemaErrors.length === 0 && unavailableParam && (
+          <ErrorMessage>
+            <MessageTitle>Critère non disponible</MessageTitle>
+            <span>
+              {`Le paramètre ${unavailableParam} n'est plus disponible pour la Biologie : les analyses ne sont plus rattachées à une visite. Retirez-le du critère pour exécuter la requête.`}
+            </span>
+          </ErrorMessage>
+        )}
+
+        {!syntaxError && schemaErrors.length === 0 && !unavailableParam && <SuccessMessage>JSON valide</SuccessMessage>}
       </Box>
     </Container>
   )

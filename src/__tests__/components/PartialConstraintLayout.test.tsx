@@ -8,11 +8,12 @@ const state = {
   cohortCreation: {
     request: {
       criteriaGroup: [
-        { id: 0, title: 'Groupe principal', type: CriteriaGroupType.AND_GROUP, criteriaIds: [1, 2], isInclusive: true }
+        { id: 0, title: 'Groupe principal', type: CriteriaGroupType.AND_GROUP, criteriaIds: [1, 2, 3], isInclusive: true }
       ],
       selectedCriteria: [
         { id: 1, type: CriteriaType.CONDITION, title: 'Diagnostic' },
-        { id: 2, type: CriteriaType.PROCEDURE, title: 'Acte' }
+        { id: 2, type: CriteriaType.PROCEDURE, title: 'Acte' },
+        { id: 3, type: CriteriaType.OBSERVATION, title: 'Glycémie' }
       ]
     }
   }
@@ -80,6 +81,22 @@ describe('ui/PartialConstraintLayout', () => {
     fireEvent.click(screen.getByTestId('AddCircleIcon'))
     fireEvent.click(screen.getByText('Annuler'))
     expect(screen.getByTestId('AddCircleIcon')).toBeInTheDocument()
+  })
+
+  it('ne propose pas les critères de Biologie dans une contrainte de même séjour', () => {
+    const data = {
+      ...baseData,
+      selectableGroups: [
+        { id: 0, title: 'Groupe principal', type: CriteriaGroupType.AND_GROUP, criteriaIds: [1, 2, 3], isInclusive: true }
+      ]
+    }
+    render(<PartialConstraintLayout data={data as never} actions={{ onConfirm: vi.fn(), onDelete: vi.fn() }} />)
+    fireEvent.click(screen.getByTestId('AddCircleIcon'))
+    fireEvent.mouseDown(screen.getByRole('combobox'))
+    fireEvent.click(screen.getByRole('option', { name: /Groupe principal/ }))
+    expect(screen.getByText(/Diagnostic/)).toBeInTheDocument()
+    expect(screen.getByText(/Acte/)).toBeInTheDocument()
+    expect(screen.queryByText(/Glycémie/)).not.toBeInTheDocument()
   })
 
   it('filtre les contraintes SAME_EPISODE_OF_CARE en mode épisode', () => {

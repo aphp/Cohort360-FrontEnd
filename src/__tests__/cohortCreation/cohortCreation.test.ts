@@ -1,4 +1,5 @@
 import {
+  ResourceType,
   SelectedCriteriaType
 } from 'types/requestCriterias'
 import {
@@ -50,6 +51,7 @@ import { completeEncounterCriteria, defaultEncounterCriteira } from '__tests__/d
 import {
   checkNominativeCriteria,
   constructFhirFilter,
+  unbuildCriteriaData,
 } from 'utils/cohortCreation'
 import { completeDocumentCriteria, defaultDocumentCriteria } from '__tests__/data/cohortCreation/documentCriteria'
 import { completeConditionCriteria, defaultConditionCriteria } from '__tests__/data/cohortCreation/conditionCriteria'
@@ -445,15 +447,31 @@ describe('test of buildObservationFilter', () => {
     const result = [
       'status=Val&subject.active=true',
       'code=https://terminology.eds.aphp.fr/aphp-itm-anabio|I3356',
-      'encounter.encounter-care-site=8312016825',
-      'encounter.status=cancelled',
       'date=ge2024-09-03T00:00:00Z',
       'date=le2024-09-04T00:00:00Z',
-      'value-quantity=3',
-      '_filter=(encounter.period-start ge 2024-09-04T00:00:00Z and encounter.period-start le 2024-09-07T00:00:00Z) or not (encounter.period-start eq "*")',
-      'encounter.period-end=ge2024-09-02T00:00:00Z&encounter.period-end=le2024-09-06T00:00:00Z'
+      'value-quantity=3'
     ]
     expect(buildFilter(selectedCriteria).filter(el => !!el).sort((a, b) => a.localeCompare(b)).join("&")).toEqual(result.filter(el => !!el).sort((a, b) => a.localeCompare(b)).join("&"))
+  })
+  it('should not build any encounter parameter', () => {
+    expect(buildFilter(completeObservationCriteria).some((param) => param.includes('encounter.'))).toBe(false)
+  })
+})
+
+describe('test of unbuildObservationFilter', () => {
+  it('should reopen a saved exam date with the same bounds', async () => {
+    const criteria = (await unbuildCriteriaData(
+      {
+        _type: 'basicResource',
+        _id: 1,
+        name: 'Critère de biologie',
+        isInclusive: true,
+        resourceType: ResourceType.OBSERVATION,
+        filterFhir: 'date=ge2024-09-03T00:00:00Z&date=le2024-09-04T00:00:00Z'
+      },
+      getCriteriaList()
+    )) as ObservationDataType
+    expect(criteria.startOccurrence).toMatchObject({ start: '2024-09-03', end: '2024-09-04' })
   })
 })
 
