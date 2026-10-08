@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import { getDocumentStatus } from 'utils/documentsFormatter'
 import { getSelectableGroups } from 'utils/temporalConstraints'
-import { safeJsonParse, formatAjvErrors } from 'utils/avjSchema/jsonValidation'
+import { safeJsonParse, formatAjvErrors, findUnavailableBiologyParam } from 'utils/avjSchema/jsonValidation'
 import { CriteriaGroup, CriteriaGroupType } from 'types'
 import { CriteriaType, SelectedCriteriaType } from 'types/requestCriterias'
 
@@ -84,6 +84,21 @@ describe('temporalConstraints.getSelectableGroups', () => {
     expect(getSelectableGroups(selected, groups)).toHaveLength(0)
   })
 
+  it('exclut les critères de Biologie des contraintes de même séjour', () => {
+    const selected = [
+      criteria(1, CriteriaType.CONDITION),
+      criteria(2, CriteriaType.OBSERVATION),
+      criteria(3, CriteriaType.PROCEDURE)
+    ]
+    const result = getSelectableGroups(selected, [andGroup(10, [1, 2, 3])])
+    expect(result[0].criteriaIds).toEqual([1, 3])
+  })
+
+  it('ne retient pas un groupe dont la Biologie est le seul autre critère', () => {
+    const selected = [criteria(1, CriteriaType.CONDITION), criteria(2, CriteriaType.OBSERVATION)]
+    expect(getSelectableGroups(selected, [andGroup(10, [1, 2])])).toHaveLength(0)
+  })
+
   it('ignore les groupes qui ne sont pas de type AND', () => {
     const selected = [criteria(1, CriteriaType.CONDITION), criteria(2, CriteriaType.PROCEDURE)]
     const orGroup: CriteriaGroup = { id: 20, title: 'OR', criteriaIds: [1, 2], type: CriteriaGroupType.OR_GROUP }
@@ -99,5 +114,36 @@ describe('temporalConstraints.getSelectableGroups', () => {
     const groups = [andGroup(10, [1, 2, 3])]
     const result = getSelectableGroups(selected, groups, true)
     expect(result[0].criteriaIds).toEqual([1, 2])
+  })
+})
+
+describe('jsonValidation.findUnavailableBiologyParam', () => {
+  const query = (resourceType: string, filterFhir: string) => ({
+    _type: 'request',
+    request: {
+      _type: 'andGroup',
+      criteria: [{ _type: 'basicResource', _id: 1, resourceType, filterFhir }]
+    }
+  })
+
+  it('détecte un paramètre encounter.* sur un critère de Biologie', () => {
+    expect(findUnavailableBiologyParam(query('Observation', 'code=A&encounter.status=finished'))).toBe(
+      'encounter.status'
+    )
+  })
+
+  it('détecte un paramètre encounter.* dans un _filter', () => {
+    const filter = encodeURIComponent(
+      '(encounter.period-start ge 2024-09-04T00:00:00Z) or not (encounter.period-start eq "*")'
+    )
+    expect(findUnavailableBiologyParam(query('Observation', `_filter=${filter}`))).toBe('encounter.period-start')
+  })
+
+  it('ignore les paramètres encounter.* des autres critères', () => {
+    expect(findUnavailableBiologyParam(query('Condition', 'encounter.status=finished'))).toBeNull()
+  })
+
+  it('renvoie null pour un critère de Biologie sans paramètre encounter.*', () => {
+    expect(findUnavailableBiologyParam(query('Observation', 'date=ge2024-01-01&date=le2024-02-01'))).toBeNull()
   })
 })

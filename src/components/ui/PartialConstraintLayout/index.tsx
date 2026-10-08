@@ -17,6 +17,7 @@ import AddCircleIcon from '@mui/icons-material/AddCircle'
 import DeleteIcon from '@mui/icons-material/Delete'
 import useStyles from './styles'
 import { CriteriaType, SelectedCriteriaType } from 'types/requestCriterias'
+import { CRITERIA_TYPES_WITHOUT_STAY } from 'utils/temporalConstraints'
 import { useAppSelector } from 'state'
 
 type EncounterConstraint = {
@@ -83,9 +84,7 @@ const PartialConstraintLayout: React.FC<PartialConstraintLayoutProps> = ({ isEpi
       ? groupCriteria.filter(
           (criteria) => criteria.type === CriteriaType.PREGNANCY || criteria.type === CriteriaType.HOSPIT
         )
-      : groupCriteria.filter(
-          (criteria) => criteria.type !== CriteriaType.IPP_LIST && criteria.type !== CriteriaType.PATIENT
-        )
+      : groupCriteria.filter((criteria) => !CRITERIA_TYPES_WITHOUT_STAY.includes(criteria.type))
   }
 
   return (
