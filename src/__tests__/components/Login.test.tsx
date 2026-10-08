@@ -33,6 +33,11 @@ vi.mock('services/aphp', () => ({
 
 import Login from 'views/Login/Login'
 import { ACCESS_TOKEN } from 'constants.js'
+import { clearUser } from 'state/me'
+import { registerSessionUsername } from 'utils/sessionUser'
+
+const makeJwt = (payload: Record<string, unknown>) => `header.${btoa(JSON.stringify(payload))}.signature`
+const validTokenFor = (username: string) => makeJwt({ username, exp: Math.floor(Date.now() / 1000) + 3600 })
 
 const configWithJwt = () => {
   const cfg = getConfig()
@@ -59,6 +64,7 @@ beforeEach(() => {
   vi.clearAllMocks()
   meState = null
   localStorage.clear()
+  registerSessionUsername(() => undefined)
 })
 
 describe('views/Login', () => {
@@ -83,6 +89,33 @@ describe('views/Login', () => {
   it('se rend sans planter quand me est null', () => {
     const { container } = renderLogin()
     expect(container.firstChild).toBeInTheDocument()
+  })
+
+  it("oublie l'utilisateur d'une session précédente avant la requête d'authentification", async () => {
+    renderLogin()
+    fireEvent.change(screen.getByLabelText(/Identifiant/), { target: { value: 'userB' } })
+    fireEvent.change(screen.getByLabelText(/mot de passe/), { target: { value: 'secret' } })
+    fireEvent.click(screen.getByRole('button', { name: 'Connexion' }))
+
+    await waitFor(() => expect(authenticateWithCredentials).toHaveBeenCalled())
+    expect(dispatch).toHaveBeenCalledWith(clearUser())
+    expect(dispatch.mock.invocationCallOrder[0]).toBeLessThan(authenticateWithCredentials.mock.invocationCallOrder[0])
+  })
+
+  it("redirige vers l'application quand la session persistée est valide", () => {
+    meState = { userName: 'userA' }
+    registerSessionUsername(() => 'userA')
+    localStorage.setItem(ACCESS_TOKEN, validTokenFor('userA'))
+    renderLogin()
+    expect(navigate).toHaveBeenCalledWith('/home', { replace: true })
+  })
+
+  it('reste sur la page de connexion quand le token appartient à un autre utilisateur', () => {
+    meState = { userName: 'userA' }
+    registerSessionUsername(() => 'userA')
+    localStorage.setItem(ACCESS_TOKEN, validTokenFor('userB'))
+    renderLogin()
+    expect(navigate).not.toHaveBeenCalled()
   })
 
   it('vide les données de la session précédente après une authentification réussie', async () => {

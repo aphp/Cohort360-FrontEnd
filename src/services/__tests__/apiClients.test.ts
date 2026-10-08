@@ -14,6 +14,7 @@ vi.mock('config', () => ({
 
 import apiBackend from 'services/apiBackend'
 import apiFhir, { getAuthorizationMethod } from 'services/apiFhir'
+import { registerSessionUsername } from 'utils/sessionUser'
 
 type InterceptorHandler = {
   fulfilled?: (config: InternalAxiosRequestConfig) => InternalAxiosRequestConfig | Promise<InternalAxiosRequestConfig>
@@ -67,6 +68,21 @@ describe('api clients interceptors', () => {
 
     expect(updatedConfig?.headers.Authorization).toBeUndefined()
     expect(updatedConfig?.headers.authorizationMethod).toBe('JWT')
+  })
+
+  it.each([
+    ['apiBackend', apiBackend],
+    ['apiFhir', apiFhir]
+  ])("annule la requête %s quand le token appartient à un autre utilisateur que celui affiché", (_, client) => {
+    const requestHandler = getRequestHandler(client.interceptors.request)
+    localStorage.setItem(ACCESS_TOKEN, `header.${btoa(JSON.stringify({ username: 'userB' }))}.signature`)
+    registerSessionUsername(() => 'userA')
+
+    try {
+      expect(() => requestHandler?.({ headers: {} } as InternalAxiosRequestConfig)).toThrow(/another user/)
+    } finally {
+      registerSessionUsername(() => undefined)
+    }
   })
 
   it('déduit correctement authorizationMethod pour OIDC/JWT', () => {

@@ -1,5 +1,5 @@
 import React, { PropsWithChildren, useEffect } from 'react'
-import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router'
+import { BrowserRouter as Router, Routes, Route } from 'react-router'
 
 import { useAppSelector } from 'state/index'
 
@@ -10,24 +10,22 @@ import AutoLogoutContainer from '../AutoLogoutContainer'
 import { WebSocketProvider } from 'components/WebSocket/WebSocketProvider'
 import Maintenance from 'views/Maintenance'
 import Snackbar from 'components/Snackbar/Snackbar'
-import { ACCESS_TOKEN } from 'constants.js'
+import { isSessionLostAfterStorageChange, leaveSession } from 'utils/sessionUser'
 
 type LayoutProps = {
   displaySideBar: boolean
 }
 
 const CrossTabAuthSync = () => {
-  const navigate = useNavigate()
-
   useEffect(() => {
     const onStorageChange = (e: StorageEvent) => {
-      if (e.key === ACCESS_TOKEN && !e.newValue && window.location.pathname !== '/') {
-        navigate('/', { replace: true })
+      if (isSessionLostAfterStorageChange(e.key)) {
+        leaveSession()
       }
     }
     window.addEventListener('storage', onStorageChange)
     return () => window.removeEventListener('storage', onStorageChange)
-  }, [navigate])
+  }, [])
 
   return null
 }

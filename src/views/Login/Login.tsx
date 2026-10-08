@@ -34,11 +34,12 @@ import React, {
 import { useNavigate } from 'react-router'
 import services from 'services/aphp'
 import { useAppDispatch, useAppSelector } from 'state'
-import { login as loginAction, type MeState } from 'state/me'
+import { clearUser, login as loginAction, type MeState } from 'state/me'
 import { saveRights } from 'state/scope'
 import type { AccessExpiration, User } from 'types'
 import { getDaysLeft } from 'utils/dates'
 import { clearPreviousSession } from 'utils/session'
+import { isSessionUserMismatch } from 'utils/sessionUser'
 import { isAccessTokenValid } from 'utils/tokens'
 import useStyles from './styles'
 import { updatePerimeters } from './utils'
@@ -142,7 +143,7 @@ const Login = () => {
   }, [])
 
   useEffect(() => {
-    if (!oidcCode && me && isAccessTokenValid()) {
+    if (!oidcCode && me && isAccessTokenValid() && !isSessionUserMismatch()) {
       const oldPath = localStorage.getItem('old-path')
       localStorage.removeItem('old-path')
       navigate(oldPath ?? '/home', { replace: true })
@@ -236,6 +237,9 @@ const Login = () => {
   const login = async () => {
     if (loading) return
     setLoading(true)
+    // Before the /auth/login/ request: a user left over from a previous session would make it
+    // look like it is sent for another user, and the API clients would cancel it.
+    dispatch(clearUser())
 
     let response = null
 
