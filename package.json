@@ -35,7 +35,7 @@
     "leaflet": "^1.9.4",
     "localforage": "^1.10.0",
     "lodash": "^4.18.1",
-    "moment": "^2.30.1",
+    "moment": "^2.31.0",
     "monaco-editor": "^0.55.1",
     "querystring-es3": "^0.2.1",
     "ramda": "^0.31.3",
