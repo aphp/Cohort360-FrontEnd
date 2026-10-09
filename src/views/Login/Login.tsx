@@ -38,6 +38,7 @@ import { login as loginAction, type MeState } from 'state/me'
 import { saveRights } from 'state/scope'
 import type { AccessExpiration, User } from 'types'
 import { getDaysLeft } from 'utils/dates'
+import { clearPreviousSession } from 'utils/session'
 import { isAccessTokenValid } from 'utils/tokens'
 import useStyles from './styles'
 import { updatePerimeters } from './utils'
@@ -265,6 +266,7 @@ const Login = () => {
     const { status, data } = response
 
     if (status === 200) {
+      clearPreviousSession(queryClient)
       localStorage.setItem(ACCESS_TOKEN, data.access_token)
       localStorage.setItem(REFRESH_TOKEN, data.refresh_token)
 
