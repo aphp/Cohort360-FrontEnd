@@ -365,7 +365,7 @@ export type MedicationFilters = GenericFilter & {
   code: Hierarchy<FhirItem>[]
 }
 
-export type BiologyFilters = GenericFilter & {
+export type BiologyFilters = Pick<GenericFilter, 'durationRange'> & {
   code: Hierarchy<FhirItem>[]
   validatedStatus: boolean
   ipp?: string
