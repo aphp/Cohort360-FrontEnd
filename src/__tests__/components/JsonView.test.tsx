@@ -18,12 +18,12 @@ vi.mock('utils/avjSchema/serializedQuerySchema.json', () => ({ default: {} }))
 
 import JsonView from 'components/CreationCohort/DiagramView/components/JsonView'
 
-const query = (filterFhir: string) =>
+const query = (filterFhir: string, extra: Record<string, unknown> = {}) =>
   JSON.stringify({
     _type: 'request',
     request: {
       _type: 'andGroup',
-      criteria: [{ _type: 'basicResource', _id: 1, resourceType: 'Observation', filterFhir }]
+      criteria: [{ _type: 'basicResource', _id: 1, resourceType: 'Observation', filterFhir, ...extra }]
     }
   })
 
@@ -47,6 +47,21 @@ describe('JsonView', () => {
       )
     ).toBeInTheDocument()
     expect(screen.queryByText('JSON valide')).not.toBeInTheDocument()
+    expect(onJsonIssuesChange).toHaveBeenLastCalledWith(true)
+  })
+
+  it('signale un patientAge sur un critère de Biologie et bloque l’exécution', async () => {
+    render(<JsonView onJsonIssuesChange={onJsonIssuesChange} debounceMs={0} />)
+    fireEvent.change(screen.getByTestId('json-editor'), {
+      target: { value: query('code=A', { patientAge: { minAge: '18-0-0' } }) }
+    })
+
+    expect(await screen.findByText('Critère non disponible')).toBeInTheDocument()
+    expect(
+      screen.getByText(
+        "Le paramètre patientAge n'est plus disponible pour la Biologie : les analyses ne sont plus rattachées à une visite. Retirez-le du critère pour exécuter la requête."
+      )
+    ).toBeInTheDocument()
     expect(onJsonIssuesChange).toHaveBeenLastCalledWith(true)
   })
 

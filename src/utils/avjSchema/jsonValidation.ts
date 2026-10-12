@@ -53,11 +53,11 @@ const safeDecode = (value: string) => {
 }
 
 /**
- * Find an `encounter.*` parameter in the filterFhir of a Biology (Observation) criterion.
+ * Find an `encounter.*` parameter in the filterFhir, or a `patientAge`, on a Biology (Observation) criterion.
  * Biology analyses are no longer linked to a stay, so these parameters are not available anymore.
  *
  * @param query - The parsed serialized query
- * @returns The name of the first `encounter.*` parameter found, or null
+ * @returns The name of the first unavailable parameter found (`encounter.*` or `patientAge`), or null
  *
  * ```
  */
@@ -71,9 +71,14 @@ export function findUnavailableBiologyParam(query: unknown): string | null {
   }
   if (!query || typeof query !== 'object') return null
 
-  const { resourceType, filterFhir } = query as { resourceType?: unknown; filterFhir?: unknown }
-  if (resourceType === 'Observation' && typeof filterFhir === 'string') {
-    for (const param of filterFhir.split('&')) {
+  const { resourceType, filterFhir, patientAge } = query as {
+    resourceType?: unknown
+    filterFhir?: unknown
+    patientAge?: unknown
+  }
+  if (resourceType === 'Observation') {
+    if (patientAge !== undefined && patientAge !== null) return 'patientAge'
+    for (const param of typeof filterFhir === 'string' ? filterFhir.split('&') : []) {
       const [key, ...rest] = param.split('=')
       const decodedKey = safeDecode(key)
       if (decodedKey.startsWith('encounter.')) return decodedKey
