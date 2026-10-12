@@ -19,31 +19,17 @@ import { ResourceType } from 'types/requestCriterias'
 import { SourceType } from 'types/scope'
 import { BiologyFilters, Direction, Order, SearchByTypes, SearchCriterias } from 'types/searchCriterias'
 import { Table, Row, CellType, Column } from 'types/table'
-import { FhirItem, Reference } from 'types/valueSet'
-import {
-  fetcherWithParams,
-  fetchValueSet,
-  getCommonParamsAll,
-  getCommonParamsList,
-  narrowSearchCriterias,
-  resolveAdditionalInfos
-} from 'utils/exploration'
+import { Reference } from 'types/valueSet'
+import { fetcherWithParams, getCommonParamsAll, getCommonParamsList, narrowSearchCriterias } from 'utils/exploration'
 import { getValueSetsByUrls } from 'utils/valueSets'
 
 const fetchAdditionalInfos = async (additionalInfo: AdditionalInfo): Promise<AdditionalInfo> => {
-  const fetchersMap: Record<string, () => Promise<FhirItem[] | undefined>> = {
-    encounterStatusList: () =>
-      additionalInfo.encounterStatusList
-        ? Promise.resolve(undefined)
-        : fetchValueSet(getConfig().core.valueSets.encounterStatus.url)
-  }
-  const resolved = await resolveAdditionalInfos(fetchersMap)
   const references: Reference[] = getValueSetsByUrls([
     getConfig().features.observation.valueSets.biologyHierarchyAnabio.url,
     getConfig().features.observation.valueSets.biologyHierarchyLoinc.url
   ])
   const sourceType = SourceType.BIOLOGY
-  return { ...additionalInfo, references, sourceType, ...resolved }
+  return { ...additionalInfo, references, sourceType }
 }
 
 const initSearchCriterias = (search: string): SearchCriterias<BiologyFilters> => ({
@@ -56,11 +42,8 @@ const initSearchCriterias = (search: string): SearchCriterias<BiologyFilters> =>
   filters: {
     validatedStatus: getConfig().features.observation.useObservationDefaultValidated,
     ipp: '',
-    nda: '',
     code: [],
-    durationRange: [null, null],
-    executiveUnits: [],
-    encounterStatus: []
+    durationRange: [null, null]
   }
 })
 
@@ -69,13 +52,11 @@ const mapToTable = (data: Data, deidentified: boolean, groupId: string[], isPati
   const rows: Row[] = []
   const columns: Column[] = [
     !isPatient && { label: `IPP${deidentified ? ' chiffré' : ''}` },
-    { label: `NDA${deidentified ? ' chiffré' : ''}` },
     { label: 'Date de prélèvement', code: Order.DATE },
     { label: 'ANABIO', code: Order.ANABIO },
     { label: 'LOINC', code: Order.LOINC },
     { label: 'Résultat', align: 'center' },
-    { label: 'Valeurs de référence', align: 'center' },
-    { label: 'Unité exécutrice', align: 'center' }
+    { label: 'Valeurs de référence', align: 'center' }
   ].filter((elem) => elem) as Column[]
   ;(data as ExplorationResults<CohortObservation>).list.forEach((elem) => {
     const anabio = elem.code?.coding?.find(
@@ -118,11 +99,6 @@ const mapToTable = (data: Data, deidentified: boolean, groupId: string[], isPati
         type: elem.IPP ? CellType.LINK : CellType.TEXT
       },
       {
-        id: `${elem.id}-nda`,
-        value: elem.NDA ?? 'Non renseigné',
-        type: CellType.TEXT
-      },
-      {
         id: `${elem.id}-effectiveDatetime`,
         value: elem.effectiveDateTime ? mapToDate(elem.effectiveDateTime) : 'Non renseigné',
         type: CellType.TEXT
@@ -152,12 +128,6 @@ const mapToTable = (data: Data, deidentified: boolean, groupId: string[], isPati
         value: referenceRange,
         type: CellType.TEXT,
         align: 'center'
-      },
-      {
-        id: `${elem.id}-executiveUnits`,
-        value: elem.serviceProvider ?? '-',
-        type: CellType.TEXT,
-        align: 'center'
       }
     ].filter((elem) => elem) as Row
     rows.push(row)
@@ -173,12 +143,9 @@ const fetchList = (
   groupId: string[],
   signal?: AbortSignal
 ): Promise<ExplorationResults<Observation>> => {
-  const { nda, ipp, executiveUnits, encounterStatus, durationRange, code, validatedStatus } = filters
+  const { ipp, durationRange, code, validatedStatus } = filters
   const params = {
-    encounter: nda,
     'patient-identifier': ipp,
-    executiveUnits: executiveUnits.map((unit) => unit.id),
-    encounterStatus: encounterStatus.map(({ id }) => id),
     uniqueFacet: ['subject'] as 'subject'[],
     minDate: durationRange[0] ?? '',
     maxDate: durationRange[1] ?? '',
