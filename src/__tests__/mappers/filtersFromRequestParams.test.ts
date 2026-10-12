@@ -1,8 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { getCodeList } from 'services/aphp/serviceValueSets'
 import { mapRequestParamsToSearchCriteria, mapSearchCriteriasToRequestParams } from 'mappers/filters'
-import { ResourceType } from 'types/requestCriterias'
+import { ObservationParamsKeys, ResourceType } from 'types/requestCriterias'
 import {
+  BiologyFilters,
   Direction,
   DocumentsFilters,
   GenderStatus,
@@ -36,9 +37,13 @@ vi.mock('config', async (importOriginal) => {
       system: { fhirUrl: 'http://localhost/fhir' },
       core: {
         codeSystems: { docStatus: 'http://doc-status' },
-        valueSets: { encounterStatus: { url: 'http://enc-status', codeSystemUrls: ['http://enc-status-cs'] } }
+        valueSets: { encounterStatus: { url: 'http://enc-status', codeSystemUrls: ['http://enc-status-cs'] } },
+        fhir: { filterActive: false }
       },
-      features: { condition: { valueSets: { conditionStatus: { url: 'http://diagnosis-type' } } } }
+      features: {
+        condition: { valueSets: { conditionStatus: { url: 'http://diagnosis-type' } } },
+        observation: { useObservationValueRestriction: false }
+      }
     }))
   }
 })
@@ -206,5 +211,37 @@ describe('mapRequestParamsToSearchCriteria - CONDITION (types de diagnostic)', (
       }
     }
     expect(mapSearchCriteriasToRequestParams(criterias, ResourceType.CONDITION, false)).not.toContain('diagnosisType')
+  })
+})
+
+describe('mapRequestParamsToSearchCriteria - OBSERVATION (BC3.3 : plus de lien avec la visite)', () => {
+  const visitParams = [
+    `${ObservationParamsKeys.NDA}=6601289264`,
+    `${ObservationParamsKeys.EXECUTIVE_UNITS}=8312002244`,
+    `${ObservationParamsKeys.ENCOUNTER_STATUS}=${encodeURIComponent('http://enc-status-cs|finished')}`
+  ]
+
+  it('ignore les paramètres liés à la visite d’un ancien filtre sauvegardé', async () => {
+    const params = [...visitParams, `${ObservationParamsKeys.IPP}=8000000000001`, 'date=ge2024-01-01'].join('&')
+    const result = await mapRequestParamsToSearchCriteria(params, ResourceType.OBSERVATION)
+
+    expect(Object.keys(result.filters).sort()).toEqual(['code', 'durationRange', 'ipp', 'validatedStatus'])
+    const filters = result.filters as BiologyFilters
+    expect(filters.ipp).toBe('8000000000001')
+    expect(filters.durationRange).toEqual(['2024-01-01', null])
+  })
+
+  it('n’écrit aucun paramètre encounter.*', () => {
+    const criterias: SearchCriterias<BiologyFilters> = {
+      searchBy: SearchByTypes.TEXT,
+      searchInput: '',
+      orderBy: { orderBy: Order.DATE, orderDirection: Direction.ASC },
+      filters: { code: [], validatedStatus: true, ipp: '', durationRange: ['2024-01-01', '2024-12-31'] }
+    }
+    const result = mapSearchCriteriasToRequestParams(criterias, ResourceType.OBSERVATION, false)
+
+    expect(result).toContain('date=ge2024-01-01')
+    expect(result).toContain('date=le2024-12-31')
+    expect(result).not.toContain('encounter.')
   })
 })
