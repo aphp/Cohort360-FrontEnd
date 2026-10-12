@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { getDocumentStatus } from 'utils/documentsFormatter'
-import { getSelectableGroups } from 'utils/temporalConstraints'
+import { CRITERIA_TYPES_WITHOUT_TEMPORAL_CONSTRAINT, getSelectableGroups } from 'utils/temporalConstraints'
 import { safeJsonParse, formatAjvErrors, findUnavailableBiologyParam } from 'utils/avjSchema/jsonValidation'
 import { CriteriaGroup, CriteriaGroupType } from 'types'
 import { CriteriaType, SelectedCriteriaType } from 'types/requestCriterias'
@@ -97,6 +97,12 @@ describe('temporalConstraints.getSelectableGroups', () => {
   it('ne retient pas un groupe dont la Biologie est le seul autre critère', () => {
     const selected = [criteria(1, CriteriaType.CONDITION), criteria(2, CriteriaType.OBSERVATION)]
     expect(getSelectableGroups(selected, [andGroup(10, [1, 2])])).toHaveLength(0)
+  })
+
+  it('garde la Biologie pour les contraintes temporelles hors séjour (chronologiques)', () => {
+    const selected = [criteria(1, CriteriaType.CONDITION), criteria(2, CriteriaType.OBSERVATION)]
+    const result = getSelectableGroups(selected, [andGroup(10, [1, 2])], false, CRITERIA_TYPES_WITHOUT_TEMPORAL_CONSTRAINT)
+    expect(result[0].criteriaIds).toEqual([1, 2])
   })
 
   it('ignore les groupes qui ne sont pas de type AND', () => {
