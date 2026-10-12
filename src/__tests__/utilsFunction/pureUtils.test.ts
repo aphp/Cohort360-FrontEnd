@@ -118,11 +118,11 @@ describe('temporalConstraints.getSelectableGroups', () => {
 })
 
 describe('jsonValidation.findUnavailableBiologyParam', () => {
-  const query = (resourceType: string, filterFhir: string) => ({
+  const query = (resourceType: string, filterFhir: string, extra: Record<string, unknown> = {}) => ({
     _type: 'request',
     request: {
       _type: 'andGroup',
-      criteria: [{ _type: 'basicResource', _id: 1, resourceType, filterFhir }]
+      criteria: [{ _type: 'basicResource', _id: 1, resourceType, filterFhir, ...extra }]
     }
   })
 
@@ -141,6 +141,20 @@ describe('jsonValidation.findUnavailableBiologyParam', () => {
 
   it('ignore les paramètres encounter.* des autres critères', () => {
     expect(findUnavailableBiologyParam(query('Condition', 'encounter.status=finished'))).toBeNull()
+  })
+
+  it('détecte un patientAge sur un critère de Biologie', () => {
+    expect(findUnavailableBiologyParam(query('Observation', 'code=A', { patientAge: { minAge: '18-0-0' } }))).toBe(
+      'patientAge'
+    )
+  })
+
+  it('ignore un patientAge à null sur un critère de Biologie', () => {
+    expect(findUnavailableBiologyParam(query('Observation', 'code=A', { patientAge: null }))).toBeNull()
+  })
+
+  it('ignore le patientAge des autres critères', () => {
+    expect(findUnavailableBiologyParam(query('Condition', 'code=A', { patientAge: { minAge: '18-0-0' } }))).toBeNull()
   })
 
   it('renvoie null pour un critère de Biologie sans paramètre encounter.*', () => {
