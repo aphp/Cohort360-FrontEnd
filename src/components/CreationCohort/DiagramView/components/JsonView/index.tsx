@@ -155,7 +155,7 @@ const JsonView: React.FC<JsonEditorWithAjvProps> = ({ onJsonIssuesChange, minHei
           </ErrorMessage>
         )}
 
-        {!syntaxError && schemaErrors.length === 0 && !unavailableParam && <SuccessMessage>JSON valide</SuccessMessage>}
+        {!hasError && <SuccessMessage>JSON valide</SuccessMessage>}
       </Box>
     </Container>
   )
