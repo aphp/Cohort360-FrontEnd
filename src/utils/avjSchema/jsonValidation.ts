@@ -41,3 +41,53 @@ export function formatAjvErrors(errors?: ErrorObject[] | null): string[] {
   const extra = errors[0].params ? ` (${JSON.stringify(errors[0].params)})` : ''
   return [` ${path} ${msg} ${extra}`]
 }
+
+const ENCOUNTER_PARAM_REGEX = /\bencounter\.[\w-]+/
+
+const safeDecode = (value: string) => {
+  try {
+    return decodeURIComponent(value)
+  } catch {
+    return value
+  }
+}
+
+/**
+ * Find an `encounter.*` parameter in the filterFhir, or a `patientAge`, on a Biology (Observation) criterion.
+ * Biology analyses are no longer linked to a stay, so these parameters are not available anymore.
+ *
+ * @param query - The parsed serialized query
+ * @returns The name of the first unavailable parameter found (`encounter.*` or `patientAge`), or null
+ *
+ * ```
+ */
+export function findUnavailableBiologyParam(query: unknown): string | null {
+  if (Array.isArray(query)) {
+    for (const item of query) {
+      const found = findUnavailableBiologyParam(item)
+      if (found) return found
+    }
+    return null
+  }
+  if (!query || typeof query !== 'object') return null
+
+  const { resourceType, filterFhir, patientAge } = query as {
+    resourceType?: unknown
+    filterFhir?: unknown
+    patientAge?: unknown
+  }
+  if (resourceType === 'Observation') {
+    if (patientAge !== undefined && patientAge !== null) return 'patientAge'
+    for (const param of typeof filterFhir === 'string' ? filterFhir.split('&') : []) {
+      const [key, ...rest] = param.split('=')
+      const decodedKey = safeDecode(key)
+      if (decodedKey.startsWith('encounter.')) return decodedKey
+      if (decodedKey === '_filter') {
+        const match = safeDecode(rest.join('=')).match(ENCOUNTER_PARAM_REGEX)
+        if (match) return match[0]
+      }
+    }
+  }
+
+  return findUnavailableBiologyParam(Object.values(query))
+}

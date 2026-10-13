@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 
-import { Grid, Typography } from '@mui/material'
+import { Grid, Tooltip, Typography } from '@mui/material'
+import InfoIcon from '@mui/icons-material/Info'
 
 import { useAppSelector } from 'state'
 
@@ -77,7 +78,12 @@ const StayConstraints: React.FC<StayConstraintsProps> = ({ constraints, onChange
   return (
     <>
       <Grid>
-        <Typography variant="h3">Contraintes sur les séjours</Typography>
+        <Grid container sx={{ flexDirection: 'row', alignItems: 'center' }}>
+          <Typography variant="h3">Contraintes sur les séjours</Typography>
+          <Tooltip title="Les contraintes sur les séjours ne s'appliquent pas aux critères de type : Démographie, Liste d'IPP, Biologie">
+            <InfoIcon data-testid="InfoIcon" fontSize="small" color="primary" style={{ marginLeft: 4 }} />
+          </Tooltip>
+        </Grid>
         <RadioGroup
           row
           value={radioValues}
