@@ -237,8 +237,6 @@ const Login = () => {
   const login = async () => {
     if (loading) return
     setLoading(true)
-    // Before the /auth/login/ request: a user left over from a previous session would make it
-    // look like it is sent for another user, and the API clients would cancel it.
     dispatch(clearUser())
 
     let response = null

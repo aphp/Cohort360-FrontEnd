@@ -3,7 +3,7 @@ import { ACCESS_TOKEN } from 'constants.js'
 const decodeTokenPayload = (token: string): Record<string, unknown> | null => {
   try {
     // JWT segments are base64url, atob only reads base64
-    const segment = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')
+    const segment = token.split('.')[1].replaceAll('-', '+').replaceAll('_', '/')
     return JSON.parse(atob(segment))
   } catch {
     return null

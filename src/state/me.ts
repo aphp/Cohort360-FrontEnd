@@ -105,10 +105,6 @@ const meSlice = createSlice({
     login: (_state: MeState, action: PayloadAction<MeState>) => {
       return action.payload
     },
-    /**
-     * Forgets a user left in the persisted state by a session that ended without logout (closed
-     * window, expired token), so a new login isn't compared against it (see `isSessionUserMismatch`).
-     */
     clearUser: () => null,
     /**
      * Updates user perimeters (access boundaries) and deidentification status.
