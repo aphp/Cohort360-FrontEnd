@@ -1,6 +1,7 @@
 import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios'
 import { ACCESS_TOKEN } from '../constants'
 import { getConfig, onUpdateConfig } from 'config'
+import { assertSessionUser } from 'utils/sessionUser'
 
 const REFRESH_TOKEN_URL = '/auth/refresh/'
 
@@ -23,6 +24,7 @@ export const addRequestConfigHook = (hook: (config: InternalAxiosRequestConfig<a
 }
 
 apiBackend.interceptors.request.use((config) => {
+  assertSessionUser()
   const oidcAuthState = localStorage.getItem('oidcAuth')
   const token = localStorage.getItem(ACCESS_TOKEN)
 

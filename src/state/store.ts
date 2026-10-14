@@ -3,6 +3,7 @@ import localforage from 'localforage'
 import { createLogger } from 'redux-logger'
 import { FLUSH, PAUSE, PERSIST, PURGE, persistReducer, persistStore, REGISTER, REHYDRATE } from 'redux-persist'
 import { createStateSyncMiddleware, initStateWithPrevTab } from 'redux-state-sync'
+import { registerSessionUsername } from 'utils/sessionUser'
 import autoLogout from './autoLogout'
 // Import reducers
 import cohortCreation from './cohortCreation'
@@ -114,6 +115,8 @@ initStateWithPrevTab(store)
 
 // Create persistor
 export const persistor = persistStore(store)
+
+registerSessionUsername(() => store.getState().me?.userName)
 
 // Infer types
 export type RootState = ReturnType<typeof store.getState>
