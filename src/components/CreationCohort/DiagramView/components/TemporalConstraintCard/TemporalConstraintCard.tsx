@@ -40,7 +40,7 @@ const TemporalConstraint: React.FC = () => {
   }, [])
 
   useEffect(() => {
-    // Biology criteria are excluded from stay constraints only, they can still be in chronological constraints
+    // Biology criteria still enable the button, but are not proposed in the constraints lists
     const selectableGroups = getSelectableGroups(
       selectedCriteria,
       criteriaGroup,

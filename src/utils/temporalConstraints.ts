@@ -7,12 +7,12 @@ import { CriteriaGroup, CriteriaGroupType } from 'types'
 import { CriteriaType, SelectedCriteriaType } from 'types/requestCriterias'
 
 /**
- * Criteria types that cannot be part of any temporal constraint
+ * Criteria types that do not enable the temporal constraints button
  */
 export const CRITERIA_TYPES_WITHOUT_TEMPORAL_CONSTRAINT: CriteriaType[] = [CriteriaType.IPP_LIST, CriteriaType.PATIENT]
 
 /**
- * Criteria types that are not linked to a stay, and therefore excluded from stay constraints
+ * Criteria types never proposed in the temporal constraints lists (stay and chronological constraints)
  */
 export const CRITERIA_TYPES_WITHOUT_STAY: CriteriaType[] = [
   ...CRITERIA_TYPES_WITHOUT_TEMPORAL_CONSTRAINT,
