@@ -1,17 +1,18 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { fireEvent, render, screen } from '@testing-library/react'
 import { CriteriaGroupType } from 'types'
 
 const state = {
   cohortCreation: {
     request: {
       criteriaGroup: [
-        { id: 0, title: 'root', type: CriteriaGroupType.AND_GROUP, criteriaIds: [1, 2, 3], isInclusive: true }
+        { id: 0, title: 'root', type: CriteriaGroupType.AND_GROUP, criteriaIds: [1, 2, 3, 4], isInclusive: true }
       ],
       selectedCriteria: [
         { id: 1, type: 'Condition', title: 'Diagnostic' },
         { id: 2, type: 'Procedure', title: 'Acte' },
-        { id: 3, type: 'Patient', title: 'Patient' }
+        { id: 3, type: 'Patient', title: 'Patient' },
+        { id: 4, type: 'Observation', title: 'Biologie' }
       ]
     }
   }
@@ -44,6 +45,12 @@ describe('TemporalConstraintConfig', () => {
   it('rend des sélecteurs (comboboxes)', () => {
     render(<TemporalConstraintConfig newConstraintsList={[]} onChangeNewConstraintsList={vi.fn()} />)
     expect(screen.getAllByRole('combobox').length).toBeGreaterThan(0)
+  })
+
+  it('ne propose pas la Biologie dans la liste déroulante', () => {
+    render(<TemporalConstraintConfig newConstraintsList={[]} onChangeNewConstraintsList={vi.fn()} />)
+    fireEvent.mouseDown(screen.getAllByRole('combobox')[0])
+    expect(screen.queryByText(/Biologie/)).not.toBeInTheDocument()
   })
 
   it('gère une contrainte existante dans newConstraintsList', () => {

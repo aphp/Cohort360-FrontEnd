@@ -99,7 +99,7 @@ describe('temporalConstraints.getSelectableGroups', () => {
     expect(getSelectableGroups(selected, [andGroup(10, [1, 2])])).toHaveLength(0)
   })
 
-  it('garde la Biologie pour les contraintes temporelles hors séjour (chronologiques)', () => {
+  it('compte la Biologie pour activer le bouton des contraintes temporelles', () => {
     const selected = [criteria(1, CriteriaType.CONDITION), criteria(2, CriteriaType.OBSERVATION)]
     const result = getSelectableGroups(selected, [andGroup(10, [1, 2])], false, CRITERIA_TYPES_WITHOUT_TEMPORAL_CONSTRAINT)
     expect(result[0].criteriaIds).toEqual([1, 2])
