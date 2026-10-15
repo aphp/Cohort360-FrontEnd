@@ -3,14 +3,8 @@ import React from 'react'
 
 import FeatureVideo from '../../FeatureVideo'
 import useStyles from '../../styles'
+import { TUTORIAL_VIDEOS } from '../../tutorials'
 import ExportDeniedAlert from './ExportDeniedAlert'
-
-// Positions des chapitres dans le tutoriel, en secondes.
-const TUTORIALS = {
-  query: 1,
-  exploration: 314,
-  export: 618
-}
 
 const KeyFeatures = () => {
   const { classes } = useStyles()
@@ -33,7 +27,7 @@ const KeyFeatures = () => {
           Les données de l'EDS étant en mouvement, votre cohorte correspond à une{' '}
           <strong>« photographie » de vos critères à un instant T</strong> au sein de votre périmètre.
         </Typography>
-        <FeatureVideo startAt={TUTORIALS.query} label="Créer une cohorte grâce au requêteur" />
+        <FeatureVideo src={TUTORIAL_VIDEOS.query} label="Créer une cohorte grâce au requêteur" />
       </Box>
 
       <Box className={classes.featureSection}>
@@ -44,7 +38,10 @@ const KeyFeatures = () => {
           Cohort360 comprend un espace d'exploration de données en ligne pour explorer un patient ou un groupe de
           patient (périmètre).
         </Typography>
-        <FeatureVideo startAt={TUTORIALS.exploration} label="Explorer les données d'un patient ou groupe de patients" />
+        <FeatureVideo
+          src={TUTORIAL_VIDEOS.exploration}
+          label="Explorer les données d'un patient ou groupe de patients"
+        />
       </Box>
 
       <Box className={classes.featureSection}>
@@ -55,7 +52,7 @@ const KeyFeatures = () => {
         <Typography className={classes.sectionText}>
           Cohort360 permet d'exporter les données de jusqu’à 20 000 patients sur votre ordinateur (en .csv et en .xlsx).
         </Typography>
-        <FeatureVideo startAt={TUTORIALS.export} label="Exporter des données" />
+        <FeatureVideo src={TUTORIAL_VIDEOS.export} label="Exporter des données" />
       </Box>
     </Box>
   )
