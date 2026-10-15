@@ -126,6 +126,6 @@ export const isCustomError = <T>(response: Back_API_Response<T> | CustomError): 
  * perimeterDisplay(null, 'Hospital A') // returns 'Hospital A'
  * ```
  */
-export const perimeterDisplay = (source_value: string | null, name: string) => {
+export const perimeterDisplay = (source_value: string | null | undefined, name: string) => {
   return source_value ? `${source_value} - ${name}` : name
 }
