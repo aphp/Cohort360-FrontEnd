@@ -77,6 +77,14 @@ describe('biology config', () => {
     expect(labels).toContain('Date de prélèvement')
   })
 
+  it('affiche la fréquence hebdomadaire de mise à jour dans le bandeau (non-régression BC3.3)', () => {
+    const messages = biologyConfig(false, null, ['g1']).getMessages!()
+    expect(messages).toEqual([
+      "Les données de biologie sont mises à jour chaque semaine, le vendredi soir. Les analyses antérieures à mars 2020 sont maintenant disponibles. Seuls les codes utilisés pour plus de 3 analyses à l'AP-HP sont proposés."
+    ])
+    expect(messages.join(' ')).not.toContain('mises à jour depuis mars 2020')
+  })
+
   it('ne propose plus les filtres liés à la visite', () => {
     const { filters } = biologyConfig(false, null, ['g1']).initSearchCriterias()
     expect(filters).not.toHaveProperty('nda')
