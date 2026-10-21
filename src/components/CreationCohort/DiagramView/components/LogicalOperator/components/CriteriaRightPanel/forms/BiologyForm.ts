@@ -48,7 +48,7 @@ export const form: () => CriteriaForm<ObservationDataType> = () => ({
   },
   infoAlert: ['Tous les éléments des champs multiples sont liés par une contrainte OU'],
   warningAlert: [
-    "Les mesures de biologies correspondent aux codes dont l'utilisation à l'AP-HP est supérieure à 3 analyses biologiques. De plus, les résultats concernent uniquement les analyses quantitatives enregistrées sur GLIMS, qui ont été validées et mises à jour depuis mars 2020."
+    "Les données de biologie sont mises à jour chaque semaine, le vendredi soir. Les analyses antérieures à mars 2020 sont maintenant disponibles. Seuls les codes utilisés pour plus de 3 analyses à l'AP-HP sont proposés."
   ],
   buildInfo: {
     type: { [ResourceType.OBSERVATION]: CriteriaType.OBSERVATION },

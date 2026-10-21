@@ -101,6 +101,14 @@ describe('BiologyForm', () => {
     }
   })
 
+  it('warns that biology data is refreshed every week (non-régression BC3.3)', () => {
+    const warningAlert = form().warningAlert ?? []
+    expect(warningAlert).toEqual([
+      "Les données de biologie sont mises à jour chaque semaine, le vendredi soir. Les analyses antérieures à mars 2020 sont maintenant disponibles. Seuls les codes utilisés pour plus de 3 analyses à l'AP-HP sont proposés."
+    ])
+    expect(warningAlert.join(' ')).not.toContain('mises à jour depuis mars 2020')
+  })
+
   it("keeps 'Date de l'examen' on the date FHIR key", () => {
     const item = getItem('startOccurrence')
     expect(getExtraLabel(item)).toBe("Date de l'examen")
