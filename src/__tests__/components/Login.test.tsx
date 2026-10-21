@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import { MemoryRouter } from 'react-router'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
@@ -137,4 +137,62 @@ describe('views/Login', () => {
     expect(localStorage.getItem('old-path')).toBe('/researches/projects')
     expect(localStorage.getItem('oidcAuth')).toBe('false')
   })
+})
+
+describe('views/Login - annonce double authentification (#3663)', () => {
+  const renderAt = (isoDate: string) => {
+    vi.useFakeTimers({ toFake: ['Date'] })
+    vi.setSystemTime(new Date(isoDate))
+    return renderLogin()
+  }
+  const isBefore = (a: Element, b: Element) => !!(a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING)
+
+  afterEach(() => vi.useRealTimers())
+
+  it.each(['2026-10-21T23:59:00+02:00'])("n'affiche rien avant le 22/10/2026 (%s)", (date) => {
+    renderAt(date)
+    expect(document.getElementById('mfa-banner')).toBeNull()
+    expect(document.getElementById('mfa-help')).toBeNull()
+  })
+
+  it.each(['2026-10-22T00:00:00+02:00', '2026-10-28T23:59:00+01:00'])(
+    "affiche le bandeau d'annonce sans aide (%s)",
+    (date) => {
+      renderAt(date)
+      const banner = document.getElementById('mfa-banner')!
+      expect(screen.getByText('A partir du 29 octobre 2026 : double authentification')).toBeInTheDocument()
+      expect(screen.getByText(/donnent accès à des données sensibles/)).toBeInTheDocument()
+      expect(document.getElementById('mfa-help')).toBeNull()
+      expect(isBefore(screen.getByText('Bienvenue ! Connectez-vous.'), banner)).toBe(true)
+      expect(isBefore(banner, screen.getByRole('button', { name: /Connexion via OIDC/ }))).toBe(true)
+      expect(banner.querySelector('button')).toBeNull()
+    }
+  )
+
+  it.each(['2026-10-29T00:00:00+01:00', '2026-11-11T23:59:00+01:00'])(
+    "affiche le bandeau avec l'aide au-dessus du bouton OIDC (%s)",
+    (date) => {
+      renderAt(date)
+      const banner = document.getElementById('mfa-banner')!
+      const help = document.getElementById('mfa-help')!
+      expect(banner).toContainElement(help)
+      expect(screen.getByRole('link', { name: 'ce lien' })).toBeInTheDocument()
+      expect(screen.getByRole('link', { name: 'id.recherche.support.dsn@aphp.fr' })).toHaveAttribute(
+        'href',
+        'mailto:id.recherche.support.dsn@aphp.fr'
+      )
+      expect(isBefore(banner, screen.getByRole('button', { name: /Connexion via OIDC/ }))).toBe(true)
+    }
+  )
+
+  it.each(['2026-11-12T00:00:00+01:00', '2027-06-01T12:00:00+02:00'])(
+    "n'affiche plus que l'aide, sous le bouton OIDC (%s)",
+    (date) => {
+      renderAt(date)
+      expect(document.getElementById('mfa-banner')).toBeNull()
+      const help = document.getElementById('mfa-help')!
+      expect(isBefore(screen.getByRole('button', { name: /Connexion via OIDC/ }), help)).toBe(true)
+      expect(isBefore(help, screen.getByText('En vous connectant, vous acceptez les mentions légales.'))).toBe(true)
+    }
+  )
 })

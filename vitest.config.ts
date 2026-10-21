@@ -8,6 +8,8 @@ export default defineConfig((configEnv) =>
       test: {
         globals: true,
         environment: 'jsdom', // tells Vitest to run our tests in a mock browser environment rather than the default Node environment
+        // Les dates métier s'entendent à l'heure de Paris (utilisateurs en France)
+        env: { TZ: 'Europe/Paris' },
         setupFiles: './src/__tests__/setup.ts',
         coverage: {
           provider: 'v8',
