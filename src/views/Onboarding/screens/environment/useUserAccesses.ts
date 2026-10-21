@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 
 import serviceOnboarding from 'services/aphp/serviceOnboarding'
 import type { MyAccess, MyAccessRole, RightCatalogCategory } from 'types'
+import { perimeterDisplay } from 'utils/perimeters'
 
 export type UserAccess = {
   id: number
@@ -21,7 +22,7 @@ const grantedRightsLabels = (role: MyAccessRole, catalog: FlatRight[]): string[]
 
 const toUserAccess = (access: MyAccess, catalog: FlatRight[]): UserAccess => ({
   id: access.id,
-  perimeter: access.perimeter ? `${access.perimeter.source_value} - ${access.perimeter.name}` : '',
+  perimeter: access.perimeter ? perimeterDisplay(access.perimeter.source_value, access.perimeter.name) : '',
   profile: access.role?.name ?? '',
   rights: access.role ? grantedRightsLabels(access.role, catalog) : [],
   expirationDate: access.end_datetime ? new Date(access.end_datetime) : undefined
