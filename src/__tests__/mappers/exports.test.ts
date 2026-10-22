@@ -25,8 +25,8 @@ const baseExport: ExportList = {
   target_name: 'export-test'
 }
 
-const getActions = (exportItem: ExportList, maintenanceIsActive: boolean): Action[] => {
-  const table = mapExportListToTable([exportItem], callbacks, maintenanceIsActive)
+const getActions = (exportItem: ExportList, maintenanceIsActive: boolean, canRetry = true): Action[] => {
+  const table = mapExportListToTable([exportItem], callbacks, maintenanceIsActive, canRetry)
   const actionsCell = table.rows[0].find((cell) => cell.type === CellType.ACTIONS)
   return actionsCell?.value as Action[]
 }
@@ -56,5 +56,17 @@ describe('mapExportListToTable - maintenance handling', () => {
       const [, retry] = getActions(failedExport, false)
       expect(retry.disabled).toBe(false)
     })
+  })
+})
+
+describe('mapExportListToTable - retry rights', () => {
+  it('should show the retry button to a user allowed to retry', () => {
+    const actions = getActions(baseExport, false, true)
+    expect(actions.map((action) => action.title)).toEqual(['Télécharger l’export', 'Relancer l’export'])
+  })
+
+  it('should hide the retry button from a user not allowed to retry', () => {
+    const actions = getActions(baseExport, false, false)
+    expect(actions.map((action) => action.title)).toEqual(['Télécharger l’export'])
   })
 })
