@@ -1,14 +1,12 @@
 import React, { ReactNode, useEffect, useState } from 'react'
 import { Checkbox, FormControlLabel, Grid } from '@mui/material'
 
-import moment from 'moment'
 import CalendarInput from './CalendarInput'
 import { BlockWrapper } from 'components/ui/Layout'
-import { ErrorMessage } from '../Errors'
-import { ErrorType } from 'types/error'
 import { DurationRangeType } from 'types/searchCriterias'
 import { CalendarLabel } from './styles'
 import { isString } from 'lodash'
+import { DATE_ERROR_MESSAGES, isEndBeforeStart } from 'utils/dates'
 
 interface CalendarRangeProps {
   value: DurationRangeType
@@ -34,22 +32,21 @@ const CalendarRange = ({
   const [startDate, setStartDate] = useState(value[0])
   const [endDate, setEndDate] = useState(value[1])
   const [isNullValuesChecked, setIsNullValuesChecked] = useState(includeNullValues)
+  const [isStartIncomplete, setIsStartIncomplete] = useState(false)
+  const [isEndIncomplete, setIsEndIncomplete] = useState(false)
 
-  const [error, setError] = useState<ErrorType>({ isError: false, errorMessage: '' })
+  const endBeforeStart = isEndBeforeStart(startDate, endDate)
 
   useEffect(() => {
-    onError(false)
-    setError({ isError: false, errorMessage: '' })
-    if (moment(startDate).isAfter(moment(endDate))) {
-      setError({ isError: true, errorMessage: 'La date maximale doit être supérieure à la date minimale.' })
-      onError(true)
-    } else {
+    const isError = endBeforeStart || isStartIncomplete || isEndIncomplete
+    onError(isError)
+    if (!isError) {
       onChange([startDate, endDate], isNullValuesChecked)
       if (onChangeIncludeNullValues) {
         onChangeIncludeNullValues(isNullValuesChecked)
       }
     }
-  }, [startDate, endDate, isNullValuesChecked])
+  }, [startDate, endDate, isNullValuesChecked, isStartIncomplete, isEndIncomplete])
 
   return (
     <>
@@ -67,6 +64,7 @@ const CalendarRange = ({
             label="Après le"
             value={startDate || null}
             onChange={(value) => setStartDate(value)}
+            onIncomplete={setIsStartIncomplete}
           />
         </Grid>
         <Grid size={{ xs: 12, md: inline ? 6 : 12 }}>
@@ -74,7 +72,9 @@ const CalendarRange = ({
             disabled={disabled}
             label="Avant le"
             value={endDate || null}
+            error={endBeforeStart ? DATE_ERROR_MESSAGES.endBeforeStart : undefined}
             onChange={(value) => setEndDate(value)}
+            onIncomplete={setIsEndIncomplete}
           />
         </Grid>
       </Grid>
@@ -92,11 +92,6 @@ const CalendarRange = ({
             label="Inclure les valeurs non renseignées"
           />
         )}
-      {error.isError && (
-        <BlockWrapper margin="10px 0px">
-          <ErrorMessage>{error.errorMessage}</ErrorMessage>
-        </BlockWrapper>
-      )}
     </>
   )
 }
