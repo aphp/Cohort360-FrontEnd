@@ -2,7 +2,6 @@ import { defineConfig, loadEnv, normalizePath } from 'vite'
 import react from '@vitejs/plugin-react'
 import tsconfigPaths from 'vite-tsconfig-paths'
 import svgr from 'vite-plugin-svgr'
-import topLevelAwait from 'vite-plugin-top-level-await'
 
 import path from 'node:path'
 import { createRequire } from 'node:module'
@@ -35,7 +34,8 @@ export default defineConfig(({ mode }) => {
 
   return {
     build: {
-      outDir: 'build'
+      outDir: 'build',
+      target: ['chrome107', 'edge107', 'firefox104', 'safari16']
     },
     server: {
       port: 3000,
@@ -45,7 +45,6 @@ export default defineConfig(({ mode }) => {
       react(),
       tsconfigPaths(),
       svgr(),
-      topLevelAwait(),
       viteStaticCopy({
         targets: [
           { src: cMapsDir, dest: '' },
