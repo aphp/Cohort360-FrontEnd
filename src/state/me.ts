@@ -105,6 +105,7 @@ const meSlice = createSlice({
     login: (_state: MeState, action: PayloadAction<MeState>) => {
       return action.payload
     },
+    clearUser: () => null,
     /**
      * Updates user perimeters (access boundaries) and deidentification status.
      * Sets deidentified to true if no nominative groups are available.
@@ -172,4 +173,4 @@ export default meSlice.reducer
 export { logout }
 
 /** Action creators for user management operations */
-export const { login, updateMaintenance, updatePerimeters } = meSlice.actions
+export const { login, clearUser, updateMaintenance, updatePerimeters } = meSlice.actions

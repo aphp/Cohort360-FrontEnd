@@ -13,9 +13,10 @@ vi.mock('services/aphp/serviceOnboarding', () => ({
 
 import meReducer, { type MeState } from 'state/me'
 import type { MyAccess } from 'types'
+import { TUTORIAL_VIDEOS } from '../../../tutorials'
 import KeyFeatures from '../KeyFeatures'
 
-const TUTORIAL_URL = 'https://formaphp.fr/documents/orbisetmoi/Tutoriels_Video/Cohort360_v0.mp4'
+const SEQUENCE = [TUTORIAL_VIDEOS.query, TUTORIAL_VIDEOS.exploration, TUTORIAL_VIDEOS.export]
 
 const videoSources = (container: HTMLElement) =>
   Array.from(container.querySelectorAll('video')).map((player) => player.getAttribute('src'))
@@ -51,14 +52,21 @@ beforeEach(() => {
 describe('KeyFeatures (US-3310)', () => {
   it('shows the three feature videos to a nominative access (RG3310.01)', () => {
     const { container } = renderKeyFeatures(nominative)
-    expect(videoSources(container)).toEqual([`${TUTORIAL_URL}#t=1`, `${TUTORIAL_URL}#t=314`, `${TUTORIAL_URL}#t=618`])
+    expect(videoSources(container)).toEqual(SEQUENCE)
     expect(screen.getByText(/Comment exporter des données \?/)).toBeInTheDocument()
   })
 
   it('shows the export video to a pseudonymised access too (RG3523.01)', () => {
     const { container } = renderKeyFeatures(pseudonymised)
-    expect(videoSources(container)).toEqual([`${TUTORIAL_URL}#t=1`, `${TUTORIAL_URL}#t=314`, `${TUTORIAL_URL}#t=618`])
+    expect(videoSources(container)).toEqual(SEQUENCE)
     expect(screen.getByText(/Comment exporter des données \?/)).toBeInTheDocument()
+  })
+
+  it('plays the three dedicated tutorials instead of the former single video (RG3543.01)', () => {
+    const { container } = renderKeyFeatures(nominative)
+    videoSources(container).forEach((src) => {
+      expect(src).not.toContain('Cohort360_v0')
+    })
   })
 
   it('shows the export video when the access is unknown (RG3523.01)', () => {

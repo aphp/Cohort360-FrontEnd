@@ -1,6 +1,7 @@
 import axios, { AxiosRequestConfig, AxiosResponse, InternalAxiosRequestConfig } from 'axios'
 import { ACCESS_TOKEN } from '../constants'
 import { getConfig, onUpdateConfig } from 'config'
+import { assertSessionUser } from 'utils/sessionUser'
 
 const apiFhir = axios.create({
   baseURL: getConfig().system.fhirUrl,
@@ -27,6 +28,7 @@ export const getAuthorizationMethod = () => {
 }
 
 apiFhir.interceptors.request.use((config) => {
+  assertSessionUser()
   const token = localStorage.getItem(ACCESS_TOKEN)
 
   if (token) {
