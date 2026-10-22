@@ -8,14 +8,21 @@ import { JobStatus } from 'types'
 import { Refresh } from '@mui/icons-material'
 import { isDateBefore } from 'utils/dates'
 
-const mapExportsToRows = (list: ExportList[], callbacks: ExportCallbacks, maintenanceIsActive: boolean) => {
+const mapExportsToRows = (
+  list: ExportList[],
+  callbacks: ExportCallbacks,
+  maintenanceIsActive: boolean,
+  canRetry: boolean
+) => {
   const rows: Row[] = []
   const unknown = 'N/A'
   const { onDownload, onRetry } = callbacks
   list.forEach((elem) => {
+    const downloadExpired =
+      elem.request_job_status === JobStatus.FINISHED && !!elem.created_at && isDateBefore(elem.created_at, 7)
     const actions = [
       {
-        title: 'Télécharger l’export',
+        title: downloadExpired ? 'Le téléchargement est disponible 7 jours uniquement' : 'Télécharger l’export',
         icon: Download,
         onClick: () => onDownload(elem.uuid, elem.target_name ?? elem.uuid, elem.output_format ?? ''),
         disabled:
@@ -23,19 +30,24 @@ const mapExportsToRows = (list: ExportList[], callbacks: ExportCallbacks, mainte
           elem.request_job_status !== JobStatus.FINISHED ||
           (elem.created_at && isDateBefore(elem.created_at, 7))
       },
-      {
-        title: 'Relancer l’export',
-        icon: Refresh,
-        onClick: () => onRetry(elem.uuid),
-        disabled:
-          maintenanceIsActive ||
-          elem.request_job_status === JobStatus.NEW ||
-          elem.request_job_status === JobStatus.ACCEPTED ||
-          elem.request_job_status === JobStatus.LONG_PENDING ||
-          elem.request_job_status === JobStatus.PENDING ||
-          elem.request_job_status === JobStatus.STARTED ||
-          (elem.request_job_status === JobStatus.FINISHED && elem.created_at && !isDateBefore(elem.created_at, 7))
-      }
+      // the back-end only allows full admins to retry an export
+      ...(canRetry
+        ? [
+            {
+              title: 'Relancer l’export',
+              icon: Refresh,
+              onClick: () => onRetry(elem.uuid),
+              disabled:
+                maintenanceIsActive ||
+                elem.request_job_status === JobStatus.NEW ||
+                elem.request_job_status === JobStatus.ACCEPTED ||
+                elem.request_job_status === JobStatus.LONG_PENDING ||
+                elem.request_job_status === JobStatus.PENDING ||
+                elem.request_job_status === JobStatus.STARTED ||
+                (elem.request_job_status === JobStatus.FINISHED && elem.created_at && !isDateBefore(elem.created_at, 7))
+            }
+          ]
+        : [])
     ]
     const row: Row = [
       {
@@ -96,10 +108,11 @@ const mapExportsToColumns = (): Column[] => {
 export const mapExportListToTable = (
   exportList: ExportList[],
   callbacks: ExportCallbacks,
-  maintenanceIsActive: boolean
+  maintenanceIsActive: boolean,
+  canRetry: boolean
 ) => {
   const table: Table = { rows: [], columns: [] }
   table.columns = mapExportsToColumns()
-  table.rows = mapExportsToRows(exportList, callbacks, maintenanceIsActive)
+  table.rows = mapExportsToRows(exportList, callbacks, maintenanceIsActive, canRetry)
   return table
 }

@@ -25,8 +25,8 @@ const baseExport: ExportList = {
   target_name: 'export-test'
 }
 
-const getActions = (exportItem: ExportList, maintenanceIsActive: boolean): Action[] => {
-  const table = mapExportListToTable([exportItem], callbacks, maintenanceIsActive)
+const getActions = (exportItem: ExportList, maintenanceIsActive: boolean, canRetry = true): Action[] => {
+  const table = mapExportListToTable([exportItem], callbacks, maintenanceIsActive, canRetry)
   const actionsCell = table.rows[0].find((cell) => cell.type === CellType.ACTIONS)
   return actionsCell?.value as Action[]
 }
@@ -56,5 +56,37 @@ describe('mapExportListToTable - maintenance handling', () => {
       const [, retry] = getActions(failedExport, false)
       expect(retry.disabled).toBe(false)
     })
+  })
+})
+
+describe('mapExportListToTable - retry rights', () => {
+  it('should show the retry button to a user allowed to retry', () => {
+    const actions = getActions(baseExport, false, true)
+    expect(actions.map((action) => action.title)).toEqual(['Télécharger l’export', 'Relancer l’export'])
+  })
+
+  it('should hide the retry button from a user not allowed to retry', () => {
+    const actions = getActions(baseExport, false, false)
+    expect(actions.map((action) => action.title)).toEqual(['Télécharger l’export'])
+  })
+})
+
+describe('mapExportListToTable - download tooltip', () => {
+  const oldDate = new Date(Date.now() - 8 * 24 * 60 * 60 * 1000).toISOString()
+
+  it('should show the default tooltip for a finished export less than 7 days old', () => {
+    const [download] = getActions(baseExport, false)
+    expect(download.title).toBe('Télécharger l’export')
+  })
+
+  it('should explain the 7-day limit for a finished export more than 7 days old', () => {
+    const [download] = getActions({ ...baseExport, created_at: oldDate }, false)
+    expect(download.title).toBe('Le téléchargement est disponible 7 jours uniquement')
+    expect(download.disabled).toBe(true)
+  })
+
+  it('should show the default tooltip for an old export that is not finished', () => {
+    const [download] = getActions({ ...baseExport, created_at: oldDate, request_job_status: JobStatus.FAILED }, false)
+    expect(download.title).toBe('Télécharger l’export')
   })
 })
