@@ -18,9 +18,11 @@ const mapExportsToRows = (
   const unknown = 'N/A'
   const { onDownload, onRetry } = callbacks
   list.forEach((elem) => {
+    const downloadExpired =
+      elem.request_job_status === JobStatus.FINISHED && !!elem.created_at && isDateBefore(elem.created_at, 7)
     const actions = [
       {
-        title: 'Télécharger l’export',
+        title: downloadExpired ? 'Le téléchargement est disponible 7 jours uniquement' : 'Télécharger l’export',
         icon: Download,
         onClick: () => onDownload(elem.uuid, elem.target_name ?? elem.uuid, elem.output_format ?? ''),
         disabled:

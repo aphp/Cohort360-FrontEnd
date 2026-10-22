@@ -70,3 +70,23 @@ describe('mapExportListToTable - retry rights', () => {
     expect(actions.map((action) => action.title)).toEqual(['Télécharger l’export'])
   })
 })
+
+describe('mapExportListToTable - download tooltip', () => {
+  const oldDate = new Date(Date.now() - 8 * 24 * 60 * 60 * 1000).toISOString()
+
+  it('should show the default tooltip for a finished export less than 7 days old', () => {
+    const [download] = getActions(baseExport, false)
+    expect(download.title).toBe('Télécharger l’export')
+  })
+
+  it('should explain the 7-day limit for a finished export more than 7 days old', () => {
+    const [download] = getActions({ ...baseExport, created_at: oldDate }, false)
+    expect(download.title).toBe('Le téléchargement est disponible 7 jours uniquement')
+    expect(download.disabled).toBe(true)
+  })
+
+  it('should show the default tooltip for an old export that is not finished', () => {
+    const [download] = getActions({ ...baseExport, created_at: oldDate, request_job_status: JobStatus.FAILED }, false)
+    expect(download.title).toBe('Télécharger l’export')
+  })
+})
