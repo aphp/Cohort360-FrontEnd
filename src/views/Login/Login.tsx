@@ -42,6 +42,8 @@ import { clearPreviousSession } from 'utils/session'
 import { isSessionUserMismatch } from 'utils/sessionUser'
 import { isAccessTokenValid } from 'utils/tokens'
 import useStyles from './styles'
+import { MfaBanner, MfaHelpText } from './MfaNotice'
+import { getMfaNoticePhase } from './mfaNoticePhase'
 import { updatePerimeters } from './utils'
 
 type ErrorSnackBarAlertProps = {
@@ -137,6 +139,7 @@ const Login = () => {
   const urlParams = new URLSearchParams(window.location.search)
   const [display_jwt_form, setDisplay_jwt_form] = useState(false)
   const oidcCode = urlParams.get('code')
+  const mfaPhase = getMfaNoticePhase()
 
   useEffect(() => {
     if (oidcCode) login()
@@ -354,7 +357,7 @@ const Login = () => {
         >
           <Grid
             container
-            size={{ xs: 8, lg: 6 }}
+            className={classes.loginBlock}
             sx={{
               flexDirection: 'column',
               alignItems: 'center',
@@ -366,6 +369,9 @@ const Login = () => {
             <Typography color="primary" className={classes.bienvenue}>
               Bienvenue ! Connectez-vous.
             </Typography>
+            {(mfaPhase === 'announcement' || mfaPhase === 'activated') && (
+              <MfaBanner withHelp={mfaPhase === 'activated'} />
+            )}
             {(appConfig.system.displayJwtLogin || display_jwt_form) && (
               <Grid
                 container
@@ -419,14 +425,15 @@ const Login = () => {
                 type="submit"
                 onClick={oidcLogin}
                 variant="contained"
-                className={cx(classes.submit, classes.oidcButton)}
-                style={{ marginBottom: 40 }}
+                className={cx(classes.submit, classes.oidcButton, mfaPhase === 'help' && classes.oidcButtonAboveHelp)}
                 id="oidc-login"
                 startIcon={<Keycloak height="25px" />}
               >
                 Connexion via OIDC
               </Button>
             )}
+
+            {mfaPhase === 'help' && <MfaHelpText />}
 
             <Typography align="center">
               <Link href="#" onClick={() => setOpen(true)} underline="hover">
