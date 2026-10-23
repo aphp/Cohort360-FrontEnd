@@ -130,6 +130,16 @@ describe('graphUtils.getVisitRepartitionMapAphp', () => {
     expect(result.Janvier.female).toBe(4)
     expect(result.Janvier.femaleCount).toBe(1)
   })
+
+  it('renvoie 0 (et non NaN) pour un mois ou un genre sans données', () => {
+    const facet: Extension[] = [
+      { url: 'root', extension: [{ url: 'year-1-female', valueDecimal: 4 }] }
+    ]
+    const result = getVisitRepartitionMapAphp(facet)
+    expect(result.Janvier.male).toBe(0)
+    expect(result.Janvier.other).toBe(0)
+    expect(result.Février.female).toBe(0)
+  })
 })
 
 describe('graphUtils.getVisitRepartitionMap (patients + encounters)', () => {

@@ -272,9 +272,11 @@ export const getVisitRepartitionMapAphp = (facet?: Extension[]): VisiteRepartiti
   ]
   for (const month of months) {
     if (!repartitionMap[month]) continue
-    repartitionMap[month].male = repartitionMap[month].male / repartitionMap[month].maleCount
-    repartitionMap[month].female = repartitionMap[month].female / repartitionMap[month].femaleCount
-    repartitionMap[month].other = repartitionMap[month].other / repartitionMap[month].otherCount
+    // No facet entry for a gender → count is 0, keep 0 instead of 0/0 = NaN
+    const { male, maleCount, female, femaleCount, other, otherCount } = repartitionMap[month]
+    repartitionMap[month].male = maleCount ? male / maleCount : 0
+    repartitionMap[month].female = femaleCount ? female / femaleCount : 0
+    repartitionMap[month].other = otherCount ? other / otherCount : 0
   }
 
   return repartitionMap
