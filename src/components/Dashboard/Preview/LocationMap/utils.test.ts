@@ -73,6 +73,15 @@ describe('parseShape', function () {
     expect(expression).toEqual(result);
   });
 
+  it('Should accept any whitespace between lng and lat', function () {
+    expect(parseShape('POLYGON((2.0  48.0,2.1\t48.1, 2.0 48.0))')).toEqual([[48.0, 2.0], [48.1, 2.1], [48.0, 2.0]]);
+  });
+
+  it('Should skip points with a missing or invalid coordinate', function () {
+    expect(parseShape('POLYGON((2.0 48.0, 1.696925, 2.1 abc, 2.0 48.0))')).toEqual([[48.0, 2.0], [48.0, 2.0]]);
+    expect(parseShape('POLYGON((1.696925, 2.1 abc))')).toBeNull();
+  });
+
   it('Should return null for undefined or empty input', function () {
     expect(parseShape(undefined)).toBeNull();
     expect(parseShape('')).toBeNull();
