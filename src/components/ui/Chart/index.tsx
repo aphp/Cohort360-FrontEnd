@@ -7,6 +7,7 @@ import { styled } from '@mui/material/styles'
 type ChartProps = {
   id?: string
   isLoading?: boolean
+  isEmpty?: boolean
   title?: string
   tooltip?: string
   warningTooltip?: string
@@ -33,6 +34,7 @@ const Chart = ({
   id,
   title,
   isLoading = false,
+  isEmpty = false,
   tooltip = undefined,
   warningTooltip = undefined,
   height = 300
@@ -65,7 +67,13 @@ const Chart = ({
         </ChartHeader>
       )}
       <Grid container sx={{ justifyContent: 'center', alignItems: 'center', flexGrow: 1, height: '100%' }}>
-        {isLoading ? <CircularProgress /> : children}
+        {isLoading && <CircularProgress />}
+        {!isLoading && isEmpty && (
+          <Typography color="textSecondary" fontWeight={600}>
+            Aucune donnée à afficher
+          </Typography>
+        )}
+        {!isLoading && !isEmpty && children}
       </Grid>
     </ChartContainer>
   )

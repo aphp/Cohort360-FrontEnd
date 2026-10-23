@@ -409,3 +409,15 @@ export const getGenderRepartitionSimpleData = (
   }
   return { vitalStatusData, genderData }
 }
+
+export const isSimpleChartDataEmpty = (data?: SimpleChartDataType[]): boolean => {
+  return !data || data.every(({ value }) => !value)
+}
+
+export const isAgeRepartitionEmpty = (data?: AgeRepartitionType): boolean => {
+  return !data || data.every((ageValues) => !ageValues?.male && !ageValues?.female)
+}
+
+export const isVisitRepartitionEmpty = (data?: VisiteRepartitionType): boolean => {
+  return !data || Object.values(data).every((monthValues) => !Number(monthValues?.male) && !Number(monthValues?.female))
+}
