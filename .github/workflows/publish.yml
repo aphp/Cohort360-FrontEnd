@@ -15,10 +15,9 @@ on:
     branches:
       - main
       - develop
-      - frontend-frigo
-      - frigo
       - 'release/**'
       - 'hotfix/**'
+      - 'feature/bc-**'
 
 jobs:
   publish:
@@ -71,8 +70,8 @@ jobs:
             develop)
               echo "IMAGE_TAGS=${DOCKER_REPO}:develop,${DOCKER_REPO}:develop-${SHORT_SHA}" >> "$GITHUB_ENV"
               ;;
-            frontend-frigo|frigo)
-              echo "IMAGE_TAGS=${DOCKER_REPO}:frontend-frigo" >> "$GITHUB_ENV"
+            feature/bc-**)
+              echo "IMAGE_TAGS=${DOCKER_REPO}:${HEAD_BRANCH#feature/}-${SHORT_SHA}" >> "$GITHUB_ENV"
               ;;
             release/*|hotfix/*)
               echo "IMAGE_TAGS=${DOCKER_REPO}:${VERSION}-rc,${DOCKER_REPO}:${VERSION}-rc.${SHORT_SHA}" >> "$GITHUB_ENV"
