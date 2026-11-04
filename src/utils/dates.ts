@@ -60,6 +60,45 @@ export const toIsoDate = (date: Moment | null) => {
   return date.format(ISO_DATE_FORMAT)
 }
 
+export const DATE_ERROR_MESSAGES = {
+  incomplete: 'Format attendu : JJ/MM/AAAA',
+  endBeforeStart: 'Fin antérieure au début'
+}
+
+/**
+ * Tells if a date typed in a date field is incomplete
+ *
+ * @param date - The field's value: null when empty, an invalid Moment while a section is missing
+ * @returns True if a section is missing or the year has fewer than 4 digits
+ */
+export const isIncompleteDate = (date: Moment | null) => {
+  if (date === null) return false
+  return !date.isValid() || date.year() < 1000
+}
+
+/**
+ * Tells if the text of a date field is incomplete
+ *
+ * @param text - The field's text, e.g. '01/10/AAAA' while the year is missing, '' when empty
+ * @returns True if the text is not empty and is not a full DD/MM/YYYY date
+ */
+export const isIncompleteDateText = (text: string) => {
+  if (text === '') return false
+  return !moment(text, 'DD/MM/YYYY', true).isValid()
+}
+
+/**
+ * Tells if an end date is strictly before a start date
+ *
+ * @param startDate - Start date (YYYY-MM-DD), or null when empty
+ * @param endDate - End date (YYYY-MM-DD), or null when empty
+ * @returns True only when both dates are set and the end is before the start
+ */
+export const isEndBeforeStart = (startDate?: string | null, endDate?: string | null) => {
+  if (!startDate || !endDate) return false
+  return moment(endDate, ISO_DATE_FORMAT).isBefore(moment(startDate, ISO_DATE_FORMAT), 'day')
+}
+
 /**
  * Validates if a date string is valid according to the specified format
  *

@@ -45,17 +45,17 @@ const CreateSample: React.FC<{
 
   const parsedPercentage = Number.parseFloat(percentage)
   const parentPatientCount = parentCohort?.result_size ?? 0
+  const expectedPatientCount = Math.floor((parsedPercentage / 100) * parentPatientCount)
 
   // Compute all field errors in one place
   const errors = useMemo<FieldErrors>(() => {
     const nameTooLong = !!(name && name.length > 255)
     const noName = !name?.trim()
     const percentageOutOfRange = Number.isNaN(parsedPercentage) || parsedPercentage < 0.01 || parsedPercentage > 99.99
-    const expectedPatientCount = Math.floor((parsedPercentage / 100) * parentPatientCount)
     const zeroPatient = !Number.isNaN(parsedPercentage) && !percentageOutOfRange && expectedPatientCount === 0
 
     return { nameTooLong, noName, percentageOutOfRange, zeroPatient }
-  }, [name, parsedPercentage, parentPatientCount])
+  }, [name, parsedPercentage, expectedPatientCount])
 
   // Compute error labels for display
   const errorLabels = useMemo<ErrorLabels>(() => {
@@ -169,7 +169,7 @@ const CreateSample: React.FC<{
           </Grid>
         </Grid>
       </DialogContent>
-      {parsedPercentage / 100 > cohortLimit && !errors.percentageOutOfRange && (
+      {expectedPatientCount > cohortLimit && !errors.percentageOutOfRange && (
         <Alert severity="warning" style={{ alignItems: 'center' }}>
           Cette cohorte contenant plus de {cohortLimit} patients, sa création est plus complexe et nécessite d'être
           placée dans une file d'attente. Un mail vous sera envoyé quand celle-ci sera disponible.

@@ -1,74 +1,67 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { FormLabel, Grid, IconButton } from '@mui/material'
 
-import { LocalizationProvider } from '@mui/x-date-pickers'
-import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment'
 import ClearIcon from '@mui/icons-material/Clear'
-import moment from 'moment'
-import { DatePickerWrapper, DateWrapper } from './styles'
-import { BlockWrapper } from 'components/ui/Layout'
-import { ErrorType } from 'types/error'
-import { ErrorMessage } from '../Errors'
-import { frFR } from '@mui/x-date-pickers/locales'
-import { ISO_DATE_FORMAT } from 'utils/dates'
+import { DateWrapper } from './styles'
+import DateInput from '../DateInput'
 
 interface CalendarInputProps {
   value: string | null
   label: string
   disabled?: boolean
+  error?: string
   onChange: (date: string | null) => void
+  onIncomplete: (isIncomplete: boolean) => void
 }
 
-const CalendarInput = ({ value, label, disabled = false, onChange }: CalendarInputProps) => {
-  const [date, setDate] = useState<moment.Moment | null>(value ? moment(value) : null)
-  const [error, setError] = useState<ErrorType>({ isError: false, errorMessage: '' })
+const CalendarInput = (props: CalendarInputProps) => {
+  const { value, label, disabled = false, error, onChange, onIncomplete } = props
+  const [date, setDate] = useState(value)
+  const [isIncomplete, setIsIncomplete] = useState(false)
+  // DateInput reads its value on mount only: a new key empties it
+  const [inputKey, setInputKey] = useState(0)
+  const hasDate = date !== null || isIncomplete
 
-  useEffect(() => {
-    setError({ isError: false, errorMessage: '' })
-    if (date && moment(date).isValid()) {
-      onChange(moment(date).format(ISO_DATE_FORMAT))
-    } else {
-      if (date === null) onChange(null)
-      else setError({ isError: true, errorMessage: 'La date sélectionnée est invalide.' })
-    }
-  }, [date])
+  const handleIncomplete = (newIsIncomplete: boolean) => {
+    setIsIncomplete(newIsIncomplete)
+    onIncomplete(newIsIncomplete)
+  }
+
+  const handleChange = (newDate: string | null) => {
+    setDate(newDate)
+    onChange(newDate)
+  }
+
+  const handleClear = () => {
+    setInputKey((key) => key + 1)
+    handleIncomplete(false)
+    handleChange(null)
+  }
 
   return (
-    <>
-      <DateWrapper size={12}>
-        <FormLabel component="legend">{label} :</FormLabel>
-        <Grid container sx={{ alignItems: 'center' }}>
-          <Grid container size={date ? 11 : 12} sx={{ justifyContent: 'space-between' }}>
-            <LocalizationProvider
-              dateAdapter={AdapterMoment}
-              adapterLocale={'fr'}
-              localeText={frFR.components.MuiLocalizationProvider.defaultProps.localeText}
-            >
-              <DatePickerWrapper
-                disabled={disabled}
-                onChange={(newValue: moment.Moment | null) => setDate(newValue)}
-                value={date}
-                slotProps={{
-                  textField: {
-                    variant: 'standard'
-                  }
-                }}
-              />
-            </LocalizationProvider>
-          </Grid>
-          {date !== null && (
-            <Grid size={1}>
-              <IconButton color="primary" size="small" onClick={() => setDate(null)} disabled={disabled}>
-                <ClearIcon style={{ fontSize: 17 }} data-testid="ClearIcon" />
-              </IconButton>
-            </Grid>
-          )}
+    <DateWrapper size={12}>
+      <FormLabel component="legend">{label} :</FormLabel>
+      <Grid container sx={{ alignItems: 'center' }}>
+        <Grid container size={hasDate ? 11 : 12} sx={{ justifyContent: 'space-between' }}>
+          <DateInput
+            key={inputKey}
+            variant="standard"
+            defaultValue={value}
+            disabled={disabled}
+            error={error}
+            onChange={handleChange}
+            onIncomplete={handleIncomplete}
+          />
         </Grid>
-      </DateWrapper>
-      <BlockWrapper>
-        <ErrorMessage>{error.errorMessage}</ErrorMessage>
-      </BlockWrapper>
-    </>
+        {hasDate && (
+          <Grid size={1}>
+            <IconButton color="primary" size="small" onClick={handleClear} disabled={disabled}>
+              <ClearIcon style={{ fontSize: 17 }} data-testid="ClearIcon" />
+            </IconButton>
+          </Grid>
+        )}
+      </Grid>
+    </DateWrapper>
   )
 }
 

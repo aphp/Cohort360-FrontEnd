@@ -1,5 +1,4 @@
 import { Grid, Typography, styled } from '@mui/material'
-import { DesktopDatePicker } from '@mui/x-date-pickers'
 
 type CustomProps = {
   disabled?: boolean
@@ -15,8 +14,4 @@ export const DateWrapper = styled(Grid)(() => ({
   gridTemplateColumns: 'auto 1fr' /* First column auto-sized, second column takes up remaining space */,
   gap: 10,
   alignItems: 'center'
-}))
-
-export const DatePickerWrapper = styled(DesktopDatePicker)(() => ({
-  width: '100%'
 }))

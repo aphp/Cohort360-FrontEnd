@@ -20,7 +20,7 @@ import { fetchAccessExpirations, fetchEncounter, fetchPatient, fetchPerimeterAcc
 import { AxiosResponse } from 'axios'
 import apiBackend from '../apiBackend'
 import { accessType, FetchScopeOptions, Rights, ScopeElement, SourceType, System } from 'types/scope'
-import { scopeLevelsToRequestParam } from 'utils/perimeters'
+import { perimeterDisplay, scopeLevelsToRequestParam } from 'utils/perimeters'
 import { mapParamsToNetworkParams } from 'utils/url'
 import { Hierarchy } from 'types/hierarchy'
 import { getExtension } from 'utils/fhir'
@@ -228,7 +228,7 @@ const servicesPerimeters: IServicePerimeters = {
       ...perimeter,
       id: perimeter.id.toString(),
       system: System.ScopeTree,
-      label: `${perimeter.source_value} - ${perimeter.name}`,
+      label: perimeterDisplay(perimeter.source_value, perimeter.name),
       access: servicesPerimeters.getAccessFromRights(rights),
       rights
     }
@@ -252,7 +252,7 @@ const servicesPerimeters: IServicePerimeters = {
       id: id.toString(),
       name,
       system: System.ScopeTree,
-      label: `${source_value} - ${name}`,
+      label: perimeterDisplay(source_value, name),
       source_value,
       type,
       parent_id,

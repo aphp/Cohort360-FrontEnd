@@ -1,5 +1,6 @@
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent, within } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import MenuButtonFilter from 'components/Researches/MenuButtonFilter'
 
 describe('MenuButtonFilter', () => {
@@ -55,5 +56,36 @@ describe('MenuButtonFilter', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Appliquer' }))
 
     expect(onChangeStartDate).toHaveBeenCalledWith('2026-09-10')
+  })
+
+  it('signale une fin antérieure au début et désactive Appliquer', () => {
+    render(
+      <MenuButtonFilter
+        startDate="2026-09-15"
+        endDate="2026-09-01"
+        onChangeStartDate={vi.fn()}
+        onChangeEndDate={vi.fn()}
+      />
+    )
+
+    fireEvent.click(screen.getByRole('button', { name: /Du .* au / }))
+
+    expect(screen.getByText('Fin antérieure au début')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Appliquer' })).toBeDisabled()
+  })
+
+  it('désactive Appliquer tant que la date est incomplète', async () => {
+    const user = userEvent.setup()
+    render(<MenuButtonFilter startDate={null} endDate={null} onChangeStartDate={vi.fn()} onChangeEndDate={vi.fn()} />)
+
+    await user.click(screen.getByRole('button', { name: 'Toutes les dates' }))
+    expect(screen.getByRole('button', { name: 'Appliquer' })).toBeEnabled()
+
+    await user.click(screen.getAllByRole('spinbutton', { name: 'Jour' })[0])
+    await user.keyboard('0110')
+    expect(screen.getByRole('button', { name: 'Appliquer' })).toBeDisabled()
+
+    await user.keyboard('2026')
+    expect(screen.getByRole('button', { name: 'Appliquer' })).toBeEnabled()
   })
 })

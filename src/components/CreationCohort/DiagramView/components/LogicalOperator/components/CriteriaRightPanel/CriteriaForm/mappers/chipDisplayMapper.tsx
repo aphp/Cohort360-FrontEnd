@@ -25,6 +25,7 @@ import moment from 'moment'
 import { getDurationRangeLabel } from 'utils/age'
 import { getConfig } from 'config'
 import { getValueSetFromCodeSystem, expandStoredCodeInCache } from 'utils/valueSets'
+import { perimeterDisplay } from 'utils/perimeters'
 
 /************************************************************************************/
 /*                        Criteria Form Item Chip Display                           */
@@ -44,7 +45,7 @@ export type ChipDisplayMethod = (
 
 const chipForScopeElement = (values: Hierarchy<ScopeElement, string>[] | null) => {
   if (!values) return null
-  const labels = values.map((value) => `${value.source_value} - ${value.name}`).join(' - ')
+  const labels = values.map((value) => perimeterDisplay(value.source_value, value.name)).join(' - ')
   return labels
 }
 

@@ -40,6 +40,11 @@ const PyramidChart: React.FC<PyramidProps> = memo(({ data, width = 400, height =
         valuesPos.push(age)
       }
     }
+    // No male/female value at any age → the y domain would be [NaN, NaN]
+    if (valuesPos.length === 0) {
+      d3.select(node.current).selectAll('*').remove()
+      return
+    }
     customData.sort((d1, d2) => d1.age - d2.age)
     const yValueMin = valuesPos[0] === 0 ? +valuesPos[0] : +valuesPos[0] - 1
     const yValueMax = +valuesPos[valuesPos.length - 1] + 1

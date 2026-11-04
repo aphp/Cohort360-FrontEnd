@@ -7,8 +7,12 @@ import {
   getAgeRepartitionMapAphp,
   getVisitRepartitionMapAphp,
   getVisitRepartitionMap,
-  getGenderRepartitionSimpleData
+  getGenderRepartitionSimpleData,
+  isSimpleChartDataEmpty,
+  isAgeRepartitionEmpty,
+  isVisitRepartitionEmpty
 } from 'utils/graphUtils'
+import { AgeRepartitionType, VisiteRepartitionType } from 'types'
 import { Encounter, Extension, Patient } from 'fhir/r4'
 
 describe('graphUtils.getGenderRepartitionMap (patients)', () => {
@@ -122,13 +126,19 @@ describe('graphUtils.getAgeRepartitionMapAphp', () => {
 
 describe('graphUtils.getVisitRepartitionMapAphp', () => {
   it('agrège les visites par mois et genre', () => {
-    const facet: Extension[] = [
-      { url: 'root', extension: [{ url: 'year-1-female', valueDecimal: 4 }] }
-    ]
+    const facet: Extension[] = [{ url: 'root', extension: [{ url: 'year-1-female', valueDecimal: 4 }] }]
     const result = getVisitRepartitionMapAphp(facet)
     // mois index 1 => Janvier (selon getStringMonthAphp)
     expect(result.Janvier.female).toBe(4)
     expect(result.Janvier.femaleCount).toBe(1)
+  })
+
+  it('renvoie 0 (et non NaN) pour un mois ou un genre sans données', () => {
+    const facet: Extension[] = [{ url: 'root', extension: [{ url: 'year-1-female', valueDecimal: 4 }] }]
+    const result = getVisitRepartitionMapAphp(facet)
+    expect(result.Janvier.male).toBe(0)
+    expect(result.Janvier.other).toBe(0)
+    expect(result.Février.female).toBe(0)
   })
 })
 
@@ -165,5 +175,30 @@ describe('graphUtils.getGenderRepartitionSimpleData', () => {
     const alive = result.vitalStatusData?.find((d) => d.value === 7)
     expect(alive).toBeDefined() // 2+4+0+1
     expect(result.genderData).toBeDefined()
+  })
+})
+
+describe('graphUtils empty chart data', () => {
+  const month = { male: 0, maleCount: 0, female: 0, femaleCount: 0, other: 0, otherCount: 0 }
+
+  it('isSimpleChartDataEmpty: vide si absent, sans entrée ou à 0', () => {
+    expect(isSimpleChartDataEmpty(undefined)).toBe(true)
+    expect(isSimpleChartDataEmpty([])).toBe(true)
+    expect(isSimpleChartDataEmpty([{ label: 'Vivant(e)s', value: 0, color: '#000' }])).toBe(true)
+    expect(isSimpleChartDataEmpty([{ label: 'Vivant(e)s', value: 3, color: '#000' }])).toBe(false)
+  })
+
+  it('isAgeRepartitionEmpty: ignore "other" et les âges absents', () => {
+    expect(isAgeRepartitionEmpty(undefined)).toBe(true)
+    expect(isAgeRepartitionEmpty([{ male: 0, female: 0, other: 4 }])).toBe(true)
+    const sparse = [] as AgeRepartitionType
+    sparse[42] = { male: 0, female: 1, other: 0 }
+    expect(isAgeRepartitionEmpty(sparse)).toBe(false)
+  })
+
+  it('isVisitRepartitionEmpty: vide si aucun homme ni femme sur tous les mois', () => {
+    expect(isVisitRepartitionEmpty(undefined)).toBe(true)
+    expect(isVisitRepartitionEmpty({ Janvier: { ...month, other: 2 } } as unknown as VisiteRepartitionType)).toBe(true)
+    expect(isVisitRepartitionEmpty({ Mars: { ...month, male: 1 } } as unknown as VisiteRepartitionType)).toBe(false)
   })
 })

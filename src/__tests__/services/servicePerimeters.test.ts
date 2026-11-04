@@ -17,7 +17,8 @@ vi.mock('../../services/apiBackend', () => ({
   default: { get: vi.fn() }
 }))
 
-vi.mock('utils/perimeters', () => ({
+vi.mock('utils/perimeters', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('utils/perimeters')>()),
   scopeLevelsToRequestParam: vi.fn(() => 'ALL')
 }))
 
@@ -132,6 +133,12 @@ describe('servicePerimeters.mapPerimeterToScopeElement', () => {
     expect(result.id).toBe('7')
     expect(result.label).toBe('S-7 - Service 7')
     expect(result.system).toBe(System.ScopeTree)
+  })
+
+  it("affiche seulement le nom quand le périmètre n'a pas de code", () => {
+    const item = makeScopeElement({ id: '8', source_value: null as unknown as string, name: 'Service 8' })
+    const result = servicesPerimeters.mapPerimeterToScopeElement(item)
+    expect(result.label).toBe('Service 8')
   })
 })
 

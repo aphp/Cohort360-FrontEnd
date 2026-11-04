@@ -48,10 +48,15 @@ export const parseShape = (polygons?: string): LatLngTuple[] | null => {
     .map((polygon) => {
       const m = polygon.match(/POLYGON\(\((.*)\)\)/)
       if (m) {
-        return m[1].split(',').map((latlng) => {
-          const [lng, lat] = latlng.trim().split(' ')
-          return [Number.parseFloat(lat), Number.parseFloat(lng)]
-        })
+        // Skip malformed points (e.g. missing lat): a NaN coordinate makes Leaflet throw
+        const points = m[1]
+          .split(',')
+          .map((latlng) => {
+            const [lng, lat] = latlng.trim().split(/\s+/)
+            return [Number.parseFloat(lat), Number.parseFloat(lng)] as LatLngTuple
+          })
+          .filter(([lat, lng]) => Number.isFinite(lat) && Number.isFinite(lng))
+        return points.length > 0 ? points : null
       }
       return null
     })

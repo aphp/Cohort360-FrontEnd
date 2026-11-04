@@ -2,6 +2,7 @@
 import React, { useRef, useEffect, useState } from 'react'
 import * as d3 from 'd3'
 import legend from './Legend'
+import { hideTooltip, showTooltip } from './tooltip'
 
 import { VisiteRepartitionType, Month } from 'types'
 import { GenderStatusLabel } from 'types/searchCriterias'
@@ -115,16 +116,10 @@ const GroupedBarChart: React.FC<GroupedBarChartProps> = ({ data, height = 250, w
       .on('mouseover', function (event, d) {
         const currentMonth = customData.find((customItem) => customItem[d.key] === d.value)
         const total_value = (currentMonth?.Hommes || 0) + (currentMonth?.Femmes || 0)
-        d3.select(this).transition().duration('50').attr('opacity', '.5')
-        div.transition().duration(50).style('opacity', 1)
-        div
-          .html(`${d.value} (${Number.parseInt((d.value / total_value) * 10000) / 100}%)`)
-          .style('left', event.pageX + 10 + 'px')
-          .style('top', event.pageY - 15 + 'px')
+        showTooltip(this, div, event, d.value, total_value)
       })
       .on('mouseout', function () {
-        d3.select(this).transition().duration('50').attr('opacity', '1')
-        div.transition().duration(50).style('opacity', 0)
+        hideTooltip(this, div)
       })
 
     svg.append('g').call(xAxis)

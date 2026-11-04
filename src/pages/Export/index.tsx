@@ -25,6 +25,7 @@ import AddIcon from '@mui/icons-material/Add'
 import PageContainer from 'components/ui/PageContainer'
 import WaitingPopup from 'views/WaitingPopup/WaitingPopup'
 import useMaintenanceIsActive from 'hooks/maintenance/useMaintenanceIsActive'
+import services from 'services/aphp'
 
 const RESULTS_PER_PAGE = 20
 
@@ -48,6 +49,7 @@ const Export = () => {
   const deidentified = useAppSelector((state) => state.me?.deidentified)
   const [exportList, setExportList] = useState<Back_API_Response<ExportList> | null>(null)
   const maintenanceIsActive = useMaintenanceIsActive()
+  const [canRetry, setCanRetry] = useState(false)
   const [loadingStatus, setLoadingStatus] = useState(LoadingStatus.FETCHING)
   const [downloading, setDownloading] = useState<boolean | null>(false)
   const [searchParams, setSearchParams] = useSearchParams()
@@ -140,6 +142,13 @@ const Export = () => {
     if (deidentified) navigate('/home')
   }, [deidentified, navigate])
 
+  useEffect(() => {
+    services.perimeters
+      .getAccesses()
+      .then((accesses) => setCanRetry(accesses.some((access) => access.role.right_full_admin)))
+      .catch((e) => console.error('Error fetching accesses', e))
+  }, [user])
+
   const table = useMemo(
     () =>
       mapExportListToTable(
@@ -152,9 +161,10 @@ const Export = () => {
             void onRetry(id)
           }
         },
-        maintenanceIsActive
+        maintenanceIsActive,
+        canRetry
       ),
-    [exportList, maintenanceIsActive]
+    [exportList, maintenanceIsActive, canRetry]
   )
 
   return (

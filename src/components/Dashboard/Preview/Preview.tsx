@@ -21,7 +21,12 @@ import PyramidChart from './Charts/PyramidChart'
 
 import useStyles from './styles'
 
-import { getGenderRepartitionSimpleData } from 'utils/graphUtils'
+import {
+  getGenderRepartitionSimpleData,
+  isAgeRepartitionEmpty,
+  isSimpleChartDataEmpty,
+  isVisitRepartitionEmpty
+} from 'utils/graphUtils'
 import { format } from 'utils/numbers'
 
 import { SimpleChartDataType, GenderRepartitionType, AgeRepartitionType, VisiteRepartitionType } from 'types'
@@ -148,31 +153,56 @@ const Preview: React.FC<PreviewProps> = ({
 
       <Grid container>
         <Grid container size={{ xs: 12, sm: 6, lg: 4 }} sx={{ justifyContent: 'center' }}>
-          <Chart id="vital-repartition-card" isLoading={loading} title="Répartition par statut vital">
+          <Chart
+            id="vital-repartition-card"
+            isLoading={loading}
+            isEmpty={isSimpleChartDataEmpty(vitalStatusData)}
+            title="Répartition par statut vital"
+          >
             <PieChart data={vitalStatusData ?? []} />
           </Chart>
         </Grid>
 
         <Grid container size={{ xs: 12, sm: 6, lg: 4 }} sx={{ justifyContent: 'center' }}>
-          <Chart id="visit-type-repartition-card" isLoading={loading} title="Répartition par type de visite">
+          <Chart
+            id="visit-type-repartition-card"
+            isLoading={loading}
+            isEmpty={isSimpleChartDataEmpty(visitTypeRepartitionData)}
+            title="Répartition par type de visite"
+          >
             <DonutChart data={visitTypeRepartitionData} />
           </Chart>
         </Grid>
 
         <Grid container size={{ xs: 12, sm: 12, lg: 4 }} sx={{ justifyContent: 'center' }}>
-          <Chart id="gender-repartition-card" isLoading={loading} title="Répartition par genre">
+          <Chart
+            id="gender-repartition-card"
+            isLoading={loading}
+            isEmpty={isSimpleChartDataEmpty(genderData)}
+            title="Répartition par genre"
+          >
             <BarChart data={genderData} />
           </Chart>
         </Grid>
 
         <Grid container size={{ md: 12, sm: 12, lg: 6 }} sx={{ justifyContent: 'center' }}>
-          <Chart id="age-structure-card" isLoading={loading} title="Pyramide des âges">
+          <Chart
+            id="age-structure-card"
+            isLoading={loading}
+            isEmpty={isAgeRepartitionEmpty(agePyramidData)}
+            title="Pyramide des âges"
+          >
             <PyramidChart data={agePyramidData} />
           </Chart>
         </Grid>
 
         <Grid container size={{ md: 12, sm: 12, lg: 6 }} sx={{ justifyContent: 'center' }}>
-          <Chart id="month-repartition-visit-card" isLoading={loading} title="Répartition des visites par mois">
+          <Chart
+            id="month-repartition-visit-card"
+            isLoading={loading}
+            isEmpty={isVisitRepartitionEmpty(monthlyVisitData)}
+            title="Répartition des visites par mois"
+          >
             <GroupedBarChart data={monthlyVisitData} />
           </Chart>
         </Grid>

@@ -227,4 +227,26 @@ describe('CreateSample', () => {
       expect(mockOnCreate).not.toHaveBeenCalled()
     })
   })
+
+  describe('queue warning', () => {
+    const cohortLimit = getConfig().features.cohort.shortCohortLimit
+
+    it('should show queue warning when expected patient count exceeds cohort limit', () => {
+      renderCreateSample(createMockCohort(cohortLimit * 10))
+
+      const percentageInput = screen.getByPlaceholderText('Entrez une valeur entre 0.01 et 99.99%')
+      fireEvent.change(percentageInput, { target: { value: '50' } }) // 5 x cohortLimit patients
+
+      expect(screen.getByText(/placée dans une file d'attente/i)).toBeInTheDocument()
+    })
+
+    it('should not show queue warning when expected patient count is below cohort limit', () => {
+      renderCreateSample(createMockCohort(cohortLimit * 10))
+
+      const percentageInput = screen.getByPlaceholderText('Entrez une valeur entre 0.01 et 99.99%')
+      fireEvent.change(percentageInput, { target: { value: '5' } }) // cohortLimit / 2 patients
+
+      expect(screen.queryByText(/placée dans une file d'attente/i)).not.toBeInTheDocument()
+    })
+  })
 })
