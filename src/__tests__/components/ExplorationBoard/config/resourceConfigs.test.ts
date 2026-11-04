@@ -1,10 +1,10 @@
 import { describe, it, expect } from 'vitest'
-import {
-  medicationRequestConfig,
-  medicationAdministrationConfig
-} from 'components/ExplorationBoard/config/medication'
+import { medicationRequestConfig, medicationAdministrationConfig } from 'components/ExplorationBoard/config/medication'
 import { conditionConfig, procedureConfig, claimConfig } from 'components/ExplorationBoard/config/pmsi'
 import { biologyConfig } from 'components/ExplorationBoard/config/biology'
+import { imagingConfig } from 'components/ExplorationBoard/config/imaging'
+import { documentsConfig } from 'components/ExplorationBoard/config/documents'
+import { formsConfig } from 'components/ExplorationBoard/config/forms'
 
 // Ces configs construisent des tables via getConfig() (config réelle) et des
 // fonctions internes. On invoque mapToTable avec une liste vide (couvre la
@@ -66,5 +66,44 @@ describe('biology config', () => {
     const table = config.mapToTable!(emptyData)
     expect(table.columns.length).toBeGreaterThan(0)
     expect(table.rows).toEqual([])
+  })
+
+  it.each([false, true])("n'affiche plus les colonnes NDA ni Unité exécutrice (pseudonymisé : %s)", (deidentified) => {
+    const labels = biologyConfig(deidentified, null, ['g1']).mapToTable!(emptyData).columns.map((c) =>
+      String(c.label ?? '')
+    )
+    expect(labels.some((label) => label.startsWith('NDA'))).toBe(false)
+    expect(labels).not.toContain('Unité exécutrice')
+    expect(labels).toContain('Date de prélèvement')
+  })
+
+  it('affiche la fréquence hebdomadaire de mise à jour dans le bandeau (non-régression BC3.3)', () => {
+    const messages = biologyConfig(false, null, ['g1']).getMessages!()
+    expect(messages).toEqual([
+      "Les données de biologie sont mises à jour chaque semaine, le vendredi soir. Les analyses antérieures à mars 2020 sont maintenant disponibles. Seuls les codes utilisés pour plus de 3 analyses à l'AP-HP sont proposés."
+    ])
+    expect(messages.join(' ')).not.toContain('mises à jour depuis mars 2020')
+  })
+
+  it('ne propose plus les filtres liés à la visite', () => {
+    const { filters } = biologyConfig(false, null, ['g1']).initSearchCriterias()
+    expect(filters).not.toHaveProperty('nda')
+    expect(filters).not.toHaveProperty('executiveUnits')
+    expect(filters).not.toHaveProperty('encounterStatus')
+    expect(filters).toHaveProperty('durationRange')
+  })
+})
+
+describe('filtres liés à la visite des autres onglets (non-régression BC3.3)', () => {
+  it.each([
+    ['PMSI', conditionConfig],
+    ['Médicaments', medicationRequestConfig],
+    ['Imagerie', imagingConfig],
+    ['Documents cliniques', documentsConfig],
+    ['Formulaires', formsConfig]
+  ])('%s propose toujours Unité exécutrice et Statut de la visite associée', (_, config) => {
+    const { filters } = config(false, null, ['g1']).initSearchCriterias()
+    expect(filters).toHaveProperty('executiveUnits')
+    expect(filters).toHaveProperty('encounterStatus')
   })
 })

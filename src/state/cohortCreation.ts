@@ -23,6 +23,7 @@ import { addRequest } from './request'
 
 import services from 'services/aphp'
 import { CriteriaType, SelectedCriteriaType, ViewMode } from 'types/requestCriterias'
+import { CRITERIA_TYPES_WITHOUT_STAY } from 'utils/temporalConstraints'
 import { Hierarchy } from 'types/hierarchy'
 import { getConfig } from 'config'
 import { ScopeElement } from 'types/scope'
@@ -727,9 +728,7 @@ const getTemporalConstraints = (
       const relevantCriteria = group.criteriaIds
         .filter((id) => id > 0)
         .map((id) => criterias.find((c) => c.id === id))
-        .filter(
-          (c): c is SelectedCriteriaType => !!c && c.type !== CriteriaType.PATIENT && c.type !== CriteriaType.IPP_LIST
-        )
+        .filter((c): c is SelectedCriteriaType => !!c && !CRITERIA_TYPES_WITHOUT_STAY.includes(c.type))
       return relevantCriteria.length > 1
     })
   }

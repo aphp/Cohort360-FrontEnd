@@ -8,7 +8,7 @@ import TemporalConstraintModal from './components/TemporalConstraintModal/Tempor
 
 import useStyles from './styles'
 import { TemporalConstraintsKind } from 'types'
-import { getSelectableGroups } from 'utils/temporalConstraints'
+import { CRITERIA_TYPES_WITHOUT_TEMPORAL_CONSTRAINT, getSelectableGroups } from 'utils/temporalConstraints'
 import { CriteriaType } from 'types/requestCriterias'
 import useMaintenanceIsActive from 'hooks/maintenance/useMaintenanceIsActive'
 
@@ -40,7 +40,13 @@ const TemporalConstraint: React.FC = () => {
   }, [])
 
   useEffect(() => {
-    const selectableGroups = getSelectableGroups(selectedCriteria, criteriaGroup)
+    // Biology criteria still enable the button, but are not proposed in the constraints lists
+    const selectableGroups = getSelectableGroups(
+      selectedCriteria,
+      criteriaGroup,
+      false,
+      CRITERIA_TYPES_WITHOUT_TEMPORAL_CONSTRAINT
+    )
 
     if (selectableGroups.length === 0) {
       if (temporalConstraints && temporalConstraints.length > 1) {

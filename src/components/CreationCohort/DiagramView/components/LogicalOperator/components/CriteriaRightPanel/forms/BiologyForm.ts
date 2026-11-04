@@ -3,11 +3,8 @@ import {
   CommonCriteriaData,
   CriteriaForm,
   NumberAndComparatorDataType,
-  WithEncounterDateDataType,
-  WithEncounterStatusDataType,
   WithOccurenceCriteriaDataType
 } from '../CriteriaForm/types'
-import { SourceType } from 'types/scope'
 import { getConfig } from 'config'
 import { BiologyStatus } from 'types'
 import { getValueSetsByUrls } from 'utils/valueSets'
@@ -15,9 +12,7 @@ import { FhirItem } from 'types/valueSet'
 import { Hierarchy } from 'types/hierarchy'
 
 export type ObservationDataType = CommonCriteriaData &
-  WithOccurenceCriteriaDataType &
-  WithEncounterDateDataType &
-  WithEncounterStatusDataType & {
+  WithOccurenceCriteriaDataType & {
     type: CriteriaType.OBSERVATION
     code: Hierarchy<FhirItem & { isLeaf?: boolean }>[] | null
     searchByValue: NumberAndComparatorDataType | null
@@ -47,17 +42,13 @@ export const form: () => CriteriaForm<ObservationDataType> = () => ({
     encounterService: null,
     startOccurrence: null,
     endOccurrence: null,
-    encounterStartDate: null,
-    encounterEndDate: null,
-    encounterStatus: [],
-    encounterAgeRange: { start: null, end: null },
     code: null,
     searchByValue: null,
     enableSearchByValue: false
   },
   infoAlert: ['Tous les éléments des champs multiples sont liés par une contrainte OU'],
   warningAlert: [
-    "Les mesures de biologies correspondent aux codes dont l'utilisation à l'AP-HP est supérieure à 3 analyses biologiques. De plus, les résultats concernent uniquement les analyses quantitatives enregistrées sur GLIMS, qui ont été validées et mises à jour depuis mars 2020."
+    "Les données de biologie sont mises à jour chaque semaine, le vendredi soir. Les analyses antérieures à mars 2020 sont maintenant disponibles. Seuls les codes utilisés pour plus de 3 analyses à l'AP-HP sont proposés."
   ],
   buildInfo: {
     type: { [ResourceType.OBSERVATION]: CriteriaType.OBSERVATION },
@@ -141,18 +132,6 @@ export const form: () => CriteriaForm<ObservationDataType> = () => ({
             chipDisplayMethodExtraArgs: [{ type: 'string', value: 'Valeur' }],
             unbuildIgnoreValues: getConfig().features.observation.useObservationValueRestriction ? ['le0,ge0'] : []
           }
-        },
-        {
-          valueKey: 'encounterStatus',
-          type: 'autocomplete',
-          label: 'Statut de la visite associée',
-          extraLabel: () => 'Statut de la visite',
-          valueSetId: getConfig().core.valueSets.encounterStatus.url,
-          noOptionsText: 'Veuillez entrer un statut de visite associée',
-          buildInfo: {
-            fhirKey: ObservationParamsKeys.ENCOUNTER_STATUS,
-            chipDisplayMethodExtraArgs: [{ type: 'string', value: 'Statut de la visite associée :' }]
-          }
         }
       ]
     },
@@ -160,49 +139,6 @@ export const form: () => CriteriaForm<ObservationDataType> = () => ({
       title: 'Options avancées',
       defaulCollapsed: true,
       items: [
-        {
-          valueKey: 'encounterAgeRange',
-          label: 'Âge au début de la prise en charge',
-          type: 'durationRange',
-          buildInfo: {
-            chipDisplayMethodExtraArgs: [{ type: 'string', value: 'Âge :' }]
-          }
-        },
-        {
-          valueKey: 'encounterService',
-          label: 'Unité exécutrice',
-          type: 'executiveUnit',
-          sourceType: SourceType.BIOLOGY,
-          buildInfo: {
-            fhirKey: ObservationParamsKeys.EXECUTIVE_UNITS
-          }
-        },
-        {
-          valueKey: 'encounterStartDate',
-          type: 'calendarRange',
-          errorType: 'ADVANCED_INPUTS_ERROR',
-          label: 'Début de prise en charge',
-          labelAltStyle: true,
-          extraLabel: () => 'Prise en charge',
-          extraInfo: 'Ne concerne pas les consultations.',
-          withOptionIncludeNull: true,
-          buildInfo: {
-            fhirKey: 'encounter.period-start',
-            chipDisplayMethodExtraArgs: [{ type: 'string', value: 'Date de début de prise en charge' }]
-          }
-        },
-        {
-          valueKey: 'encounterEndDate',
-          type: 'calendarRange',
-          label: 'Fin de prise en charge',
-          labelAltStyle: true,
-          errorType: 'ADVANCED_INPUTS_ERROR',
-          withOptionIncludeNull: true,
-          buildInfo: {
-            fhirKey: 'encounter.period-end',
-            chipDisplayMethodExtraArgs: [{ type: 'string', value: 'Date de fin de prise en charge' }]
-          }
-        },
         {
           valueKey: 'startOccurrence',
           type: 'calendarRange',
