@@ -249,7 +249,7 @@ const ExportForm: React.FC = () => {
       setPurpose(prefill.purpose)
       setProjectDetails(prefill.project_details ?? EMPTY_PROJECT_DETAILS)
     }
-    prefillPurpose()
+    prefillPurpose().catch((error) => console.error(error))
     return () => {
       cancelled = true
     }
