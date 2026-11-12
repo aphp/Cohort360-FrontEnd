@@ -56,3 +56,22 @@ export type ExportCallbacks = {
   onDownload: (id: string, name: string, output_format: string) => void
   onRetry: (id: string) => void
 }
+
+export enum ExportPurpose {
+  CARE_SUPPORT = 'care_support',
+  ACTIVITY_MANAGEMENT = 'activity_management',
+  INTERNAL_RESEARCH = 'internal_research',
+  MULTICENTER_RESEARCH = 'multicenter_research'
+}
+
+export type ExportProjectDetails = {
+  title: string
+  project_leader: string
+  start_date: string | null
+  end_date: string | null
+}
+
+export type ExportPurposePrefill = {
+  purpose: ExportPurpose
+  project_details: ExportProjectDetails | null
+}

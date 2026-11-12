@@ -5,7 +5,7 @@
  */
 
 /* eslint-disable max-statements */
-import React, { useState, useCallback, useEffect, useMemo } from 'react'
+import React, { useState, useCallback, useEffect, useMemo, useRef } from 'react'
 
 import {
   Grid,
@@ -26,6 +26,13 @@ import InfoIcon from '@mui/icons-material/Info'
 import { IndeterminateCheckBoxOutlined } from '@mui/icons-material'
 
 import ExportTable from '../ExportTable'
+import ExportPurposeFields from '../ExportPurposeFields'
+import {
+  EMPTY_PROJECT_DETAILS,
+  isKnownPurpose,
+  isPurposeComplete,
+  toProjectDetailsPayload
+} from '../ExportPurposeFields/purposes'
 import CustomAlert from 'components/ui/Alert'
 import { useAppDispatch } from 'state'
 import { showDialog } from 'state/warningDialog'
@@ -33,12 +40,13 @@ import { showDialog } from 'state/warningDialog'
 import { fetchExportableCohorts, fetchExportableCohort } from 'services/aphp/callApi'
 import {
   fetchExportTablesRelationsInfo,
+  fetchExportPurposePrefill,
   fetchExportTablesInfo,
   postExportCohort
 } from 'services/aphp/serviceExportCohort'
 
 import { Cohort } from 'types'
-import { TableSetting, TableInfo } from 'types/export'
+import { ExportProjectDetails, ExportPurpose, TableSetting, TableInfo } from 'types/export'
 import { useNavigate, useSearchParams } from 'react-router'
 import { sortTables } from 'pages/ExportRequest/components/exportUtils'
 import { useDebounceAction } from 'hooks/useDebounceAction'
@@ -51,9 +59,6 @@ import useStyles from '../../styles'
  * Enumeration of possible error states in the export form.
  */
 export enum Error {
-  ERROR_MOTIF,
-  ERROR_CONDITION,
-  ERROR_TABLE,
   ERROR_TABLE_LIMIT,
   ERROR_FETCH,
   NO_ERROR
@@ -93,7 +98,7 @@ const errorTablesInitialState: ErrorTables = [
  *
  * Features:
  * - Cohort selection (from URL parameter or dropdown)
- * - Export motivation input with validation
+ * - Export purpose selection, with the project details for internal research
  * - File format selection (CSV/Excel)
  * - Table selection with column filtering
  * - FHIR resource filtering
@@ -104,7 +109,6 @@ const errorTablesInitialState: ErrorTables = [
  */
 const ExportForm: React.FC = () => {
   const { classes } = useStyles()
-  const [error, setError] = useState<Error | null>(null)
   const [errorTables, setErrorTables] = useState<ErrorTables>(errorTablesInitialState)
   const [fetchError, setFetchError] = useState<Error | null>(null)
   const [oneFile, setOneFile] = useState<boolean>(false)
@@ -115,7 +119,11 @@ const ExportForm: React.FC = () => {
   const [exportTableList, setExportTableList] = useState<TableInfo[] | null>(null)
   const [compatibilitiesTables, setCompatibilitiesTables] = useState<string[] | null>(null)
   const [conditions, setConditions] = useState<boolean>(false)
-  const [motivation, setMotivation] = useState<string | null>(null)
+  const [purpose, setPurpose] = useState<ExportPurpose | null>(null)
+  const [projectDetails, setProjectDetails] = useState<ExportProjectDetails>(EMPTY_PROJECT_DETAILS)
+  const [incompleteDates, setIncompleteDates] = useState({ start_date: false, end_date: false })
+  const purposeTouched = useRef(false)
+  const previousCohortUuid = useRef<string | undefined>(undefined)
   const [searchParams, setSearchParams] = useSearchParams()
   const cohortID = searchParams.get('groupId')
   const [loading, setLoading] = useState<boolean>(false)
@@ -222,6 +230,30 @@ const ExportForm: React.FC = () => {
       setExportCohort(exportCohortList.find((cohort) => cohort.group_id === cohortID) ?? null)
     }
   }, [cohortID, exportCohortList])
+
+  useEffect(() => {
+    const cohortUuid = exportCohort?.uuid
+    // la saisie faite pendant le chargement de la liste des cohortes est conservée
+    if (previousCohortUuid.current && previousCohortUuid.current !== cohortUuid) {
+      purposeTouched.current = false
+      setPurpose(null)
+      setProjectDetails(EMPTY_PROJECT_DETAILS)
+      setIncompleteDates({ start_date: false, end_date: false })
+    }
+    previousCohortUuid.current = cohortUuid
+    if (!cohortUuid) return
+    let cancelled = false
+    const prefillPurpose = async () => {
+      const prefill = await fetchExportPurposePrefill(cohortUuid)
+      if (cancelled || !prefill || !isKnownPurpose(prefill.purpose) || purposeTouched.current) return
+      setPurpose(prefill.purpose)
+      setProjectDetails(prefill.project_details ?? EMPTY_PROJECT_DETAILS)
+    }
+    prefillPurpose().catch((error) => console.error(error))
+    return () => {
+      cancelled = true
+    }
+  }, [exportCohort?.uuid])
 
   useEffect(() => {
     if (oneFile) {
@@ -334,7 +366,8 @@ const ExportForm: React.FC = () => {
   const handleSubmitPayload = async () => {
     const response = await postExportCohort({
       cohortId: exportCohort ?? { uuid: '' },
-      motivation: motivation ?? '',
+      purpose: purpose as ExportPurpose,
+      projectDetails: toProjectDetailsPayload(purpose as ExportPurpose, projectDetails),
       group_tables: oneFile,
       outputFormat: exportTypeFile,
       tables: tablesSettings
@@ -359,20 +392,27 @@ const ExportForm: React.FC = () => {
 
   const debouncedSubmitPayload = useDebounceAction(handleSubmitPayload, 500)
 
-  const handleChangeMotivation = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    if (e.target.value.length < 10) {
-      setMotivation(e.target.value)
-      setError(Error.ERROR_MOTIF)
-    }
-    if (e.target.value.length >= 10) {
-      setMotivation(e.target.value)
-      setError(null)
-    }
-    if (e.target.value.length === 0) {
-      setMotivation(null)
-      setError(null)
-    }
+  const handleChangePurpose = (newPurpose: ExportPurpose) => {
+    purposeTouched.current = true
+    setPurpose(newPurpose)
+    // les champs de date sont démontés hors recherche interne, leur saisie partielle est perdue
+    if (newPurpose !== ExportPurpose.INTERNAL_RESEARCH) setIncompleteDates({ start_date: false, end_date: false })
   }
+
+  const handleChangeProjectDetails = (changes: Partial<ExportProjectDetails>) => {
+    purposeTouched.current = true
+    setProjectDetails((prev) => ({ ...prev, ...changes }))
+  }
+
+  const handleIncompleteDate = useCallback((field: 'start_date' | 'end_date', isIncomplete: boolean) => {
+    setIncompleteDates((prev) => (prev[field] === isIncomplete ? prev : { ...prev, [field]: isIncomplete }))
+  }, [])
+
+  const purposeComplete = isPurposeComplete(
+    purpose,
+    projectDetails,
+    incompleteDates.start_date || incompleteDates.end_date
+  )
 
   const tableListView = useMemo(() => {
     return exportTableList?.map((exportTable, index: number) => (
@@ -443,29 +483,17 @@ const ExportForm: React.FC = () => {
       {displayForm && (
         <>
           <Typography style={{ color: 'black' }}>
-            Pour effectuer un export de données, veuillez renseigner un motif, sélectionner uniquement les tables que
-            vous voulez exporter et accepter les conditions de l'entrepôt de données de santé (EDS). <br />
-            Tous les champs sont obligatoires
+            Pour effectuer un export de données, veuillez indiquer sa finalité, sélectionner uniquement les tables que
+            vous voulez exporter et accepter les conditions de l'entrepôt de données de santé (EDS).
           </Typography>
 
-          <TextField
-            id="motif"
-            multiline
-            autoFocus
-            fullWidth
-            minRows={3}
-            maxRows={5}
-            style={{ marginTop: '20px', backgroundColor: 'white' }}
-            value={motivation}
-            label="Motif de l'export"
-            variant="outlined"
-            onChange={(e) => handleChangeMotivation(e)}
-            error={error === Error.ERROR_MOTIF}
+          <ExportPurposeFields
+            purpose={purpose}
+            projectDetails={projectDetails}
+            onChangePurpose={handleChangePurpose}
+            onChangeProjectDetails={handleChangeProjectDetails}
+            onIncompleteDate={handleIncompleteDate}
           />
-
-          <Typography style={error === Error.ERROR_MOTIF ? { color: 'red' } : { color: 'black' }}>
-            Le motif doit comporter au moins 10 caractères
-          </Typography>
 
           <Grid container size={12} className={classes.oneFileGrid} sx={{ alignItems: 'center' }}>
             <FormControlLabel
@@ -635,9 +663,7 @@ const ExportForm: React.FC = () => {
                 }
               />
               <Button
-                disabled={
-                  conditions === false || motivation === null || error === Error.ERROR_MOTIF || limitError || exporting
-                }
+                disabled={conditions === false || !purposeComplete || limitError || exporting}
                 onClick={() => {
                   setExporting(true)
                   debouncedSubmitPayload()
@@ -648,20 +674,6 @@ const ExportForm: React.FC = () => {
             </Grid>
           </Grid>
           <Grid container sx={{ mb: '12px', justifyContent: 'flex-end' }}>
-            {error === Error.ERROR_MOTIF && (
-              <CustomAlert severity="error">
-                Merci d'indiquer le motif de votre demande d'export, ce motif doit contenir au moins 10 caractères.
-              </CustomAlert>
-            )}
-
-            {error === Error.ERROR_CONDITION && (
-              <CustomAlert severity="error">
-                Merci d'accepter toutes les conditions de l'Entrepôt de données de santé.
-              </CustomAlert>
-            )}
-            {error === Error.ERROR_TABLE && (
-              <CustomAlert severity="error">Merci d'indiquer les tables que vous voulez exporter.</CustomAlert>
-            )}
             {limitError && (
               <CustomAlert severity="error">
                 Merci d'indiquer des tables qui respectent la limite de lignes autorisées.

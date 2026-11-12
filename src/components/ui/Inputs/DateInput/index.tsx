@@ -22,6 +22,7 @@ class AdapterMomentUnpaddedYear extends AdapterMoment {
 
 type DateInputProps = {
   defaultValue: string | null
+  label?: string
   onChange: (date: string | null) => void
   onIncomplete?: (isIncomplete: boolean) => void
   error?: string
@@ -42,6 +43,7 @@ type DateInputProps = {
 const DateInput = (props: DateInputProps) => {
   const {
     defaultValue,
+    label,
     onChange,
     onIncomplete,
     error,
@@ -96,6 +98,7 @@ const DateInput = (props: DateInputProps) => {
         value={date}
         slotProps={{
           textField: {
+            label,
             variant,
             className,
             fullWidth: true,
