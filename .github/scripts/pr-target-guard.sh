@@ -6,7 +6,15 @@ set -euo pipefail
 marker='<!-- pr-target-guard -->'
 pending_line='_🔄 Vérification en cours, ce commentaire va être mis à jour._'
 
-comment=$(gh api --paginate "repos/$REPO/issues/$PR_NUMBER/comments" \
+retry() {
+  for _ in 1 2 3; do
+    "$@" && return 0
+    sleep 5
+  done
+  return 1
+}
+
+comment=$(retry gh api --paginate "repos/$REPO/issues/$PR_NUMBER/comments" \
   --jq ".[] | select(.user.login == \"github-actions[bot]\" and (.body | startswith(\"$marker\")))" | jq -s 'first // empty')
 comment_id=$(jq -r '.id // empty' <<<"$comment")
 comment_body=$(jq -r '.body // empty' <<<"$comment")
@@ -21,9 +29,9 @@ if [ "$1" = pending ]; then
 fi
 
 # Lus sur la PR et non dans l'événement : les labels ont pu changer pendant la CI.
-pr=$(gh api "repos/$REPO/pulls/$PR_NUMBER")
-base_ref=$(jq -r '.base.ref' <<<"$pr")
-head_ref=$(jq -r '.head.ref' <<<"$pr")
+pr=$(retry gh pr view "$PR_NUMBER" --repo "$REPO" --json baseRefName,headRefName,labels)
+base_ref=$(jq -r '.baseRefName' <<<"$pr")
+head_ref=$(jq -r '.headRefName' <<<"$pr")
 labels=$(jq -c '[.labels[].name]' <<<"$pr")
 errors=()
 
