@@ -1,0 +1,45 @@
+name: pr-target-guard-labels
+
+on:
+  pull_request_target:
+    types: [labeled, unlabeled]
+
+permissions:
+  actions: write
+  contents: read
+  issues: write
+  pull-requests: write
+
+concurrency:
+  group: pr-target-guard-labels-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  rerun-pr-target-guard:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+        with:
+          sparse-checkout: .github/scripts
+
+      - name: Relance de pr-target-guard
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          run=$(gh api "repos/$REPO/actions/workflows/test.yml/runs?event=pull_request&head_sha=$HEAD_SHA" \
+            --jq '.workflow_runs[0] // empty')
+          if [ -z "$run" ]; then
+            echo "Pas de CI sur ce commit, rien à relancer."
+            exit 0
+          fi
+          bash .github/scripts/pr-target-guard.sh pending
+          if [ "$(jq -r .status <<<"$run")" != completed ]; then
+            echo "CI en cours : pr-target-guard lira les labels en fin de CI."
+            exit 0
+          fi
+          job=$(gh api "repos/$REPO/actions/runs/$(jq -r .id <<<"$run")/jobs" \
+            --jq '.jobs[] | select(.name == "pr-target-guard") | .id')
+          gh api -X POST "repos/$REPO/actions/jobs/$job/rerun"
