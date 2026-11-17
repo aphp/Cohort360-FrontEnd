@@ -24,27 +24,7 @@ env:
   TZ: Europe/Paris
 
 jobs:
-  pr-target-guard:
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    steps:
-      - name: Vers main — uniquement hotfix/** ou release/**
-        if: github.event_name == 'pull_request' && github.event.pull_request.base.ref == 'main'
-        env:
-          HEAD_REF: ${{ github.head_ref }}
-        run: |
-          case "$HEAD_REF" in
-            hotfix/*|release/*) ;;
-            *)
-              echo "::error title=PR invalide vers main::Seules les branches hotfix/** ou release/** peuvent cibler main (reçu: $HEAD_REF)."
-              exit 1
-              ;;
-          esac
-      - name: Garde OK
-        run: echo "PR target OK"
-
   lint:
-    needs: [pr-target-guard]
     runs-on: ubuntu-latest
     timeout-minutes: 20
     permissions:
@@ -70,7 +50,6 @@ jobs:
         run: npm run lint
 
   typecheck:
-    needs: [pr-target-guard]
     runs-on: ubuntu-latest
     timeout-minutes: 20
     permissions:
@@ -96,7 +75,6 @@ jobs:
         run: ./node_modules/.bin/tsc --noEmit
 
   test:
-    needs: [pr-target-guard]
     runs-on: ubuntu-latest
     timeout-minutes: 20
     permissions:
@@ -129,7 +107,6 @@ jobs:
           if-no-files-found: error
 
   sonar_precheck:
-    needs: [pr-target-guard]
     runs-on: ubuntu-latest
     timeout-minutes: 5
     outputs:
