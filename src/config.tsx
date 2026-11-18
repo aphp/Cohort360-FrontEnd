@@ -438,7 +438,7 @@ let config: AppConfig = {
     backendUrl: '/api/back',
     fhirUrl: '/api/fhir',
     datamodelUrl: '/api/datamodel',
-    sessionTimeout: 780000,
+    sessionTimeout: 900000,
     refreshTokenInterval: 180000,
     displayJwtLogin: false,
     displayOidcLogin: true,
