@@ -2,6 +2,7 @@ import { ObservationParamsKeys, Comparators, CriteriaType, ResourceType } from '
 import {
   CommonCriteriaData,
   CriteriaForm,
+  NewDurationRangeType,
   NumberAndComparatorDataType,
   WithOccurenceCriteriaDataType
 } from '../CriteriaForm/types'
@@ -17,6 +18,7 @@ export type ObservationDataType = CommonCriteriaData &
     code: Hierarchy<FhirItem & { isLeaf?: boolean }>[] | null
     searchByValue: NumberAndComparatorDataType | null
     enableSearchByValue: boolean
+    validationDate: NewDurationRangeType | null
   }
 
 const getDefaultFilter = () => {
@@ -44,7 +46,8 @@ export const form: () => CriteriaForm<ObservationDataType> = () => ({
     endOccurrence: null,
     code: null,
     searchByValue: null,
-    enableSearchByValue: false
+    enableSearchByValue: false,
+    validationDate: null
   },
   infoAlert: ['Tous les éléments des champs multiples sont liés par une contrainte OU'],
   warningAlert: [
@@ -143,10 +146,22 @@ export const form: () => CriteriaForm<ObservationDataType> = () => ({
           valueKey: 'startOccurrence',
           type: 'calendarRange',
           errorType: 'ADVANCED_INPUTS_ERROR',
-          extraLabel: () => "Date de l'examen",
+          extraLabel: () => 'Date de prélèvement',
           buildInfo: {
+            // 'date' = Observation.effectiveDateTime
             fhirKey: ObservationParamsKeys.DATE,
-            chipDisplayMethodExtraArgs: [{ type: 'string', value: "Date de l'examen" }]
+            chipDisplayMethodExtraArgs: [{ type: 'string', value: 'Date de prélèvement' }]
+          }
+        },
+        {
+          valueKey: 'validationDate',
+          type: 'calendarRange',
+          errorType: 'ADVANCED_INPUTS_ERROR',
+          extraLabel: () => 'Date de validation',
+          buildInfo: {
+            // 'issued' = Observation.issued
+            fhirKey: ObservationParamsKeys.ISSUED,
+            chipDisplayMethodExtraArgs: [{ type: 'string', value: 'Date de validation' }]
           }
         }
       ]
