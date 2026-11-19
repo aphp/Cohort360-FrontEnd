@@ -225,7 +225,13 @@ describe('mapRequestParamsToSearchCriteria - OBSERVATION (BC3.3 : plus de lien a
     const params = [...visitParams, `${ObservationParamsKeys.IPP}=8000000000001`, 'date=ge2024-01-01'].join('&')
     const result = await mapRequestParamsToSearchCriteria(params, ResourceType.OBSERVATION)
 
-    expect(Object.keys(result.filters).sort()).toEqual(['code', 'durationRange', 'ipp', 'validatedStatus'])
+    expect(Object.keys(result.filters).sort()).toEqual([
+      'code',
+      'durationRange',
+      'ipp',
+      'validatedStatus',
+      'validationDateRange'
+    ])
     const filters = result.filters as BiologyFilters
     expect(filters.ipp).toBe('8000000000001')
     expect(filters.durationRange).toEqual(['2024-01-01', null])
@@ -236,12 +242,42 @@ describe('mapRequestParamsToSearchCriteria - OBSERVATION (BC3.3 : plus de lien a
       searchBy: SearchByTypes.TEXT,
       searchInput: '',
       orderBy: { orderBy: Order.DATE, orderDirection: Direction.ASC },
-      filters: { code: [], validatedStatus: true, ipp: '', durationRange: ['2024-01-01', '2024-12-31'] }
+      filters: {
+        code: [],
+        validatedStatus: true,
+        ipp: '',
+        durationRange: ['2024-01-01', '2024-12-31'],
+        validationDateRange: [null, null]
+      }
     }
     const result = mapSearchCriteriasToRequestParams(criterias, ResourceType.OBSERVATION, false)
 
     expect(result).toContain('date=ge2024-01-01')
     expect(result).toContain('date=le2024-12-31')
     expect(result).not.toContain('encounter.')
+  })
+
+  it('conserve les bornes de Date de validation après un aller-retour (RG3283.11)', async () => {
+    const saved = await mapRequestParamsToSearchCriteria(
+      'date=ge2024-01-01&issued=ge2024-02-01&issued=le2024-02-29',
+      ResourceType.OBSERVATION
+    )
+    const filters = saved.filters as BiologyFilters
+    expect(filters.durationRange).toEqual(['2024-01-01', null])
+    expect(filters.validationDateRange).toEqual(['2024-02-01', '2024-02-29'])
+
+    const params = mapSearchCriteriasToRequestParams(saved, ResourceType.OBSERVATION, false)
+    expect(params).toContain('issued=ge2024-02-01')
+    expect(params).toContain('issued=le2024-02-29')
+  })
+
+  it('accepte une seule borne de Date de validation (RG3283.07 / RG3283.08)', async () => {
+    const onlyEnd = await mapRequestParamsToSearchCriteria('issued=le2024-02-29', ResourceType.OBSERVATION)
+    expect((onlyEnd.filters as BiologyFilters).validationDateRange).toEqual([null, '2024-02-29'])
+  })
+
+  it('relit un ancien filtre sauvegardé sans Date de validation', async () => {
+    const saved = await mapRequestParamsToSearchCriteria('date=ge2024-01-01', ResourceType.OBSERVATION)
+    expect((saved.filters as BiologyFilters).validationDateRange).toEqual([null, null])
   })
 })

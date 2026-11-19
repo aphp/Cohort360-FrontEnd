@@ -5,6 +5,7 @@ import { biologyConfig } from 'components/ExplorationBoard/config/biology'
 import { imagingConfig } from 'components/ExplorationBoard/config/imaging'
 import { documentsConfig } from 'components/ExplorationBoard/config/documents'
 import { formsConfig } from 'components/ExplorationBoard/config/forms'
+import { Order } from 'types/searchCriterias'
 
 // Ces configs construisent des tables via getConfig() (config réelle) et des
 // fonctions internes. On invoque mapToTable avec une liste vide (couvre la
@@ -92,9 +93,46 @@ describe('biology config', () => {
     expect(filters).not.toHaveProperty('encounterStatus')
     expect(filters).toHaveProperty('durationRange')
   })
+
+  it('affiche la colonne Date de validation, triable sur issued (RG3283.03 / RG3283.04)', () => {
+    const columns = biologyConfig(false, null, ['g1']).mapToTable!(emptyData).columns
+    const validation = columns.find((c) => c.label === 'Date de validation')
+    expect(validation?.code).toBe(Order.ISSUED)
+    expect(columns.find((c) => c.label === 'Date de prélèvement')?.code).toBe(Order.DATE)
+  })
+
+  it('affiche la date de validation ou Non renseigné (RG3283.05)', () => {
+    const data = {
+      list: [
+        { id: 'o1', effectiveDateTime: '2024-03-01T10:00:00Z', issued: '2024-03-02T10:00:00Z' },
+        { id: 'o2', effectiveDateTime: '2024-03-01T10:00:00Z' }
+      ],
+      total: 2
+    } as never
+    const rows = biologyConfig(false, {} as never, ['g1']).mapToTable!(data).rows
+    const issuedCell = (row: (typeof rows)[number]) => row.find((cell) => cell.id.endsWith('-issued'))?.value
+    expect(issuedCell(rows[0])).toBe(new Date('2024-03-02T10:00:00Z').toLocaleDateString('fr-FR'))
+    expect(issuedCell(rows[1])).toBe('Non renseigné')
+  })
+
+  it('propose le filtre Date de validation (RG3283.06)', () => {
+    const { filters } = biologyConfig(false, null, ['g1']).initSearchCriterias()
+    expect(filters).toHaveProperty('validationDateRange', [null, null])
+  })
 })
 
 describe('filtres liés à la visite des autres onglets (non-régression BC3.3)', () => {
+  it.each([
+    ['PMSI', conditionConfig],
+    ['Médicaments', medicationRequestConfig],
+    ['Imagerie', imagingConfig],
+    ['Documents cliniques', documentsConfig],
+    ['Formulaires', formsConfig]
+  ])('%s ne propose pas Date de validation (BC3.3)', (_, config) => {
+    const { filters } = config(false, null, ['g1']).initSearchCriterias()
+    expect(filters).not.toHaveProperty('validationDateRange')
+  })
+
   it.each([
     ['PMSI', conditionConfig],
     ['Médicaments', medicationRequestConfig],

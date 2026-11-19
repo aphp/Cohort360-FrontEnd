@@ -139,6 +139,7 @@ export const ObservationParamsKeys = {
   NDA: 'encounter.identifier',
   VALIDATED_STATUS: 'status',
   DATE: 'date',
+  VALIDATION_DATE: 'issued',
   ISSUED: 'issued',
   VALUE: 'value-quantity',
   EXECUTIVE_UNITS: `encounter.${encounterCareSite}`,
