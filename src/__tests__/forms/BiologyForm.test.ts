@@ -45,7 +45,14 @@ vi.mock('data/valueSets', () => ({
   )
 }))
 
-import { form } from 'components/CreationCohort/DiagramView/components/LogicalOperator/components/CriteriaRightPanel/forms/BiologyForm'
+import {
+  form,
+  ObservationDataType
+} from 'components/CreationCohort/DiagramView/components/LogicalOperator/components/CriteriaRightPanel/forms/BiologyForm'
+import {
+  constructFhirFilterForType,
+  unbuildCriteriaDataFromDefinition
+} from 'components/CreationCohort/DiagramView/components/LogicalOperator/components/CriteriaRightPanel/CriteriaForm/mappers'
 
 const getItems = () => form().itemSections.flatMap((section) => section.items)
 
@@ -109,9 +116,42 @@ describe('BiologyForm', () => {
     expect(warningAlert.join(' ')).not.toContain('mises à jour depuis mars 2020')
   })
 
-  it("keeps 'Date de l'examen' on the date FHIR key", () => {
+  it("labels the 'date' FHIR key 'Date de prélèvement' (RG3284.01)", () => {
     const item = getItem('startOccurrence')
-    expect(getExtraLabel(item)).toBe("Date de l'examen")
+    expect(getExtraLabel(item)).toBe('Date de prélèvement')
     expect(item.buildInfo?.fhirKey).toBe('date')
+    expect(getItems().map(getExtraLabel)).not.toContain("Date de l'examen")
+  })
+
+  it("exposes 'Date de validation' on 'issued', right below 'Date de prélèvement' (RG3284.03, RG3284.06)", () => {
+    const valueKeys = getItems().map((item) => item.valueKey)
+    const item = getItem('validationDate')
+    expect(getExtraLabel(item)).toBe('Date de validation')
+    expect(item.type).toBe('calendarRange')
+    expect(item.buildInfo?.fhirKey).toBe('issued')
+    expect(valueKeys.indexOf('validationDate')).toBe(valueKeys.indexOf('startOccurrence') + 1)
+    expect(form().initialData.validationDate).toBeNull()
+  })
+
+  // RG3284.02, RG3284.04, RG3284.05, RG3284.07, RG3284.10
+  it.each([
+    ['start only', { start: '2023-01-01', end: null }],
+    ['end only', { start: null, end: '2024-12-31' }],
+    ['both bounds', { start: '2023-01-01', end: '2024-12-31' }]
+  ])('round-trips validationDate (%s) combined with startOccurrence', async (_, validationDate) => {
+    const criteria = {
+      ...form().initialData,
+      startOccurrence: { start: '2022-01-01', end: null },
+      validationDate
+    } as ObservationDataType
+    const filterFhir = constructFhirFilterForType(criteria, false, form())
+    expect(filterFhir).toContain('date=ge2022-01-01')
+    expect(filterFhir).toContain('issued=')
+
+    const unbuilt = await unbuildCriteriaDataFromDefinition(
+      { _id: 1, resourceType: 'Observation', isInclusive: true, filterFhir } as never,
+      form()
+    )
+    expect(unbuilt).toMatchObject({ startOccurrence: { start: '2022-01-01', end: null }, validationDate })
   })
 })
