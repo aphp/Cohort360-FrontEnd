@@ -5,7 +5,7 @@ import {
   retryExport as _retryExport
 } from 'services/aphp/callApi'
 import { getConfig } from 'config'
-import { AxiosResponse } from 'axios'
+import { AxiosResponse, isAxiosError } from 'axios'
 import { Export, Cohort } from 'types'
 import apiBackend from 'services/apiBackend'
 import { TableSetting } from 'types/export'
@@ -43,49 +43,44 @@ export const fetchExportTablesRelationsInfo = async (tableList: string[]) => {
   }
 }
 
-/**
- * Extracts the filename from the Content-Disposition header.
- * @param contentDisposition  The Content-Disposition header value from which to extract the filename.
- * @returns {string}  The extracted filename, or a default name if extraction fails.
- */
-const extractFilename = (contentDisposition: string): string => {
-  const filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/
-  const matches = filenameRegex.exec(contentDisposition)
-  let default_filename = 'Download.zip'
-  if (matches?.[1]) {
-    default_filename = matches[1].replaceAll(/['"]/g, '')
+export const getExportDownloadErrorMessage = (status?: number): string => {
+  if (status === 400) return "L'export n'est pas disponible au téléchargement (non terminé ou fichiers supprimés)."
+  if (status === 500 || status === 503) return 'Le stockage est momentanément indisponible, réessayez plus tard.'
+  return 'Erreur lors du téléchargement.'
+}
+
+export class ExportDownloadError extends Error {
+  status?: number
+
+  constructor(status?: number) {
+    super(getExportDownloadErrorMessage(status))
+    this.name = 'ExportDownloadError'
+    this.status = status
   }
-  return default_filename
 }
 
 /**
- *  Downloads the exported file for the given export ID.
+ * Starts the browser's own download of an export: the file goes straight to disk, never into the tab's memory.
+ * Following a link can't send the Bearer, so we first get a short-lived export download token.
  * @param id The ID of the export to download.
- * @param signal An optional AbortSignal to cancel the download request if needed.
+ * @param signal An optional AbortSignal to cancel the token request.
+ * @throws ExportDownloadError if the token can't be obtained.
  */
 export const downloadExport = async (id: string, signal?: AbortSignal) => {
+  let status: number | undefined
+  let token: string | undefined
   try {
-    const downloadResponse = await apiBackend.get(`/exports/${id}/download/`, {
-      responseType: 'blob',
-      signal
-    })
-
-    const filename = extractFilename(downloadResponse.headers['content-disposition'])
-    const blob = new Blob([downloadResponse.data], { type: 'application/zip' })
-
-    const url = window.URL.createObjectURL(blob)
-    const link = document.createElement('a')
-
-    link.href = url
-    link.download = filename
-
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
-    window.URL.revokeObjectURL(url)
+    // the interceptor resolves 4xx/5xx with the AxiosError instead of rejecting
+    const response = await apiBackend.post<{ token: string }>(`/exports/${id}/download-token/`, null, { signal })
+    if (isAxiosError(response)) status = response.response?.status
+    else if (response?.status === 200) token = response.data?.token
+    else status = response?.status
   } catch (error) {
-    console.error('Download error:', error)
+    status = isAxiosError(error) ? error.response?.status : undefined
   }
+  if (signal?.aborted) return
+  if (!token) throw new ExportDownloadError(status)
+  window.location.assign(`${apiBackend.defaults.baseURL}/exports/${id}/download/?token=${encodeURIComponent(token)}`)
 }
 
 export const retryExport = async (id: string, signal?: AbortSignal) => {

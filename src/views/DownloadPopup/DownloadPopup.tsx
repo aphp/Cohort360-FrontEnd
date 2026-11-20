@@ -12,6 +12,7 @@ import {
 } from '@mui/material'
 import useStyles from './styles'
 import apiBackend from '../../services/apiBackend'
+import { downloadExport, ExportDownloadError, getExportDownloadErrorMessage } from 'services/aphp/serviceExportCohort'
 import { useNavigate, useParams } from 'react-router'
 
 const DownloadPopup: React.FC = () => {
@@ -21,6 +22,7 @@ const DownloadPopup: React.FC = () => {
   const { classes } = useStyles()
   const [open, setOpen] = useState<boolean>(true)
   const [downloading, setDownloading] = useState<boolean | null>(false)
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
   const extractFilename = (contentDisposition: string): string => {
     const filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/
@@ -32,7 +34,19 @@ const DownloadPopup: React.FC = () => {
     return default_filename
   }
 
+  const downloadExportItem = async (exportId: string) => {
+    setDownloading(true)
+    try {
+      await downloadExport(exportId)
+      setDownloading(null)
+    } catch (error) {
+      setErrorMessage(error instanceof ExportDownloadError ? error.message : getExportDownloadErrorMessage())
+      setDownloading(false)
+    }
+  }
+
   const downloadItem = async (itemId: string) => {
+    if (resource === 'exports') return downloadExportItem(itemId)
     try {
       setDownloading(true)
       let path = `/${resource}/${itemId}/download/`
@@ -88,7 +102,7 @@ const DownloadPopup: React.FC = () => {
   if (downloading === null) {
     downloadStatusContent = (
       <Typography variant="h2" color="primary">
-        Téléchargement terminé !
+        {resource === 'exports' ? 'Téléchargement lancé !' : 'Téléchargement terminé !'}
       </Typography>
     )
   } else if (downloading) {
@@ -99,9 +113,16 @@ const DownloadPopup: React.FC = () => {
     )
   } else {
     downloadStatusContent = (
-      <Typography variant="h2" color="secondary">
-        Erreur lors du téléchargement
-      </Typography>
+      <>
+        <Typography variant="h2" color="secondary">
+          Erreur lors du téléchargement
+        </Typography>
+        {errorMessage && (
+          <Typography component="span" display="block">
+            {errorMessage}
+          </Typography>
+        )}
+      </>
     )
   }
 

@@ -9,7 +9,13 @@ import { Grid, CircularProgress, Tooltip, Box } from '@mui/material'
 import SearchInput from 'components/ui/Searchbar/SearchInput'
 import DataTable from 'components/ui/Table'
 import { useNavigate, useSearchParams } from 'react-router'
-import { downloadExport, fetchExportsList, retryExport } from 'services/aphp/serviceExportCohort'
+import {
+  downloadExport,
+  ExportDownloadError,
+  fetchExportsList,
+  getExportDownloadErrorMessage,
+  retryExport
+} from 'services/aphp/serviceExportCohort'
 import { cleanSearchParams } from 'utils/paginationUtils'
 import { Back_API_Response, LoadingStatus } from 'types'
 import { cancelPendingRequest } from 'utils/abortController'
@@ -17,7 +23,8 @@ import useSearchCriterias, { initExportSearchCriterias } from 'reducers/searchCr
 import { mapExportListToTable } from 'mappers/exports'
 import { ExportList, FetchExportArgs } from 'types/export'
 import { StickyPagination } from 'components/ui/Pagination'
-import { useAppSelector } from 'state'
+import { useAppDispatch, useAppSelector } from 'state'
+import { setMessage } from 'state/message'
 import HeaderLayout from 'components/ui/Header'
 import { GAP } from 'types/exploration'
 import Button from 'components/ui/Button'
@@ -45,6 +52,7 @@ const Export = () => {
   const controllerRef = useRef<AbortController>(new AbortController())
   const downloadControllerRef = useRef<AbortController | null>(null)
   const navigate = useNavigate()
+  const dispatch = useAppDispatch()
   const user = useAppSelector((state) => state.me?.impersonation?.username ?? state.me?.userName) ?? ''
   const deidentified = useAppSelector((state) => state.me?.deidentified)
   const [exportList, setExportList] = useState<Back_API_Response<ExportList> | null>(null)
@@ -98,7 +106,7 @@ const Export = () => {
   }
 
   /**
-   * Cancels the ongoing download request if it exists.
+   * Cancels the ongoing export download token request if it exists (the download then never starts).
    * This function is called when the user clicks the cancel button in the waiting popup.
    */
   const cancelDownload = () => {
@@ -106,7 +114,7 @@ const Export = () => {
   }
 
   /**
-   * Initiates the download of an export file.
+   * Starts the browser download of an export file, or shows why it can't start.
    * @param id The ID of the export to download
    */
   const onDownload = async (id: string) => {
@@ -118,11 +126,8 @@ const Export = () => {
     try {
       await downloadExport(id, controller.signal)
     } catch (e: Error | unknown) {
-      if (e instanceof Error && e.name === 'AbortError') {
-        console.log('Download annulé')
-      } else {
-        console.error(e)
-      }
+      const content = e instanceof ExportDownloadError ? e.message : getExportDownloadErrorMessage()
+      dispatch(setMessage({ type: 'error', content }))
     } finally {
       setDownloading(false)
       downloadControllerRef.current = null
