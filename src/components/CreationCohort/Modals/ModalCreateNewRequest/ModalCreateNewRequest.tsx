@@ -69,7 +69,6 @@ const ModalCreateNewRequest: React.FC<{
       }
       setProjectName(`Projet de recherche ${_projectsList.length || ''}`)
     } else {
-      _onChangeValue('parent_folder', NEW_PROJECT_ID)
       setProjectName(`Projet de recherche par défaut`)
     }
   }
@@ -127,18 +126,24 @@ const ModalCreateNewRequest: React.FC<{
       return setError(ERROR_PROJECT_NAME)
     }
 
-    if (currentRequest.parent_folder.uuid === NEW_PROJECT_ID) {
-      // Create a project before
-      const newProject = await services.projects.addProject({ name: projectName })
-      if (newProject) {
-        currentRequest.parent_folder.uuid = newProject.uuid
+    try {
+      let newRequest = currentRequest
+      if (currentRequest.parent_folder.uuid === NEW_PROJECT_ID) {
+        // Create a project before
+        const newProject = await services.projects.addProject({ name: projectName })
+        newRequest = { ...currentRequest, parent_folder: { uuid: newProject.uuid, name: newProject.name } }
+        dispatch(fetchProjects())
       }
-      dispatch(fetchProjects())
-    }
 
-    dispatch(addRequest({ newRequest: currentRequest }))
-    dispatch(setSelectedProject(null))
+      await dispatch(addRequest({ newRequest })).unwrap()
+      dispatch(setSelectedProject(null))
+    } catch {
+      setLoading(false)
+    }
   }
+
+  const parentUuid = currentRequest?.parent_folder?.uuid
+  const canCreate = !!parentUuid && (parentUuid !== NEW_PROJECT_ID || !BLANK_REGEX.test(projectName))
 
   const handleConfirmOpen = () => {
     if (tab === 'open' && openRequest !== null) {
@@ -207,7 +212,7 @@ const ModalCreateNewRequest: React.FC<{
           Annuler
         </Button>
         {tab === 'form' ? (
-          <Button disabled={loading} onClick={handleConfirm}>
+          <Button disabled={loading || !canCreate} onClick={handleConfirm}>
             Créer
           </Button>
         ) : (
