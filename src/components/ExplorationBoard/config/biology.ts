@@ -43,7 +43,8 @@ const initSearchCriterias = (search: string): SearchCriterias<BiologyFilters> =>
     validatedStatus: getConfig().features.observation.useObservationDefaultValidated,
     ipp: '',
     code: [],
-    durationRange: [null, null]
+    durationRange: [null, null],
+    validationDateRange: [null, null]
   }
 })
 
@@ -53,6 +54,7 @@ const mapToTable = (data: Data, deidentified: boolean, groupId: string[], isPati
   const columns: Column[] = [
     !isPatient && { label: `IPP${deidentified ? ' chiffré' : ''}` },
     { label: 'Date de prélèvement', code: Order.DATE },
+    { label: 'Date de validation', code: Order.ISSUED },
     { label: 'ANABIO', code: Order.ANABIO },
     { label: 'LOINC', code: Order.LOINC },
     { label: 'Résultat', align: 'center' },
@@ -104,6 +106,11 @@ const mapToTable = (data: Data, deidentified: boolean, groupId: string[], isPati
         type: CellType.TEXT
       },
       {
+        id: `${elem.id}-issued`,
+        value: elem.issued ? mapToDate(elem.issued) : 'Non renseigné',
+        type: CellType.TEXT
+      },
+      {
         id: `${elem.id}-anabio`,
         value: anabio === 'No matching concept' ? '-' : (anabio ?? '-'),
         type: CellType.TEXT,
@@ -143,12 +150,14 @@ const fetchList = (
   groupId: string[],
   signal?: AbortSignal
 ): Promise<ExplorationResults<Observation>> => {
-  const { ipp, durationRange, code, validatedStatus } = filters
+  const { ipp, durationRange, validationDateRange, code, validatedStatus } = filters
   const params = {
     'patient-identifier': ipp,
     uniqueFacet: ['subject'] as 'subject'[],
     minDate: durationRange[0] ?? '',
     maxDate: durationRange[1] ?? '',
+    minValidationDate: validationDateRange[0] ?? '',
+    maxValidationDate: validationDateRange[1] ?? '',
     code: code.map((code) => encodeURI(`${code.system}|${code.id}`)).join(','),
     rowStatus: validatedStatus,
     subject: patient?.id,

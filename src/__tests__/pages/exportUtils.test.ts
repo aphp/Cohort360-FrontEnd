@@ -36,10 +36,13 @@ vi.mock('config', async (importOriginal) => {
   }
 })
 
-import { fetchPatient } from 'services/aphp/callApi'
+import { fetchObservation, fetchPatient } from 'services/aphp/callApi'
+import { mapRequestParamsToSearchCriteria } from 'mappers/filters'
 import { fetchResourceCount2 } from 'pages/ExportRequest/components/exportUtils'
 
 const mockFetchPatient = vi.mocked(fetchPatient)
+const mockFetchObservation = vi.mocked(fetchObservation)
+const mockMapRequestParams = vi.mocked(mapRequestParamsToSearchCriteria)
 
 beforeEach(() => {
   vi.clearAllMocks()
@@ -101,5 +104,52 @@ describe('exportUtils.fetchResourceCount2', () => {
     await expect(fetchResourceCount2('cohort-1', ResourceType.PATIENT)).rejects.toThrow('API down')
     expect(errorSpy).toHaveBeenCalled()
     errorSpy.mockRestore()
+  })
+})
+
+describe('exportUtils.fetchResourceCount2 - OBSERVATION', () => {
+  const biologyCriteria = (validationDateRange: [string | null, string | null]) =>
+    ({
+      searchBy: '_text',
+      searchInput: '',
+      orderBy: {},
+      filters: {
+        code: [],
+        validatedStatus: true,
+        ipp: '',
+        durationRange: ['2024-01-01', null],
+        validationDateRange
+      }
+    }) as never
+
+  it('transmet les bornes de Date de validation du filtre sauvegardé (BC3.3)', async () => {
+    mockMapRequestParams.mockResolvedValueOnce(biologyCriteria(['2024-02-01', '2024-02-29']))
+    mockFetchObservation.mockResolvedValue({ data: { resourceType: 'Bundle', total: 12 } } as never)
+
+    const count = await fetchResourceCount2('cohort-1', ResourceType.OBSERVATION, {
+      filter: 'date=ge2024-01-01&issued=ge2024-02-01&issued=le2024-02-29'
+    })
+
+    expect(count).toBe(12)
+    expect(mockFetchObservation).toHaveBeenCalledWith(
+      expect.objectContaining({
+        _list: ['cohort-1'],
+        minDate: '2024-01-01',
+        maxDate: '',
+        minValidationDate: '2024-02-01',
+        maxValidationDate: '2024-02-29'
+      })
+    )
+  })
+
+  it('envoie des bornes de validation vides pour un filtre sans Date de validation', async () => {
+    mockMapRequestParams.mockResolvedValueOnce(biologyCriteria([null, null]))
+    mockFetchObservation.mockResolvedValue({ data: { resourceType: 'Bundle', total: 3 } } as never)
+
+    await fetchResourceCount2('cohort-1', ResourceType.OBSERVATION, { filter: 'date=ge2024-01-01' })
+
+    expect(mockFetchObservation).toHaveBeenCalledWith(
+      expect.objectContaining({ minValidationDate: '', maxValidationDate: '' })
+    )
   })
 })

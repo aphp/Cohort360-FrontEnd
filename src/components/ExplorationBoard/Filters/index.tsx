@@ -12,7 +12,7 @@ import MultiSelect from 'components/ui/Inputs/MultiSelect'
 import allDocTypesList from 'assets/docTypes.json'
 import DocTypes from 'components/ui/Inputs/DocTypes'
 import { AdditionalInfo } from 'types/exploration'
-import { Typography } from '@mui/material'
+import { Box, Typography } from '@mui/material'
 import { isEqual } from 'lodash'
 import { getConfig } from 'config'
 
@@ -188,7 +188,18 @@ const ExplorationFilters = ({ filters, infos, onChange, onError, hasChanged }: E
       [FilterKeys.MODALITY]: ({ field }) => (
         <MultiSelect {...field} options={infos.modalities ?? []} label="Modalités :" placeholder="Modalités" />
       ),
-      [FilterKeys.DURATION_RANGE]: ({ field }) => <CalendarRange {...field} label="Date :" onError={onError} />,
+      [FilterKeys.DURATION_RANGE]: ({ field }) => (
+        <CalendarRange
+          {...field}
+          label={infos.sourceType === SourceType.BIOLOGY ? 'Date de prélèvement :' : 'Date :'}
+          onError={onError}
+        />
+      ),
+      [FilterKeys.VALIDATION_DATE_RANGE]: ({ field }) => (
+        <Box mt="15px">
+          <CalendarRange {...field} label="Date de validation :" onError={onError} />
+        </Box>
+      ),
       [FilterKeys.EXECUTIVE_UNITS]: ({ field }) => (
         <ExecutiveUnits
           {...field}

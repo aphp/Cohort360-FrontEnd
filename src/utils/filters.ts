@@ -69,6 +69,7 @@ export const removeFilter = <F>(key: FilterKeys, value: FilterValue, filters: F)
         castedFilters[key] = removeElementInArray((castedFilters[key] as string).split(','), value as string).join(',')
         break
       case FilterKeys.DURATION_RANGE:
+      case FilterKeys.VALIDATION_DATE_RANGE:
       case FilterKeys.BIRTHDATES:
         castedFilters[key] = [null, null]
         break
@@ -106,6 +107,8 @@ export const getFilterLabel = (key: FilterKeys, value: FilterValue): string => {
     },
     [FilterKeys.VITAL_STATUSES]: (value) => VitalStatusLabel[value as VitalStatus],
     [FilterKeys.DURATION_RANGE]: (value) => getDurationRangeLabel(value as DurationRangeType),
+    [FilterKeys.VALIDATION_DATE_RANGE]: (value) =>
+      `Date de validation : ${getDurationRangeLabel(value as DurationRangeType)}`,
     [FilterKeys.START_DATE]: (value) => `Après le : ${moment(value as string).format('DD/MM/YYYY')}`,
     [FilterKeys.END_DATE]: (value) => `Avant le : ${moment(value as string).format('DD/MM/YYYY')}`,
     [FilterKeys.NDA]: (value) => `NDA : ${value}`,
@@ -149,6 +152,8 @@ export const selectFiltersAsArray = (filters: Filters, searchInput: string | und
       value: searchInput,
       label: `Recherche de : "${searchInput}"`
     })
+  // Seuls les filtres de l'onglet Biologie portent une date de validation
+  const isBiology = FilterKeys.VALIDATION_DATE_RANGE in filters
   for (const key in filters) {
     const value = filters[key as keyof Filters]
     if (value) {
@@ -174,10 +179,14 @@ export const selectFiltersAsArray = (filters: Filters, searchInput: string | und
           break
         case FilterKeys.BIRTHDATES:
         case FilterKeys.DURATION_RANGE:
+        case FilterKeys.VALIDATION_DATE_RANGE:
           if (value[0] || value[1]) {
             result.push({
               category: key,
-              label: getFilterLabel(key, value),
+              label:
+                isBiology && key === FilterKeys.DURATION_RANGE
+                  ? `Date de prélèvement : ${getFilterLabel(key, value)}`
+                  : getFilterLabel(key, value),
               value: value as FilterValue
             })
           }
@@ -239,6 +248,7 @@ export const atLeastOneSearchCriteria = (searchCriterias: SearchCriterias<Filter
     ('nda' in filters && !!filters.nda) ||
     ('bodySite' in filters && !!filters.bodySite) ||
     ('durationRange' in filters && (!!filters.durationRange?.[0] || !!filters.durationRange?.[1])) ||
+    ('validationDateRange' in filters && (!!filters.validationDateRange?.[0] || !!filters.validationDateRange?.[1])) ||
     ('birthdatesRanges' in filters && (!!filters.birthdatesRanges?.[0] || !!filters.birthdatesRanges?.[1])) ||
     ('genders' in filters && filters.genders?.length > 0) ||
     ('vitalStatuses' in filters && filters.vitalStatuses?.length > 0) ||
