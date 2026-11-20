@@ -875,8 +875,8 @@ export const fetchObservation = async (args: fetchObservationProps): FHIR_Bundle
   if (subject) options = [...options, `subject=${subject}`]
   if (minDate) options = [...options, `${ObservationParamsKeys.DATE}=ge${minDate}`]
   if (maxDate) options = [...options, `${ObservationParamsKeys.DATE}=le${maxDate}`]
-  if (minValidationDate) options = [...options, `${ObservationParamsKeys.VALIDATION_DATE}=ge${minValidationDate}`]
-  if (maxValidationDate) options = [...options, `${ObservationParamsKeys.VALIDATION_DATE}=le${maxValidationDate}`]
+  if (minValidationDate) options = [...options, `${ObservationParamsKeys.ISSUED}=ge${minValidationDate}`]
+  if (maxValidationDate) options = [...options, `${ObservationParamsKeys.ISSUED}=le${maxValidationDate}`]
   if (appConfig.features.observation.useObservationDefaultValidated && rowStatus)
     options = [...options, `${ObservationParamsKeys.VALIDATED_STATUS}=${BiologyStatus.VALIDATED}`]
   if (executiveUnits && executiveUnits.length > 0)

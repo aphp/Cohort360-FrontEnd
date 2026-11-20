@@ -290,7 +290,7 @@ const fetchObservationCount = async (cohortId: string, observationFilters?: Sear
   try {
     let observationResp
     if (observationFilters && observationFilters !== null) {
-      const { code, durationRange, validatedStatus } = observationFilters.filters
+      const { code, durationRange, validationDateRange, validatedStatus } = observationFilters.filters
 
       observationResp = await fetchObservation({
         size: 0,
@@ -299,6 +299,8 @@ const fetchObservationCount = async (cohortId: string, observationFilters?: Sear
         code: code.map((code) => encodeURI(`${code.system}|${code.id}`)).join(','),
         minDate: durationRange[0] ?? '',
         maxDate: durationRange[1] ?? '',
+        minValidationDate: validationDateRange?.[0] ?? '',
+        maxValidationDate: validationDateRange?.[1] ?? '',
         rowStatus: validatedStatus
       })
     } else {

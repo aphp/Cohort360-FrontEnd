@@ -300,7 +300,7 @@ const mapBiologyFromRequestParams = async (parameters: URLSearchParams) => {
   const code = await getValueSetCodes(parameters, ObservationParamsKeys.CODE)
   const validatedStatus = true
   const { durationRange } = await mapGenericFromRequestParams(parameters, ResourceType.OBSERVATION)
-  const validationDates = parameters.getAll(ObservationParamsKeys.VALIDATION_DATE)
+  const validationDates = parameters.getAll(ObservationParamsKeys.ISSUED)
   const validationDateRange: DurationRangeType = [
     validationDates.find((e) => e.startsWith('ge'))?.slice(2) ?? null,
     validationDates.find((e) => e.startsWith('le'))?.slice(2) ?? null
@@ -562,10 +562,8 @@ const mapBiologyToRequestParams = (filters: BiologyFilters) => {
     )
   if (validatedStatus) requestParams.push(`${ObservationParamsKeys.VALIDATED_STATUS}=VAL`)
   requestParams.push(...mapGenericToRequestParams({ durationRange }, ResourceType.OBSERVATION))
-  if (validationDateRange?.[0])
-    requestParams.push(`${ObservationParamsKeys.VALIDATION_DATE}=ge${validationDateRange[0]}`)
-  if (validationDateRange?.[1])
-    requestParams.push(`${ObservationParamsKeys.VALIDATION_DATE}=le${validationDateRange[1]}`)
+  if (validationDateRange?.[0]) requestParams.push(`${ObservationParamsKeys.ISSUED}=ge${validationDateRange[0]}`)
+  if (validationDateRange?.[1]) requestParams.push(`${ObservationParamsKeys.ISSUED}=le${validationDateRange[1]}`)
   return requestParams
 }
 
