@@ -5,6 +5,7 @@ import { render, screen, fireEvent, waitFor, within } from '@testing-library/rea
 const addRequestUnwrap = vi.fn()
 const addRequest = vi.fn()
 const addProject = vi.fn()
+const setMessage = vi.fn()
 
 vi.mock('react-router', () => ({ useNavigate: () => vi.fn() }))
 
@@ -32,6 +33,8 @@ vi.mock('state/request', () => ({
 
 vi.mock('state/cohortCreation', () => ({ fetchRequestCohortCreation: () => ({}) }))
 
+vi.mock('state/message', () => ({ setMessage: (payload: unknown) => setMessage(payload) }))
+
 vi.mock('services/aphp', () => ({ default: { projects: { addProject: (...args: unknown[]) => addProject(...args) } } }))
 
 import ModalCreateNewRequest from 'components/CreationCohort/Modals/ModalCreateNewRequest/ModalCreateNewRequest'
@@ -48,6 +51,7 @@ describe('ModalCreateNewRequest — utilisateur sans projet', () => {
     addRequestUnwrap.mockReset()
     addRequest.mockReset()
     addProject.mockReset()
+    setMessage.mockReset()
   })
 
   it('désactive « Créer » tant qu’aucun projet n’est sélectionné', async () => {
@@ -95,5 +99,40 @@ describe('ModalCreateNewRequest — utilisateur sans projet', () => {
 
     await waitFor(() => expect(createButton()).toBeEnabled())
     expect(screen.getByPlaceholderText('Nom de la requête')).toBeInTheDocument()
+  })
+
+  it('réutilise le projet créé quand on relance après un échec de la requête', async () => {
+    addProject.mockResolvedValue({ uuid: 'p-new', name: 'Projet de recherche par défaut' })
+    addRequestUnwrap.mockRejectedValueOnce(new Error('Impossible de créer la requête')).mockResolvedValueOnce({})
+    render(<ModalCreateNewRequest onClose={vi.fn()} />)
+    await screen.findByPlaceholderText('Nom de la requête')
+
+    await selectNewProject()
+    fireEvent.click(createButton())
+    await waitFor(() => expect(createButton()).toBeEnabled())
+
+    fireEvent.click(createButton())
+    await waitFor(() => expect(addRequestUnwrap).toHaveBeenCalledTimes(2))
+
+    expect(addProject).toHaveBeenCalledTimes(1)
+    expect(addRequest).toHaveBeenLastCalledWith({
+      newRequest: expect.objectContaining({ parent_folder: { uuid: 'p-new', name: 'Projet de recherche par défaut' } })
+    })
+  })
+
+  it('affiche une erreur et ne crée pas la requête si la création du projet échoue', async () => {
+    addProject.mockRejectedValue(new Error("Erreur lors de l'ajout du projet"))
+    render(<ModalCreateNewRequest onClose={vi.fn()} />)
+    await screen.findByPlaceholderText('Nom de la requête')
+
+    await selectNewProject()
+    fireEvent.click(createButton())
+
+    await waitFor(() => expect(createButton()).toBeEnabled())
+    expect(setMessage).toHaveBeenCalledWith({
+      type: 'error',
+      content: 'Une erreur est survenue lors de la création du projet'
+    })
+    expect(addRequest).not.toHaveBeenCalled()
   })
 })
