@@ -281,12 +281,15 @@ export const getEncounterDocuments = async (
     encountersIdList.push(encounter.id ?? '')
   })
 
-  const documentsResp = await fetchDocumentReference({
+  const documentsParams = {
     encounter: encountersIdList.join(','),
     _list: groupId ? groupId.split(',') : []
-  })
+  }
+  const countResp = await fetchDocumentReference({ ...documentsParams, size: 0 })
+  const total = countResp.data.resourceType === 'Bundle' ? (countResp.data.total ?? 0) : 0
+  const documentsResp = total > 0 ? await fetchDocumentReference({ ...documentsParams, size: total }) : undefined
 
-  const documents: CohortComposition[] = getApiResponseResources(documentsResp) ?? []
+  const documents: CohortComposition[] = (documentsResp && getApiResponseResources(documentsResp)) ?? []
 
   for (const encounter of _encounters) {
     const currentDocuments = documents?.filter(

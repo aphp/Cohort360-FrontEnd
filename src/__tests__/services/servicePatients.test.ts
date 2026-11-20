@@ -150,16 +150,40 @@ describe('servicePatients.getEncounterDocuments', () => {
   })
 
   it('associe les documents aux encounters correspondants', async () => {
-    mockFetchDocRef.mockResolvedValue({
-      data: {
-        resources: [
-          { id: 'doc1', context: { encounter: [{ reference: 'Encounter/enc1' }] } }
-        ]
-      }
-    } as never)
+    mockFetchDocRef.mockReset()
+    mockFetchDocRef
+      .mockResolvedValueOnce({ data: { resourceType: 'Bundle', total: 1 } } as never)
+      .mockResolvedValueOnce({
+        data: {
+          resources: [{ id: 'doc1', context: { encounter: [{ reference: 'Encounter/enc1' }] } }]
+        }
+      } as never)
     const encounters = [{ id: 'enc1' }, { id: 'enc2' }] as never
     const result = await getEncounterDocuments(encounters, undefined, 'group-1')
     expect(result?.[0].documents).toHaveLength(1)
     expect(result?.[1].documents).toHaveLength(0)
+  })
+
+  it('récupère tous les documents au-delà de la page par défaut (size = total)', async () => {
+    mockFetchDocRef.mockReset()
+    mockFetchDocRef
+      .mockResolvedValueOnce({ data: { resourceType: 'Bundle', total: 287 } } as never)
+      .mockResolvedValueOnce({ data: { resources: [] } } as never)
+    await getEncounterDocuments([{ id: 'enc1' }, { id: 'enc2' }] as never, undefined, 'group-1')
+    expect(mockFetchDocRef).toHaveBeenNthCalledWith(1, { encounter: 'enc1,enc2', _list: ['group-1'], size: 0 })
+    expect(mockFetchDocRef).toHaveBeenNthCalledWith(2, { encounter: 'enc1,enc2', _list: ['group-1'], size: 287 })
+  })
+
+  it.each([
+    ['le total est 0', { resourceType: 'Bundle', total: 0 }],
+    ['le total est absent', { resourceType: 'Bundle' }],
+    ["la réponse n'est pas un Bundle", { resourceType: 'OperationOutcome' }]
+  ])('ne récupère pas les documents quand %s', async (_label, countData) => {
+    mockFetchDocRef.mockReset()
+    mockFetchDocRef.mockResolvedValueOnce({ data: countData } as never)
+    const result = await getEncounterDocuments([{ id: 'enc1' }] as never)
+    expect(mockFetchDocRef).toHaveBeenCalledTimes(1)
+    expect(mockFetchDocRef).toHaveBeenCalledWith({ encounter: 'enc1', _list: [], size: 0 })
+    expect(result?.[0].documents).toEqual([])
   })
 })
