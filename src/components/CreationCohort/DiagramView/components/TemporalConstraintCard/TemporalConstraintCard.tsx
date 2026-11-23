@@ -14,6 +14,8 @@ import useMaintenanceIsActive from 'hooks/maintenance/useMaintenanceIsActive'
 
 const TemporalConstraint: React.FC = () => {
   const [modalIsOpen, setModalIsOpen] = useState(false)
+  const [temporalConstraintExist, setTemporalConstraintExist] = useState(false)
+  const [disableTemporalConstraint, setDisableTemporalConstraint] = useState(false)
 
   const maintenanceIsActive = useMaintenanceIsActive()
   const {
@@ -29,19 +31,25 @@ const TemporalConstraint: React.FC = () => {
   const dispatch = useAppDispatch()
   const { classes } = useStyles()
 
-  const temporalConstraintExist = temporalConstraints?.length > 0
-
-  const disableTemporalConstraint = useMemo(
-    () => getSelectableGroups(selectedCriteria, criteriaGroup).length === 0,
-    [selectedCriteria, criteriaGroup]
-  )
+  useEffect(() => {
+    if (temporalConstraints?.length > 0) {
+      setTemporalConstraintExist(true)
+    } else {
+      setTemporalConstraintExist(false)
+    }
+  }, [])
 
   useEffect(() => {
-    if (disableTemporalConstraint && temporalConstraints && temporalConstraints.length > 1) {
-      temporalConstraints.forEach((temporalConstraint) => {
-        dispatch(deleteTemporalConstraint(temporalConstraint))
-        dispatch(buildCohortCreation({ selectedPopulation: null }))
-      })
+    const selectableGroups = getSelectableGroups(selectedCriteria, criteriaGroup)
+
+    if (selectableGroups.length === 0) {
+      if (temporalConstraints && temporalConstraints.length > 1) {
+        temporalConstraints?.map((temporalConstraint) => {
+          dispatch(deleteTemporalConstraint(temporalConstraint))
+          dispatch(buildCohortCreation({ selectedPopulation: null }))
+        })
+      }
+      setDisableTemporalConstraint(true)
     }
   }, [])
 
