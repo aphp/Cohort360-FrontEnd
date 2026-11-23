@@ -41,7 +41,7 @@ export const getReferences = (config: Readonly<AppConfig>) => [
     resourceType: config.features.observation.valueSets.biologyHierarchyAnabio.resourceType,
     loadingMode: config.features.observation.valueSets.biologyHierarchyAnabio.loadingMode ?? 'expand',
     checked: true,
-    joinDisplayWithCode: false,
+    joinDisplayWithCode: true,
     joinDisplayWithSystem: true,
     filterRoots: <T>(biologyItem: LabelObject) =>
       biologyItem.id !== '527941' &&
