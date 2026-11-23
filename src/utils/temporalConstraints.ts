@@ -7,12 +7,14 @@ import { CriteriaGroup, CriteriaGroupType } from 'types'
 import { CriteriaType, SelectedCriteriaType } from 'types/requestCriterias'
 
 /**
- * Criteria types that do not enable the temporal constraints button
+ * Criteria types that carry neither a date nor a stay (Démographie, Liste d'IPP)
  */
 export const CRITERIA_TYPES_WITHOUT_TEMPORAL_CONSTRAINT: CriteriaType[] = [CriteriaType.IPP_LIST, CriteriaType.PATIENT]
 
 /**
- * Criteria types never proposed in the temporal constraints lists (stay and chronological constraints)
+ * Criteria types excluded from temporal constraints (Démographie, Liste d'IPP, Biologie):
+ * they do not count to enable the temporal constraints button and are never proposed
+ * in the stay or chronological constraints lists
  */
 export const CRITERIA_TYPES_WITHOUT_STAY: CriteriaType[] = [
   ...CRITERIA_TYPES_WITHOUT_TEMPORAL_CONSTRAINT,
@@ -21,11 +23,11 @@ export const CRITERIA_TYPES_WITHOUT_STAY: CriteriaType[] = [
 
 /**
  * Filters criteria groups to get AND groups that contain at least 2 selectable criteria
+ * (not of a type listed in CRITERIA_TYPES_WITHOUT_STAY, or pregnancy/hospit in episode mode)
  *
  * @param selectedCriteria - Array of selected criteria to filter
  * @param criteriaGroups - Array of criteria groups to process
  * @param isEpisode - Whether to filter for episode-specific criteria (pregnancy/hospit)
- * @param excludedTypes - Criteria types excluded when not in episode mode (stay constraints by default)
  * @returns Array of criteria groups that meet the selectable criteria requirements
  *
  * @example
@@ -40,12 +42,13 @@ export const CRITERIA_TYPES_WITHOUT_STAY: CriteriaType[] = [
 export const getSelectableGroups = (
   selectedCriteria: SelectedCriteriaType[],
   criteriaGroups: CriteriaGroup[],
-  isEpisode?: boolean,
-  excludedTypes: CriteriaType[] = CRITERIA_TYPES_WITHOUT_STAY
+  isEpisode?: boolean
 ) => {
   const selectableCriteria = selectedCriteria
     .filter(({ type }) =>
-      isEpisode ? type === CriteriaType.PREGNANCY || type === CriteriaType.HOSPIT : !excludedTypes.includes(type)
+      isEpisode
+        ? type === CriteriaType.PREGNANCY || type === CriteriaType.HOSPIT
+        : !CRITERIA_TYPES_WITHOUT_STAY.includes(type)
     )
     .map((criteria) => criteria.id)
   const andGroupsWithSelectableCriteria = criteriaGroups
