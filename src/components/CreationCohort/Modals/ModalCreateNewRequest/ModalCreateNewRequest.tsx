@@ -6,13 +6,14 @@ import { Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogT
 import RequestForm from './components/RequestForm'
 import RequestList from './components/RequestList'
 
-import { RequestType } from 'types'
+import { ParentInfo, RequestType } from 'types'
 import services from 'services/aphp'
 
 import { useAppSelector, useAppDispatch } from 'state'
 import { fetchProjects, setSelectedProject } from 'state/project'
 import { fetchRequests, addRequest } from 'state/request'
 import { fetchRequestCohortCreation } from 'state/cohortCreation'
+import { setMessage } from 'state/message'
 
 const ERROR_TITLE = 'error_title'
 const ERROR_PROJECT = 'error_project'
@@ -69,7 +70,7 @@ const ModalCreateNewRequest: React.FC<{
       }
       setProjectName(`Projet de recherche ${_projectsList.length || ''}`)
     } else {
-      _onChangeValue('parent_folder', NEW_PROJECT_ID)
+      _onChangeValue('parent_folder', { uuid: NEW_PROJECT_ID })
       setProjectName(`Projet de recherche par défaut`)
     }
   }
@@ -127,17 +128,28 @@ const ModalCreateNewRequest: React.FC<{
       return setError(ERROR_PROJECT_NAME)
     }
 
+    let newRequest = currentRequest
     if (currentRequest.parent_folder.uuid === NEW_PROJECT_ID) {
-      // Create a project before
-      const newProject = await services.projects.addProject({ name: projectName })
-      if (newProject) {
-        currentRequest.parent_folder.uuid = newProject.uuid
+      let parentFolder: ParentInfo
+      try {
+        const newProject = await services.projects.addProject({ name: projectName })
+        parentFolder = { uuid: newProject.uuid, name: newProject.name }
+      } catch {
+        dispatch(setMessage({ type: 'error', content: 'Une erreur est survenue lors de la création du projet' }))
+        setLoading(false)
+        return
       }
+      newRequest = { ...currentRequest, parent_folder: parentFolder }
+      _onChangeValue('parent_folder', parentFolder)
       dispatch(fetchProjects())
     }
 
-    dispatch(addRequest({ newRequest: currentRequest }))
-    dispatch(setSelectedProject(null))
+    try {
+      await dispatch(addRequest({ newRequest })).unwrap()
+      dispatch(setSelectedProject(null))
+    } catch {
+      setLoading(false)
+    }
   }
 
   const handleConfirmOpen = () => {
