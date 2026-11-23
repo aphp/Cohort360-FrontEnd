@@ -14,7 +14,6 @@ import useMaintenanceIsActive from 'hooks/maintenance/useMaintenanceIsActive'
 
 const TemporalConstraint: React.FC = () => {
   const [modalIsOpen, setModalIsOpen] = useState(false)
-  const [temporalConstraintExist, setTemporalConstraintExist] = useState(false)
 
   const maintenanceIsActive = useMaintenanceIsActive()
   const {
@@ -30,13 +29,7 @@ const TemporalConstraint: React.FC = () => {
   const dispatch = useAppDispatch()
   const { classes } = useStyles()
 
-  useEffect(() => {
-    if (temporalConstraints?.length > 0) {
-      setTemporalConstraintExist(true)
-    } else {
-      setTemporalConstraintExist(false)
-    }
-  }, [])
+  const temporalConstraintExist = temporalConstraints?.length > 0
 
   const disableTemporalConstraint = useMemo(
     () => getSelectableGroups(selectedCriteria, criteriaGroup).length === 0,
@@ -50,7 +43,7 @@ const TemporalConstraint: React.FC = () => {
         dispatch(buildCohortCreation({ selectedPopulation: null }))
       })
     }
-  }, [disableTemporalConstraint, temporalConstraints, dispatch])
+  }, [])
 
   const handleOnClose = () => void setModalIsOpen(false)
 
