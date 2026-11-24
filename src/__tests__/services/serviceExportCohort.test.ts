@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
-import { AxiosError, AxiosResponse } from 'axios'
+import { AxiosResponse } from 'axios'
 import { Direction, Order } from 'types/searchCriterias'
 
 vi.mock('config', () => ({
@@ -29,10 +29,8 @@ import {
   fetchExportTablesRelationsInfo,
   retryExport,
   fetchExportsList,
-  fetchExportPurposePrefill,
   postExportCohort
 } from 'services/aphp/serviceExportCohort'
-import { ExportPurpose } from 'types/export'
 
 const mockFetchTableInfo = vi.mocked(fetchExportTableInfo)
 const mockFetchRelationInfo = vi.mocked(fetchExportTableRelationInfo)
@@ -148,8 +146,7 @@ describe('serviceExportCohort.postExportCohort', () => {
     await postExportCohort({
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       cohortId: { uuid: 'cohort-1' } as any,
-      purpose: ExportPurpose.CARE_SUPPORT,
-      projectDetails: null,
+      motivation: 'analyse',
       group_tables: true,
       outputFormat: 'csv',
       tables: [
@@ -167,8 +164,7 @@ describe('serviceExportCohort.postExportCohort', () => {
     expect(mockPost).toHaveBeenCalledWith(
       '/exports/',
       expect.objectContaining({
-        purpose: 'care_support',
-        project_details: null,
+        motivation: 'analyse',
         output_format: 'csv',
         group_tables: true,
         nominative: true,
@@ -182,25 +178,6 @@ describe('serviceExportCohort.postExportCohort', () => {
         ]
       })
     )
-    expect(mockPost.mock.calls[0][1]).not.toHaveProperty('motivation')
-  })
-
-  it('envoie les informations du projet en recherche interne', async () => {
-    mockPost.mockResolvedValue(asAxios({ uuid: 'exp-7' }))
-    const projectDetails = { title: 'Projet X', project_leader: 'Jeanne Martin', start_date: '2026-06-01', end_date: null }
-    await postExportCohort({
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      cohortId: { uuid: 'cohort-7' } as any,
-      purpose: ExportPurpose.INTERNAL_RESEARCH,
-      projectDetails,
-      group_tables: true,
-      outputFormat: 'csv',
-      tables: []
-    })
-    expect(mockPost).toHaveBeenCalledWith(
-      '/exports/',
-      expect.objectContaining({ purpose: 'internal_research', project_details: projectDetails })
-    )
   })
 
   it('ajoute automatiquement patient__identifier quand Patient est sélectionné', async () => {
@@ -208,8 +185,7 @@ describe('serviceExportCohort.postExportCohort', () => {
     await postExportCohort({
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       cohortId: { uuid: 'cohort-3' } as any,
-      purpose: ExportPurpose.CARE_SUPPORT,
-      projectDetails: null,
+      motivation: 'analyse',
       group_tables: false,
       outputFormat: 'csv',
       tables: [
@@ -230,8 +206,7 @@ describe('serviceExportCohort.postExportCohort', () => {
     await postExportCohort({
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       cohortId: { uuid: 'cohort-4' } as any,
-      purpose: ExportPurpose.CARE_SUPPORT,
-      projectDetails: null,
+      motivation: 'analyse',
       group_tables: false,
       outputFormat: 'csv',
       tables: [
@@ -252,8 +227,7 @@ describe('serviceExportCohort.postExportCohort', () => {
     await postExportCohort({
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       cohortId: { uuid: 'cohort-5' } as any,
-      purpose: ExportPurpose.CARE_SUPPORT,
-      projectDetails: null,
+      motivation: 'analyse',
       group_tables: true,
       outputFormat: 'csv',
       tables: [
@@ -273,8 +247,7 @@ describe('serviceExportCohort.postExportCohort', () => {
     await postExportCohort({
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       cohortId: { uuid: 'cohort-6' } as any,
-      purpose: ExportPurpose.CARE_SUPPORT,
-      projectDetails: null,
+      motivation: 'analyse',
       group_tables: true,
       outputFormat: 'csv',
       tables: [
@@ -292,8 +265,7 @@ describe('serviceExportCohort.postExportCohort', () => {
     await postExportCohort({
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       cohortId: { uuid: 'cohort-2' } as any,
-      purpose: ExportPurpose.CARE_SUPPORT,
-      projectDetails: null,
+      motivation: '',
       group_tables: false,
       outputFormat: 'xlsx',
       tables: [
@@ -303,27 +275,5 @@ describe('serviceExportCohort.postExportCohort', () => {
     })
     const payload = mockPost.mock.calls[0][1] as { export_tables: Record<string, unknown>[] }
     expect(payload.export_tables[0]).not.toHaveProperty('fhir_filter')
-  })
-})
-
-describe('serviceExportCohort.fetchExportPurposePrefill', () => {
-  it('interroge la route de préremplissage avec la cohorte', async () => {
-    const prefill = { purpose: 'care_support', project_details: null }
-    mockGet.mockResolvedValue(asAxios(prefill))
-    expect(await fetchExportPurposePrefill('cohort-1')).toEqual(prefill)
-    expect(mockGet).toHaveBeenCalledWith('/exports/prefill-purpose/', { params: { cohort: 'cohort-1' } })
-  })
-
-  it('retourne null sans export de référence (204)', async () => {
-    mockGet.mockResolvedValue({ ...asAxios(''), status: 204 })
-    expect(await fetchExportPurposePrefill('cohort-1')).toBeNull()
-  })
-
-  it("retourne null quand l'appel échoue", async () => {
-    // apiBackend résout les erreurs au lieu de les rejeter, et ne renvoie rien sans réponse du serveur
-    mockGet.mockResolvedValue(new AxiosError('Not Found', '404', undefined, undefined, { status: 404 } as never) as never)
-    expect(await fetchExportPurposePrefill('cohort-1')).toBeNull()
-    mockGet.mockResolvedValue(undefined as never)
-    expect(await fetchExportPurposePrefill('cohort-1')).toBeNull()
   })
 })

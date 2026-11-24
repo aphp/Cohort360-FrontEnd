@@ -8,7 +8,7 @@ import { getConfig } from 'config'
 import { AxiosResponse } from 'axios'
 import { Export, Cohort } from 'types'
 import apiBackend from 'services/apiBackend'
-import { ExportProjectDetails, ExportPurpose, ExportPurposePrefill, TableSetting } from 'types/export'
+import { TableSetting } from 'types/export'
 import { Direction, OrderBy } from 'types/searchCriterias'
 
 export const fetchExportTablesInfo = async () => {
@@ -141,15 +141,13 @@ const AUTO_LINKED_TABLES: Record<string, string[]> = {
 
 export const postExportCohort = async ({
   cohortId,
-  purpose,
-  projectDetails,
+  motivation,
   group_tables,
   outputFormat,
   tables
 }: {
   cohortId: Cohort
-  purpose: ExportPurpose
-  projectDetails: ExportProjectDetails | null
+  motivation: string
   group_tables: boolean
   outputFormat: string
   tables: TableSetting[]
@@ -190,19 +188,11 @@ export const postExportCohort = async ({
   }
 
   return await apiBackend.post<Export>('/exports/', {
-    purpose,
-    project_details: projectDetails,
+    motivation,
     export_tables,
     nominative: nominative,
     shift_date: shift_date,
     output_format: outputFormat,
     group_tables: group_tables
   })
-}
-
-export const fetchExportPurposePrefill = async (cohortUuid: string): Promise<ExportPurposePrefill | null> => {
-  const response = await apiBackend.get<ExportPurposePrefill>('/exports/prefill-purpose/', {
-    params: { cohort: cohortUuid }
-  })
-  return response?.status === 200 ? response.data : null
 }
