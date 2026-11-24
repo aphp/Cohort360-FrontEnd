@@ -25,6 +25,7 @@ import moment from 'moment'
 import { getDurationRangeLabel } from 'utils/age'
 import { getConfig } from 'config'
 import { getValueSetFromCodeSystem, expandStoredCodeInCache } from 'utils/valueSets'
+import { HIERARCHY_ROOT } from 'services/aphp/serviceValueSets'
 import { perimeterDisplay } from 'utils/perimeters'
 
 /************************************************************************************/
@@ -239,6 +240,12 @@ const displaySystem = (system?: string) => {
   }
 }
 
+const isAnabioCode = (code: LabelObject) =>
+  !!code.system &&
+  code.id !== HIERARCHY_ROOT &&
+  (getValueSetFromCodeSystem(code.system) || code.system) ===
+    getConfig().features.observation.valueSets.biologyHierarchyAnabio.url
+
 const chipFromLabelObject = <T extends AutoCompleteItem | CodeSearchItem>(
   val: LabelObject[] | null,
   item: T,
@@ -249,7 +256,8 @@ const chipFromLabelObject = <T extends AutoCompleteItem | CodeSearchItem>(
 ) => {
   if (val === null) return null
   const labels = getLabel(val, item, valueSets).map(
-    (code) => `${displaySystem(code.system)} ${prependCode ? code.id + ' - ' : ''}${code.label}`
+    (code) =>
+      `${displaySystem(code.system)} ${prependCode || isAnabioCode(code) ? code.id + ' - ' : ''}${code.label}`
   )
   const tooltipTitle = labels.join(' - ')
   return (

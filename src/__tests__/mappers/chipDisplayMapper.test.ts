@@ -47,3 +47,40 @@ describe('CHIPS_DISPLAY_METHODS.codeSearch', () => {
     expect(JSON.stringify(chip)).not.toContain('JQGA004*')
   })
 })
+
+describe('chip ANABIO sur la carte du critère', () => {
+  const ANABIO = 'https://test/ValueSet/anabio'
+  const LOINC = 'https://test/ValueSet/loinc'
+  const bioValueSets = {
+    entities: {},
+    cache: {
+      [ANABIO]: [{ id: '1046265', label: 'PARASITOLOGIE - ANTIPALUDOGRAMME', system: ANABIO }],
+      [LOINC]: [{ id: '2345-7', label: 'Glucose', system: LOINC }]
+    }
+  } as any
+  const bioItem = { valueSetsInfo: [{ url: ANABIO }, { url: LOINC }] } as any
+
+  beforeAll(() => {
+    updateConfig({
+      features: {
+        observation: { valueSets: { biologyHierarchyAnabio: { url: ANABIO }, biologyHierarchyLoinc: { url: LOINC } } }
+      }
+    })
+  })
+
+  it('affiche "<code> - <libellé>" pour un code ANABIO', () => {
+    const chip = CHIPS_DISPLAY_METHODS.codeSearch([{ id: '1046265', system: ANABIO }] as any, bioItem, bioValueSets, [
+      '',
+      false
+    ])
+    expect(JSON.stringify(chip)).toContain('1046265 - PARASITOLOGIE - ANTIPALUDOGRAMME')
+  })
+
+  it("n'ajoute pas le code pour LOINC", () => {
+    const chip = CHIPS_DISPLAY_METHODS.codeSearch([{ id: '2345-7', system: LOINC }] as any, bioItem, bioValueSets, [
+      '',
+      false
+    ])
+    expect(JSON.stringify(chip)).not.toContain('2345-7 - ')
+  })
+})
