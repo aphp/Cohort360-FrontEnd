@@ -25,6 +25,7 @@ import moment from 'moment'
 import { getDurationRangeLabel } from 'utils/age'
 import { getConfig } from 'config'
 import { getValueSetFromCodeSystem, expandStoredCodeInCache } from 'utils/valueSets'
+import { HIERARCHY_ROOT } from 'services/aphp/serviceValueSets'
 import { perimeterDisplay } from 'utils/perimeters'
 
 /************************************************************************************/
@@ -218,14 +219,14 @@ const chipFromCodeSearch = (
   return chipFromLabelObject(val, item, getLabelsForCodeSearchItem, valueSets, label, prependCode)
 }
 
+// system might be a CodeSystem URL, so we need to find the corresponding ValueSet URL first
+const toValueSetUrl = (system: string) => getValueSetFromCodeSystem(system) || system
+
 // TODO refacto this to be more generic using config
 const displaySystem = (system?: string) => {
   if (!system) return ''
 
-  // system might be a CodeSystem URL, so we need to find the corresponding ValueSet URL first
-  const valueSetUrl = getValueSetFromCodeSystem(system) || system
-
-  switch (valueSetUrl) {
+  switch (toValueSetUrl(system)) {
     case getConfig().features.medication.valueSets.medicationAtc.url:
       return `${getConfig().features.medication.valueSets.medicationAtc.title}: `
     case getConfig().features.medication.valueSets.medicationUcd.url:
@@ -239,6 +240,17 @@ const displaySystem = (system?: string) => {
   }
 }
 
+/**
+ * RG3797 : sur la carte du critère, seuls les codes ANABIO s'affichent "<code> - <libellé>".
+ * On ne peut pas réutiliser getLabelFromCode / joinDisplayWithCode (utilisés par la hiérarchie) :
+ * ce drapeau est à true pour tous les référentiels (ATC, UCD, LOINC, CCAM, CIM10, GHM),
+ * ce qui ajouterait le code sur les chips de tous les critères.
+ */
+const isAnabioCode = (code: LabelObject) =>
+  !!code.system &&
+  code.id !== HIERARCHY_ROOT &&
+  toValueSetUrl(code.system) === getConfig().features.observation.valueSets.biologyHierarchyAnabio.url
+
 const chipFromLabelObject = <T extends AutoCompleteItem | CodeSearchItem>(
   val: LabelObject[] | null,
   item: T,
@@ -249,7 +261,7 @@ const chipFromLabelObject = <T extends AutoCompleteItem | CodeSearchItem>(
 ) => {
   if (val === null) return null
   const labels = getLabel(val, item, valueSets).map(
-    (code) => `${displaySystem(code.system)} ${prependCode ? code.id + ' - ' : ''}${code.label}`
+    (code) => `${displaySystem(code.system)} ${prependCode || isAnabioCode(code) ? code.id + ' - ' : ''}${code.label}`
   )
   const tooltipTitle = labels.join(' - ')
   return (
