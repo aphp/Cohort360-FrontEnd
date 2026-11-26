@@ -299,11 +299,13 @@ const mapBiologyFromRequestParams = async (parameters: URLSearchParams) => {
   const ipp = decodeURIComponent(parameters.get(ObservationParamsKeys.IPP) ?? '')
   const code = await getValueSetCodes(parameters, ObservationParamsKeys.CODE)
   const validatedStatus = true
-  const { nda, durationRange, executiveUnits, encounterStatus } = await mapGenericFromRequestParams(
-    parameters,
-    ResourceType.OBSERVATION
-  )
-  return { code, validatedStatus, nda, ipp, durationRange, executiveUnits, encounterStatus }
+  const { durationRange } = await mapGenericFromRequestParams(parameters, ResourceType.OBSERVATION)
+  const validationDates = parameters.getAll(ObservationParamsKeys.ISSUED)
+  const validationDateRange: DurationRangeType = [
+    validationDates.find((e) => e.startsWith('ge'))?.slice(2) ?? null,
+    validationDates.find((e) => e.startsWith('le'))?.slice(2) ?? null
+  ]
+  return { code, validatedStatus, ipp, durationRange, validationDateRange }
 }
 
 const mapFormFromRequestParams = async (parameters: URLSearchParams) => {
@@ -387,7 +389,7 @@ export const mapRequestParamsToSearchCriteria = async (
   }
 }
 
-const mapGenericToRequestParams = (filters: GenericFilter, type: ResourceType) => {
+const mapGenericToRequestParams = (filters: Partial<GenericFilter>, type: ResourceType) => {
   const { nda, durationRange, executiveUnits, encounterStatus } = filters
   const requestParams: string[] = []
   if (nda) requestParams.push(`${getGenericKeyFromResourceType(type, 'NDA')}=${encodeURIComponent(nda)}`)
@@ -548,7 +550,7 @@ const mapAdministrationToRequestParams = (filters: MedicationFilters) => {
 }
 
 const mapBiologyToRequestParams = (filters: BiologyFilters) => {
-  const { code, validatedStatus, nda, durationRange, ipp, executiveUnits, encounterStatus } = filters
+  const { code, validatedStatus, durationRange, validationDateRange, ipp } = filters
   const appConfig = getConfig()
   const requestParams: string[] = []
   if (appConfig.core.fhir.filterActive) requestParams.push('subject.active=true')
@@ -559,9 +561,9 @@ const mapBiologyToRequestParams = (filters: BiologyFilters) => {
       `${ObservationParamsKeys.CODE}=${encodeURIComponent(code.map((e) => e.system + '|' + e.id).join(','))}`
     )
   if (validatedStatus) requestParams.push(`${ObservationParamsKeys.VALIDATED_STATUS}=VAL`)
-  requestParams.push(
-    ...mapGenericToRequestParams({ nda, durationRange, executiveUnits, encounterStatus }, ResourceType.OBSERVATION)
-  )
+  requestParams.push(...mapGenericToRequestParams({ durationRange }, ResourceType.OBSERVATION))
+  if (validationDateRange?.[0]) requestParams.push(`${ObservationParamsKeys.ISSUED}=ge${validationDateRange[0]}`)
+  if (validationDateRange?.[1]) requestParams.push(`${ObservationParamsKeys.ISSUED}=le${validationDateRange[1]}`)
   return requestParams
 }
 

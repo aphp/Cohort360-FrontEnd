@@ -85,7 +85,7 @@ const TemporalConstraint: React.FC = () => {
           </Button>
         </Badge>
       ) : (
-        <Tooltip title="Les contraintes temporelles ne peuvent être ajoutées que s'il y a au moins un groupe de critères de type ET et au moins deux critères hors critères démographiques et d'IPP.">
+        <Tooltip title="Les contraintes temporelles ne peuvent être ajoutées que s'il y a au moins un groupe de critères de type ET et au moins deux critères hors critères démographiques, d'IPP et de biologie.">
           <span>
             <Button
               onClick={handleOnClick}

@@ -14,7 +14,7 @@ vi.mock('services/aphp', () => ({
 
 import { unbuildRequest, joinRequest } from 'utils/cohortCreation'
 
-const REQUETEUR_VERSION = 'v1.6.4'
+const REQUETEUR_VERSION = 'v1.7.0'
 
 const makeRequest = (requestGroup: unknown, caresiteCohortList: string[] = ['c1']) =>
   JSON.stringify({

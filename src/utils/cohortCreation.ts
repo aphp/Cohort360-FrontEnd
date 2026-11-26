@@ -47,7 +47,7 @@ import { formatAge } from './age'
 import { getConfig } from 'config'
 
 /** Current version of the Requeteur format used for cohort requests */
-const REQUETEUR_VERSION = 'v1.6.4'
+const REQUETEUR_VERSION = 'v1.7.0'
 
 /** Default criteria group used as fallback when group lookup fails */
 const DEFAULT_GROUP_ERROR: CriteriaGroup = {

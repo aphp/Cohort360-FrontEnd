@@ -158,6 +158,7 @@ export enum Order {
   CREATED = 'created',
   CREATED_AT = 'created_at',
   DATE = 'date',
+  ISSUED = 'issued',
   DESCRIPTION = 'description',
   DIAGNOSIS = 'diagnosis',
   EFFECTIVE_TIME = 'effective-time',
@@ -248,6 +249,7 @@ export enum FilterKeys {
   START_DATE = 'startDate',
   END_DATE = 'endDate',
   DURATION_RANGE = 'durationRange',
+  VALIDATION_DATE_RANGE = 'validationDateRange',
   ONLY_PDF_AVAILABLE = 'onlyPdfAvailable',
   EXCLUDE_IMPORTED_DOCUMENTS = 'excludeImportedDocuments',
   SOURCE = 'source',
@@ -365,10 +367,11 @@ export type MedicationFilters = GenericFilter & {
   code: Hierarchy<FhirItem>[]
 }
 
-export type BiologyFilters = GenericFilter & {
+export type BiologyFilters = Pick<GenericFilter, 'durationRange'> & {
   code: Hierarchy<FhirItem>[]
   validatedStatus: boolean
   ipp?: string
+  validationDateRange: DurationRangeType
 }
 
 export type ImagingFilters = GenericFilter & {

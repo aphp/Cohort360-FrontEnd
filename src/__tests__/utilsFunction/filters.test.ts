@@ -5,7 +5,8 @@ import {
   addElementInArray,
   toggleFilter,
   removeFilter,
-  getFilterLabel
+  getFilterLabel,
+  selectFiltersAsArray
 } from 'utils/filters'
 import { FilterKeys, GenderStatus, VitalStatus } from 'types/searchCriterias'
 import { CohortsType } from 'types/cohorts'
@@ -93,5 +94,33 @@ describe('utils/filters - getFilterLabel', () => {
 
   it('retourne une chaîne vide pour une clé non gérée', () => {
     expect(getFilterLabel('cléInconnue' as FilterKeys, 'x')).toBe('')
+  })
+})
+
+describe('utils/filters - Date de validation (BC3.3)', () => {
+  it('réinitialise la plage de Date de validation à [null, null]', () => {
+    const filters = { validationDateRange: ['2024-01-01', '2024-02-01'] } as never
+    const result = removeFilter(FilterKeys.VALIDATION_DATE_RANGE, '', filters) as {
+      validationDateRange: [null, null]
+    }
+    expect(result.validationDateRange).toEqual([null, null])
+  })
+
+  it('préfixe les chips de date dans l’onglet Biologie', () => {
+    const filters = {
+      code: [],
+      validatedStatus: true,
+      durationRange: ['2024-01-01', null],
+      validationDateRange: [null, '2024-02-01']
+    } as never
+    const labels = selectFiltersAsArray(filters, undefined).map((chip) => chip.label)
+    expect(labels).toContain('Date de prélèvement : Après le 01/01/2024 ')
+    expect(labels).toContain('Date de validation : Avant le 01/02/2024 ')
+  })
+
+  it('ne préfixe pas la chip de date des autres onglets', () => {
+    const filters = { durationRange: ['2024-01-01', null], nda: '' } as never
+    const labels = selectFiltersAsArray(filters, undefined).map((chip) => chip.label)
+    expect(labels).toEqual(['Après le 01/01/2024 '])
   })
 })

@@ -820,6 +820,8 @@ type fetchObservationProps = {
   subject?: string
   minDate?: string
   maxDate?: string
+  minValidationDate?: string
+  maxValidationDate?: string
   _list?: string[]
   rowStatus: boolean
   signal?: AbortSignal
@@ -842,6 +844,8 @@ export const fetchObservation = async (args: fetchObservationProps): FHIR_Bundle
     minDate,
     subject,
     maxDate,
+    minValidationDate,
+    maxValidationDate,
     rowStatus,
     signal,
     executiveUnits,
@@ -871,6 +875,8 @@ export const fetchObservation = async (args: fetchObservationProps): FHIR_Bundle
   if (subject) options = [...options, `subject=${subject}`]
   if (minDate) options = [...options, `${ObservationParamsKeys.DATE}=ge${minDate}`]
   if (maxDate) options = [...options, `${ObservationParamsKeys.DATE}=le${maxDate}`]
+  if (minValidationDate) options = [...options, `${ObservationParamsKeys.ISSUED}=ge${minValidationDate}`]
+  if (maxValidationDate) options = [...options, `${ObservationParamsKeys.ISSUED}=le${maxValidationDate}`]
   if (appConfig.features.observation.useObservationDefaultValidated && rowStatus)
     options = [...options, `${ObservationParamsKeys.VALIDATED_STATUS}=${BiologyStatus.VALIDATED}`]
   if (executiveUnits && executiveUnits.length > 0)

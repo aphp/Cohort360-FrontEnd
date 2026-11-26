@@ -18,6 +18,7 @@ import { AvatarWrapper } from 'components/ui/Avatar/styles'
 
 import { useAppSelector } from 'state'
 import { TemporalConstraintsKind, TemporalConstraintsType } from 'types'
+import { CRITERIA_TYPES_WITHOUT_STAY } from 'utils/temporalConstraints'
 
 import useStyles from './styles'
 
@@ -67,8 +68,7 @@ const TemporalConstraintConfig: React.FC<{
 
     // remove criteria types that cannot be part of a temporal constraint
     const selectableCriteriaTypes = selectedCriteria.filter(
-      (criteria) =>
-        mainGroupCriteriaIds.includes(criteria.id) && criteria.type !== 'Patient' && criteria.type !== 'IPPList'
+      (criteria) => mainGroupCriteriaIds.includes(criteria.id) && !CRITERIA_TYPES_WITHOUT_STAY.includes(criteria.type)
     )
 
     // get constraints that contain the firstCriteriaSelected

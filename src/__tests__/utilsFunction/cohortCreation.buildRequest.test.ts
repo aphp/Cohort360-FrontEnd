@@ -123,3 +123,21 @@ describe('cohortCreation.buildRequest - déidentification et contraintes', () =>
     expect(json.request).toBeUndefined()
   })
 })
+
+describe('cohortCreation.buildRequest - critère de Biologie', () => {
+  it("n'envoie ni patientAge ni paramètre encounter.* pour un critère créé depuis l'interface graphique", async () => {
+    const { defaultObservationCriteria } = await import('__tests__/data/cohortCreation/observationCriteria')
+    const json = JSON.parse(
+      await buildRequest(
+        [population({ cohort_id: 'c1' })],
+        [{ ...defaultObservationCriteria, id: 1 }],
+        [rootGroup([1])],
+        noConstraints
+      )
+    )
+    const [criterion] = json.request.criteria
+    expect(criterion.resourceType).toBe('Observation')
+    expect(criterion.patientAge).toBeUndefined()
+    expect(criterion.filterFhir).not.toContain('encounter.')
+  })
+})
